@@ -72,18 +72,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         stmt = conn.createStatement();
 
-        System.out.println("Vou executar o statement");
         ResultSet rs = stmt.executeQuery(query);//Execute the query
         ResultSetMetaData rsmd = rs.getMetaData();//Obtain the query's result metadata
-        columnsNumber = rsmd.getColumnCount();
-
-        System.out.println("A resposta tem " + columnsNumber + " colunas");
+        columnsNumber = rsmd.getColumnCount();//Get number of columns
 
         while (rs.next()){
-            devolve = devolve + rs.getInt(1) + ";" + rs.getString(2) + ";" + rs.getString(3) + "\n";
+            for (int i=0;i<columnsNumber;++i)
+                devolve = devolve + rs.getString(i) + " | ";
+            if (rs.next())
+                devolve = devolve + "\n";
         }
 
-        System.out.println(devolve);
+        System.out.println("Vou devolver " + devolve);
 
         ////
         //  TO DO LIST NESTA FUNCAO:
