@@ -8,7 +8,18 @@ import java.io.IOException;
 // It also has the message ids that the client and server must pass to one another.
 //
 public class Common {
-    static enum Messages { MSG_GETTOPICS, MSG_OK, MSG_LOGIN, MSG_ERR }
+    static enum Message { MSG_GETTOPICS, MSG_OK, MSG_LOGIN, MSG_ERR, MSG_INVALID_MSG }
+
+    static public boolean sendMessage(Message msg, DataOutputStream outStream) {
+        return Common.sendIntThroughStream(msg.ordinal(),outStream);
+    }
+    static public Message recvMessage(DataInputStream inStream) {
+        int intMsg;
+        if ( (intMsg = Common.readIntFromStream(inStream)) == -1) {
+            return Message.MSG_INVALID_MSG; //Connection dead!
+        }
+        return Message.values()[intMsg];
+    }
 
     static public boolean sendStringThroughStream(String s, DataOutputStream outStream) {
         if ( outStream == null ) {

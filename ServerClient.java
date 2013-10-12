@@ -33,18 +33,16 @@ public class ServerClient implements Runnable {
         ServerTopic topic = new ServerTopic(5, "Hello, Ladies", "Hakuna Matata");
 
         for(;;) {
-            Common.Messages msg;
+            Common.Message msg;
             int intMsg;
 
             // Read the next Message/Request
-            if ( (intMsg = Common.readIntFromStream(inStream)) == -1) {
-                break; //Connection dead!
-            }
-            msg = Common.Messages.values()[intMsg];
+            if ( ( msg = Common.recvMessage(inStream)) == Common.Message.MSG_INVALID_MSG)
+                break ;
 
 
             // Handle the request
-            if ( msg == Common.Messages.MSG_LOGIN)
+            if ( msg == Common.Message.MSG_LOGIN)
                 if ( !handleLogin() )
                     break ;
 
@@ -79,7 +77,7 @@ public class ServerClient implements Runnable {
         }
 
 
-        if ( !Common.sendIntThroughStream(Common.Messages.MSG_OK.ordinal(),outStream) )
+        if ( !Common.sendMessage(Common.Message.MSG_OK,outStream) )
             return false;
 
         return true;

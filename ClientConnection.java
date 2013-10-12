@@ -56,10 +56,9 @@ public class ClientConnection {
     // Returns: true on successful login; false otherwise.
     //
     boolean login(String user, String pass) {
-        Common.Messages reply;
-        int intReply;
+        Common.Message reply;
         for(;;) {
-            if ( !Common.sendIntThroughStream(Common.Messages.MSG_LOGIN.ordinal(),outStream) ) {
+            if ( !Common.sendMessage(Common.Message.MSG_LOGIN, outStream) ) {
                 reconnect(); continue;
             }
             if ( !Common.sendStringThroughStream(user, outStream) ) {
@@ -70,12 +69,11 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
-            if ( (intReply = Common.readIntFromStream(inStream)) == -1) {
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.MSG_INVALID_MSG) {
                 reconnect(); continue;
             }
-                reply = Common.Messages.values()[intReply];
 
-            return reply == Common.Messages.MSG_OK;
+            return reply == Common.Message.MSG_OK;
 
         }
     }
@@ -87,7 +85,7 @@ public class ClientConnection {
         int numTopics;
         ClientTopic[] topics;
         for(;;) {
-            if ( !Common.sendIntThroughStream(Common.Messages.MSG_GETTOPICS.ordinal(),outStream) ) {
+            if ( !Common.sendMessage(Common.Message.MSG_GETTOPICS,outStream) ) {
                 reconnect(); continue;
             }
 
