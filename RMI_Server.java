@@ -3,6 +3,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
+import java.util.ArrayList;
 
 ////
 //  This is the RMI Server class, which will be responsible for interacting with the database, allowing the TCP Servers to commit
@@ -49,25 +50,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
 
-    public int Login(String user, String pwd) throws RemoteException, SQLException{
+    public boolean Login(String user, String pwd) throws RemoteException, SQLException{
 
-        String query, result;
+        String query;
+        ArrayList<String[]> result;
 
-        query = "Select u.username, u.pass from Utilizadores u where u.username = " + user + " and u.pass = " + pwd;
+        query = "Select u.username, u.pass from Utilizadores u where u.username = '" + user + "' and u.pass = '" + pwd + "'";
 
         result = ReceiveData(query);
 
-        System.out.println(result);
+        System.out.println(result.size());
 
-        return 1;
+        return result.size()>0;
     }
 
     ////
     //  Method responsible for executing queries like "Select..."
     ////
-    public String ReceiveData(String query) throws RemoteException, SQLException{
-        String nome, descricao, devolve = new String();
-        int columnsNumber;
+    public ArrayList<String[]> ReceiveData(String query) throws RemoteException, SQLException{
+        int columnsNumber, pos = 0;
+        ArrayList<String[]> result = new ArrayList<String[]>();
 
         statement = conn.createStatement();
 
@@ -76,37 +78,27 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         columnsNumber = rsmd.getColumnCount();//Get number of columns
 
         while (rs.next()){
-            for (int i=1;i<=columnsNumber;++i)
-                devolve = devolve + rs.getString(i) + " | ";
-            if (rs.next())
-                devolve = devolve + "\n";
+            result.add(new String[columnsNumber]);
+            for (int i=1;i<=columnsNumber;++i){
+                result.get(pos)[i] = rs.getString(i);
+            }
         }
 
-        System.out.println("Vou devolver " + devolve);
-
-        ////
-        //  TO DO LIST NESTA FUNCAO:
-        //      1- Decide how to handle the exceptions (try-catch or just throw them)
-        //      2- See how to check the queries' result: Find how how many columns it has and how to return its content
-        ////
-
-        return devolve;
+        return result;
     }
 
     ////
     //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
     //  database's tables
     ////
-    public int InsertData(String query) throws RemoteException, SQLException{
+    public boolean InsertData(String query) throws RemoteException, SQLException{
 
         int update;
 
         statement = conn.createStatement();
         update = statement.executeUpdate(query);
-        if (update != 0)//Data were sucessfully stored in the database
-            return 1;
-        else//There was an error storing the data in the database
-            return -1;
+
+        return update != 0;
     }
 
     public static void main(String[] args) {
