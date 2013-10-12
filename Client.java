@@ -3,5 +3,7 @@ public class Client {
         ClientConnection conn = new ClientConnection();
         conn.connect();
         System.out.println(conn.login("Hakuna","Matata"));
+
+        for (;;);
     }
 }

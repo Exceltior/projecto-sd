@@ -10,14 +10,14 @@ import java.sql.*;
 ////
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
-    private Statement stmt;
+    private Statement statement;
     private Connection conn;
     private String url;
 
     public RMI_Server(String servidor, String porto, String sid, String username, String password) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
-        this.stmt = null;
+        this.statement = null;
     }
 
     public Connection getConn(){
@@ -69,9 +69,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String nome, descricao, devolve = new String();
         int columnsNumber;
 
-        stmt = conn.createStatement();
+        statement = conn.createStatement();
 
-        ResultSet rs = stmt.executeQuery(query);//Execute the query
+        ResultSet rs = statement.executeQuery(query);//Execute the query
         ResultSetMetaData rsmd = rs.getMetaData();//Obtain the query's result metadata
         columnsNumber = rsmd.getColumnCount();//Get number of columns
 
@@ -101,8 +101,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         int update;
 
-        stmt = conn.createStatement();
-        update = stmt.executeUpdate(query);
+        statement = conn.createStatement();
+        update = statement.executeUpdate(query);
         if (update != 0)//Data were sucessfully stored in the database
             return 1;
         else//There was an error storing the data in the database
