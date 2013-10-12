@@ -4,6 +4,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
 
+////
+//  This is the RMI Server class, which will be responsible for interacting with the database, allowing the TCP Servers to commit
+//  queries and other commands to the database
+////
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     private Statement stmt;
@@ -38,14 +42,29 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ////
         //
         //
-        //  FIXME: O QUE FAZER COM ESTAS EXCEPCOES NO CONSTRUTOR DO RMI SERVER???
+        //  FIXME: WHAT TO DO WITH THIS EXCEPTIONS???
         //
         //
         ////
     }
 
+
+    public int Login(String user, String pwd) throws RemoteException, SQLException{
+
+        String query, result;
+
+        //query = "Select u.username, u.pass from Utilizadores u where u.username = " + user + " and u.pass = " + pwd;
+        query = "Select * from Utilizadores";
+
+        result = ReceiveData(query);
+
+        System.out.println(result);
+
+        return 1;
+    }
+
     ////
-    //  Metodo responsavel por executar queries do tipo "Select ..."
+    //  Method responsible for executing queries like "Select..."
     ////
     public String ReceiveData(String query) throws RemoteException, SQLException{
         String nome, descricao, devolve = new String();
@@ -54,23 +73,30 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         stmt = conn.createStatement();
 
         System.out.println("Vou executar o statement");
-        ResultSet rs = stmt.executeQuery(query);//Executar a query
-        ResultSetMetaData rsmd = rs.getMetaData();//Obter Metada do resultado da query
+        ResultSet rs = stmt.executeQuery(query);//Execute the query
+        ResultSetMetaData rsmd = rs.getMetaData();//Obtain the query's result metadata
         columnsNumber = rsmd.getColumnCount();
 
+        System.out.println("A resposta tem " + columnsNumber + " colunas");
+
+        while (rs.next()){
+            devolve = devolve + rs.getInt(1) + ";" + rs.getString(2) + ";" + rs.getString(3) + "\n";
+        }
+
+        System.out.println(devolve);
 
         ////
         //  TO DO LIST NESTA FUNCAO:
-        //      1- DECIDIR SE TRATAMOS AQUI AS EXCEPCOES (COM TRY-CATCH) OU SE AS DEIXAMOS A IR PARA O SERVIDOR
-        //      2- VER COMO RECEBER RESULTADO DAS QUERIES (ASSUMIR QUE TUDO CORRE BEM): DESCOBRIR QUANTAS COLUNAS TEM
-        //          A TABELA RESULTANTE E DEVOLVER O SEU CONTEUDO
+        //      1- Decide how to handle the exceptions (try-catch or just throw them)
+        //      2- See how to check the queries' result: Find how how many columns it has and how to return its content
         ////
 
         return devolve;
     }
 
     ////
-    //  M\u00e9todo respons\u00e1vel por executar uma query do tipo "Insert..." . Com este m\u00e9todo podemos inserir entradas nas tabelas
+    //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
+    //  database's tables
     ////
     public int InsertData(String query) throws RemoteException, SQLException{
 
@@ -78,17 +104,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         stmt = conn.createStatement();
         update = stmt.executeUpdate(query);
-        if (update != 0)//Dados inseridos com sucesso
+        if (update != 0)//Data were sucessfully stored in the database
             return 1;
-        else//Erro ao inserir os dados
+        else//There was an error storing the data in the database
             return -1;
     }
 
     public static void main(String[] args) {
 
         ////
-        //  Meter o username da base de dados, a pass da base de dados e o IP da base de dados num ficheiro de texto ou naquela cena
-        //  de properties que o prof disse na PL
+        //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
         ////
 
         String username = "sd", password = "sd", query;
@@ -111,12 +136,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
             //Start RMIRegistry programmatically
             Registry r = LocateRegistry.createRegistry(7000);
+            r.rebind("academica", servidor);
+            //Sabes que nunca estaras so... na 1ª ou 2ª divisao... Porque tu es a briosa, o orgulho do nosso coração!!!!
 
             ////
-            //  FIXME: VALE A PENA METER O PORTO DO REGISTRY NUMA VARIAVEL, OU NUM FICHEIRO DE TEXTO OU WHATEVER???
+            //  FIXME: Is it worth to store the RMI Registry's port in some sort of a file or variable?
             ////
 
-            r.rebind("benfica", servidor);
             System.out.println("Server ready :)");
 
         } catch(RemoteException e){
@@ -130,7 +156,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ////
         //
         //
-        //  FIXME: O QUE FAZER COM ESTAS EXCEPCOES NO CONSTRUTOR DO RMI SERVER???
+        //  FIXME: WHAT TO DO WITH THIS EXCEPTIONS???
         //
         //
         ////
