@@ -53,8 +53,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         String query, result;
 
-        //query = "Select u.username, u.pass from Utilizadores u where u.username = " + user + " and u.pass = " + pwd;
-        query = "Select * from Utilizadores";
+        query = "Select u.username, u.pass from Utilizadores u where u.username = " + user + " and u.pass = " + pwd;
 
         result = ReceiveData(query);
 
@@ -77,7 +76,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         columnsNumber = rsmd.getColumnCount();//Get number of columns
 
         while (rs.next()){
-            for (int i=0;i<columnsNumber;++i)
+            for (int i=1;i<=columnsNumber;++i)
                 devolve = devolve + rs.getString(i) + " | ";
             if (rs.next())
                 devolve = devolve + "\n";
