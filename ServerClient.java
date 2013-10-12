@@ -49,8 +49,12 @@ public class ServerClient implements Runnable {
         }
     }
 
+    ////
+    //  Only returns false if we lost connection
+    ////
     private boolean handleLogin() {
         String user, pwd;
+        boolean log;
 
         if ( (user = Common.readStringFromStream(inStream)) == null)
             return false;
@@ -64,9 +68,16 @@ public class ServerClient implements Runnable {
             RMI_Interface rmi_i = (RMI_Interface) LocateRegistry.getRegistry(7000).lookup("academica");
 
             //Login
-            rmi_i.Login(user, pwd);
+            log = rmi_i.Login(user, pwd);
 
-            //How to confirm that the client is really connected?? What is suppose to happen when the login is valid?
+            if (!log){
+                if ( !Common.sendMessage(Common.Message.MSG_ERR,outStream) )
+                    return false;
+            }
+            else{
+                if ( !Common.sendMessage(Common.Message.MSG_OK,outStream) )
+                    return false;
+            }
 
         } catch (RemoteException e) {
            System.out.println("Remote Exception no ServerClient!");
@@ -76,10 +87,6 @@ public class ServerClient implements Runnable {
            System.out.println("SQLException no ServerClient!");
         }
 
-
-        if ( !Common.sendMessage(Common.Message.MSG_OK,outStream) )
-            return false;
-
-        return true;
+        return false;
     }
 }
