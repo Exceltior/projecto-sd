@@ -13,7 +13,7 @@ import java.net.Socket;
 // if a command has not been correctly sent. Instead, Connection might loop forever until it manages to send the
 // message to any available server. This eases our error checking code when using this class.
 //
-public class Connection2 {
+public class ClientConnection {
     private static final String[] hosts = { "localhost", "server2"};
     private static final int[] ports = { 1234, 1234 };
     private int currentHost = -1;
