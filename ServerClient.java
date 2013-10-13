@@ -16,6 +16,9 @@ public class ServerClient implements Runnable {
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
 
+    // The client's uid. -1 means not logged in.
+    private int uid = -1;
+
     public ServerClient(Socket currentSocket) {
         this.socket = currentSocket;
         try {
@@ -47,6 +50,11 @@ public class ServerClient implements Runnable {
                     break ;
 
         }
+
+        if ( uid != -1 )
+            System.out.println("Connection to UID +"+uid+" dropped!");
+        else
+            System.out.println("Connection to a client dropped!");
     }
 
     ////
@@ -54,7 +62,6 @@ public class ServerClient implements Runnable {
     ////
     private boolean handleLogin() {
         String user, pwd;
-        boolean log;
 
         if ( (user = Common.readStringFromStream(inStream)) == null)
             return false;
@@ -64,18 +71,18 @@ public class ServerClient implements Runnable {
         // Do actual login handling code here
 
         try {
-            //Start RMIRegistry programmatically
+            //FIXME: We should move the registry startup code somewhere else, as well as the interface allocations
             RMI_Interface rmi_i = (RMI_Interface) LocateRegistry.getRegistry(7000).lookup("academica");
 
             //Login
-            log = rmi_i.Login(user, pwd);
+            uid = rmi_i.Login(user, pwd);
 
-            if (!log){
-                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+            if (uid != -1){
+                if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                     return false;
             }
-            else{
-                if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+            else {
+                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
                     return false;
             }
 

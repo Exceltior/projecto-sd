@@ -50,7 +50,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
 
-    public boolean Login(String user, String pwd) throws RemoteException, SQLException{
+    public int Login(String user, String pwd) throws RemoteException, SQLException{
 
         String query;
         ArrayList<String[]> result;
@@ -61,7 +61,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         System.out.println(result.size());
 
-        return result.size()>0;
+        if ( result.size() > 0 )
+            return Integer.valueOf(result.get(0)[0]);
+        else
+            return -1;
     }
 
     ////
