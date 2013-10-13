@@ -48,6 +48,12 @@ public class ClientConnection {
     boolean register(String username, String pass, String email, Date date){
         Common.Message reply;
 
+        ////
+        //  Ideia para o Maxi: Basicamente é mandar estes campos todos ao servidor de TCP que depois tem de invocar um metodo
+        //  remoto que lhe permite fazer o registo do novo utilizador. Depois temos que arranjar uma forma de atribuir os id's
+        //  aos utilizadores, nao sei se ha uma forma automatica de fazer isso na base de dados ou nao, mas depois ou hoje a
+        //  noite ou amanha de manha vou ver se consigo fazer isso. Well, cya ;)
+        ////
 
         return true;
     }
