@@ -114,11 +114,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             rs = statement.executeQuery(query);
             rsmd = rs.getMetaData();
             columnsNumber = rsmd.getColumnCount();//Get number of columns
-            System.out.println(columnsNumber);
+            System.out.println("Query's result has " + columnsNumber + " columns");
             while (rs.next()){
                 result.add(new String[columnsNumber]);
                 for (int i=1;i<=columnsNumber;++i){
-                    result.get(pos)[i-1/*FIXME: Joca, is -1 right?*/] = rs.getString(i);
+                    result.get(pos)[i-1] = rs.getString(i);
                 }
             }
         } catch (SQLException e) {
@@ -154,7 +154,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         RMI_Server servidor = null;
 
         try{
-            servidor = new RMI_Server("192.168.56.120","1521","XE",username,password);
+            servidor = new RMI_Server("192.168.56.101","1521","XE",username,password);
             servidor.setConn(DriverManager.getConnection(servidor.getUrl(), username, password));
 
 
