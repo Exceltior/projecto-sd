@@ -61,11 +61,11 @@ public class ClientConnection {
             if ( !Common.sendMessage(Common.Message.MSG_LOGIN, outStream) ) {
                 reconnect(); continue;
             }
-            if ( !Common.sendStringThroughStream(user, outStream) ) {
+            if ( !Common.sendString(user, outStream) ) {
                 reconnect(); continue;
             }
 
-            if ( !Common.sendStringThroughStream(pass, outStream) ) {
+            if ( !Common.sendString(pass, outStream) ) {
                 reconnect(); continue;
             }
 
@@ -90,7 +90,7 @@ public class ClientConnection {
             }
 
 
-            if ( (numTopics = Common.readIntFromStream(inStream)) == -1) {
+            if ( (numTopics = Common.recvInt(inStream)) == -1) {
                 reconnect(); continue;
             }
 

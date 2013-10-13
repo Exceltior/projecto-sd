@@ -50,14 +50,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
 
-    public int Login(String user, String pwd) throws RemoteException, SQLException{
+    public int login(String user, String pwd) throws RemoteException {
 
         String query;
         ArrayList<String[]> result;
 
         query = "Select u.username, u.pass from Utilizadores u where u.username = '" + user + "' and u.pass = '" + pwd + "'";
 
-        result = ReceiveData(query);
+        result = receiveData(query);
 
         System.out.println(result.size());
 
@@ -67,24 +67,58 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return -1;
     }
 
+    public ServerTopic[] getTopics() throws RemoteException  {
+        String query = "Select * from Topicos";
+
+        ArrayList<String[]> result = receiveData(query);
+
+        if ( result == null )
+            return null; //FIXME: We should do something about a query failing or something like that...
+
+        if ( result.size() == 0 )
+            return null;
+
+        ServerTopic[] topics = new ServerTopic[result.size()];
+
+        for (int i = 0; i < result.size(); i++)
+            topics[i] = new ServerTopic(result.get(i));
+
+        return topics;
+    }
+
     ////
     //  Method responsible for executing queries like "Select..."
+    //
+    // Returns: null on failure, Arraylist with all columns (as strings in an array), which may be empty if there query
+    // produces an empty table.
+    //
     ////
-    public ArrayList<String[]> ReceiveData(String query) throws RemoteException, SQLException{
+    public ArrayList<String[]> receiveData(String query){
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
 
-        statement = conn.createStatement();
+        try {
+            statement = conn.createStatement();
+        } catch (SQLException e) {
+            System.err.println("Error creating SQL statement '" + query + "'!");
+            return null;
+        }
 
-        ResultSet rs = statement.executeQuery(query);//Execute the query
-        ResultSetMetaData rsmd = rs.getMetaData();//Obtain the query's result metadata
-        columnsNumber = rsmd.getColumnCount();//Get number of columns
-
-        while (rs.next()){
-            result.add(new String[columnsNumber]);
-            for (int i=1;i<=columnsNumber;++i){
-                result.get(pos)[i] = rs.getString(i);
+        ResultSet rs = null;//Execute the query
+        ResultSetMetaData rsmd = null;//Obtain the query's result metadata
+        try {
+            rs = statement.executeQuery(query);
+            rsmd = rs.getMetaData();
+            columnsNumber = rsmd.getColumnCount();//Get number of columns
+            while (rs.next()){
+                result.add(new String[columnsNumber]);
+                for (int i=1;i<=columnsNumber;++i){
+                    result.get(pos)[i] = rs.getString(i);
+                }
             }
+        } catch (SQLException e) {
+            System.err.println("Error executing SQL query '" + query + "'!");
+            return null;
         }
 
         return result;
@@ -94,7 +128,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
     //  database's tables
     ////
-    public boolean InsertData(String query) throws RemoteException, SQLException{
+    public boolean insertData(String query) throws RemoteException, SQLException{
 
         int update;
 

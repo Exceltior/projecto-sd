@@ -12,11 +12,11 @@ public class ClientTopic extends Topic {
 
     static public ClientTopic fromDataStream(DataInputStream in) {
         ClientTopic ret = new ClientTopic();
-        if ( (ret.id = Common.readIntFromStream(in)) == -1)
+        if ( (ret.id = Common.recvInt(in)) == -1)
             return null;
-        if ( (ret.title = Common.readStringFromStream(in)) == null)
+        if ( (ret.title = Common.recvString(in)) == null)
             return null;
-        if ( (ret.body = Common.readStringFromStream(in)) == null)
+        if ( (ret.body = Common.recvString(in)) == null)
             return null;
         return ret;
     }

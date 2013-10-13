@@ -8,73 +8,73 @@ import java.io.IOException;
 // It also has the message ids that the client and server must pass to one another.
 //
 public class Common {
-    static enum Message { MSG_GETTOPICS, MSG_OK, MSG_LOGIN, MSG_ERR, ERR_NO_MSG_RECVD}
+    static enum Message { MSG_GETTOPICS, MSG_OK, MSG_LOGIN, MSG_ERR, ERR_NO_MSG_RECVD, ERR_NOT_LOGGED_IN}
 
     static public boolean sendMessage(Message msg, DataOutputStream outStream) {
-        return Common.sendIntThroughStream(msg.ordinal(),outStream);
+        return Common.sendInt(msg.ordinal(), outStream);
     }
     static public Message recvMessage(DataInputStream inStream) {
         int intMsg;
-        if ( (intMsg = Common.readIntFromStream(inStream)) == -1) {
+        if ( (intMsg = Common.recvInt(inStream)) == -1) {
             return Message.ERR_NO_MSG_RECVD; //Connection dead!
         }
         return Message.values()[intMsg];
     }
 
-    static public boolean sendStringThroughStream(String s, DataOutputStream outStream) {
+    static public boolean sendString(String s, DataOutputStream outStream) {
         if ( outStream == null ) {
-            System.err.println("sendStringThroughStream ERR");
+            System.err.println("sendString ERR");
             return false;
         }
 
         try {
             outStream.writeUTF(s);
         } catch (IOException e) {
-            System.err.println("sendStringThroughStream ERR"); e.printStackTrace();
+            System.err.println("sendString ERR"); e.printStackTrace();
             return false;
         }
         return true;
     }
 
-    static public boolean sendIntThroughStream(int i, DataOutputStream outStream) {
+    static public boolean sendInt(int i, DataOutputStream outStream) {
         if ( outStream == null ) {
-            System.err.println("sendIntThroughStream ERR");
+            System.err.println("sendInt ERR");
             return false;
         }
         try {
             outStream.writeInt(i);
         } catch (IOException e) {
-            System.err.println("sendIntThroughStream ERR"); e.printStackTrace();
+            System.err.println("sendInt ERR"); e.printStackTrace();
             return false;
         }
 
         return true;
     }
 
-    static public String readStringFromStream(DataInputStream inStream) {
+    static public String recvString(DataInputStream inStream) {
         if ( inStream == null ) {
-            System.err.println("readStringFromStream ERR");
+            System.err.println("recvString ERR");
             return null;
         }
         String ret = null;
         try {
             ret = inStream.readUTF();
         } catch (IOException e) {
-            System.err.println("readStringFromStream ERR"); e.printStackTrace();
+            System.err.println("recvString ERR"); e.printStackTrace();
         }
 
         return ret;
     }
-    static public int readIntFromStream(DataInputStream inStream) {
+    static public int recvInt(DataInputStream inStream) {
         if ( inStream == null ) {
-            System.err.println("readIntFromStream ERR");
+            System.err.println("recvInt ERR");
             return -1;
         }
         int ret = -1;
         try {
             ret = inStream.readInt();
         } catch (IOException e) {
-            System.err.println("readIntFromStream ERR"); e.printStackTrace();
+            System.err.println("recvInt ERR"); e.printStackTrace();
         }
 
         return ret;
