@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Date;
 
 ////
 // Connection -- Manages talking to the destination. It makes sure the messages get to the destination by using
@@ -39,6 +40,16 @@ public class ClientConnection {
                 System.err.println("connect ERR"); e.printStackTrace();
             }
         } while ( currentSocket == null);
+    }
+
+    ////
+    //  Method to register a client to the database
+    ////
+    boolean register(String username, String pass, String email, Date date){
+        Common.Message reply;
+
+
+        return true;
     }
 
     ////

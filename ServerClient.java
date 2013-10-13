@@ -168,9 +168,11 @@ public class ServerClient implements Runnable {
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                 return false;
         } else {
-            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
                 return false;
+            }
         }
+
 
         // Message was handled successfully
         return true;

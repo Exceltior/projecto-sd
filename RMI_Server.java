@@ -55,9 +55,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query;
         ArrayList<String[]> result;
 
-        /*query = "select u.userid from Utilizadores u where u.username = '" + user + "' and u.pass = '" +
-                pwd + "'";*/
-        query = "select * from Utilizadores";
+        query = "select u.userid from Utilizadores u where u.username = '" + user + "' and u.pass = '" + pwd + "'";
 
         result = receiveData(query);
 
