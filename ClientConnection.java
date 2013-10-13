@@ -69,7 +69,7 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.MSG_INVALID_MSG) {
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
                 reconnect(); continue;
             }
 

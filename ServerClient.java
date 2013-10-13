@@ -37,7 +37,7 @@ public class ServerClient implements Runnable {
             int intMsg;
 
             // Read the next Message/Request
-            if ( ( msg = Common.recvMessage(inStream)) == Common.Message.MSG_INVALID_MSG)
+            if ( ( msg = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD)
                 break ;
 
 
@@ -71,11 +71,11 @@ public class ServerClient implements Runnable {
             log = rmi_i.Login(user, pwd);
 
             if (!log){
-                if ( !Common.sendMessage(Common.Message.MSG_ERR,outStream) )
+                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
                     return false;
             }
             else{
-                if ( !Common.sendMessage(Common.Message.MSG_OK,outStream) )
+                if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                     return false;
             }
 
