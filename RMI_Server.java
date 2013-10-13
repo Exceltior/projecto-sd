@@ -93,7 +93,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // produces an empty table.
     //
     ////
-    public ArrayList<String[]> receiveData(String query){
+    public ArrayList<String[]> receiveData(String query) throws RemoteException{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
 
