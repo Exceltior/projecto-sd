@@ -23,14 +23,14 @@ public class Common {
 
     static public boolean sendString(String s, DataOutputStream outStream) {
         if ( outStream == null ) {
-            System.err.println("sendString ERR");
+            //System.err.println("sendString ERR");
             return false;
         }
 
         try {
             outStream.writeUTF(s);
         } catch (IOException e) {
-            System.err.println("sendString ERR"); e.printStackTrace();
+            //System.err.println("sendString ERR"); e.printStackTrace();
             return false;
         }
         return true;
@@ -38,13 +38,13 @@ public class Common {
 
     static public boolean sendInt(int i, DataOutputStream outStream) {
         if ( outStream == null ) {
-            System.err.println("sendInt ERR");
+            //System.err.println("sendInt ERR");
             return false;
         }
         try {
             outStream.writeInt(i);
         } catch (IOException e) {
-            System.err.println("sendInt ERR"); e.printStackTrace();
+            //System.err.println("sendInt ERR"); e.printStackTrace();
             return false;
         }
 
@@ -53,28 +53,28 @@ public class Common {
 
     static public String recvString(DataInputStream inStream) {
         if ( inStream == null ) {
-            System.err.println("recvString ERR");
+            //System.err.println("recvString ERR");
             return null;
         }
         String ret = null;
         try {
             ret = inStream.readUTF();
         } catch (IOException e) {
-            System.err.println("recvString ERR"); e.printStackTrace();
+            //System.err.println("recvString ERR"); e.printStackTrace();
         }
 
         return ret;
     }
     static public int recvInt(DataInputStream inStream) {
         if ( inStream == null ) {
-            System.err.println("recvInt ERR");
+            //System.err.println("recvInt ERR");
             return -1;
         }
         int ret = -1;
         try {
             ret = inStream.readInt();
         } catch (IOException e) {
-            System.err.println("recvInt ERR"); e.printStackTrace();
+            //System.err.println("recvInt ERR"); e.printStackTrace();
         }
 
         return ret;
