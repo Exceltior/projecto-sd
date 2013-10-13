@@ -1,8 +1,9 @@
+import java.io.Serializable;
 
 ////
 // A Topic, meant to be extended by the Client and the Server.
 //
-public class Topic {
+public class Topic implements Serializable{
     protected int   id;
     protected String title;
     protected String body;

@@ -61,7 +61,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         result = receiveData(query);
 
-        System.out.println(result.size());
+        System.out.println("Query: " + query + " has " + result.size() + " results");
 
         if ( result.size() > 0 )
             return Integer.valueOf(result.get(0)[0]);
@@ -69,10 +69,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return -1;
     }
 
-    public ServerTopic[] getTopics() throws RemoteException  {
+    public ServerTopic[] getTopics() throws RemoteException{
         String query = "Select * from Topicos";
 
-        ArrayList<String[]> result = receiveData(query);
+        ArrayList<String[]> result = null;
+
+        try{
+            result = receiveData(query);
+        } catch(RemoteException e){
+            System.out.println("DEU MERDA");
+        }
+
+        System.out.println("Query: " + query + " has " + result.size() + " results");
 
         if ( result == null )
             return null; //FIXME: We should do something about a query failing or something like that...
@@ -99,7 +107,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
 
-        System.out.println("Running query: "+query);
+        System.out.println("\n-------------------------------\nRunning query: "+query);
 
         try {
             statement = conn.createStatement();
@@ -121,11 +129,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                     result.get(pos)[i-1] = rs.getString(i);
                 }
             }
+            statement.close();
         } catch (SQLException e) {
             System.err.println("Error executing SQL query '" + query + "'!");
             return null;
         }
-        // FIXME: Falta fazer close ao statement
 
         return result;
     }
@@ -171,7 +179,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             //Start RMIRegistry programmatically
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("academica", servidor);
-            //Sabes que nunca estaras so... na 1ª ou 2ª divisao... Porque tu es a briosa, o orgulho do nosso coração!!!!
+            //Sabes que nunca estaras so... Na 1ª ou 2ª divisao... Porque tu es a briosa, o orgulho do nosso coração!!!!
 
             ////
             //  FIXME: Is it worth to store the RMI Registry's port in some sort of a file or variable?

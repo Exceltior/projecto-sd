@@ -25,8 +25,8 @@ public class ServerTopic extends Topic {
     // Create a ServerTopic from a SQL Line (array of strings)
     //
     public ServerTopic(String[] line) {
-        this.id = Integer.valueOf(line[2]);
-        this.title = line[0];
-        this.body = line[1];
+        this.id = Integer.valueOf(line[0]);
+        this.title = line[1];
+        this.body = line[2];
     }
 }

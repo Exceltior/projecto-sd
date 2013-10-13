@@ -68,19 +68,30 @@ public class ServerClient implements Runnable {
             int intMsg;
 
             // Read the next Message/Request
-            if ( ( msg = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD)
+            if ( ( msg = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD){
+                System.out.println("Error No Message Received!!!");
                 break ;
+            }
 
 
             // Handle the request
             if ( msg == Common.Message.MSG_LOGIN) {
-                if ( !handleLogin() )
+                if ( !handleLogin() ){
+                    System.out.println("Error in the handle login method!!!");
                     break ;
+                }
             } else if ( msg == Common.Message.MSG_GETTOPICS)
-                if ( !handleListTopicsRequest() )
+                if ( !handleListTopicsRequest() ){
+                    System.out.println("Error in the handle list topcis requets method!!!");
                     break ;
+                }
         }
 
+        ////
+        //  FIXME: Quando não há topicos para mostrar (porque não há nada na base de dados) tu simplesmente assumes que
+        //  houve mega bode na ligação e assumes que o cliente se desligou, porque não dizer simplesmente ao utilizador
+        //  "Amigo, não há tópicos para mostrar queres adicionar algum??"
+        ////
         if ( !isLoggedIn() )
             System.out.println("Connection to UID "+uid+" dropped!");
         else
@@ -99,13 +110,24 @@ public class ServerClient implements Runnable {
         ServerTopic[] topics = null;
         try {
             topics = RMIInterface.getTopics();
+            System.out.println("Ja recebi os topicos");
+
         } catch (RemoteException e) {
             //FIXME: Handle this
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Existiu uma remoteException! " + e.getMessage() + "\nO valor de topics e " + topics);
         }
 
-        if ( topics == null )
+        ////
+        //  Here, if topics is null, it means that either the query went wrong (that should be handled in the RMI Server) or
+        //  that there are no topics stored in the databse.
+        ////
+        if ( topics == null ){
+            System.out.println("Hi! I am in the handleListTopicsRequest method and this is going to return false :)");
             return false; //There was an error and there are no topics...
+        }
+
+
 
         if ( !Common.sendInt(topics.length,outStream) )
             return false;
