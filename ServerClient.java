@@ -73,14 +73,12 @@ public class ServerClient implements Runnable {
 
 
             // Handle the request
-            if ( msg == Common.Message.MSG_LOGIN)
+            if ( msg == Common.Message.MSG_LOGIN) {
                 if ( !handleLogin() )
                     break ;
-
-            if ( msg == Common.Message.MSG_GETTOPICS)
+            } else if ( msg == Common.Message.MSG_GETTOPICS)
                 if ( !handleListTopicsRequest() )
                     break ;
-
         }
 
         if ( !isLoggedIn() )
@@ -91,10 +89,12 @@ public class ServerClient implements Runnable {
 
     private boolean handleListTopicsRequest() {
         if ( !isLoggedIn() ) {
-            Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN,outStream);
-            return true; // Message was handled (note that we return true because not being logged in is not a
-                         // connection error
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
         }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
 
         ServerTopic[] topics = null;
         try {

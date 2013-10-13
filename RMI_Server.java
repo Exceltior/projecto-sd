@@ -11,7 +11,7 @@ import java.util.ArrayList;
 ////
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
-    private Statement statement;
+    private Statement statement; //FIXME: <-- why is this global?!?!?!
     private Connection conn;
     private String url;
 
@@ -55,7 +55,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query;
         ArrayList<String[]> result;
 
-        query = "Select u.username, u.pass from Utilizadores u where u.username = '" + user + "' and u.pass = '" + pwd + "'";
+        /*query = "select u.userid from Utilizadores u where u.username = '" + user + "' and u.pass = '" +
+                pwd + "'";*/
+        query = "select * from Utilizadores";
 
         result = receiveData(query);
 
@@ -97,6 +99,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
 
+        System.out.println("Running query: "+query);
+
         try {
             statement = conn.createStatement();
         } catch (SQLException e) {
@@ -110,16 +114,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             rs = statement.executeQuery(query);
             rsmd = rs.getMetaData();
             columnsNumber = rsmd.getColumnCount();//Get number of columns
+            System.out.println(columnsNumber);
             while (rs.next()){
                 result.add(new String[columnsNumber]);
                 for (int i=1;i<=columnsNumber;++i){
-                    result.get(pos)[i] = rs.getString(i);
+                    result.get(pos)[i-1/*FIXME: Joca, is -1 right?*/] = rs.getString(i);
                 }
             }
         } catch (SQLException e) {
             System.err.println("Error executing SQL query '" + query + "'!");
             return null;
         }
+        // FIXME: Falta fazer close ao statement
 
         return result;
     }
@@ -148,7 +154,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         RMI_Server servidor = null;
 
         try{
-            servidor = new RMI_Server("192.168.56.101","1521","XE",username,password);
+            servidor = new RMI_Server("192.168.56.120","1521","XE",username,password);
             servidor.setConn(DriverManager.getConnection(servidor.getUrl(), username, password));
 
 

@@ -84,11 +84,21 @@ public class ClientConnection {
     ClientTopic[] getTopics() {
         int numTopics;
         ClientTopic[] topics;
+        Common.Message reply;
         for(;;) {
             if ( !Common.sendMessage(Common.Message.MSG_GETTOPICS,outStream) ) {
                 reconnect(); continue;
             }
 
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
 
             if ( (numTopics = Common.recvInt(inStream)) == -1) {
                 reconnect(); continue;
