@@ -3,7 +3,6 @@ import java.util.Scanner;
 
 public class Client {
 
-    private int id;
     private ClientConnection conn;
     private String username;
     private String password;
@@ -11,14 +10,6 @@ public class Client {
     Client(){
         super();
         conn = new ClientConnection();
-    }
-
-    public int getId(){
-        return this.id;
-    }
-
-    public void setId(int i){
-        this.id = i;
     }
 
     public void setUsername(String u){
@@ -51,6 +42,10 @@ public class Client {
         return this.password;
     }
 
+    ////
+    //  Method responsible for collecting the information needed to create a new topic, and send a request to the TCP Server
+    //  in order to create that new topic in the database
+    ////
     public boolean createTopic(Scanner sc,ClientConnection conn){
         String nome, descricao;
 
@@ -60,7 +55,7 @@ public class Client {
         System.out.println("Insira a descricao do topico:");
         descricao = sc.nextLine();
 
-        return conn.createTopic(nome,descricao, this.id);
+        return conn.createTopic(nome,descricao);
     }
 
     static public void main(String[] args) {
@@ -128,14 +123,16 @@ public class Client {
 
         cliente.setUsername(username);
         cliente.setPassword(pass);
-        cliente.setId(conn.getClientID(cliente.getUsername()));
+
+        if (!cliente.createTopic(sc,conn)){
+            System.out.println("Erro ao criar um topico");
+            return ;
+        }
 
         ClientTopic[] topics = conn.getTopics();
 
         for (Topic t : topics)
             System.out.println(t);
-
-        System.out.println(cliente.createTopic(sc,conn));
 
         for (;;);
     }

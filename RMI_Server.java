@@ -64,7 +64,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         System.out.println("Query: " + query + " has " + result.size() + " results");
 
-        if ( result.size() > 0 )
+        if ( result.size() > 0 )//Return the user's id
             return Integer.valueOf(result.get(0)[0]);
         else
             return -1;
@@ -99,28 +99,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    //  Method responsible for getting a user's id, given is username
+    // Method responsible for checking if there aren't any topics already created with the same name as the one we want
+    //  to create
     ////
-    public int getUserId(String username)throws RemoteException{
-        String query = "Select u.userid from Utilizadores u where u.username='" + username +"'";
-
-        ArrayList<String[]> result = null;
-
-        try {
-            result = receiveData(query);
-        } catch(RemoteException e){
-            System.out.println("DEU MERDA");
-        }
-
-        if (result.size() > 1){
-            //FIXME: THIS SHOULD NEVER HAPPEN!!!!!!
-            System.out.println("Deu asneira, há mais do que um user com o mesmo username");
-            return -1;
-        }
-
-        return Integer.parseInt(result.get(0)[0]);
-    }
-
     public boolean validate_topic(String nome){
         String query = "Select * from Topicos t where t.nome = '" + nome + "'";
         ArrayList<String[]> topics = null;
@@ -132,9 +113,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             //FIXME: Deal with this
         }
         if (topics!=null)
-            System.out.println("Estou no final do metodo validate topic e o users tem " + topics.size() + " dados");
+            System.out.println("Estou no final do metodo validate topic e o topics tem " + topics.size() + " dados");
         else
-            System.out.println("Estou no final do metodo validate topic e o users e nulo");
+            System.out.println("Estou no final do metodo validate topic e o topics e nulo");
 
         if (topics !=null)//If we have at least one user with the same username the registration is going to be unsucessfull
             return !(topics.size()>0);
@@ -205,7 +186,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
         num_topics++;
 
-        String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "','" + uid + ")";
+        String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "'," + uid + ")";
 
         System.out.println("\nQuery to process:\n" + query + "\n");
 
@@ -250,6 +231,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 for (int i=1;i<=columnsNumber;++i){
                     result.get(pos)[i-1] = rs.getString(i);
                 }
+                pos++;
             }
             statement.close();
         } catch (SQLException e) {

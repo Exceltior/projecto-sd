@@ -124,44 +124,7 @@ public class ClientConnection {
         }
     }
 
-    int getClientID(String username){
-        Common.Message reply;
-        int userid = -1;
-
-        for(;;) {
-            if ( !Common.sendMessage(Common.Message.MSG_GET_USER_ID, outStream) ) {
-                reconnect(); continue;
-            }
-            if ( !Common.sendString(username, outStream) ) {
-                reconnect(); continue;
-            }
-
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.out.println("AQUI3");
-                reconnect(); continue;
-            }
-
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                //Shouldn't happen, FIXME!
-                System.err.println("AQUI4");
-                return -1;
-            }
-
-            if ( (userid = Common.recvInt(inStream)) == -1) {
-                System.out.println("AQUI3");
-                reconnect(); continue;
-            }
-
-
-            ////
-            // FIXME: FALTA AQUI RECEBER O MSG_OK? QUANDO ESTAMOS A RECEBER OS TOPICOS NAO RECEBEMOS ISSO....
-            ////
-
-            return userid;
-        }
-    }
-
-    boolean createTopic(String nome, String descricao, int uid){
+    boolean createTopic(String nome, String descricao){
         Common.Message reply;
 
         for(;;) {
@@ -173,10 +136,6 @@ public class ClientConnection {
             }
 
             if ( !Common.sendString(descricao, outStream) ) {
-                reconnect(); continue;
-            }
-
-            if ( !Common.sendInt(uid, outStream) ) {
                 reconnect(); continue;
             }
 
