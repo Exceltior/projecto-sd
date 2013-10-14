@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 ////
@@ -47,6 +48,8 @@ public class ClientConnection {
     ////
     boolean register(String username, String pass, String email, Date date){
         Common.Message reply;
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy.MM.dd");
+        String s_date = format1.format(date);//Now we have the date in the 'yyyy-mm-dd' format
 
         ////
         //  Ideia para o Maxi: Basicamente é mandar estes campos todos ao servidor de TCP que depois tem de invocar um metodo
@@ -55,7 +58,33 @@ public class ClientConnection {
         //  noite ou amanha de manha vou ver se consigo fazer isso. Well, cya ;)
         ////
 
-        return true;
+        for(;;) {
+            if ( !Common.sendMessage(Common.Message.MSG_REG, outStream) ) {
+                reconnect(); continue;
+            }
+            if ( !Common.sendString(username, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( !Common.sendString(pass, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( !Common.sendString(email, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( !Common.sendString(s_date, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                reconnect(); continue;
+            }
+
+            return reply == Common.Message.MSG_OK;
+
+        }
     }
 
     ////

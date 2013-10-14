@@ -14,6 +14,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private Statement statement; //FIXME: <-- why is this global?!?!?!
     private Connection conn;
     private String url;
+    public static int num_users;
+    static int starting_money = 10000;
 
     public RMI_Server(String servidor, String porto, String sid, String username, String password) throws RemoteException {
         super();
@@ -94,6 +96,28 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return topics;
     }
 
+
+    ////
+    //  Method responsile for insering a new user in the database
+    ////
+    public boolean register(String user, String pass, String email, String date) throws RemoteException{
+        boolean check = false;
+
+        num_users++;
+        String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +
+                "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'))";
+
+        System.out.println("\nQuery to process:\n" + query + "\n");
+
+        try{
+            check = insertData(query);
+        }catch(SQLException s){
+            System.out.println("SQLException no Register do RMI Server");
+        }
+
+        return check;
+    }
+
     ////
     //  Method responsible for executing queries like "Select..."
     //
@@ -147,6 +171,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         statement = conn.createStatement();
         update = statement.executeUpdate(query);
 
+        System.out.println("O resultado foi " + (update!=0));
+
         return update != 0;
     }
 
@@ -170,6 +196,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             if (servidor.getConn() == null) {
                 System.out.println("Failed to make connection!");
                 return ;
+            }
+
+            //Get current number of users
+            try{
+                ArrayList<String[]> teste= servidor.receiveData("Select count(*) from Utilizadores");
+                num_users = Integer.parseInt(teste.get(0)[0]);
+            }catch(RemoteException r){
+                System.out.println("Remote Exception while trying to get the number of users....");
+                //FIXME: HOW TO DEAL WITH THIS EXCEPTION????
             }
 
             System.out.println("You made it, take control your database now!");

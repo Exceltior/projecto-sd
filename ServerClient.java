@@ -80,11 +80,18 @@ public class ServerClient implements Runnable {
                     System.out.println("Error in the handle login method!!!");
                     break ;
                 }
-            } else if ( msg == Common.Message.MSG_GETTOPICS)
+            } else if (msg == Common.Message.MSG_REG){
+                //Need to register the client
+                if (!handleRegistration()){
+                    System.out.println("Error in the handle registration method!!!");
+                    break ;
+                }
+            } else if ( msg == Common.Message.MSG_GETTOPICS){
                 if ( !handleListTopicsRequest() ){
                     System.out.println("Error in the handle list topcis requets method!!!");
                     break ;
                 }
+            }
         }
 
         ////
@@ -96,6 +103,41 @@ public class ServerClient implements Runnable {
             System.out.println("Connection to UID "+uid+" dropped!");
         else
             System.out.println("Connection to a client dropped!");
+    }
+
+    private boolean handleRegistration(){
+        String user, pass, date, email;
+        Boolean registration = false;
+
+        if ( (user = Common.recvString(inStream)) == null)
+            return false;
+        if ( (pass = Common.recvString(inStream)) == null)
+            return false;
+        if ( (email = Common.recvString(inStream)) == null)
+            return false;
+        if ( (date = Common.recvString(inStream)) == null)
+            return false;
+
+        System.out.println("Vou registar:" +  user + " " + pass + " " + email + " " + date);
+
+        try{
+            registration = RMIInterface.register(user,pass,email,date);
+        } catch(RemoteException r){
+            System.out.println("RemoteException in the ServerCliente while trying to register a new user");
+            return false;
+        }
+        if (registration){
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+                return false;
+        } else {
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
+                return false;
+            }
+        }
+
+        System.out.println("O handle registration correu impecavelmente bem e o cliente foi registado com sucesso :)");
+
+        return true;
     }
 
     private boolean handleListTopicsRequest() {
