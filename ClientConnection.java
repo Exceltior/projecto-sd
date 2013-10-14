@@ -128,7 +128,7 @@ public class ClientConnection {
         Common.Message reply;
 
         for(;;) {
-            if ( !Common.sendMessage(Common.Message.MSG_CREATETOPCIS, outStream) ) {
+            if ( !Common.sendMessage(Common.Message.MSG_CREATETOPICS, outStream) ) {
                 reconnect(); continue;
             }
             if ( !Common.sendString(nome, outStream) ) {

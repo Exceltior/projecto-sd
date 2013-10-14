@@ -91,7 +91,7 @@ public class ServerClient implements Runnable {
                     System.out.println("Error in the handle list topcis requets method!!!");
                     break ;
                 }
-            }else if (msg == Common.Message.MSG_CREATETOPCIS){
+            }else if (msg == Common.Message.MSG_CREATETOPICS){
                 if ( !handleCreateTopicRequest() ){
                     System.out.println("Error in the handle list topcis requets method!!!");
                     break ;
