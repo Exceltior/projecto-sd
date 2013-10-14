@@ -86,8 +86,18 @@ public class ServerClient implements Runnable {
                     System.out.println("Error in the handle registration method!!!");
                     break ;
                 }
-            } else if ( msg == Common.Message.MSG_GETTOPICS){
+            }else if (msg == Common.Message.MSG_GET_USER_ID){
+                if ( !handleGetIdRequest() ){
+                    System.out.println("Error in the handle get Id Request method!!!");
+                    break ;
+                }
+            }else if ( msg == Common.Message.MSG_GETTOPICS){
                 if ( !handleListTopicsRequest() ){
+                    System.out.println("Error in the handle list topcis requets method!!!");
+                    break ;
+                }
+            }else if (msg == Common.Message.MSG_CREATETOPCIS){
+                if ( !handleCreateTopicRequest() ){
                     System.out.println("Error in the handle list topcis requets method!!!");
                     break ;
                 }
@@ -144,6 +154,75 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+
+    private boolean handleCreateTopicRequest(){
+        String nome, descricao;
+        int uid;
+        boolean result = false;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( (nome = Common.recvString(inStream)) == null)
+            return false;
+
+        if ( (descricao = Common.recvString(inStream)) == null)
+            return false;
+
+        if ( (uid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+             result = RMIInterface.createTopic(nome,descricao,uid);
+        }catch(RemoteException e){
+            //FIXME: Handle this!
+            System.out.println("Existiu uma remoteException no handlecreatetopicrequest! " + e.getMessage());
+        }
+
+        if (result != false){
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+                return false;
+        } else {
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean handleGetIdRequest(){
+        int id = -1;
+        String username = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( (username = Common.recvString(inStream)) == null)
+            return false;
+
+        try{
+            id = RMIInterface.getUserId(username);
+            System.out.println("O id recebido e " + id);
+        }catch(RemoteException e){
+            //FIXME: Handle this!
+            System.out.println("Existiu uma remoteException! " + e.getMessage());
+        }
+
+        if (id != -1){
+            if ( !Common.sendInt(id,outStream) )
+                return false;
+        } else {
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private boolean handleListTopicsRequest() {
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -172,8 +251,6 @@ public class ServerClient implements Runnable {
             System.out.println("Hi! I am in the handleListTopicsRequest method and this is going to return false :)");
             return false; //There was an error and there are no topics...
         }
-
-
 
         if ( !Common.sendInt(topics.length,outStream) )
             return false;
@@ -218,7 +295,6 @@ public class ServerClient implements Runnable {
                 return false;
             }
         }
-
 
         // Message was handled successfully
         return true;
