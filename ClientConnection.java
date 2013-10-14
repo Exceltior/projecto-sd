@@ -209,12 +209,12 @@ public class ClientConnection {
         Common.Message reply;
         for(;;) {
             if ( !Common.sendMessage(Common.Message.MSG_GETTOPICS,outStream) ) {
-                System.out.println("AQUI");
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.out.println("AQUI2");
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
@@ -225,7 +225,7 @@ public class ClientConnection {
             }
 
             if ( (numTopics = Common.recvInt(inStream)) == -1) {
-                System.out.println("AQUI3");
+                System.err.println("AQUI3");
                 reconnect(); continue;
             }
 

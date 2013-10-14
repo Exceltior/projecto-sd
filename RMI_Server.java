@@ -71,20 +71,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public ServerTopic[] getTopics() throws RemoteException{
-        String query = "Select * from Topicos";
+        String query = "select * from Topicos";
 
         ArrayList<String[]> result = null;
 
         try{
             result = receiveData(query);
         } catch(RemoteException e){
-            System.out.println("DEU MERDA");
+            System.err.println("DEU MERDA");
         }
 
-        System.out.println("Query: " + query + " has " + result.size() + " results");
 
         if ( result == null )
             return null; //FIXME: We should do something about a query failing or something like that...
+
+        System.out.println("Query: " + query + " has " + result.size() + " results");
 
         if ( result.size() == 0 )
             return null;
