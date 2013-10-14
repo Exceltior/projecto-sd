@@ -18,7 +18,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public static int num_topics;
     static int starting_money = 10000;
 
-    public RMI_Server(String servidor, String porto, String sid, String username, String password) throws RemoteException {
+    public RMI_Server(String servidor, String porto, String sid) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
         this.statement = null;
@@ -102,50 +102,41 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // Method responsible for checking if there aren't any topics already created with the same name as the one we want
     //  to create
     ////
-    public boolean validate_topic(String nome){
+    public boolean validateTopic(String nome){
         String query = "Select * from Topicos t where t.nome = '" + nome + "'";
         ArrayList<String[]> topics = null;
 
         try{
             topics = receiveData(query);
         }catch(RemoteException r){
-            System.out.println("Remote Exception on the validate_data method");
+            System.err.println("Remote Exception on the validateData method");
             //FIXME: Deal with this
         }
-        if (topics!=null)
-            System.out.println("Estou no final do metodo validate topic e o topics tem " + topics.size() + " dados");
-        else
-            System.out.println("Estou no final do metodo validate topic e o topics e nulo");
 
-        if (topics !=null)//If we have at least one user with the same username the registration is going to be unsucessfull
-            return !(topics.size()>0);
 
-        return true;
+
+        // NOTE: topics will only be null if the query failed. And we should assume that never happens...
+        return topics == null || topics.size() == 0;
+
     }
 
     ////
     //  Method responsible for validating a user's username, before adding it to the database
     ///
-    public boolean validate_data(String username){
+    public boolean validateData(String username){
         String query = "Select * from Utilizadores u where u.username = '" + username + "'";
         ArrayList<String[]> users = null;
 
         try{
             users = receiveData(query);
         }catch(RemoteException r){
-            System.out.println("Remote Exception on the validate_data method");
+            System.err.println("Remote Exception on the validateData method");
             //FIXME: Deal with this
         }
 
-        if (users!=null)
-            System.out.println("Estou no final do metodo validate user e o users tem " + users.size() + " dados");
-        else
-            System.out.println("Estou no final do metodo validate user e o users e nulo");
+        // NOTE: users will only be null if the query failed. And we should assume that never happens...
+        return users == null || users.size() == 0;
 
-        if (users !=null)//If we have at least one user with the same username the registration is going to be unsucessfull
-            return !(users.size()>0);
-
-        return true;
     }
 
     ////
@@ -154,7 +145,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public boolean register(String user, String pass, String email, String date) throws RemoteException{
         boolean check = false;
 
-        if (!validate_data(user)){
+        if (! validateData(user)){
             System.out.println("O validate_user devolveu false");
             return false;
         }
@@ -162,8 +153,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         num_users++;
         String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +
                 "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'))";
-
-        System.out.println("\nQuery to process:\n" + query + "\n");
 
         try{
             check = insertData(query);
@@ -180,15 +169,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{
         boolean check = false;
 
-        if (!validate_topic(nome)){
+        if (! validateTopic(nome)){
             System.out.println("O validate_user devolveu false");
             return false;
         }
         num_topics++;
 
         String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "'," + uid + ")";
-
-        System.out.println("\nQuery to process:\n" + query + "\n");
 
         try{
             check = insertData(query);
@@ -210,7 +197,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
 
-        System.out.println("\n-------------------------------\nRunning query: "+query);
+        System.out.println();
+        System.out.println("-------------------------------");
+        System.out.println("Running query: "+query);
 
         try {
             statement = conn.createStatement();
@@ -219,8 +208,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
         }
 
-        ResultSet rs = null;//Execute the query
-        ResultSetMetaData rsmd = null;//Obtain the query's result metadata
+        ResultSet rs;
+        ResultSetMetaData rsmd;
         try {
             rs = statement.executeQuery(query);
             rsmd = rs.getMetaData();
@@ -264,11 +253,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
         ////
 
-        String username = "sd", password = "sd", query;
-        RMI_Server servidor = null;
+        String username = "sd", password = "sd";
+        RMI_Server servidor;
 
         try{
-            servidor = new RMI_Server("192.168.56.101","1521","XE",username,password);
+            servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.setConn(DriverManager.getConnection(servidor.getUrl(), username, password));
 
 
@@ -288,7 +277,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 teste = servidor.receiveData("Select count(*) from Topicos");
                 num_topics = Integer.parseInt(teste.get(0)[0]);
             }catch(RemoteException r){
-                System.out.println("Remote Exception while trying to get the number of users....");
+                System.err.println("Remote Exception while trying to get the number of users....");
                 //FIXME: HOW TO DEAL WITH THIS EXCEPTION????
             }
 

@@ -34,14 +34,6 @@ public class Client {
         return this.conn;
     }
 
-    public String getUsername(){
-        return this.username;
-    }
-
-    public String getPassword(){
-        return this.password;
-    }
-
     ////
     //  Method responsible for collecting the information needed to create a new topic, and send a request to the TCP Server
     //  in order to create that new topic in the database

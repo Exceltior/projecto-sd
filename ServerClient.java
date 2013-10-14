@@ -61,11 +61,8 @@ public class ServerClient implements Runnable {
     @Override
     public void run() {
 
-        ServerTopic topic = new ServerTopic(5, "Hello, Ladies", "Hakuna Matata");
-
         for(;;) {
             Common.Message msg;
-            int intMsg;
 
             // Read the next Message/Request
             if ( ( msg = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD){
@@ -112,7 +109,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleRegistration(){
         String user, pass, date, email;
-        Boolean registration = false;
+        boolean registration; // true = managed to register, false = problems registering
 
         if ( (user = Common.recvString(inStream)) == null)
             return false;
@@ -129,16 +126,17 @@ public class ServerClient implements Runnable {
             registration = RMIInterface.register(user,pass,email,date);
             System.out.println("Estou no SeverClient e o registration e " + registration);
         } catch(RemoteException r){
-            System.out.println("RemoteException in the ServerCliente while trying to register a new user");
+            System.err.println("RemoteException in the ServerCliente while trying to register a new user");
             return false;
         }
+
         if (registration){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                 return false;
         } else {
-            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
                 return false;
-            }else
+            else
                 System.out.println("Foi enviada mensagem de erro");
             // Here we have to return true to keep the connection to the client alive
             return true;
@@ -152,8 +150,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleCreateTopicRequest(){
         String nome, descricao;
-        int uid;
-        boolean result = false;
+        boolean result;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -170,15 +167,15 @@ public class ServerClient implements Runnable {
         }catch(RemoteException e){
             //FIXME: Handle this!
             System.out.println("Existiu uma remoteException no handlecreatetopicrequest! " + e.getMessage());
+            return false; /* FIXME: Do this? */
         }
 
-        if (result != false){
+        if (result){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                 return false;
         } else {
-            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
                 return false;
-            }
         }
 
         return true;
@@ -199,7 +196,7 @@ public class ServerClient implements Runnable {
         } catch (RemoteException e) {
             //FIXME: Handle this
             //e.printStackTrace();
-            System.out.println("Existiu uma remoteException! " + e.getMessage() + "\nO valor de topics e " + topics);
+            System.out.println("Existiu uma remoteException! " + e.getMessage());
         }
 
         ////
