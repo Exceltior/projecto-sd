@@ -82,6 +82,7 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
+            System.out.println("Estou no client connection " + (reply == Common.Message.MSG_OK));
             return reply == Common.Message.MSG_OK;
 
         }

@@ -98,10 +98,40 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
 
     ////
+    //  Method responsible for validating a user's username, before adding it to the database
+    ///
+    public boolean validate_data(String username){
+        String query = "Select * from Utilizadores u where u.username = '" + username + "'";
+        ArrayList<String[]> users = null;
+
+        try{
+            users = receiveData(query);
+        }catch(RemoteException r){
+            System.out.println("Remote Exception on the validate_data method");
+            //FIXME: Deal with this
+        }
+
+        if (users!=null)
+            System.out.println("Estou no final do metodo validate data e o users tem " + users.size() + " dados");
+        else
+            System.out.println("Estou no final do metodo validate data e o users e nulo");
+
+        if (users !=null)//If we have at least one user with the same username the registration is going to be unsucessfull
+            return !(users.size()>0);
+
+        return true;
+    }
+
+    ////
     //  Method responsile for insering a new user in the database
     ////
     public boolean register(String user, String pass, String email, String date) throws RemoteException{
         boolean check = false;
+
+        if (!validate_data(user)){
+            System.out.println("O validate_user devolveu false");
+            return false;
+        }
 
         num_users++;
         String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +

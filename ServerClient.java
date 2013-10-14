@@ -122,6 +122,7 @@ public class ServerClient implements Runnable {
 
         try{
             registration = RMIInterface.register(user,pass,email,date);
+            System.out.println("Estou no SeverClient e o registration e " + registration);
         } catch(RemoteException r){
             System.out.println("RemoteException in the ServerCliente while trying to register a new user");
             return false;
@@ -132,7 +133,10 @@ public class ServerClient implements Runnable {
         } else {
             if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
                 return false;
-            }
+            }else
+                System.out.println("Foi enviada mensagem de erro");
+            // Here we have to return true to keep the connection to the client alive
+            return true;
         }
 
         System.out.println("O handle registration correu impecavelmente bem e o cliente foi registado com sucesso :)");
