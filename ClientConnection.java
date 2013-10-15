@@ -59,7 +59,7 @@ public class ClientConnection {
         ////
 
         for(;;) {
-            if ( !Common.sendMessage(Common.Message.MSG_REG, outStream) ) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_REG, outStream) ) {
                 reconnect(); continue;
             }
             if ( !Common.sendString(username, outStream) ) {
@@ -105,7 +105,7 @@ public class ClientConnection {
     boolean login(String user, String pass) {
         Common.Message reply;
         for(;;) {
-            if ( !Common.sendMessage(Common.Message.MSG_LOGIN, outStream) ) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_LOGIN, outStream) ) {
                 reconnect(); continue;
             }
             if ( !Common.sendString(user, outStream) ) {
@@ -128,7 +128,7 @@ public class ClientConnection {
         Common.Message reply;
 
         for(;;) {
-            if ( !Common.sendMessage(Common.Message.MSG_CREATETOPICS, outStream) ) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_CREATETOPICS, outStream) ) {
                 reconnect(); continue;
             }
             if ( !Common.sendString(nome, outStream) ) {
@@ -167,7 +167,7 @@ public class ClientConnection {
         ClientTopic[] topics;
         Common.Message reply;
         for(;;) {
-            if ( !Common.sendMessage(Common.Message.MSG_GETTOPICS,outStream) ) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPICS,outStream) ) {
                 System.err.println("AQUI");
                 reconnect(); continue;
             }

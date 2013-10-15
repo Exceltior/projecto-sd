@@ -72,25 +72,31 @@ public class ServerClient implements Runnable {
 
 
             // Handle the request
-            if ( msg == Common.Message.MSG_LOGIN) {
+            // FIXME: All of these prints are mostly here just for debugging. In practice, they will mean that we've
+            // lost the connection to che client. We should drop them in production code
+            if ( msg == Common.Message.REQUEST_LOGIN) {
                 if ( !handleLogin() ){
-                    System.out.println("Error in the handle login method!!!");
+                    System.err.println("Error in the handle login method!!!");
                     break ;
                 }
-            } else if (msg == Common.Message.MSG_REG){
-                //Need to register the client
+            } else if (msg == Common.Message.REQUEST_REG){
                 if (!handleRegistration()){
-                    System.out.println("Error in the handle registration method!!!");
+                    System.err.println("Error in the handle registration method!!!");
                     break ;
                 }
-            }else if ( msg == Common.Message.MSG_GETTOPICS){
+            } else if ( msg == Common.Message.REQUEST_GETTOPICS){
                 if ( !handleListTopicsRequest() ){
-                    System.out.println("Error in the handle list topcis requets method!!!");
+                    System.err.println("Error in the handle list topics request method!!!");
                     break ;
                 }
-            }else if (msg == Common.Message.MSG_CREATETOPICS){
+            } else if (msg == Common.Message.REQUEST_CREATETOPICS){
                 if ( !handleCreateTopicRequest() ){
-                    System.out.println("Error in the handle list topcis requets method!!!");
+                    System.err.println("Error in the handle create topics request method!!!");
+                    break ;
+                }
+            }else if (msg == Common.Message.REQUEST_GET_IDEA_BY_IID){
+                if ( !handleGetIdeaByIID() ){
+                    System.err.println("Error in the handle get idea by IID method!!!");
                     break ;
                 }
             }
@@ -175,6 +181,44 @@ public class ServerClient implements Runnable {
                 return false;
         } else {
             if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                return false;
+        }
+
+        return true;
+    }
+
+    private boolean handleGetIdeaByIID() {
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        int iid;
+
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        ServerIdea idea = null;
+
+        try {
+            idea = RMIInterface.getIdeaByIID(iid);
+        } catch (RemoteException e) {
+            System.err.println("RMI exception while fetching an idea by its IID");
+            return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
+        }
+
+        if ( idea == null) {
+            // There is no idea with this ID
+            if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
+                return false;
+        } else {
+            // Got the idea, let's send it
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+
+            if ( !idea.writeToDataStream(outStream) )
                 return false;
         }
 

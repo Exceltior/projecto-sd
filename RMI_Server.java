@@ -109,7 +109,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
     public ServerIdea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select * from Ideias, TopicosIdeias where TopicosIdeias.iid = Ideias.iid and TopicosIdeias" +
-                ".tid = ";
+                ".tid = "+tid+" +  and Ideias.activa = 1";
 
         ArrayList<String[]> result = null;
 
@@ -219,6 +219,20 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         idea.addParentTopicsFromSQL(queryResult);
 
         return true;
+    }
+
+    ////
+    // Build an idea from an IID. Notice that this constructor does nto give us parent topic and ideas, it only gahters
+    // IID (which we already had), title and body
+    //
+    public ServerIdea getIdeaByIID(int iid) throws RemoteException {
+        String query = "select * from Ideias t where t.iid = " + iid + " and t.activa = 1";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return null;
+
+        return new ServerIdea(queryResult.get(0));
     }
 
     ////

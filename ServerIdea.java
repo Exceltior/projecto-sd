@@ -24,14 +24,14 @@ public class ServerIdea extends Idea {
     }
 
     ////
-    // Create a ServerIdea from a SQL Line (array of strings)
+    // Create a ServerIdea from a SQL row (array of strings)
     //
-    public ServerIdea(String[] lines) {
+    public ServerIdea(String[] row) {
         /* FIXME: Implement this */
-        this.id = Integer.valueOf(lines[0]);
-        this.title = lines[1]; //title come sbefore the body
-        this.body = lines[2];
-        this.uid = Integer.valueOf(lines[3]);
+        this.id = Integer.valueOf(row[0]);
+        this.title = row[1]; //title come sbefore the body
+        this.body = row[2];
+        this.uid = Integer.valueOf(row[3]);
     }
 
     ////
