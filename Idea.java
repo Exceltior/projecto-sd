@@ -1,4 +1,3 @@
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +17,10 @@ public class Idea implements Serializable {
     protected int[] parentIdeaIDs = null;
     protected IdeaRelationship[] parentIdeaRelationships = null;
 
-    ////
+    //Children ideas and their relationships
+    protected int[] childrenIdeaIDs = null;
+    protected IdeaRelationship[] childrenIdeaRelationships = null;
+ 	////
     // Class Constructor
     ////
     public Idea(int id, int uid, String body, String title) {
@@ -27,18 +29,11 @@ public class Idea implements Serializable {
         this.body = body;
         this.title = title;
     }
-
-    ////
-    // Class Constructor
-    ////
     public Idea() {
         this.id = this.uid = 0;
         this.body = this.title = null;
     }
 
-    ////
-    //  Method used to write information about the idea in the output stream (send it to the server)
-    ////
     public boolean writeToDataStream(DataOutputStream out) {
         if ( ! Common.sendInt(id, out) )
             return false;
@@ -53,26 +48,10 @@ public class Idea implements Serializable {
     }
 
     ////
-    //  Method used to read information about the idea from the input stream (read it from the server)
-    ////
-    public boolean readFromDataStream(DataInputStream in){
-
-        if ((this.id = Common.recvInt(in) ) == -1)
-            return false;
-        if ((this.uid = Common.recvInt(in) ) == -1)
-            return false;
-        if ((this.title = Common.recvString(in) ) == null)
-            return false;
-        if ((this.body = Common.recvString(in) ) == null)
-            return false;
-
-        return true;
-    }
-
-    ////
     // Create an Idea from a SQL row (array of strings)
     //
     public Idea(String[] row) {
+        /* FIXME: Implement this */
         this.id = Integer.valueOf(row[0]);
         this.title = row[1]; //title come sbefore the body
         this.body = row[2];
@@ -92,9 +71,6 @@ public class Idea implements Serializable {
         return true;
     }
 
-    ////
-    // Method used to translate the different relationship type between ideas into the corresponding integer values
-    ////
     private IdeaRelationship relationshipFromInt(int relationship) {
         if ( relationship == 1 )
             return IdeaRelationship.IDEA_IN_FAVOR;
@@ -105,9 +81,6 @@ public class Idea implements Serializable {
     }
 
 
-    ////
-    // Method used to add parent ideas, given the result of an SQL query
-    ////
     public boolean addParentIdeasFromSQL(ArrayList<String[]> lines) {
         parentIdeaIDs = new int[lines.size()];
         for (int i = 0; i < lines.size(); i++) {

@@ -106,6 +106,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return topics;
     }
 
+    ////
+    // This returns an array of ideas which belong to this Topic.
+    //
     // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideias e, " +
@@ -149,8 +152,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             System.err.println("Remote Exception on the validateData method");
             //FIXME: Deal with this
         }
-
-
 
         // NOTE: topics will only be null if the query failed. And we should assume that never happens...
         return topics == null || topics.size() == 0;
@@ -210,6 +211,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return insertData(query);
     }
 
+    ////
+    // Add the parent topics of this idea to it
+    //
     public boolean addParentTopicsToIdea(Idea idea) throws  RemoteException{
         String query = "select * from TopicosIdeias t where t.iid = " + idea.getId();
         ArrayList<String[]> queryResult = receiveData(query);
@@ -221,6 +225,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         return true;
     }
+
+    ////
+    // Add the parent ideas of this idea to it
+    //
     public boolean addParentIdeasToIdea(Idea idea) throws RemoteException {
         String query = "select * from RelacaoIdeias r where r.iidfilho = " + idea.getId();
         ArrayList<String[]> queryResult = receiveData(query);
@@ -234,8 +242,24 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    // Add the children ideas of this idea to it
+    //
+    public boolean addChildrenIdeasToIdea(Idea idea) throws  RemoteException {
+        String query = "select * from RelacaoIdeias r where r.iidpai = " + idea.getId();
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return false;
+
+        idea.addChildrenIdeasFromSQL(queryResult);
+
+        return true;
+    }
+
+    ////
     // Build an idea from an IID. Notice that this constructor does nto give us parent topic and ideas, it only gahters
-    // IID (which we already had), title and body
+    // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
+    // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
     //
     public Idea getIdeaByIID(int iid) throws RemoteException {
         String query = "select * from Ideias t where t.iid = " + iid + " and t.activa = 1";
