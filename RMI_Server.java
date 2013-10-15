@@ -98,6 +98,34 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return topics;
     }
 
+    // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
+    public ServerIdea[] getIdeasFromTopic(int tid) throws RemoteException{
+        String query = "select * from Ideias, TopicosIdeias where TopicosIdeias.iid = Ideias.iid and TopicosIdeias" +
+                ".tid = ";
+
+        ArrayList<String[]> result = null;
+
+        try{
+            result = receiveData(query);
+        } catch(RemoteException e){
+            System.err.println("DEU MERDA");
+        }
+
+
+        if ( result == null )
+            return null; //FIXME: We should do something about a query failing or something like that...
+
+        if ( result.size() == 0 )
+            return null;
+
+        ServerIdea[] ideas = new ServerIdea[result.size()];
+
+        for (int i = 0; i < result.size(); i++)
+            ideas[i] = new ServerIdea(result.get(i));
+
+        return ideas;
+    }
+
     ////
     // Method responsible for checking if there aren't any topics already created with the same name as the one we want
     //  to create
@@ -117,7 +145,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         // NOTE: topics will only be null if the query failed. And we should assume that never happens...
         return topics == null || topics.size() == 0;
-
     }
 
     ////

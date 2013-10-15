@@ -2,6 +2,7 @@ import java.io.DataOutputStream;
 
 ////
 // Specialized class which handles writing a Topic through an outputstream, thus sending it.
+// FIXME: Since this is the servertopic, it might be useful to store the id of the creator in here
 //
 public class ServerTopic extends Topic {
     public ServerTopic() {
