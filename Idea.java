@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -58,17 +59,17 @@ public class Idea implements Serializable {
     ////
     //  Method responsible for receiving messages from the Server, reading information from the data Output Stream
     ////
-    public boolean readFromDataStream(DataOutputStream out) {
+    public boolean readFromDataStream(DataInputStream in) {
         int id, uid;
         String title, body;
 
-        if ( (id = Common.recvInt(out)) == -1)
+        if ( (id = Common.recvInt(in)) == -1)
             return false;
-        if ( (uid = Common.recvInt(out)) == -1)
+        if ( (uid = Common.recvInt(in)) == -1)
             return false;
-        if ( !(title = Common.recvString(out)) )
+        if ( (title = Common.recvString(in)) == null )
             return false;
-        if ( !(body = Common.recvString(out)) )
+        if ( (body = Common.recvString(in)) == null )
             return false;
 
         return true;
@@ -118,5 +119,18 @@ public class Idea implements Serializable {
 
         return true;
     }
+
+    public boolean addChildrenIdeasFromSQL(ArrayList<String[]> lines) {
+        childrenIdeaIDs = new int[lines.size()];
+        for (int i = 0; i < lines.size(); i++) {
+            String[] row = lines.get(i);
+            childrenIdeaIDs[i] = Integer.valueOf(row[1]);
+            childrenIdeaRelationships[i] = relationshipFromInt(Integer.valueOf(row[2]));
+        }
+
+        return true;
+    }
+
+
 
 }

@@ -150,9 +150,36 @@ public class ClientConnection {
                 return false;
             }
 
-            ////
-            // FIXME: FALTA AQUI RECEBER O MSG_OK? QUANDO ESTAMOS A RECEBER OS TOPICOS NAO RECEBEMOS ISSO....
-            ////
+            return reply == Common.Message.MSG_OK;
+
+        }
+    }
+
+    boolean createIdea(String title, String description){
+        Common.Message reply;
+
+        for(;;) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
+                reconnect(); continue;
+            }
+            if ( !Common.sendString(title, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( !Common.sendString(description, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.out.println("AQUI3");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("AQUI4");
+                return false;
+            }
 
             return reply == Common.Message.MSG_OK;
 

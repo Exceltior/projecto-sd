@@ -15,6 +15,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private String url;
     public static int num_users;
     public static int num_topics;
+    public static int num_ideas;
     static int starting_money = 10000;
 
     ////
@@ -177,6 +178,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Method responsible for validating an idea, before adding it to the database
+    ////
+    public boolean validateIdea(String title){
+        String query = "Select * from Ideias i where i.title='" + title + "'";
+        ArrayList<String[]> ideias = null;
+
+        try{
+            ideias = receiveData(query);
+        }catch(RemoteException r){
+            System.err.println("Remote Exception on the validateIdea method");
+            //FIXME: Deal with this
+        }
+
+        return ideias == null || ideias.size() == 0;
+    }
+
+    ////
     //  Method responsile for insering a new user in the database
     ////
     public boolean register(String user, String pass, String email, String date) throws RemoteException{
@@ -201,12 +219,29 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{
         if (! validateTopic(nome)){
-            System.out.println("O validate topic devolveu false");
+            System.err.println("Topico invalido");
             return false;
         }
         num_topics++;
 
         String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "'," + uid + ")";
+
+        return insertData(query);
+    }
+
+    ////
+    //  Method responsible for creating a new idea in the database
+    ////
+    public boolean createIdea(String title, String description, int uid) throws RemoteException{
+         String query;
+        if (!validateIdea(title)){
+             System.out.println("Ideia invalida");
+             return false;
+         }
+
+        num_ideas++;
+
+        query = "INSERT INTO Ideias VALUES (" + num_ideas + ",'" + title + "','" + description + "'," + uid + "," + "1)";
 
         return insertData(query);
     }
@@ -369,6 +404,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
                 teste = servidor.receiveData("Select count(*) from Topicos");
                 num_topics = Integer.parseInt(teste.get(0)[0]);
+
+                teste = servidor.receiveData("Select count(*) from Ideias");
+                num_ideas = Integer.parseInt(teste.get(0)[0]);
             }catch(RemoteException r){
                 System.err.println("Remote Exception while trying to get the number of users....");
                 //FIXME: HOW TO DEAL WITH THIS EXCEPTION????

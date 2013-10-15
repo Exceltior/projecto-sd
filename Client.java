@@ -7,11 +7,9 @@ public class Client {
     private String username;
     private String password;
 
-    Client(String user, String pass){
+    Client(){
         super();
         conn = new ClientConnection();
-        username = user;
-        password = pass;
     }
 
     public String getUsername(){
@@ -20,6 +18,14 @@ public class Client {
 
     public String getPassword(){
         return this.password;
+    }
+
+    public void setUsername(String user){
+        this.username = user;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String AskUsername(Scanner sc){
@@ -40,52 +46,107 @@ public class Client {
     //  Method responsible for collecting the information needed to create a new topic, and send a request to the TCP Server
     //  in order to create that new topic in the database
     ////
-    public boolean createTopic(Scanner sc,ClientConnection conn){
+    private boolean createTopic(Scanner sc,ClientConnection conn){
         String nome, descricao;
 
-        System.out.println("Insira o nome do topico:");
+        System.out.println("Please enter the name of the topic:");
         nome = sc.nextLine();
 
-        System.out.println("Insira a descricao do topico:");
+        System.out.println("Please enter the description of the topic:");
         descricao = sc.nextLine();
 
         return conn.createTopic(nome,descricao);
     }
 
-    static public void main(String[] args) {
+    ////
+    //  Method responsible for collecting the information needed to create a new idea, and send a request to the TCP Server in
+    //  order to create that new topic in the database
+    ////
+    private boolean createIdea(Scanner sc, ClientConnection conn){
+        String  title, description;
+
+        System.out.println("Please enter the title of the idea:");
+        title = sc.nextLine();
+
+        System.out.println("Please enter the description of the idea:");
+        description = sc.nextLine();
+
+        //FIXME: Recolher ids a favor e contra
+
+        return conn.createIdea(title, description);
+    }
+
+    public static int Menu(Scanner sc){
+        int choice;
+
+        System.out.println("\n\nMain Menu");
+        System.out.println("1 - Check a topic");//List all topics and choose one. While "inside" a topic list all ideas
+        System.out.println("2 - Create a new topic");
+        System.out.println("3 - Submit an idea");
+        System.out.print("Your choice: ");
+
+        ////
+        //  FIXME: INCOMPLETE, THERE ARE OPTIONS MISSING!!!!!!!
+        ////
+
+        choice = sc.nextInt();
+        sc.nextLine();
+
+        return choice;
+    }
+
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Client cliente = new Client("Hakuna", "Matata");
-        String username = cliente.getUsername(), pass = cliente.getPassword();
+        Client cliente = new Client();
         ClientConnection conn = cliente.getConnection();
+        String username = "", password = "", email = "";
+        int choice;
+        boolean login_result = false, stay = true;
 
         //  Connects to the TCP Primary Server
         conn.connect();
 
-        //Makes login
-        boolean login_result = conn.login(username,pass), stay = true;
+        do{
+            System.out.println("\n               Welcome!");
+            System.out.println("--------------------------------------------------");
+            System.out.println("There is no current session opened. Please select how you wish to connect:");
+            System.out.println("1 - Login");
+            System.out.println("2 - Register");
+            System.out.print("Your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            if (choice < 1 || choice > 2){
+                System.out.println("Invalid Choice!");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    System.err.println("Client thread was interrupted");
+                    //FIXME: WHAT TO DO WITH THIS EXCEPTION????
+                }
+            }
+
+        }while (choice < 1 || choice > 2);
+
 
         while (!login_result){
-            System.out.println("\nLogin failed\n1- Enter username and password again\n2- Register\nYour choice:");
-            int choice = sc.nextInt();
-            sc.nextLine();
+
+            System.out.println("Please enter your username:");
+            username = sc.nextLine();
+
+            System.out.println("Please enter your password:");
+            password = sc.nextLine();
 
             if (choice == 2){
                 while (stay){
-
                     stay = false;
 
-                    System.out.println("Enter your username:");
-                    username = sc.nextLine();
-
-                    System.out.println("Enter your password:");
-                    pass = sc.nextLine();
-
                     System.out.println("Enter your email address:");
-                    String email = sc.nextLine();
+                    email = sc.nextLine();
 
                     Date date = new Date();//Get current date
 
-                    if (!conn.register(username,pass,email,date)){
+                    if (!conn.register(username,password,email,date)){
                         do{
                             System.out.print("Registration unsucessfull :(\n1-Try registration again\n2-try login in with another username?\nYour choice: ");
                             choice = sc.nextInt();
@@ -102,28 +163,60 @@ public class Client {
                         } while (choice!=1 && choice!=2);
                     }
                     else //Now tht the registration is sucessfull is time to login
-                        System.out.println("Registration sucessfull :)");
-
+                        System.out.println("Registration sucessfull");
                 }
             }
 
-            username = cliente.AskUsername(sc);
-            pass = cliente.AskPassword(sc);
+            login_result = conn.login(username,password);
 
-            login_result = conn.login(username,pass);
-            System.out.println("O login deu " + login_result);
+            if (!login_result)
+                System.out.println("Login unsucessfull!\n");
         }
+        ////
+        //  Login was successfull
+        ////
 
-        if (!cliente.createTopic(sc,conn)){
-            System.out.println("Erro ao criar um topico! Topico já existe");
-            return ;
+        while(true){
+            choice = Menu(sc);
+
+            switch(choice){
+
+                //Check a topic - List all the topcis and ask the user which one he wants. While "inside" a topic list all ideas
+                case 1:
+                {
+                    ClientTopic[] topics = conn.getTopics();
+
+                    System.out.println("\n");
+                    for (Topic t : topics)
+                        System.out.println(t);
+
+                    System.out.print("Which topic do you want to see? ");
+                    int selected = sc.nextInt();
+
+                    ////
+                    //  FIXME: NEED TO IMPLEMENT THIS PART: TOPIC HAS BEEN SELECTED, IT'S TIME TO SHOW ITS IDEAS
+                    ////
+
+                    break;
+                }
+
+                //Create a new topic
+                case 2:
+                    if (!cliente.createTopic(sc,conn))
+                        System.out.println("Error while creating a topic! Topic already exists");
+                    break;
+
+                //Submit an idea
+                case 3:
+                    if (!cliente.createIdea(sc,conn))
+                        System.out.println("Error while creating an idea! Idea already exists");
+                    break;
+
+                //Wrong choice
+                default:
+                    System.out.println("Invalid option!");
+                    break;
+            }
         }
-
-        ClientTopic[] topics = conn.getTopics();
-
-        for (Topic t : topics)
-            System.out.println(t);
-
-        for (;;);
     }
 }

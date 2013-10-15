@@ -99,6 +99,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get idea by IID method!!!");
                     break ;
                 }
+            }else if(msg == Common.Message.REQUEST_CREATEIDEA){
+                if ( !handleCreateIdea()){
+                    System.err.println("Error in the handle create idea method!!!");
+                    break ;
+                }
             }
         }
 
@@ -156,7 +161,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleCreateTopicRequest(){
         String nome, descricao;
-        boolean result;
+        boolean result = false;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -174,6 +179,41 @@ public class ServerClient implements Runnable {
             //FIXME: Handle this!
             System.out.println("Existiu uma remoteException no handlecreatetopicrequest! " + e.getMessage());
             return false; /* FIXME: Do this? */
+        }
+
+        if (result){
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+                return false;
+        } else {
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                return false;
+        }
+
+        return true;
+    }
+
+    private boolean handleCreateIdea(){
+        String title, description;
+        boolean result = false;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        if ( (title = Common.recvString(inStream)) == null)
+            return false;
+
+        if ( (description = Common.recvString(inStream)) == null)
+            return false;
+
+        try{
+           result = RMIInterface.createIdea(title,description,this.uid);
+        }catch(RemoteException r){
+            System.err.println("Error while creating a new idea");
+            //FIXME: Handle this!
         }
 
         if (result){
