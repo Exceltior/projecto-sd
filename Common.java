@@ -77,6 +77,10 @@ public class Common {
         int ret = -1;
         try {
             ret = inStream.readInt();
+            if ( ret == -1 ) {
+                System.err.println("They're trying to hack us!");
+                // FIXME: Deal with this!
+            }
         } catch (IOException e) {
             //System.err.println("recvInt ERR"); e.printStackTrace();
         }
