@@ -11,17 +11,18 @@ import java.util.ArrayList;
 ////
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
-    private Statement statement; //FIXME: <-- why is this global?!?!?!
     private Connection conn;
     private String url;
     public static int num_users;
     public static int num_topics;
     static int starting_money = 10000;
 
+    ////
+    //  Class constructor. Creates a new instance of the class RMI_Server
+    ////
     public RMI_Server(String servidor, String porto, String sid) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
-        this.statement = null;
     }
 
     public Connection getConn(){
@@ -40,7 +41,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try {
             conn.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.err.println("Error closing the connection");
         }
 
         ////
@@ -52,7 +54,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ////
     }
 
-
+    ////
+    //  Method responsible for checking a given username and corresponding password, in order to check if the user is registered
+    //  and if that is the case, confirm his (or hers) login.
+    ////
     public int login(String user, String pwd) throws RemoteException {
 
         String query;
@@ -70,6 +75,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return -1;
     }
 
+    ////
+    //  Method responsible for getting all the topics stored in the database.
+    ////
     public ServerTopic[] getTopics() throws RemoteException{
         String query = "select * from Topicos";
 
@@ -173,7 +181,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         boolean check = false;
 
         if (! validateData(user)){
-            System.out.println("O validate_user devolveu false");
+            System.out.println("O validae data devolveu false");
             return false;
         }
 
@@ -181,11 +189,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +
                 "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'))";
 
-        try{
-            check = insertData(query);
-        }catch(SQLException s){
-            System.out.println("SQLException no Register do RMI Server");
-        }
+        check = insertData(query);
 
         return check;
     }
@@ -197,18 +201,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         boolean check = false;
 
         if (! validateTopic(nome)){
-            System.out.println("O validate_user devolveu false");
+            System.out.println("O validate topic devolveu false");
             return false;
         }
         num_topics++;
 
         String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "'," + uid + ")";
 
-        try{
-            check = insertData(query);
-        }catch(SQLException s){
-            System.out.println("SQLException no Register do RMI Server");
-        }
+        check = insertData(query);
 
         return check;
     }
@@ -223,6 +223,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public ArrayList<String[]> receiveData(String query) throws RemoteException{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
+        Statement statement;
 
         System.out.println();
         System.out.println("-------------------------------");
@@ -262,12 +263,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
     //  database's tables
     ////
-    public boolean insertData(String query) throws RemoteException, SQLException{
+    public boolean insertData(String query) throws RemoteException{
+        Statement statement;
+        int update = -1;
 
-        int update;
-
-        statement = conn.createStatement();
-        update = statement.executeUpdate(query);
+        try{
+            statement = conn.createStatement();
+            update = statement.executeUpdate(query);
+        }catch(SQLException s){
+            System.err.println("SQLException in the insertData method");
+        }
 
         System.out.println("O resultado foi " + (update!=0));
 

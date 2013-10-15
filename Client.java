@@ -7,17 +7,19 @@ public class Client {
     private String username;
     private String password;
 
-    Client(){
+    Client(String user, String pass){
         super();
         conn = new ClientConnection();
+        username = user;
+        password = pass;
     }
 
-    public void setUsername(String u){
-        this.username = u;
+    public String getUsername(){
+        return this.username;
     }
 
-    public void setPassword(String p){
-        this.password = p;
+    public String getPassword(){
+        return this.password;
     }
 
     public String AskUsername(Scanner sc){
@@ -52,8 +54,8 @@ public class Client {
 
     static public void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String username = "Hakuna", pass = "Matata";
-        Client cliente = new Client();
+        Client cliente = new Client("Hakuna", "Matata");
+        String username = cliente.getUsername(), pass = cliente.getPassword();
         ClientConnection conn = cliente.getConnection();
 
         //  Connects to the TCP Primary Server
@@ -112,12 +114,8 @@ public class Client {
             System.out.println("O login deu " + login_result);
         }
 
-
-        cliente.setUsername(username);
-        cliente.setPassword(pass);
-
         if (!cliente.createTopic(sc,conn)){
-            System.out.println("Erro ao criar um topico");
+            System.out.println("Erro ao criar um topico! Topico já existe");
             return ;
         }
 
