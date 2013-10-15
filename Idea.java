@@ -14,8 +14,14 @@ public class Idea implements Serializable {
     // FIXME: These may not always be filled. For instance, when we only want to send topic titles
     // to the server (list all ideas in a topic)
     protected int[] parentTopicIDs = null;
+
+    //Parent ideas and their relationships
     protected int[] parentIdeaIDs = null;
     protected IdeaRelationship[] parentIdeaRelationships = null;
+
+    //Children ideas and their relationships
+    protected int[] childrenIdeaIDs = null;
+    protected IdeaRelationship[] childrenIdeaRelationships = null;
 
     public Idea(int id, int uid, String body, String title) {
         this.id = id;
@@ -80,7 +86,18 @@ public class Idea implements Serializable {
         for (int i = 0; i < lines.size(); i++) {
             String[] row = lines.get(i);
             parentIdeaIDs[i] = Integer.valueOf(row[0]);
-            parentIdeaRelationships[i] = relationshipFromInt(Integer.valueOf(row[1]));
+            parentIdeaRelationships[i] = relationshipFromInt(Integer.valueOf(row[2]));
+        }
+
+        return true;
+    }
+
+    public boolean addChildrenIdeasFromSQL(ArrayList<String[]> lines) {
+        childrenIdeaIDs = new int[lines.size()];
+        for (int i = 0; i < lines.size(); i++) {
+            String[] row = lines.get(i);
+            childrenIdeaIDs[i] = Integer.valueOf(row[1]);
+            childrenIdeaRelationships[i] = relationshipFromInt(Integer.valueOf(row[2]));
         }
 
         return true;
