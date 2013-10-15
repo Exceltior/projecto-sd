@@ -107,7 +107,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
-    public ServerIdea[] getIdeasFromTopic(int tid) throws RemoteException{
+    public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select * from Ideias, TopicosIdeias where TopicosIdeias.iid = Ideias.iid and TopicosIdeias" +
                 ".tid = "+tid+" +  and Ideias.activa = 1";
 
@@ -126,10 +126,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if ( result.size() == 0 )
             return null;
 
-        ServerIdea[] ideas = new ServerIdea[result.size()];
+        Idea[] ideas = new Idea[result.size()];
 
         for (int i = 0; i < result.size(); i++)
-            ideas[i] = new ServerIdea(result.get(i));
+            ideas[i] = new Idea(result.get(i));
 
         return ideas;
     }
@@ -178,7 +178,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Method responsile for insering a new user in the database
     ////
     public boolean register(String user, String pass, String email, String date) throws RemoteException{
-        boolean check = false;
+        boolean check;
 
         if (! validateData(user)){
             System.out.println("O validae data devolveu false");
@@ -209,7 +209,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return insertData(query);
     }
 
-    public boolean addParentTopicsToIdea(ServerIdea idea) throws  RemoteException{
+    public boolean addParentTopicsToIdea(Idea idea) throws  RemoteException{
         String query = "select * from TopicosIdeias t where t.iid = " + idea.getId();
         ArrayList<String[]> queryResult = receiveData(query);
 
@@ -225,14 +225,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // Build an idea from an IID. Notice that this constructor does nto give us parent topic and ideas, it only gahters
     // IID (which we already had), title and body
     //
-    public ServerIdea getIdeaByIID(int iid) throws RemoteException {
+    public Idea getIdeaByIID(int iid) throws RemoteException {
         String query = "select * from Ideias t where t.iid = " + iid + " and t.activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null)
             return null;
 
-        return new ServerIdea(queryResult.get(0));
+        return new Idea(queryResult.get(0));
     }
 
     ////

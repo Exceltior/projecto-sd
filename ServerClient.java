@@ -200,7 +200,7 @@ public class ServerClient implements Runnable {
         if ( (iid = Common.recvInt(inStream)) == -1)
             return false;
 
-        ServerIdea idea = null;
+        Idea idea = null;
 
         try {
             idea = RMIInterface.getIdeaByIID(iid);

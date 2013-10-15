@@ -10,7 +10,7 @@ public interface RMI_Interface extends Remote {
     public boolean register(String user, String pass, String email, String date) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
     public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException;
-    public ServerIdea[] getIdeasFromTopic(int tid) throws RemoteException;
-    public boolean addParentTopicsToIdea(ServerIdea idea) throws  RemoteException;
-    public ServerIdea getIdeaByIID(int iid) throws RemoteException;
+    public Idea[] getIdeasFromTopic(int tid) throws RemoteException;
+    public boolean addParentTopicsToIdea(Idea idea) throws  RemoteException;
+    public Idea getIdeaByIID(int iid) throws RemoteException;
 }
