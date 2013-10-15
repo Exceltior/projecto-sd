@@ -198,8 +198,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Method responsible for creating a new topic in the database
     ////
     public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{
-        boolean check = false;
-
         if (! validateTopic(nome)){
             System.out.println("O validate topic devolveu false");
             return false;
@@ -208,9 +206,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "'," + uid + ")";
 
-        check = insertData(query);
+        return insertData(query);
+    }
 
-        return check;
+    public boolean addParentTopicsToIdea(ServerIdea idea) throws  RemoteException{
+        String query = "select * from TopicosIdeias t where t.iid = " + idea.getId();
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return false;
+
+        idea.addParentTopicsFromSQL(queryResult);
+
+        return true;
     }
 
     ////
@@ -262,6 +270,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
     //  database's tables
+    //
+    // FIXME: We are going to have to do more than just print a pretty message to stderr. In fact, we should never let
+    // execution go through or we may have unpredicteable results
     ////
     public boolean insertData(String query) throws RemoteException{
         Statement statement;
