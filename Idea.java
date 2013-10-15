@@ -20,6 +20,7 @@ public class Idea implements Serializable {
     //Children ideas and their relationships
     protected int[] childrenIdeaIDs = null;
     protected IdeaRelationship[] childrenIdeaRelationships = null;
+
  	////
     // Class Constructor
     ////
@@ -29,11 +30,18 @@ public class Idea implements Serializable {
         this.body = body;
         this.title = title;
     }
+
+    ////
+    // Class Constructor
+    ////
     public Idea() {
         this.id = this.uid = 0;
         this.body = this.title = null;
     }
 
+    ////
+    //  Method responsible for comunicating with the Server, writing information to the data Output Stream
+    ////
     public boolean writeToDataStream(DataOutputStream out) {
         if ( ! Common.sendInt(id, out) )
             return false;
@@ -42,6 +50,25 @@ public class Idea implements Serializable {
         if ( ! Common.sendString(title, out) )
             return false;
         if ( ! Common.sendString(body, out) )
+            return false;
+
+        return true;
+    }
+
+    ////
+    //  Method responsible for receiving messages from the Server, reading information from the data Output Stream
+    ////
+    public boolean readFromDataStream(DataOutputStream out) {
+        int id, uid;
+        String title, body;
+
+        if ( (id = Common.recvInt(out)) == -1)
+            return false;
+        if ( (uid = Common.recvInt(out)) == -1)
+            return false;
+        if ( !(title = Common.recvString(out)) )
+            return false;
+        if ( !(body = Common.recvString(out)) )
             return false;
 
         return true;
