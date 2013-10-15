@@ -221,6 +221,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         return true;
     }
+    public boolean addParentIdeasToIdea(Idea idea) throws RemoteException {
+        String query = "select * from RelacaoIdeias r where r.iidfilho = " + idea.getId();
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return false;
+
+        idea.addParentIdeasFromSQL(queryResult);
+
+        return true;
+    }
 
     ////
     // Build an idea from an IID. Notice that this constructor does nto give us parent topic and ideas, it only gahters
