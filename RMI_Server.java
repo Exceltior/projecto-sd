@@ -106,6 +106,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return topics;
     }
 
+    ////
+    // This returns an array of ideas which belong to this Topic.
+    //
     // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideias e, " +
@@ -149,8 +152,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             System.err.println("Remote Exception on the validateData method");
             //FIXME: Deal with this
         }
-
-
 
         // NOTE: topics will only be null if the query failed. And we should assume that never happens...
         return topics == null || topics.size() == 0;
