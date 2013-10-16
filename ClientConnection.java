@@ -213,14 +213,13 @@ public class ClientConnection {
                 devolve = 2;
             }
 
-            //Receive final MSG_OK or MSG_ERR
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI7");
-                reconnect(); continue;
+            //Receive final MSG_OK
+            if(reply == Common.Message.MSG_OK){
+                System.out.println("Vou devolver 1");
+                return 1;//Everything went well
             }
 
-            if(reply == Common.Message.MSG_OK)
-                return 1;//Everything went well
+            System.out.println("Vou devolver " + devolve);
 
             return devolve;//There was an error
         }

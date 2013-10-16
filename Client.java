@@ -1,4 +1,5 @@
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -83,28 +84,34 @@ public class Client {
         System.out.println("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
         topics = sc.nextLine();
 
-        //Receive confirmation from the server that the topics are well introduced
-
         //FIXME: Recolher ids a favor e contra + topicos
 
         return conn.createIdea(title, description,nshares,price,topics) > 0;
     }
 
     public static int Menu(Scanner sc){
-        int choice;
+        int choice = -1;
+        boolean repeat = false;
 
         System.out.println("\n\nMain Menu");
         System.out.println("1 - Check a topic");//List all topics and choose one. While "inside" a topic list all ideas
         System.out.println("2 - Create a new topic");
         System.out.println("3 - Submit an idea");
-        System.out.print("Your choice: ");
+
+        do{
+            System.out.print("Your choice: ");
 
         ////
         //  FIXME: INCOMPLETE, THERE ARE OPTIONS MISSING!!!!!!!
         ////
+            try{
+                choice = sc.nextInt();
+                sc.nextLine();
+            }catch(InputMismatchException m){
+                repeat = true;
+            }
 
-        choice = sc.nextInt();
-        sc.nextLine();
+        }while(repeat);
 
         return choice;
     }
@@ -114,7 +121,7 @@ public class Client {
         Client cliente = new Client();
         ClientConnection conn = cliente.getConnection();
         String username = "", password = "", email = "";
-        int choice;
+        int choice, selected = -1, min_id_topic = 0, max_id_topic = 0;
         boolean login_result = false, stay = true;
 
         //  Connects to the TCP Primary Server
@@ -127,8 +134,12 @@ public class Client {
             System.out.println("1 - Login");
             System.out.println("2 - Register");
             System.out.print("Your choice: ");
-            choice = sc.nextInt();
-            sc.nextLine();
+            try{
+                choice = sc.nextInt();
+                sc.nextLine();
+            }catch(InputMismatchException m){
+                  choice = 5;//So that we run the cicle again
+            }
 
             if (choice < 1 || choice > 2){
                 System.out.println("Invalid Choice!");
@@ -189,6 +200,7 @@ public class Client {
         ////
         //  Login was successfull
         ////
+        System.out.println("Login Successfull!");
 
         while(true){
             choice = Menu(sc);
@@ -200,12 +212,26 @@ public class Client {
                 {
                     ClientTopic[] topics = conn.getTopics();
 
-                    System.out.println("\n");
-                    for (Topic t : topics)
-                        System.out.println(t);
+                    if (topics.length>0)
+                        min_id_topic = topics[0].getId();
 
-                    System.out.print("Which topic do you want to see? ");
-                    int selected = sc.nextInt();
+                    System.out.println("\n");
+                    for (Topic t : topics){
+                        System.out.println(t);
+                        if(t.getId() > max_id_topic)
+                            max_id_topic = t.getId();
+                        else if(t.getId() < min_id_topic)
+                            min_id_topic = t.getId();
+                    }
+
+                    do{
+                        System.out.print("Which topic do you want to see? ");
+                        try{
+                            selected = sc.nextInt();
+                        }catch(InputMismatchException m){
+                            selected = -1;
+                        }
+                    }while (selected < min_id_topic || selected > max_id_topic);
 
                     ////
                     //  FIXME: NEED TO IMPLEMENT THIS PART: TOPIC HAS BEEN SELECTED, IT'S TIME TO SHOW ITS IDEAS

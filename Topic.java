@@ -26,4 +26,8 @@ public class Topic implements Serializable{
         this.title = title;
         this.body = body;
     }
+
+    public int getId(){
+        return this.id;
+    }
 }
