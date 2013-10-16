@@ -64,6 +64,7 @@ public class Client {
     ////
     private boolean createIdea(Scanner sc, ClientConnection conn){
         String  title, description;
+        int nshares, price;
 
         System.out.println("Please enter the title of the idea:");
         title = sc.nextLine();
@@ -71,9 +72,17 @@ public class Client {
         System.out.println("Please enter the description of the idea:");
         description = sc.nextLine();
 
-        //FIXME: Recolher ids a favor e contra
+        System.out.println("Please enter the number of shares for the idea:");
+        nshares = sc.nextInt();
 
-        return conn.createIdea(title, description);
+        System.out.println("Please enter the price of each share of the idea:");
+        price = sc.nextInt();
+
+        //Pedir ja numero de shares e preco
+
+        //FIXME: Recolher ids a favor e contra + topicos
+
+        return conn.createIdea(title, description,nshares,price);
     }
 
     public static int Menu(Scanner sc){

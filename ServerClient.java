@@ -194,7 +194,8 @@ public class ServerClient implements Runnable {
 
     private boolean handleCreateIdea(){
         String title, description;
-        boolean result = false;
+        int nshares, price;
+        boolean result = false, result_shares = false;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -209,14 +210,20 @@ public class ServerClient implements Runnable {
         if ( (description = Common.recvString(inStream)) == null)
             return false;
 
+        if ( (nshares = Common.recvInt(inStream)) == -1)
+            return false;
+        if ( (price = Common.recvInt(inStream)) == -1)
+            return false;
+
         try{
            result = RMIInterface.createIdea(title,description,this.uid);
+           result_shares = RMIInterface.setSharesIdea(this.uid,title,nshares,price);
         }catch(RemoteException r){
             System.err.println("Error while creating a new idea");
             //FIXME: Handle this!
         }
 
-        if (result){
+        if (result && result_shares){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                 return false;
         } else {

@@ -155,7 +155,7 @@ public class ClientConnection {
         }
     }
 
-    boolean createIdea(String title, String description){
+    boolean createIdea(String title, String description, int nshares, int price){
         Common.Message reply;
 
         for(;;) {
@@ -167,6 +167,14 @@ public class ClientConnection {
             }
 
             if ( !Common.sendString(description, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( !Common.sendInt(nshares, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( !Common.sendInt(price, outStream) ) {
                 reconnect(); continue;
             }
 

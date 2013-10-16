@@ -181,7 +181,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Method responsible for validating an idea, before adding it to the database
     ////
     public boolean validateIdea(String title){
-        String query = "Select * from Ideias i where i.title='" + title + "'";
+        String query = "Select * from Ideias i where i.titulo='" + title + "'";
         ArrayList<String[]> ideias = null;
 
         try{
@@ -292,7 +292,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    // Build an idea from an IID. Notice that this constructor does nto give us parent topic and ideas, it only gahters
+    // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gahters
     // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
     // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
     //
@@ -304,6 +304,30 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
 
         return new Idea(queryResult.get(0));
+    }
+
+    ////
+    //  Set up the number of shares for a given idea, and the price of each share for that idea
+    ////
+    public boolean setSharesIdea(int uid, String title,int nshares, int price)throws RemoteException{
+        String query = "Select i.iid from Ideias i where i.titulo = '" + title + "'";
+        ArrayList<String[]> result = null;
+        int idea_id;
+
+        try{
+            result = receiveData(query);
+            if ( result.size() > 0 ){//There is an idea with the given title
+                idea_id = Integer.valueOf(result.get(0)[0]);//Get its id
+                query = "INSERT INTO Shares VALUES (" + idea_id + "," + uid + "," + nshares + "," + price + ")";
+
+                return insertData(query);
+            }
+        }catch(RemoteException r){
+            System.err.println("Remote Exception on the setSharesIdea method");
+            //FIXME: Deal with this
+        }
+
+        return false;
     }
 
     ////
@@ -418,6 +442,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("academica", servidor);
             //Sabes que nunca estaras so... Na 1ª ou 2ª divisao... Porque tu es a briosa, o orgulho do nosso coração!!!!
+            //Lalalala... lalalalalalala... lalalalalala... lalalalalala
+            //Forca Briosa vence... Nos queremos que fiques na 1ª.... E por ti vamos cantar... JAMAIS TE IREMOS DEIXAR!!!!!
+            //Lalalala... lalalalalalala... lalalalalala... lalalalalala
+            //Somos ultras de Coimbra ... E viemos p'ra te ver vencer... Nosso nome e Mancha Negra... SOU BRIOSA ATE MORRER!!!!
+            //Lalalala... lalalalalalala... lalalalalala... lalalalalala
 
             ////
             //  FIXME: Is it worth to store the RMI Registry's port in some sort of a file or variable?
