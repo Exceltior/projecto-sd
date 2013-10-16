@@ -201,7 +201,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         boolean check;
 
         if (! validateData(user)){
-            System.out.println("O validae data devolveu false");
+            System.err.println("O validate data devolveu false");
             return false;
         }
 
@@ -331,6 +331,68 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Method responsible for creating the connection between an idea and one or more topics
+    ////
+    public boolean setTopicsIdea(String ideaTitle, String topicTitle, int uid) throws RemoteException{
+
+        String query = "Select i.iid from Ideias i where i.titulo = '" + ideaTitle + "'";
+        ArrayList<String[]> ideas = null, topics = null;
+        int idea_id, topic_id;
+        boolean check;
+
+        try{
+            ideas = receiveData(query);
+            query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
+            System.out.println("SSSSS\n\n" + query);
+            topics = receiveData(query);
+
+            ////
+            //  There is no topic with the given title, so let's create it
+            ////
+            if (topics.size() == 0){
+
+                ////
+                //  FIXME: Decide which description to put in the topic when creating it
+                ////
+
+                check = createTopic(topicTitle,("Topic created by user " + uid),uid);
+                if(!check){
+                    System.err.println("Error creating topic " + topicTitle + " in the setTopicsIdea method!");
+                    //FIXME: What to do in this situation???
+                } else{
+                    //Add the number of the topic to the ArrayList
+                    String []temp = {"" + (num_topics-1)};
+                    topics.add(temp);
+                }
+            }
+
+            ////
+            //  EXPLANATION: We want to get the id of the given idea and topic. Therefore, we  know we have in "ideas" an
+            //  ArrayList of String arrays which contain the ids of the ideas with title like "ideaTitle" (For that we can
+            //  have one element in the ArrayList or no elements). We also have a similar content in "topics" (We have an
+            //  ArrayList of String array which contain the ids of the topics with title like "topicTitle" - We also have
+            //  one element or no elements in the ArrayList).
+            //  Given that, we are only interested in the situations where we can find the idea id and the topic id.
+            //  Those situations correspond to ideas.size() = 1 (We found the idea we were looking for) and topics.size()=1
+            //  So here you have it: The if condition explained in, what we hope to be, a simple and clear way.
+            ////
+            if ( ideas.size() + topics.size() > 1){
+                idea_id = Integer.valueOf(ideas.get(0)[0]);//Get idea id
+                topic_id = Integer.valueOf(topics.get(0)[0]);//Get topic id
+
+                query = "INSERT INTO TopicosIdeias VALUES (" + topic_id + "," + idea_id + ")";
+
+                return insertData(query);
+            }
+        }catch(RemoteException r){
+            System.err.println("Remote Exception on the setTopicsIdea method");
+            //FIXME: Deal with this
+        }
+
+        return false;
+    }
+
+    ////
     //  Method responsible for executing queries like "Select..."
     //
     // Returns: null on failure, Arraylist with all columns (as strings in an array), which may be empty if there query
@@ -342,9 +404,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement;
 
-        System.out.println();
-        System.out.println("-------------------------------");
-        System.out.println("Running query: "+query);
+        //System.out.println("\n-------------------------------\nRunning query: "+query);
 
         try {
             statement = conn.createStatement();
@@ -359,7 +419,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             rs = statement.executeQuery(query);
             rsmd = rs.getMetaData();
             columnsNumber = rsmd.getColumnCount();//Get number of columns
-            System.out.println("Query's result has " + columnsNumber + " columns");
+            //System.out.println("Query's result has " + columnsNumber + " columns");
             while (rs.next()){
                 result.add(new String[columnsNumber]);
                 for (int i=1;i<=columnsNumber;++i){
@@ -394,7 +454,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             System.err.println("SQLException in the insertData method");
         }
 
-        System.out.println("O resultado foi " + (update!=0));
+        //System.out.println("O resultado foi " + (update!=0));
 
         return update != 0;
     }

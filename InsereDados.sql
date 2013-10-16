@@ -3,13 +3,13 @@ INSERT INTO Utilizadores VALUES (1,'hakuna@matata.com','Hakuna','Matata', 10000,
 INSERT INTO Utilizadores VALUES (2,'joca@joca.com', 'Joca', 'teste123', 10000, to_date('2013.10.14', 'yyyy.mm.dd'));
 
 /*Criacao dos Topicos*/
-INSERT INTO Topicos VALUES (1,'Hello, Ladies','Hakuna Matata',1);
-INSERT INTO Topicos VALUES (2,'Tenis','Joao Sousa fecha top50 ATP!',1);
+INSERT INTO Topicos VALUES (1,'Tenis','Joao Sousa fecha top50 ATP!',1);
+INSERT INTO Topicos VALUES (2,'Hello, Ladies','Hakuna Matata',1);
 INSERT INTO Topicos VALUES (3,'Latada','Latada comecça na quarta-feira dia 17',1);
 
 /*Criacao das Ideias:
-Ideias 1,4 e 5 vao para o topico 2
-Ideia 2 vai para o topico 1
+Ideias 1,4 e 5 vao para o topico 1
+Ideia 2 vai para o topico 2
 Ideia 3 vai para o topico 3*/ 
 INSERT INTO Ideias VALUES (2,'Ladies', 'Hello Ladies, my name is Maxi... Super Maxi!',1,1);
 
@@ -20,8 +20,10 @@ INSERT INTO Ideias VALUES (5, 'Tenis Portugal', 'O Joao Sousa tem feito um traba
 INSERT INTO Ideias VALUES (3, 'Cortejo Latada', 'O Cortejo da Latada e um excelente evento',1,1);
 
 /*Colocacao das ideias nos diferentes topicos*/
-INSERT INTO TopicosIdeias VALUES (1,2);
-INSERT INTO TopicosIdeias VALUES (2,1);
+INSERT INTO TopicosIdeias VALUES (1,1);
+INSERT INTO TopicosIdeias VALUES (1,4);
+INSERT INTO TopicosIdeias VALUES (1,5);
+INSERT INTO TopicosIdeias VALUES (2,2);
 INSERT INTO TopicosIdeias VALUES (3,3);
 
 /*Tratar da relacao entre as ideias:
@@ -31,3 +33,10 @@ Ideia 5 apoia a ideia 1*/
 INSERT INTO RelacaoIdeias VALUES (1,4,-1);
 INSERT INTO RelacaoIdeias VALUES (4,5,-1);
 INSERT INTO RelacaoIdeias VALUES (1,5,1);
+
+/*Inserir Shares*/
+INSERT INTO Shares VALUES (1,1,100,2);
+INSERT INTO Shares VALUES (2,1,100,3);
+INSERT INTO Shares VALUES (3,2,100,4);
+INSERT INTO Shares VALUES (4,1,100,6);
+INSERT INTO Shares VALUES (5,1,100,1);

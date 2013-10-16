@@ -155,8 +155,9 @@ public class ClientConnection {
         }
     }
 
-    boolean createIdea(String title, String description, int nshares, int price){
+    int createIdea(String title, String description, int nshares, int price, String topics){
         Common.Message reply;
+        int devolve = -1;
 
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
@@ -178,19 +179,50 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
+            if (!Common.sendString(topics,outStream)){
+                reconnect(); continue;
+            }
+
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.out.println("AQUI3");
+                System.err.println("AQUI3");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
                 //Shouldn't happen, FIXME!
                 System.err.println("AQUI4");
-                return false;
+                return devolve;
             }
 
-            return reply == Common.Message.MSG_OK;
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI5");
+                reconnect(); continue;
+            }
 
+            //Receive confirmation of the topics -> If everything went well we dont need to do anything
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI6");
+                reconnect(); continue;
+            }
+
+            if(reply == Common.Message.ERR_TOPIC_NAME){
+                String errTopic = "";
+                if ( (errTopic= Common.recvString(inStream)) == null)
+                    return devolve;
+                System.err.println("Error: Topic " + errTopic + "has an invalid name. Idea submited was not attached to this topic");
+                devolve = 2;
+            }
+
+            //Receive final MSG_OK or MSG_ERR
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI7");
+                reconnect(); continue;
+            }
+
+            if(reply == Common.Message.MSG_OK)
+                return 1;//Everything went well
+
+            return devolve;//There was an error
         }
     }
 

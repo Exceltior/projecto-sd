@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Common {
     static enum Message {
         REQUEST_GETTOPICS, MSG_OK, REQUEST_LOGIN, MSG_ERR, ERR_NO_MSG_RECVD, ERR_NOT_LOGGED_IN, REQUEST_REG,
-        REQUEST_CREATETOPICS, REQUEST_GET_IDEA_BY_IID, ERR_NO_SUCH_IID, REQUEST_CREATEIDEA
+        REQUEST_CREATETOPICS, REQUEST_GET_IDEA_BY_IID, ERR_NO_SUCH_IID, REQUEST_CREATEIDEA, ERR_TOPIC_NAME, MSG_TOPIC_OK
     }
 
     static public boolean sendMessage(Message msg, DataOutputStream outStream) {

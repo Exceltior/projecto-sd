@@ -63,7 +63,7 @@ public class Client {
     //  order to create that new topic in the database
     ////
     private boolean createIdea(Scanner sc, ClientConnection conn){
-        String  title, description;
+        String  title, description, topics;
         int nshares, price;
 
         System.out.println("Please enter the title of the idea:");
@@ -78,11 +78,16 @@ public class Client {
         System.out.println("Please enter the price of each share of the idea:");
         price = sc.nextInt();
 
-        //Pedir ja numero de shares e preco
+        sc.nextLine();//Clear the buffer
+
+        System.out.println("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
+        topics = sc.nextLine();
+
+        //Receive confirmation from the server that the topics are well introduced
 
         //FIXME: Recolher ids a favor e contra + topicos
 
-        return conn.createIdea(title, description,nshares,price);
+        return conn.createIdea(title, description,nshares,price,topics) > 0;
     }
 
     public static int Menu(Scanner sc){
@@ -210,21 +215,24 @@ public class Client {
                 }
 
                 //Create a new topic
-                case 2:
+                case 2:{
                     if (!cliente.createTopic(sc,conn))
                         System.out.println("Error while creating a topic! Topic already exists");
                     break;
-
+                }
                 //Submit an idea
-                case 3:
+                case 3:{
                     if (!cliente.createIdea(sc,conn))
                         System.out.println("Error while creating an idea! Idea already exists");
+                    else
+                        System.out.println("Idea created with success");
                     break;
-
+                }
                 //Wrong choice
-                default:
+                default:{
                     System.out.println("Invalid option!");
                     break;
+                }
             }
         }
     }
