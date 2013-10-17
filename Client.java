@@ -7,10 +7,13 @@ public class Client {
     private ClientConnection conn;
     private String username;
     private String password;
+    private String email;
+    private Scanner sc;
 
     Client(){
         super();
         conn = new ClientConnection();
+        sc = new Scanner(System.in);
     }
 
     public String getUsername(){
@@ -29,13 +32,18 @@ public class Client {
         this.password = password;
     }
 
-    public String AskUsername(Scanner sc){
+    private String askUsername(){
         System.out.print("Enter username: ");
         return sc.nextLine();
     }
 
-    public String AskPassword(Scanner sc){
+    private String askPassword(){
         System.out.print("Enter password: ");
+        return sc.nextLine();
+    }
+
+    private String askEmail(){
+        System.out.print("Enter your email address: ");
         return sc.nextLine();
     }
 
@@ -89,7 +97,7 @@ public class Client {
         return conn.createIdea(title, description,nshares,price,topics) > 0;
     }
 
-    public static int Menu(Scanner sc){
+    private int Menu(Scanner sc){
         int choice = -1;
         boolean repeat = false;
 
@@ -116,11 +124,26 @@ public class Client {
         return choice;
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Client cliente = new Client();
-        ClientConnection conn = cliente.getConnection();
-        String username = "", password = "", email = "";
+    private int printWelcomeScreen(){
+        int choice;
+
+        System.out.println("\n               Welcome!");
+        System.out.println("--------------------------------------------------");
+        System.out.println("There is no current session opened. Please select how you wish to connect:");
+        System.out.println("1 - Login");
+        System.out.println("2 - Register");
+        System.out.print("Your choice: ");
+        try{
+            choice = sc.nextInt();
+            sc.nextLine();
+        }catch(InputMismatchException m){
+            choice = 5;//So that we run the cicle again
+        }
+
+        return choice;
+    }
+
+    private void execute(){
         int choice, selected = -1, min_id_topic = 0, max_id_topic = 0;
         boolean login_result = false, stay = true;
 
@@ -128,18 +151,7 @@ public class Client {
         conn.connect();
 
         do{
-            System.out.println("\n               Welcome!");
-            System.out.println("--------------------------------------------------");
-            System.out.println("There is no current session opened. Please select how you wish to connect:");
-            System.out.println("1 - Login");
-            System.out.println("2 - Register");
-            System.out.print("Your choice: ");
-            try{
-                choice = sc.nextInt();
-                sc.nextLine();
-            }catch(InputMismatchException m){
-                  choice = 5;//So that we run the cicle again
-            }
+            choice = printWelcomeScreen();
 
             if (choice < 1 || choice > 2){
                 System.out.println("Invalid Choice!");
@@ -156,18 +168,14 @@ public class Client {
 
         while (!login_result){
 
-            System.out.println("Please enter your username:");
-            username = sc.nextLine();
-
-            System.out.println("Please enter your password:");
-            password = sc.nextLine();
+            username = askUsername();
+            password = askPassword();
 
             if (choice == 2){
                 while (stay){
                     stay = false;
 
-                    System.out.println("Enter your email address:");
-                    email = sc.nextLine();
+                    email = askEmail();
 
                     Date date = new Date();//Get current date
 
@@ -242,13 +250,13 @@ public class Client {
 
                 //Create a new topic
                 case 2:{
-                    if (!cliente.createTopic(sc,conn))
+                    if (!createTopic(sc,conn))
                         System.out.println("Error while creating a topic! Topic already exists");
                     break;
                 }
                 //Submit an idea
                 case 3:{
-                    if (!cliente.createIdea(sc,conn))
+                    if (!createIdea(sc,conn))
                         System.out.println("Error while creating an idea! Idea already exists");
                     else
                         System.out.println("Idea created with success");
@@ -261,5 +269,10 @@ public class Client {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.execute();
     }
 }

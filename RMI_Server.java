@@ -399,7 +399,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // produces an empty table.
     //
     ////
-    public ArrayList<String[]> receiveData(String query) throws RemoteException{
+    private ArrayList<String[]> receiveData(String query) throws RemoteException{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement;
@@ -443,7 +443,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // FIXME: We are going to have to do more than just print a pretty message to stderr. In fact, we should never let
     // execution go through or we may have unpredicteable results
     ////
-    public boolean insertData(String query) throws RemoteException{
+    private boolean insertData(String query) throws RemoteException{
         Statement statement;
         int update = -1;
 
@@ -459,37 +459,36 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return update != 0;
     }
 
-    public static void main(String[] args) {
+    private void execute(){
 
         ////
         //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
         ////
 
         String username = "sd", password = "sd";
-        RMI_Server servidor;
 
         try{
-            servidor = new RMI_Server("192.168.56.101","1521","XE");
-            servidor.setConn(DriverManager.getConnection(servidor.getUrl(), username, password));
+
+            conn = DriverManager.getConnection(url, username, password);
 
 
             //connect to database
             Class.forName("oracle.jdbc.driver.OracleDriver");
 
-            if (servidor.getConn() == null) {
+            if (conn == null) {
                 System.out.println("Failed to make connection!");
                 return ;
             }
 
             //Get current number of users
             try{
-                ArrayList<String[]> teste= servidor.receiveData("Select count(*) from Utilizadores");
+                ArrayList<String[]> teste= receiveData("Select count(*) from Utilizadores");
                 num_users = Integer.parseInt(teste.get(0)[0]);
 
-                teste = servidor.receiveData("Select count(*) from Topicos");
+                teste = receiveData("Select count(*) from Topicos");
                 num_topics = Integer.parseInt(teste.get(0)[0]);
 
-                teste = servidor.receiveData("Select count(*) from Ideias");
+                teste = receiveData("Select count(*) from Ideias");
                 num_ideas = Integer.parseInt(teste.get(0)[0]);
             }catch(RemoteException r){
                 System.err.println("Remote Exception while trying to get the number of users....");
@@ -500,13 +499,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
             //Start RMIRegistry programmatically
             Registry r = LocateRegistry.createRegistry(7000);
-            r.rebind("academica", servidor);
-            //Sabes que nunca estaras so... Na 1ª ou 2ª divisao... Porque tu es a briosa, o orgulho do nosso coração!!!!
-            //Lalalala... lalalalalalala... lalalalalala... lalalalalala
-            //Forca Briosa vence... Nos queremos que fiques na 1ª.... E por ti vamos cantar... JAMAIS TE IREMOS DEIXAR!!!!!
-            //Lalalala... lalalalalalala... lalalalalala... lalalalalala
-            //Somos ultras de Coimbra ... E viemos p'ra te ver vencer... Nosso nome e Mancha Negra... SOU BRIOSA ATE MORRER!!!!
-            //Lalalala... lalalalalalala... lalalalalala... lalalalalala
+            r.rebind("academica", this);
 
             ////
             //  FIXME: Is it worth to store the RMI Registry's port in some sort of a file or variable?
@@ -529,5 +522,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         //
         //
         ////
+    }
+
+    public static void main(String[] args) {
+
+        ////
+        //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
+        ////
+
+        try{
+            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
+            servidor.execute();
+        }catch(RemoteException r){
+            System.out.println("RemoteException on the main method of the RMI Server");
+        }
     }
 }
