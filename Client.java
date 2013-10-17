@@ -105,6 +105,7 @@ public class Client {
         System.out.println("1 - Check a topic");//List all topics and choose one. While "inside" a topic list all ideas
         System.out.println("2 - Create a new topic");
         System.out.println("3 - Submit an idea");
+        System.out.println("0 - Sair");
 
         do{
             System.out.print("Your choice: ");
@@ -144,7 +145,7 @@ public class Client {
     }
 
     private void execute(){
-        int choice, selected = -1, min_id_topic = 0, max_id_topic = 0;
+        int choice;
         boolean login_result = false, stay = true;
 
         //  Connects to the TCP Primary Server
@@ -210,10 +211,25 @@ public class Client {
         ////
         System.out.println("Login Successfull!");
 
-        while(true){
+        mainLoop();
+    }
+
+    private void mainLoop(){
+        int choice, selected = -1, min_id_topic = 0, max_id_topic = 0;
+        boolean stay = true;
+
+        while(stay){
             choice = Menu(sc);
 
             switch(choice){
+
+                //Logout
+                case 0:
+                {
+                    System.out.println("Thank you for posting with us, hope you have a nice day! Goodbye!");
+                    stay = false;
+                    break;
+                }
 
                 //Check a topic - List all the topcis and ask the user which one he wants. While "inside" a topic list all ideas
                 case 1:
