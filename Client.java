@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -55,7 +56,7 @@ public class Client {
     //  Method responsible for collecting the information needed to create a new topic, and send a request to the TCP Server
     //  in order to create that new topic in the database
     ////
-    private boolean createTopic(Scanner sc,ClientConnection conn){
+    private boolean createTopic(){
         String nome, descricao;
 
         System.out.println("Please enter the name of the topic:");
@@ -71,7 +72,7 @@ public class Client {
     //  Method responsible for collecting the information needed to create a new idea, and send a request to the TCP Server in
     //  order to create that new topic in the database
     ////
-    private boolean createIdea(Scanner sc, ClientConnection conn){
+    private boolean createIdea(){
         String  title, description, topics;
         int nshares, price;
 
@@ -97,6 +98,31 @@ public class Client {
         return conn.createIdea(title, description,nshares,price,topics) > 0;
     }
 
+    ////
+    //  Prints the Welcome Screen, when the users connects to the Server
+    ////
+    private int printWelcomeScreen(){
+        int choice;
+
+        System.out.println("\n               Welcome!");
+        System.out.println("--------------------------------------------------");
+        System.out.println("There is no current session opened. Please select how you wish to connect:");
+        System.out.println("1 - Login");
+        System.out.println("2 - Register");
+        System.out.print("Your choice: ");
+        try{
+            choice = sc.nextInt();
+            sc.nextLine();
+        }catch(InputMismatchException m){
+            choice = 5;//So that we run the cicle again
+        }
+
+        return choice;
+    }
+
+    ////
+    //  Prints the main menu screen, where the user can select what actions to do
+    ////
     private int Menu(Scanner sc){
         int choice = -1;
         boolean repeat = false;
@@ -105,6 +131,7 @@ public class Client {
         System.out.println("1 - Check a topic");//List all topics and choose one. While "inside" a topic list all ideas
         System.out.println("2 - Create a new topic");
         System.out.println("3 - Submit an idea");
+        System.out.println("4 - Delete an idea");
         System.out.println("0 - Sair");
 
         do{
@@ -121,25 +148,6 @@ public class Client {
             }
 
         }while(repeat);
-
-        return choice;
-    }
-
-    private int printWelcomeScreen(){
-        int choice;
-
-        System.out.println("\n               Welcome!");
-        System.out.println("--------------------------------------------------");
-        System.out.println("There is no current session opened. Please select how you wish to connect:");
-        System.out.println("1 - Login");
-        System.out.println("2 - Register");
-        System.out.print("Your choice: ");
-        try{
-            choice = sc.nextInt();
-            sc.nextLine();
-        }catch(InputMismatchException m){
-            choice = 5;//So that we run the cicle again
-        }
 
         return choice;
     }
@@ -224,16 +232,14 @@ public class Client {
             switch(choice){
 
                 //Logout
-                case 0:
-                {
+                case 0:{
                     System.out.println("Thank you for posting with us, hope you have a nice day! Goodbye!");
                     stay = false;
                     break;
                 }
 
                 //Check a topic - List all the topcis and ask the user which one he wants. While "inside" a topic list all ideas
-                case 1:
-                {
+                case 1:{
                     ClientTopic[] topics = conn.getTopics();
 
                     if (topics.length>0)
@@ -266,16 +272,24 @@ public class Client {
 
                 //Create a new topic
                 case 2:{
-                    if (!createTopic(sc,conn))
+                    if (!createTopic())
                         System.out.println("Error while creating a topic! Topic already exists");
                     break;
                 }
                 //Submit an idea
                 case 3:{
-                    if (!createIdea(sc,conn))
+                    if (!createIdea())
                         System.out.println("Error while creating an idea! Idea already exists");
                     else
                         System.out.println("Idea created with success");
+                    break;
+                }
+
+                //Delete an idea
+                case 4:{
+
+                    //First we need to check if there is any idea which is fully owned by the user
+                    System.out.println("Delete an idea!!!!");
                     break;
                 }
                 //Wrong choice

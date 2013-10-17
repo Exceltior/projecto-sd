@@ -310,7 +310,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
     public boolean setSharesIdea(int uid, String title,int nshares, int price)throws RemoteException{
-        String query = "Select i.iid from Ideias i where i.titulo = '" + title + "'";
+        String query = "Select i.iid from Ideias i where i.titulo = '" + title + "' and i.activa = 1";
         ArrayList<String[]> result = null;
         int idea_id;
 
@@ -335,7 +335,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     public boolean setTopicsIdea(String ideaTitle, String topicTitle, int uid) throws RemoteException{
 
-        String query = "Select i.iid from Ideias i where i.titulo = '" + ideaTitle + "'";
+        String query = "Select i.iid from Ideias i where i.titulo = '" + ideaTitle + "' and i.activa = 1";
         ArrayList<String[]> ideas = null, topics = null;
         int idea_id, topic_id;
         boolean check;
