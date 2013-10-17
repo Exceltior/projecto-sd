@@ -132,5 +132,13 @@ public class Idea implements Serializable {
     }
 
 
+    public String toString(){
+        return "Topic{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                ", userid = " + uid +
+                '}';
+    }
 
 }
