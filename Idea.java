@@ -63,13 +63,13 @@ public class Idea implements Serializable {
         int id, uid;
         String title, body;
 
-        if ( (id = Common.recvInt(in)) == -1)
+        if ( (this.id = Common.recvInt(in)) == -1)
             return false;
-        if ( (uid = Common.recvInt(in)) == -1)
+        if ( (this.uid = Common.recvInt(in)) == -1)
             return false;
-        if ( (title = Common.recvString(in)) == null )
+        if ( (this.title = Common.recvString(in)) == null )
             return false;
-        if ( (body = Common.recvString(in)) == null )
+        if ( (this.body = Common.recvString(in)) == null )
             return false;
 
         return true;
