@@ -95,7 +95,7 @@ public class Client {
 
         //FIXME: Recolher ids a favor e contra + topicos
 
-        return conn.createIdea(title, description,nshares,price,topics) > 0;
+        return conn.createIdea(title, description,nshares,price,topics.split(";"));
     }
 
     ////
@@ -222,8 +222,36 @@ public class Client {
         mainLoop();
     }
 
+    private int listTopics(){
+        int selected = -1, min_id_topic = 0, max_id_topic = 0;
+        ClientTopic[] topics = conn.getTopics();
+
+        if (topics.length>0)
+            min_id_topic = topics[0].getId();
+
+        System.out.println("\n");
+        for (Topic t : topics){
+            System.out.println(t);
+            if(t.getId() > max_id_topic)
+                max_id_topic = t.getId();
+            else if(t.getId() < min_id_topic)
+                min_id_topic = t.getId();
+        }
+
+        do{
+            System.out.print("Which topic do you want to see? ");
+            try{
+                selected = sc.nextInt();
+            }catch(InputMismatchException m){
+                selected = -1;
+            }
+        }while (selected < min_id_topic || selected > max_id_topic);
+
+        return selected;
+    }
+
     private void mainLoop(){
-        int choice, selected = -1, min_id_topic = 0, max_id_topic = 0;
+        int choice, topic, idea;
         boolean stay = true;
 
         while(stay){
@@ -240,28 +268,9 @@ public class Client {
 
                 //Check a topic - List all the topcis and ask the user which one he wants. While "inside" a topic list all ideas
                 case 1:{
-                    ClientTopic[] topics = conn.getTopics();
+                    topic = listTopics();
 
-                    if (topics.length>0)
-                        min_id_topic = topics[0].getId();
-
-                    System.out.println("\n");
-                    for (Topic t : topics){
-                        System.out.println(t);
-                        if(t.getId() > max_id_topic)
-                            max_id_topic = t.getId();
-                        else if(t.getId() < min_id_topic)
-                            min_id_topic = t.getId();
-                    }
-
-                    do{
-                        System.out.print("Which topic do you want to see? ");
-                        try{
-                            selected = sc.nextInt();
-                        }catch(InputMismatchException m){
-                            selected = -1;
-                        }
-                    }while (selected < min_id_topic || selected > max_id_topic);
+                    Idea[] ideasList = conn.getTopicIdeas(topic);
 
                     ////
                     //  FIXME: NEED TO IMPLEMENT THIS PART: TOPIC HAS BEEN SELECTED, IT'S TIME TO SHOW ITS IDEAS
@@ -279,7 +288,7 @@ public class Client {
                 //Submit an idea
                 case 3:{
                     if (!createIdea())
-                        System.out.println("Error while creating an idea! Idea already exists");
+                        System.out.println("Error while creating an idea!");
                     else
                         System.out.println("Idea created with success");
                     break;

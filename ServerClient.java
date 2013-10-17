@@ -106,6 +106,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle create idea method!!!");
                     break ;
                 }
+            }else if (msg == Common.Message.REQUEST_GETTOPICSIDEAS){
+                if (!handleGetTopicsIdea()){
+                    System.err.println("Error in the handle get topics idea method!!!");
+                    break;
+                }
             }
         }
 
@@ -194,11 +199,34 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    private boolean handleGetTopicsIdea(){
+        int topicid = -1;
+        Idea[] ideaslist = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( (topicid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        //Now we go to the database and get the ideas
+
+        try{
+            ideaslist = RMIInterface.getIdeasFromTopic(topicid);
+        }catch (RemoteException r){
+            System.err.println("Error while getting ideas from topic");
+            //FIXME: Handle this
+        }
+
+        return true;
+    }
+
     private boolean handleCreateIdea(){
-        String title, description, topics;
+        String title, description, topic;
         String[] topicsArray;
-        int nshares, price;
-        boolean result = false, result_shares = false, result_topics = false;
+        int nshares, price, result = -1, numTopics = -1;
+        boolean result_shares = false, result_topics = false;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -218,14 +246,36 @@ public class ServerClient implements Runnable {
         if ( (price = Common.recvInt(inStream)) == -1)
             return false;
 
-        if ((topics = Common.recvString(inStream)) == null)
+        if ( (numTopics = Common.recvInt(inStream)) == -1)
             return false;
 
-        topicsArray = topics.split(";");
+        topicsArray = new String[numTopics];
+
+        for (int i=0;i<numTopics;i++){
+            if( (topic = Common.recvString(inStream)) == null)
+                return false;
+            topicsArray[i] = topic;
+        }
 
         try{
            result = RMIInterface.createIdea(title,description,this.uid);
-           result_shares = RMIInterface.setSharesIdea(this.uid,title,nshares,price);
+
+            if (result < 0){
+                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                    return false;
+                return true;
+            }
+
+           result_shares = RMIInterface.setSharesIdea(this.uid,result,nshares,price);
+
+            if (!result_shares){
+                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                    return false;
+                return true;
+            }
+
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+                return false;
 
             ////
             //  Take care of the topics
@@ -233,31 +283,31 @@ public class ServerClient implements Runnable {
 
             //1st - Verify if the topics' names are correct
             for (int i=0;i<topicsArray.length;i++){
-                topics = topicsArray[i];
-                if (topics.length() > limit_characters_topic){//Topic name too long, tell that to the client
+                topic = topicsArray[i];
+                if (topic.length() > limit_characters_topic){//Topic name too long, tell that to the client
                     if(!Common.sendMessage(Common.Message.ERR_TOPIC_NAME, outStream))
                         return false;
-                    if (!Common.sendString(topics, outStream))//Send number of topic that was wrong
+                    if (!Common.sendString(topic, outStream))//Send name of the topic that was wrong
                         return false;
                 }
-                else if(!Common.sendMessage(Common.Message.MSG_TOPIC_OK,outStream))//Everything went well with the topic
+                else if(!Common.sendMessage(Common.Message.MSG_OK,outStream))//Everything went well with the topic
                     return false;
 
                 //2nd - Actually bind them to the idea
-                result_topics = RMIInterface.setTopicsIdea(title,topics,uid);
+                result_topics = RMIInterface.setTopicsIdea(result,topic,uid);
+            }
+
+            if (result_topics){
+                if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+                    return false;
+            }else{
+                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                    return false;
             }
 
         }catch(RemoteException r){
             System.err.println("Error while creating a new idea");
             //FIXME: Handle this!
-        }
-
-        if (result && result_shares && result_topics){
-            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
-                return false;
-        } else {
-            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
-                return false;
         }
 
         return true;

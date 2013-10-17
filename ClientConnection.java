@@ -156,9 +156,10 @@ public class ClientConnection {
         }
     }
 
-    int createIdea(String title, String description, int nshares, int price, String topics){
+    boolean createIdea(String title, String description, int nshares, int price, String[] topics){
         Common.Message reply;
         int devolve = -1;
+        boolean skip = false;
 
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
@@ -180,50 +181,75 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
-            if (!Common.sendString(topics,outStream)){
-                reconnect(); continue;
+            if (!Common.sendInt(topics.length,outStream)){
+                reconnect();continue;
             }
 
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI3");
-                reconnect(); continue;
+            //Send topics
+            for (String topic : topics) {
+                if (!Common.sendString(topic, outStream)) {
+                    reconnect();skip = true; break;
+                }
+            }
+            if (skip)
+                continue;
+
+            //Get Confirmations
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                System.err.println("Error while creating idea in the database");
+                return false;
             }
 
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                //Shouldn't happen, FIXME!
-                System.err.println("AQUI4");
-                return devolve;
+            //If we get here we added the idea to the database, but not the topics!
+
+            //Get more confirmations
+            reply = Common.recvMessage(inStream);
+            while (reply != Common.Message.MSG_OK){
+                if (reply == Common.Message.MSG_ERR)//Error, going to return false
+                    System.out.println("Error while associating topics to the idea. All of the topics may not be associated with it");
+                else if (reply == Common.Message.ERR_TOPIC_NAME){
+                    //Invalid topic name
+                    String wrongTopic = Common.recvString(inStream);
+                    System.out.println("Topic name '" + wrongTopic + "' is invalid!");
+                }
             }
 
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI5");
-                reconnect(); continue;
-            }
-
-            //Receive confirmation of the topics -> If everything went well we dont need to do anything
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI6");
-                reconnect(); continue;
-            }
-
-            if(reply == Common.Message.ERR_TOPIC_NAME){
-                String errTopic = "";
-                if ( (errTopic= Common.recvString(inStream)) == null)
-                    return devolve;
-                System.err.println("Error: Topic " + errTopic + "has an invalid name. Idea submited was not attached to this topic");
-                devolve = 2;
-            }
-
-            //Receive final MSG_OK
-            if(reply == Common.Message.MSG_OK){
-                System.out.println("Vou devolver 1");
-                return 1;//Everything went well
-            }
-
-            System.out.println("Vou devolver " + devolve);
-
-            return devolve;//There was an error
+            return true;
         }
+    }
+
+    ///
+    //  Get every idea in a given topic
+    ///
+
+    Idea[] getTopicIdeas(int topic){
+        Common.Message reply;
+        Idea[] devolve = null;
+        int ideaslen;
+
+         for(;;){
+             if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPICSIDEAS, outStream) ) {
+                 reconnect(); continue;
+             }
+
+             if ( !Common.sendInt(topic,outStream)){
+                 reconnect();continue;
+             }
+
+             if ( (ideaslen = Common.recvInt(inStream)) == -1){
+                 reconnect();continue;
+             }
+
+             //Receive ideas
+             devolve = new Idea[ideaslen];
+             for (int i=0;i<ideaslen;i++){
+                 ;
+             }
+
+             return devolve;
+         }
     }
 
     ////

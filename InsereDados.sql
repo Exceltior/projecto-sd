@@ -11,13 +11,16 @@ INSERT INTO Topicos VALUES (3,'Latada','Latada comecça na quarta-feira dia 17',
 Ideias 1,4 e 5 vao para o topico 1
 Ideia 2 vai para o topico 2
 Ideia 3 vai para o topico 3*/ 
+INSERT INTO Ideias VALUES (1,'Joao Sousa', 'A descida do Joao Sousa no ranking ATP nao desvaloriza o trabalho que ele tem vindo a realizar este ano',1,1);
+
 INSERT INTO Ideias VALUES (2,'Ladies', 'Hello Ladies, my name is Maxi... Super Maxi!',1,1);
 
-INSERT INTO Ideias VALUES (1,'Joao Sousa', 'A descida do Joao Sousa no ranking ATP nao desvaloriza o trabalho que ele tem vindo a realizar este ano',1,1);
+INSERT INTO Ideias VALUES (3, 'Cortejo Latada', 'O Cortejo da Latada e um excelente evento',1,1);
+
 INSERT INTO Ideias VALUES (4,'Atletas Portugueses', 'Se o Joao Sousa fosse bom ja tinha chamado a atencao no ranking ATP a muito tempo. A sua descida nao e nada mais do que um processo descendente normal na sua carreira',2,1);
+
 INSERT INTO Ideias VALUES (5, 'Tenis Portugal', 'O Joao Sousa tem feito um trabalho notavel. O facto de ter conseguido entrar em todos os torneios do Grand Slam esta temporada mostra uma melhoria significativa e um excelente salto para a sua carreira tenistica',1,1);
 
-INSERT INTO Ideias VALUES (3, 'Cortejo Latada', 'O Cortejo da Latada e um excelente evento',1,1);
 
 /*Colocacao das ideias nos diferentes topicos*/
 INSERT INTO TopicosIdeias VALUES (1,1);

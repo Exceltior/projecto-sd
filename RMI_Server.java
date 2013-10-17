@@ -13,9 +13,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     private Connection conn;
     private String url;
-    public static int num_users;
-    public static int num_topics;
-    public static int num_ideas;
+    static int num_users;
+    static int num_topics;
+    static int num_ideas;
     static int starting_money = 10000;
 
     ////
@@ -180,8 +180,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsible for validating an idea, before adding it to the database
     ////
-    public boolean validateIdea(String title){
-        String query = "Select * from Ideias i where i.titulo='" + title + "'";
+    public boolean validateIdea(String description){
+        String query = "Select * from Ideias i where i.descricao='" + description + "'";
         ArrayList<String[]> ideias = null;
 
         try{
@@ -232,18 +232,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsible for creating a new idea in the database
     ////
-    public boolean createIdea(String title, String description, int uid) throws RemoteException{
+    public int createIdea(String title, String description, int uid) throws RemoteException{
          String query;
-        if (!validateIdea(title)){
+        if (!validateIdea(description)){
              System.out.println("Ideia invalida");
-             return false;
+             return -1;
          }
 
         num_ideas++;
 
         query = "INSERT INTO Ideias VALUES (" + num_ideas + ",'" + title + "','" + description + "'," + uid + "," + "1)";
 
-        return insertData(query);
+        if(insertData(query))
+            return num_ideas-1;
+        else
+            return -1;
     }
 
     ////
@@ -309,33 +312,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
-    public boolean setSharesIdea(int uid, String title,int nshares, int price)throws RemoteException{
-        String query = "Select i.iid from Ideias i where i.titulo = '" + title + "' and i.activa = 1";
-        ArrayList<String[]> result = null;
-        int idea_id;
+    public boolean setSharesIdea(int uid, int iid,int nshares, int price)throws RemoteException{
 
-        try{
-            result = receiveData(query);
-            if ( result.size() > 0 ){//There is an idea with the given title
-                idea_id = Integer.valueOf(result.get(0)[0]);//Get its id
-                query = "INSERT INTO Shares VALUES (" + idea_id + "," + uid + "," + nshares + "," + price + ")";
+        String query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + ")";
 
-                return insertData(query);
-            }
-        }catch(RemoteException r){
-            System.err.println("Remote Exception on the setSharesIdea method");
-            //FIXME: Deal with this
-        }
-
-        return false;
+        return insertData(query);
     }
 
     ////
     //  Method responsible for creating the connection between an idea and one or more topics
     ////
-    public boolean setTopicsIdea(String ideaTitle, String topicTitle, int uid) throws RemoteException{
+    public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
 
-        String query = "Select i.iid from Ideias i where i.titulo = '" + ideaTitle + "' and i.activa = 1";
+        String query = "Select i.iid from Ideias i where i.iid = '" + iid + "' and i.activa = 1";
         ArrayList<String[]> ideas = null, topics = null;
         int idea_id, topic_id;
         boolean check;
@@ -366,17 +355,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 }
             }
 
-            ////
-            //  EXPLANATION: We want to get the id of the given idea and topic. Therefore, we  know we have in "ideas" an
-            //  ArrayList of String arrays which contain the ids of the ideas with title like "ideaTitle" (For that we can
-            //  have one element in the ArrayList or no elements). We also have a similar content in "topics" (We have an
-            //  ArrayList of String array which contain the ids of the topics with title like "topicTitle" - We also have
-            //  one element or no elements in the ArrayList).
-            //  Given that, we are only interested in the situations where we can find the idea id and the topic id.
-            //  Those situations correspond to ideas.size() = 1 (We found the idea we were looking for) and topics.size()=1
-            //  So here you have it: The if condition explained in, what we hope to be, a simple and clear way.
-            ////
-            if ( ideas.size() + topics.size() > 1){
+            if ( (ideas.size() > 0) && (topics.size() > 0)){
                 idea_id = Integer.valueOf(ideas.get(0)[0]);//Get idea id
                 topic_id = Integer.valueOf(topics.get(0)[0]);//Get topic id
 
