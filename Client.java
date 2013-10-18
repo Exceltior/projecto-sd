@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -271,6 +270,10 @@ public class Client {
                     topic = listTopics();
 
                     Idea[] ideasList = conn.getTopicIdeas(topic);
+
+                    System.out.println("\nList of Ideas for the given topic:\n");
+                    for (Idea anIdeasList : ideasList)
+                        System.out.println(anIdeasList);
 
                     ////
                     //  FIXME: NEED TO IMPLEMENT THIS PART: TOPIC HAS BEEN SELECTED, IT'S TIME TO SHOW ITS IDEAS

@@ -113,8 +113,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideias e, " +
-                "TopicosIdeias where TopicosIdeias.iid = e.iid and TopicosIdeias" +
-                ".tid = "+tid+" +  and Ideias.activa = 1";
+                "TopicosIdeias t where t.iid = e.iid and t" +
+                ".tid = "+tid+" and e.activa = 1";
 
         ArrayList<String[]> result = null;
 

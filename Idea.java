@@ -133,7 +133,7 @@ public class Idea implements Serializable {
 
 
     public String toString(){
-        return "Topic{" +
+        return "Idea{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +

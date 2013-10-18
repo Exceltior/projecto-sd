@@ -227,6 +227,7 @@ public class ClientConnection {
     Idea[] getTopicIdeas(int topic){
         Common.Message reply;
         Idea[] devolve = null;
+        Idea temp = new Idea();
         int ideaslen;
 
          for(;;){
@@ -245,7 +246,8 @@ public class ClientConnection {
              //Receive ideas
              devolve = new Idea[ideaslen];
              for (int i=0;i<ideaslen;i++){
-                 ;
+                 temp.readFromDataStream(inStream);
+                 devolve[i] = temp;
              }
 
              return devolve;

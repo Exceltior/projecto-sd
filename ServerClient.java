@@ -214,6 +214,14 @@ public class ServerClient implements Runnable {
 
         try{
             ideaslist = RMIInterface.getIdeasFromTopic(topicid);
+
+            if (!Common.sendInt(ideaslist.length,outStream))
+                return false;
+
+            //Send ideas
+            for (Idea anIdeaslist : ideaslist)
+                anIdeaslist.writeToDataStream(outStream);
+
         }catch (RemoteException r){
             System.err.println("Error while getting ideas from topic");
             //FIXME: Handle this
