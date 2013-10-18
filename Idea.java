@@ -81,7 +81,7 @@ public class Idea implements Serializable {
     public Idea(String[] row) {
         /* FIXME: Implement this */
         this.id = Integer.valueOf(row[0]);
-        this.title = row[1]; //title come sbefore the body
+        this.title = row[1]; //title comes before the body
         this.body = row[2];
         this.uid = Integer.valueOf(row[3]);
     }

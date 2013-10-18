@@ -158,27 +158,40 @@ public class ClientConnection {
 
     boolean sendData(String[] data){
         //Send number of items
-        if (!Common.sendInt(data.length,outStream))
-            return false;
 
-        //Send itens
-        for (String adata : data) {
-            if (!Common.sendString(adata, outStream))
+        if(data != null){
+            if (!Common.sendInt(data.length,outStream))
+                return false;
+
+            //Send itens
+            for (int i=0;i<data.length;i++) {
+                if (!Common.sendString(data[i], outStream))
+                    return false;
+            }
+        }else{
+            if(!Common.sendInt(-2,outStream))
                 return false;
         }
         return true;
     }
 
-    boolean sendInt(int[] data){
+    boolean sendInteger(int[] data){
         //Send number of items
-        if (!Common.sendInt(data.length,outStream))
-            return false;
 
-        //Send itens
-        for (int adata : data) {
-            if (!Common.sendInt(adata, outStream))
+        if (data != null){
+            if (!Common.sendInt(data.length,outStream))
+                return false;
+
+            //Send itens
+            for (int i=0;i<data.length;i++) {
+                if (!Common.sendInt(data[i], outStream))
+                    return false;
+            }
+        }else{
+            if (!Common.sendInt(-2,outStream))
                 return false;
         }
+
         return true;
     }
 
@@ -190,6 +203,11 @@ public class ClientConnection {
             if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
                 reconnect(); continue;
             }
+
+            if ( (reply=Common.recvMessage(inStream)) == Common.Message.MSG_ERR ){
+                reconnect(); continue;
+            }
+
             if ( !Common.sendString(title, outStream) ) {
                 reconnect(); continue;
             }
@@ -216,17 +234,17 @@ public class ClientConnection {
             }
 
             //Send ideas for
-            if ( !sendInt(ideasFor)){
+            if ( !sendInteger(ideasFor)){
                 reconnect();continue;
             }
 
-            //Send number of ideas against
-            if ( !sendInt(ideasAgainst)){
+            //Send ideas against
+            if ( !sendInteger(ideasAgainst)){
                 reconnect();continue;
             }
 
-            //Send number of ideas neutral
-            if ( !sendInt(ideasNeutral)){
+            //Send ideas neutral
+            if ( !sendInteger(ideasNeutral)){
                 reconnect();continue;
             }
 
@@ -257,10 +275,17 @@ public class ClientConnection {
             while (reply != Common.Message.MSG_OK){
                 if(reply == Common.Message.ERR_IDEA_ID){
                     //Invalid Idea ID
+                    System.out.println("ERR_IDEA_ID");
                     int id = Common.recvInt(inStream);
                     System.out.println("Idea ID " + id + " is invalid!");
                 }
             }
+
+            //Get Final Confirmation
+            reply = Common.recvMessage(inStream);
+
+            if(reply != Common.Message.MSG_OK)
+                return false;
 
             return true;
         }
@@ -273,24 +298,12 @@ public class ClientConnection {
     Idea[] getTopicIdeas(int topic){
         Common.Message reply;
         Idea[] devolve = null;
-        Idea temp = new Idea();
         int ideaslen;
         boolean needReconnect = false;
 
          for(;;){
              if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPICSIDEAS, outStream) ) {
                  reconnect(); continue;
-             }
-
-             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                 System.err.println("AQUI2");
-                 reconnect(); continue;
-             }
-
-             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                 //Shouldn't happen, FIXME!
-                 System.err.println("Bodega");
-                 return null;
              }
 
              if ( !Common.sendInt(topic,outStream)){
@@ -305,11 +318,11 @@ public class ClientConnection {
              devolve = new Idea[ideaslen];
 
              for (int i=0;i<ideaslen;i++){
-                 if ( !temp.readFromDataStream(inStream) ){
+                 devolve[i] = new Idea();
+                 if ( !devolve[i].readFromDataStream(inStream) ){
                      needReconnect = true;
                      break;
                  }
-                 devolve[i] = temp;
              }
 
              if ( needReconnect ) {
@@ -351,6 +364,8 @@ public class ClientConnection {
             }
 
             topics = new ClientTopic[numTopics];
+
+            System.out.println("O numero de topicos e " + numTopics);
 
             boolean needReconnect = false;
             for (int i = 0; i < numTopics; i++) {

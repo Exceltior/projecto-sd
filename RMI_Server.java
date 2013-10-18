@@ -94,8 +94,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if ( result == null )
             return null; //FIXME: We should do something about a query failing or something like that...
 
-        System.out.println("Query: " + query + " has " + result.size() + " results");
-
         if ( result.size() == 0 )
             return null;
 
@@ -123,7 +121,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         } catch(RemoteException e){
             System.err.println("DEU MERDA");
         }
-
 
         if ( result == null )
             return null; //FIXME: We should do something about a query failing or something like that...
@@ -235,7 +232,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public int createIdea(String title, String description, int uid) throws RemoteException{
          String query;
         if (!validateIdea(description)){
-             System.out.println("Ideia invalida");
+             System.out.println("Invalid Idea!");
              return -1;
          }
 
@@ -244,7 +241,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         query = "INSERT INTO Ideias VALUES (" + num_ideas + ",'" + title + "','" + description + "'," + uid + "," + "1)";
 
         if(insertData(query))
-            return num_ideas-1;
+            return num_ideas;
         else
             return -1;
     }
@@ -354,7 +351,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try{
             ideas = receiveData(query);
             query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
-            System.out.println("SSSSS\n\n" + query);
             topics = receiveData(query);
 
             ////

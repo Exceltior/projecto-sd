@@ -67,6 +67,25 @@ public class Client {
         return conn.createTopic(nome,descricao);
     }
 
+    private String[] askTopics(String sentence){
+        boolean repeat;
+        String response;
+
+        do{
+            repeat = false;
+            System.out.println(sentence);
+            response = sc.nextLine();
+
+            if (response.equals("")){//Empty String, going to ask the user again
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+
+        }while (repeat);
+
+        return response.split(";");
+    }
+
     ////
     //  Method responsible for asking the user information about the ideas
     ////
@@ -74,6 +93,7 @@ public class Client {
         String ideas;
         String[] temp;
         int[] devolve;
+        int pos = 0, temp_num;
         boolean repeat = false;
 
         do{
@@ -85,7 +105,11 @@ public class Client {
 
             for (String aTemp : temp) {
                 try {
-                    Integer.parseInt(aTemp);
+                    temp_num = Integer.parseInt(aTemp);
+                    if(temp_num == -1)
+                        return null;
+                    devolve[pos] = temp_num;
+                    pos = pos + 1;
                 } catch (NumberFormatException n) {
                     System.out.println("Invalid input! Please enter again");
                     repeat = true;
@@ -101,7 +125,8 @@ public class Client {
     //  order to create that new topic in the database
     ////
     private boolean createIdea(){
-        String  title, description, topics;
+        String title, description;
+        String[] topics;
         int[] ideasFor, ideasAgainst, ideasNeutral;
         int nshares, price, minNumShares;
 
@@ -117,21 +142,24 @@ public class Client {
         System.out.println("Please enter the price of each share of the idea:");
         price = sc.nextInt();
 
-        System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
-        minNumShares = sc.nextInt();
+        do{
+            System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
+            minNumShares = sc.nextInt();
+            if (minNumShares<0 || minNumShares>nshares)
+                System.out.println("Invalid number!");
+        }while(minNumShares<0 || minNumShares>nshares);
+
 
         sc.nextLine();//Clear the buffer
 
-        System.out.println("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
-        topics = sc.nextLine();
+        topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
+        ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+        ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+        ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
 
-        ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)");
-        ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)");
-        ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)");
+        //FIXME: O METODO ASKIDES PODE DEVOLVER NULL!
 
-        //FIXME: Recolher ids a favor e contra + topicos
-
-        return conn.createIdea(title, description,nshares,price,topics.split(";"),minNumShares,ideasFor,ideasAgainst,ideasNeutral);
+        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral);
     }
 
     ////
@@ -248,8 +276,14 @@ public class Client {
 
             login_result = conn.login(username,password);
 
-            if (!login_result)
-                System.out.println("Login unsucessfull!\n");
+            if (!login_result){
+                System.out.println("Login unsucessfull!\nIf you want to register just enter 2, otherwise press any key to login again");
+                String temp = sc.nextLine();
+                try{
+                    if (Integer.parseInt(temp) == 2)
+                        choice = 2;
+                }catch(NumberFormatException ignored){}//We don't need to handle this exception
+            }
         }
         ////
         //  Login was successfull
