@@ -156,7 +156,7 @@ public class ClientConnection {
         }
     }
 
-    boolean createIdea(String title, String description, int nshares, int price, String[] topics){
+    boolean createIdea(String title, String description, int nshares, int price, String[] topics, int minNumShares){
         Common.Message reply;
         int devolve = -1;
         boolean skip = false;
@@ -179,6 +179,10 @@ public class ClientConnection {
 
             if ( !Common.sendInt(price, outStream) ) {
                 reconnect(); continue;
+            }
+
+            if( !Common.sendInt(minNumShares,outStream) ){
+                reconnect();continue;
             }
 
             if (!Common.sendInt(topics.length,outStream)){
@@ -229,10 +233,22 @@ public class ClientConnection {
         Idea[] devolve = null;
         Idea temp = new Idea();
         int ideaslen;
+        boolean needReconnect = false;
 
          for(;;){
              if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPICSIDEAS, outStream) ) {
                  reconnect(); continue;
+             }
+
+             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                 System.err.println("AQUI2");
+                 reconnect(); continue;
+             }
+
+             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                 //Shouldn't happen, FIXME!
+                 System.err.println("Bodega");
+                 return null;
              }
 
              if ( !Common.sendInt(topic,outStream)){
@@ -245,10 +261,19 @@ public class ClientConnection {
 
              //Receive ideas
              devolve = new Idea[ideaslen];
+
              for (int i=0;i<ideaslen;i++){
-                 temp.readFromDataStream(inStream);
+                 if ( !temp.readFromDataStream(inStream) ){
+                     needReconnect = true;
+                     break;
+                 }
                  devolve[i] = temp;
              }
+
+             if ( needReconnect ) {
+                 reconnect(); continue;
+             }
+
 
              return devolve;
          }
@@ -297,6 +322,52 @@ public class ClientConnection {
             }
 
             return topics;
+        }
+    }
+
+    ////
+    //  Get transaction history for the given user
+    ////
+    String[] showHistory(){
+        String[] history;
+        String temp;
+        Common.Message reply;
+        int numTransactions = -1;
+        boolean needReconnect = false;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_HISTORY,outStream) ) {
+                System.err.println("AQUI");
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( (numTransactions = Common.recvInt(inStream)) == -1) {
+                System.err.println("AQUI3");
+                reconnect(); continue;
+            }
+
+            history = new String[numTransactions];
+
+            for(int i=0; i<numTransactions;++i){
+                if ( (temp = Common.recvString(inStream)) == null ){
+                     needReconnect = true;
+                    break;
+                }
+                history[i] = temp;
+            }
+
+            return history;
         }
     }
 }

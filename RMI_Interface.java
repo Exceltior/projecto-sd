@@ -16,6 +16,7 @@ public interface RMI_Interface extends Remote {
     public boolean addChildrenIdeasToIdea(Idea idea) throws  RemoteException;
     public Idea getIdeaByIID(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid) throws RemoteException;
-    public boolean setSharesIdea(int uid, int iid,int nshares, int price)throws RemoteException;
+    public boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares)throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
+    public String[] getHistory(int iid) throws RemoteException;
 }

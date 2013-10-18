@@ -73,7 +73,7 @@ public class Client {
     ////
     private boolean createIdea(){
         String  title, description, topics;
-        int nshares, price;
+        int nshares, price, minNumShares;
 
         System.out.println("Please enter the title of the idea:");
         title = sc.nextLine();
@@ -87,6 +87,9 @@ public class Client {
         System.out.println("Please enter the price of each share of the idea:");
         price = sc.nextInt();
 
+        System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
+        minNumShares = sc.nextInt();
+
         sc.nextLine();//Clear the buffer
 
         System.out.println("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
@@ -94,7 +97,7 @@ public class Client {
 
         //FIXME: Recolher ids a favor e contra + topicos
 
-        return conn.createIdea(title, description,nshares,price,topics.split(";"));
+        return conn.createIdea(title, description,nshares,price,topics.split(";"),minNumShares);
     }
 
     ////
@@ -131,6 +134,7 @@ public class Client {
         System.out.println("2 - Create a new topic");
         System.out.println("3 - Submit an idea");
         System.out.println("4 - Delete an idea");
+        System.out.println("5 - Show Transaction History");
         System.out.println("0 - Sair");
 
         do{
@@ -304,6 +308,17 @@ public class Client {
                     System.out.println("Delete an idea!!!!");
                     break;
                 }
+
+                //Show Transaction History
+                case 5:{
+                    String[] history = conn.showHistory();
+
+                    for (String aHistory : history)
+                        System.out.println(aHistory);
+
+                    break;
+                }
+
                 //Wrong choice
                 default:{
                     System.out.println("Invalid option!");

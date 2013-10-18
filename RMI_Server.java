@@ -310,11 +310,33 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Send to the Server the history of transactions for a given client
+    ////
+    public String[] getHistory(int uid) throws RemoteException{
+        String[] history = null;
+        String query = "Select t.comprador, t.vendedor, t.valor, i.titulo from Transacoes t, Ideias i " +
+                "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid";
+
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return null;
+
+        history = new String[queryResult.size()];
+
+        for (int i=0;i<queryResult.size();i++)
+            history[i] = "Buyer id: " + queryResult.get(i)[0] + " Seller id: " +  queryResult.get(i)[1] + "Transaction Money: "
+                    + queryResult.get(i)[2] + "Idea: " + queryResult.get(i)[3];
+
+        return  history;
+    }
+
+    ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
-    public boolean setSharesIdea(int uid, int iid,int nshares, int price)throws RemoteException{
+    public boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares)throws RemoteException{
 
-        String query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + ")";
+        String query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
 
         return insertData(query);
     }

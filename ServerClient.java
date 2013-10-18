@@ -111,6 +111,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get topics idea method!!!");
                     break;
                 }
+            }else if( msg == Common.Message.REQUEST_GET_HISTORY){
+                if (!handleGetHistory()){
+                    System.err.println("Error in the handle get history method!!!!!");
+                    break;
+                }
             }
         }
 
@@ -233,7 +238,7 @@ public class ServerClient implements Runnable {
     private boolean handleCreateIdea(){
         String title, description, topic;
         String[] topicsArray;
-        int nshares, price, result = -1, numTopics = -1;
+        int nshares, price, result = -1, numTopics = -1, numMinShares = -1;
         boolean result_shares = false, result_topics = false;
 
         if ( !isLoggedIn() ) {
@@ -252,6 +257,9 @@ public class ServerClient implements Runnable {
         if ( (nshares = Common.recvInt(inStream)) == -1)
             return false;
         if ( (price = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (numMinShares = Common.recvInt(inStream)) == -1)
             return false;
 
         if ( (numTopics = Common.recvInt(inStream)) == -1)
@@ -274,7 +282,7 @@ public class ServerClient implements Runnable {
                 return true;
             }
 
-           result_shares = RMIInterface.setSharesIdea(this.uid,result,nshares,price);
+           result_shares = RMIInterface.setSharesIdea(this.uid,result,nshares,price,numMinShares);
 
             if (!result_shares){
                 if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
@@ -359,6 +367,9 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    ////
+    //  Sends the list of the topics to the user
+    ////
     private boolean handleListTopicsRequest() {
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -392,6 +403,44 @@ public class ServerClient implements Runnable {
         for (ServerTopic t : topics)
             if(!t.writeToDataStream(outStream))
                 return false;
+
+        return true;
+    }
+
+    ////
+    //  Sends the history of a given client to that client
+    ////
+    private boolean handleGetHistory(){
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        String[] history = null;
+
+        try{
+            history = RMIInterface.getHistory(uid);
+        }catch(RemoteException r){
+            //FIXME: Handle this
+            //e.printStackTrace();
+            System.out.println("Existiu uma remoteException! " + r.getMessage());
+        }
+
+        if (history == null){
+            System.err.println("HI! I am in the handleGetHistory and history is null!!!");
+            return false;
+        }
+
+        //Now send the history
+        if ( !Common.sendInt(history.length,outStream))
+            return false;
+
+        for (int i=0;i<history.length;i++){
+            if (!Common.sendString(history[i],outStream))
+                return false;
+        }
 
         return true;
     }
