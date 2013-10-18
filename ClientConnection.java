@@ -156,10 +156,35 @@ public class ClientConnection {
         }
     }
 
-    boolean createIdea(String title, String description, int nshares, int price, String[] topics, int minNumShares){
+    boolean sendData(String[] data){
+        //Send number of items
+        if (!Common.sendInt(data.length,outStream))
+            return false;
+
+        //Send itens
+        for (String adata : data) {
+            if (!Common.sendString(adata, outStream))
+                return false;
+        }
+        return true;
+    }
+
+    boolean sendInt(int[] data){
+        //Send number of items
+        if (!Common.sendInt(data.length,outStream))
+            return false;
+
+        //Send itens
+        for (int adata : data) {
+            if (!Common.sendInt(adata, outStream))
+                return false;
+        }
+        return true;
+    }
+
+    boolean createIdea(String title, String description, int nshares, int price, String[] topics, int minNumShares, int[] ideasFor, int[] ideasAgainst, int[] ideasNeutral){
         Common.Message reply;
         int devolve = -1;
-        boolean skip = false;
 
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
@@ -185,20 +210,27 @@ public class ClientConnection {
                 reconnect();continue;
             }
 
-            if (!Common.sendInt(topics.length,outStream)){
+            //Send topics
+            if ( !sendData(topics)){
                 reconnect();continue;
             }
 
-            //Send topics
-            for (String topic : topics) {
-                if (!Common.sendString(topic, outStream)) {
-                    reconnect();skip = true; break;
-                }
+            //Send ideas for
+            if ( !sendInt(ideasFor)){
+                reconnect();continue;
             }
-            if (skip)
-                continue;
 
-            //Get Confirmations
+            //Send number of ideas against
+            if ( !sendInt(ideasAgainst)){
+                reconnect();continue;
+            }
+
+            //Send number of ideas neutral
+            if ( !sendInt(ideasNeutral)){
+                reconnect();continue;
+            }
+
+            //Get Confirmations of data except topics and ideas relations
             reply = Common.recvMessage(inStream);
 
             if (reply == Common.Message.ERR_NO_MSG_RECVD){
@@ -206,10 +238,9 @@ public class ClientConnection {
                 return false;
             }
 
-            //If we get here we added the idea to the database, but not the topics!
-
-            //Get more confirmations
+            //Get more confirmations of topics
             reply = Common.recvMessage(inStream);
+
             while (reply != Common.Message.MSG_OK){
                 if (reply == Common.Message.MSG_ERR)//Error, going to return false
                     System.out.println("Error while associating topics to the idea. All of the topics may not be associated with it");
@@ -217,6 +248,17 @@ public class ClientConnection {
                     //Invalid topic name
                     String wrongTopic = Common.recvString(inStream);
                     System.out.println("Topic name '" + wrongTopic + "' is invalid!");
+                }
+            }
+
+            //Get Confirmation of idea's relations
+            reply = Common.recvMessage(inStream);
+
+            while (reply != Common.Message.MSG_OK){
+                if(reply == Common.Message.ERR_IDEA_ID){
+                    //Invalid Idea ID
+                    int id = Common.recvInt(inStream);
+                    System.out.println("Idea ID " + id + " is invalid!");
                 }
             }
 

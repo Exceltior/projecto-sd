@@ -235,10 +235,47 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    private String[] receiveData(){
+        String[] data;
+        int numIdeas;
+        String temp;
+
+        if ( (numIdeas = Common.recvInt(inStream)) == -1)
+            return null;
+
+        data = new String[numIdeas];
+        for (int i=0;i<numIdeas;i++){
+            if( (temp = Common.recvString(inStream)) == null)
+                return null;
+            data[i] = temp;
+        }
+
+        return data;
+    }
+
+    private int[] receiveInt(){
+        int[] data;
+        int numIdeas, temp;
+
+        if ( (numIdeas = Common.recvInt(inStream)) == -1)
+            return null;
+
+        data = new int[numIdeas];
+        for (int i=0;i<numIdeas;i++){
+            if( (temp = Common.recvInt(inStream)) == -1)
+                return null;
+            data[i] = temp;
+        }
+
+        return data;
+    }
+
+
     private boolean handleCreateIdea(){
-        String title, description, topic;
+        String title, description, temp, topic, idea;
         String[] topicsArray;
-        int nshares, price, result = -1, numTopics = -1, numMinShares = -1;
+        int[] ideasForArray, ideasAgainstArray, ideasNeutralArray;
+        int nshares, price, result = -1, numTopics = -1, numMinShares = -1, numIdeasFor = -1, numIdeasNeutral = -1, numIdeasAgainst = -1;
         boolean result_shares = false, result_topics = false;
 
         if ( !isLoggedIn() ) {
@@ -262,19 +299,25 @@ public class ServerClient implements Runnable {
         if ( (numMinShares = Common.recvInt(inStream)) == -1)
             return false;
 
-        if ( (numTopics = Common.recvInt(inStream)) == -1)
+        //Receive Topics
+        if ( (topicsArray = receiveData()) == null )
             return false;
 
-        topicsArray = new String[numTopics];
+        //Receive Ideas For
+        if ( (ideasForArray = receiveInt()) == null)
+            return false;
 
-        for (int i=0;i<numTopics;i++){
-            if( (topic = Common.recvString(inStream)) == null)
-                return false;
-            topicsArray[i] = topic;
-        }
+        //Receive Ideas Against
+        if ( (ideasAgainstArray = receiveInt()) == null)
+            return false;
+
+        //Receive Ideas Neutral
+        if ( (ideasNeutralArray = receiveInt()) == null)
+            return false;
 
         try{
-           result = RMIInterface.createIdea(title,description,this.uid);
+            result = RMIInterface.createIdea(title,description,this.uid);
+            //result has the idea id
 
             if (result < 0){
                 if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
@@ -298,19 +341,18 @@ public class ServerClient implements Runnable {
             ////
 
             //1st - Verify if the topics' names are correct
-            for (int i=0;i<topicsArray.length;i++){
-                topic = topicsArray[i];
-                if (topic.length() > limit_characters_topic){//Topic name too long, tell that to the client
-                    if(!Common.sendMessage(Common.Message.ERR_TOPIC_NAME, outStream))
+            for (String aTopicsArray : topicsArray) {
+                topic = aTopicsArray;
+                if (topic.length() > limit_characters_topic) {//Topic name too long, tell that to the client
+                    if (!Common.sendMessage(Common.Message.ERR_TOPIC_NAME, outStream))
                         return false;
                     if (!Common.sendString(topic, outStream))//Send name of the topic that was wrong
                         return false;
-                }
-                else if(!Common.sendMessage(Common.Message.MSG_OK,outStream))//Everything went well with the topic
+                } else if (!Common.sendMessage(Common.Message.MSG_OK, outStream))//Everything went well with the topic
                     return false;
 
                 //2nd - Actually bind them to the idea
-                result_topics = RMIInterface.setTopicsIdea(result,topic,uid);
+                result_topics = RMIInterface.setTopicsIdea(result, topic, uid);
             }
 
             if (result_topics){
@@ -320,6 +362,50 @@ public class ServerClient implements Runnable {
                 if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
                     return false;
             }
+
+
+            ////
+            // Take care of the ideas for
+            ////
+            for (int i=0;i<ideasForArray.length;i++){
+                if( !RMIInterface.setIdeasRelations(result,ideasForArray[i],1)){
+                    //Alert the client that the idea is not valid
+                    if (!Common.sendMessage(Common.Message.ERR_IDEA_ID,outStream))
+                        return false;
+                    if(!Common.sendInt(ideasForArray[i],outStream))
+                        return false;
+                }
+            }
+
+            ////
+            //  Take care of the ideas against
+            ////
+            for (int i=0;i<ideasAgainstArray.length;i++){
+                if( !RMIInterface.setIdeasRelations(result,ideasAgainstArray[i],1)){
+                    //Alert the server that the idea is not valid
+                    if (!Common.sendMessage(Common.Message.ERR_IDEA_ID,outStream))
+                        return false;
+                    if(!Common.sendInt(ideasAgainstArray[i],outStream))
+                        return false;
+                }
+            }
+
+            ////
+            //  Take care of the ideas neutral
+            ////
+            for (int i=0;i<ideasNeutralArray.length;i++){
+                if( !RMIInterface.setIdeasRelations(result,ideasNeutralArray[i],1)){
+                    //Alert the server that the idea is not valid
+                    if (!Common.sendMessage(Common.Message.ERR_IDEA_ID,outStream))
+                        return false;
+                    if(!Common.sendInt(ideasNeutralArray[i],outStream))
+                        return false;
+                }
+            }
+
+            //Everything ok
+            if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
+                return false;
 
         }catch(RemoteException r){
             System.err.println("Error while creating a new idea");
@@ -437,8 +523,8 @@ public class ServerClient implements Runnable {
         if ( !Common.sendInt(history.length,outStream))
             return false;
 
-        for (int i=0;i<history.length;i++){
-            if (!Common.sendString(history[i],outStream))
+        for (String aHistory : history) {
+            if (!Common.sendString(aHistory, outStream))
                 return false;
         }
 

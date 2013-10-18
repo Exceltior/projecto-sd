@@ -394,6 +394,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Method responsible for creating the different relationships between ideas
+    ////
+    public boolean setIdeasRelations(int iidpai,int iidfilho, int tipo) throws RemoteException{
+        String query;
+
+        //  Tipo = 1 -> For
+        //  Tipo = -1 -> Against
+        //  Tipo = 0 -> Neutral
+
+        //Check if the id of the "children" idea is valid
+        query = "Select * from Ideias i where i.iid = " + iidfilho;
+        if (receiveData(query).size() == 0)
+            return false;
+
+        query = "INSERT INTO RelacaoIdeias Values(" + iidpai + ", " + iidfilho + ", " + tipo + ")";
+
+        return insertData(query);
+    }
+
+    ////
     //  Method responsible for executing queries like "Select..."
     //
     // Returns: null on failure, Arraylist with all columns (as strings in an array), which may be empty if there query

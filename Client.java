@@ -68,11 +68,41 @@ public class Client {
     }
 
     ////
+    //  Method responsible for asking the user information about the ideas
+    ////
+    private int[] askIdeas(String sentence){
+        String ideas;
+        String[] temp;
+        int[] devolve;
+        boolean repeat = false;
+
+        do{
+            System.out.println(sentence);
+            ideas = sc.nextLine();
+
+            temp = ideas.split(";");
+            devolve = new int[temp.length];
+
+            for (String aTemp : temp) {
+                try {
+                    Integer.parseInt(aTemp);
+                } catch (NumberFormatException n) {
+                    System.out.println("Invalid input! Please enter again");
+                    repeat = true;
+                }
+            }
+        }while (repeat);
+
+        return devolve;
+    }
+
+    ////
     //  Method responsible for collecting the information needed to create a new idea, and send a request to the TCP Server in
     //  order to create that new topic in the database
     ////
     private boolean createIdea(){
         String  title, description, topics;
+        int[] ideasFor, ideasAgainst, ideasNeutral;
         int nshares, price, minNumShares;
 
         System.out.println("Please enter the title of the idea:");
@@ -95,9 +125,13 @@ public class Client {
         System.out.println("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
         topics = sc.nextLine();
 
+        ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)");
+        ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)");
+        ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)");
+
         //FIXME: Recolher ids a favor e contra + topicos
 
-        return conn.createIdea(title, description,nshares,price,topics.split(";"),minNumShares);
+        return conn.createIdea(title, description,nshares,price,topics.split(";"),minNumShares,ideasFor,ideasAgainst,ideasNeutral);
     }
 
     ////
@@ -279,9 +313,7 @@ public class Client {
                     for (Idea anIdeasList : ideasList)
                         System.out.println(anIdeasList);
 
-                    ////
-                    //  FIXME: NEED TO IMPLEMENT THIS PART: TOPIC HAS BEEN SELECTED, IT'S TIME TO SHOW ITS IDEAS
-                    ////
+                    //Now we are going to ask the user if he wants to create an idea
 
                     break;
                 }
@@ -313,8 +345,13 @@ public class Client {
                 case 5:{
                     String[] history = conn.showHistory();
 
-                    for (String aHistory : history)
-                        System.out.println(aHistory);
+                    if (history == null || history.length == 0)
+                        System.out.println("There are no previous transactions registered for this user");
+
+                    else{
+                        for (String aHistory : history)
+                            System.out.println(aHistory);
+                    }
 
                     break;
                 }
