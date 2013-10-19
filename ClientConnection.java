@@ -432,4 +432,47 @@ public class ClientConnection {
             return history;
         }
     }
+
+    boolean deleteIdea(int iid) {
+        Common.Message reply;
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_DELETE_IDEA,outStream) ) {
+                System.err.println("AQUI");
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            if ( !Common.sendInt(iid, outStream) ) {
+                reconnect(); continue;
+            }
+
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NO_SUCH_IID ) {
+                //Shouldn't happen, FIXME!
+                System.out.println("No idea with that IID"); //FIXME: See what we have to print here
+                return false;
+            } else if ( reply == Common.Message.ERR_IDEA_HAS_CHILDREN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Idea has children"); //FIXME: See what we have to print here
+                return false;
+            }
+
+            return true;
+        }
+    }
 }

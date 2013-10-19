@@ -291,6 +291,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return true;
     }
 
+    public boolean ideaHasChildren(int iid) throws RemoteException {
+        String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return false; //FIXME: We should handle the query getting all fucked up (NULL case)
+
+        return !queryResult.isEmpty();
+    }
+
+    public boolean removeIdea(Idea idea) throws  RemoteException {
+        if ( ideaHasChildren(idea.id) ) {
+            return false;
+        }
+
+        String query = "update Ideias set activa = 0 where iid="+idea.id;
+        boolean queryResult = insertData(query);
+
+        if (!queryResult)
+            return false; //FIXME: We should handle the query getting all fucked up (false case)
+
+        return true;
+
+    }
+
     ////
     // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gahters
     // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
@@ -300,7 +325,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "select * from Ideias t where t.iid = " + iid + " and t.activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult == null)
+        //FIXME: Maybe we should handle the case where the query fails in a different way
+        if (queryResult == null || queryResult.isEmpty())
             return null;
 
         return new Idea(queryResult.get(0));

@@ -116,6 +116,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get history method!!!!!");
                     break;
                 }
+            } else if ( msg == Common.Message.REQUEST_DELETE_IDEA) {
+                if (!handleDeleteIdea()) {
+                    System.err.println("Error deleting idea");
+                    break;
+                }
             }
         }
 
@@ -495,6 +500,59 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    private boolean handleDeleteIdea() {
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        int iid;
+        Idea idea = null;
+
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try {
+            idea = RMIInterface.getIdeaByIID(iid);
+        }catch(RemoteException r){
+            //FIXME: Handle this
+            System.err.println("Existiu uma remoteException! " + r.getMessage());
+        }
+
+        // At this point we will only send ONE message:
+        // --> ERR_NO_SUCH_IID: In case we've found no idea with this IDD
+        // --> ERR_IDEA_HAS_CHILDREN: In case we've found it, but it has children
+        // --> MSG_OK: In case everything's fine
+
+        if ( idea == null ) {
+            if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
+                return false;
+            return true;
+        }
+
+        boolean result = false;
+        try {
+            result = RMIInterface.removeIdea(idea);
+        }catch(RemoteException r){
+            //FIXME: Handle this
+            System.err.println("Existiu uma remoteException2! " + r.getMessage());
+        }
+        if ( result ) {
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+        } else {
+            // FIXME: Currently we __KNOW__ that if removeIdea fails, this is why it happened. it may change in the
+            // future.
+            if ( !Common.sendMessage(Common.Message.ERR_IDEA_HAS_CHILDREN, outStream))
+                return false;
+        }
+
+        return true;
+
+    }
+
     ////
     //  Sends the history of a given client to that client
     ////
@@ -513,7 +571,7 @@ public class ServerClient implements Runnable {
         }catch(RemoteException r){
             //FIXME: Handle this
             //e.printStackTrace();
-            System.out.println("Existiu uma remoteException! " + r.getMessage());
+            System.err.println("Existiu uma remoteException! " + r.getMessage());
         }
 
         if (history == null){
