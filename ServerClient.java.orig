@@ -117,11 +117,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get history method!!!!!");
                     break;
                 }
+<<<<<<< HEAD
             } else if ( msg == Common.Message.REQUEST_DELETE_IDEA) {
                 if (!handleDeleteIdea()) {
                     System.err.println("Error deleting idea");
-                    break;
-                }
+=======
             }else if( msg == Common.Message.REQUEST_GETTOPIC){
                 if (!handlegetTopic()){
                     System.err.println("Error in the handle get topic method!!!!!");
@@ -130,6 +130,7 @@ public class ServerClient implements Runnable {
             }else if (msg == Common.Message.REQUEST_GET_IDEA){
                 if (!handleGetIdea()){
                     System.err.println("Error in the handle get idea method");
+>>>>>>> 870bb2eb649b617dd5157f42f5f8d037bb641f20
                     break;
                 }
             }

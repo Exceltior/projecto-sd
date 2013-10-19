@@ -210,6 +210,17 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
+            if ( reply == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
             if ( !Common.sendString(title, outStream) ) {
                 reconnect(); continue;
             }
@@ -275,7 +286,7 @@ public class ClientConnection {
             reply = Common.recvMessage(inStream);
 
             while (reply != Common.Message.MSG_OK){
-                if(reply == Common.Message.ERR_IDEA_ID){
+                if(reply == Common.Message.ERR_NO_SUCH_IID){
                     //Invalid Idea ID
                     System.out.println("ERR_IDEA_ID");
                     int id = Common.recvInt(inStream);
@@ -293,10 +304,115 @@ public class ClientConnection {
         }
     }
 
+    ////
+    //  Get an idea by its iid and title
+    ////
+    Idea[] getIdea(int iid, String title){
+        Common.Message reply;
+        Idea[] ideas;
+        int len;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEA, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( !Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            if ( !Common.sendString(title,outStream)){
+                reconnect();continue;
+            }
+
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.TOPIC_OK){
+
+                if ( (len = Common.recvInt(inStream)) == -1){
+                    reconnect();continue;
+                }
+
+                ideas = new Idea[len];
+
+                for (int i=0;i<len;i++){
+                    ideas[i] = new Idea();
+                    ideas[i].readFromDataStream(inStream);
+                }
+
+                reply = Common.recvMessage(inStream);
+                if (reply != Common.Message.MSG_OK)
+                    return null;
+                return ideas;
+            }
+
+            return null;
+        }
+    }
+
+    ////
+    // Get a topic by its tid and name
+    ////
+    ClientTopic getTopic(int tid, String name){
+        Common.Message reply;
+        ClientTopic topic = null;
+        int len;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPIC, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( !Common.sendInt(tid,outStream)){
+                reconnect();continue;
+            }
+
+            if ( !Common.sendString(name,outStream)){
+                reconnect();continue;
+            }
+
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.TOPIC_OK){
+
+                topic = ClientTopic.fromDataStream(inStream);
+
+
+                reply = Common.recvMessage(inStream);
+                if (reply != Common.Message.MSG_OK)
+                    return null;
+                return topic;
+            }
+
+            return null;
+        }
+    }
+
     ///
     //  Get every idea in a given topic
     ///
-
     Idea[] getTopicIdeas(int topic){
         Common.Message reply;
         Idea[] devolve = null;
@@ -306,6 +422,17 @@ public class ClientConnection {
          for(;;){
              if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPICSIDEAS, outStream) ) {
                  reconnect(); continue;
+             }
+
+             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                 System.err.println("AQUI2");
+                 reconnect(); continue;
+             }
+
+             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                 //Shouldn't happen, FIXME!
+                 System.err.println("Bodega");
+                 return null;
              }
 
              if ( !Common.sendInt(topic,outStream)){
@@ -372,6 +499,7 @@ public class ClientConnection {
             boolean needReconnect = false;
             for (int i = 0; i < numTopics; i++) {
                 if ( (topics[i] = ClientTopic.fromDataStream(inStream)) == null ) {
+                    System.out.println("DEU ASNEIRA");
                     needReconnect = true;
                     break;
                 }

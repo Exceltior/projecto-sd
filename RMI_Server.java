@@ -175,23 +175,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    //  Method responsible for validating an idea, before adding it to the database
-    ////
-    public boolean validateIdea(String description){
-        String query = "Select * from Ideias i where i.descricao='" + description + "'";
-        ArrayList<String[]> ideias = null;
-
-        try{
-            ideias = receiveData(query);
-        }catch(RemoteException r){
-            System.err.println("Remote Exception on the validateIdea method");
-            //FIXME: Deal with this
-        }
-
-        return ideias == null || ideias.size() == 0;
-    }
-
-    ////
     //  Method responsile for insering a new user in the database
     ////
     public boolean register(String user, String pass, String email, String date) throws RemoteException{
@@ -231,10 +214,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     public int createIdea(String title, String description, int uid) throws RemoteException{
          String query;
-        if (!validateIdea(description)){
-             System.out.println("Invalid Idea!");
-             return -1;
-         }
 
         num_ideas++;
 
@@ -317,7 +296,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gahters
+    // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gathers
     // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
     // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
     //
@@ -330,6 +309,68 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
 
         return new Idea(queryResult.get(0));
+    }
+
+    public Idea[] getIdeaByIID(int iid, String title) throws RemoteException{
+        String query;
+        Idea[] devolve;
+
+        if (iid != -1 && !title.equals(""))
+            query = "Select * from Ideias i where i.activa = 1 and i.iid = '" + iid +"' and i.titulo = " + title;
+        else if(iid != -1)
+            query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid;
+        else if (!title.equals(""))
+            query = "Select * from Ideias i where i.activa = 1 and i.titulo = '" + title;
+        else
+            return null;
+
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.size() == 0)
+            return null;
+
+        devolve = new Idea[queryResult.size()];
+        for (int i=0;i<queryResult.size();i++)
+            devolve[i] = new Idea(queryResult.get(i));
+
+        return devolve;
+    }
+
+    ////
+    // Build an idea from a title. Notice that this constructor does not give us parent topic and ideas, it only gathers
+    // the title (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
+    // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
+    ////
+    public Idea getIdeaByTitle(String title) throws RemoteException{
+        String query = "select * from Ideias t where t.titulo = " + title + " and t.activa = 1";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return null;
+
+        return new Idea(queryResult.get(0));
+    }
+
+    public ServerTopic getTopic(int tid, String name) throws RemoteException{
+        String query;
+
+        if (tid != -1 && !name.equals(""))
+            query = "Select * from Topicos t where t.nome = '" + name +"' and t.tid = " + tid;
+        else if(tid != -1)
+            query = "Select * from Topicos t where t.tid = " + tid;
+        else if (!name.equals(""))
+            query = "Select * from Topicos t where t.nome = '" + name;
+        else
+            return null;
+
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.size() == 0)
+            return null;
+
+        ServerTopic topics = new ServerTopic(queryResult.get(0));
+
+        return topics;
     }
 
     ////
@@ -568,11 +609,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public static void main(String[] args) {
-
-        ////
-        //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
-        ////
-
         try{
             RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();
