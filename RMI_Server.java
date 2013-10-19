@@ -292,7 +292,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gahters
+    // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gathers
     // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
     // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
     //
@@ -304,6 +304,41 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
 
         return new Idea(queryResult.get(0));
+    }
+
+    ////
+    // Build an idea from a title. Notice that this constructor does not give us parent topic and ideas, it only gathers
+    // the title (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
+    // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
+    ////
+    public Idea getIdeaByTitle(String title) throws RemoteException{
+        String query = "select * from Ideias t where t.titulo = " + title + " and t.activa = 1";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return null;
+
+        return new Idea(queryResult.get(0));
+    }
+
+    public ServerTopic getTopic(int tid, String name) throws RemoteException{
+        String query;
+
+        if (tid != -1 && !name.equals(""))
+            query = "Select * from Topicos t where t.nome = '" + name +"' and t.tid = " + tid;
+        else if(tid != -1)
+            query = "Select * from Topicos t where t.tid = " + tid;
+        else if (!name.equals(""))
+            query = "Select * from Topicos t where t.nome = '" + name;
+        else
+            return null;
+
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null)
+            return null;
+
+        return new ServerTopic(queryResult.get(0));
     }
 
     ////
@@ -542,11 +577,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public static void main(String[] args) {
-
-        ////
-        //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
-        ////
-
         try{
             RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();

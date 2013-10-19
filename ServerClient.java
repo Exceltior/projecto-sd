@@ -116,6 +116,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get history method!!!!!");
                     break;
                 }
+            }else if( msg == Common.Message.REQUEST_GETTOPIC){
+                if (!handlegetTopic()){
+                    System.err.println("Error in the handle get topic method!!!!!");
+                    break;
+                }
             }
         }
 
@@ -212,6 +217,9 @@ public class ServerClient implements Runnable {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
         }
 
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
         if ( (topicid = Common.recvInt(inStream)) == -1)
             return false;
 
@@ -270,13 +278,27 @@ public class ServerClient implements Runnable {
         return data;
     }
 
+    private boolean setRelations(int iid,int[] ideas, int relationType) throws RemoteException{
+
+        for (int i=0;i<ideas.length;i++){
+            if (!RMIInterface.setIdeasRelations(iid, ideas[i], 1)) {
+                //Alert the client that the idea is not valid
+                if (!Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
+                    return false;
+                if (!Common.sendInt(ideas[i], outStream))
+                    return false;
+            }
+        }
+        return true;
+    }
+
 
     private boolean handleCreateIdea(){
-        String title, description, temp, topic, idea;
+        String title, description, topic;
         String[] topicsArray;
         int[] ideasForArray, ideasAgainstArray, ideasNeutralArray;
-        int nshares, price, result = -1, numTopics = -1, numMinShares = -1, numIdeasFor = -1, numIdeasNeutral = -1, numIdeasAgainst = -1;
-        boolean result_shares = false, result_topics = false;
+        int nshares, price, result, numMinShares;
+        boolean result_topics = false, result_shares;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -363,44 +385,17 @@ public class ServerClient implements Runnable {
                     return false;
             }
 
-            ////
             // Take care of the ideas for
-            ////
-            for (int i=0;i<ideasForArray.length;i++){
-                if (!RMIInterface.setIdeasRelations(result, ideasForArray[i], 1)) {
-                    //Alert the client that the idea is not valid
-                    if (!Common.sendMessage(Common.Message.ERR_IDEA_ID, outStream))
-                        return false;
-                    if (!Common.sendInt(ideasForArray[i], outStream))
-                        return false;
-                }
-            }
+            if (!setRelations(result, ideasForArray, 1))
+                return false;
 
-            ////
             //  Take care of the ideas against
-            ////
-            for (int i=0;i<ideasAgainstArray.length;i++){
-                if (!RMIInterface.setIdeasRelations(result, ideasAgainstArray[i], 1)) {
-                    //Alert the client that the idea is not valid
-                    if (!Common.sendMessage(Common.Message.ERR_IDEA_ID, outStream))
-                        return false;
-                    if (!Common.sendInt(ideasAgainstArray[i], outStream))
-                        return false;
-                }
-            }
+            if (!setRelations(result,ideasAgainstArray,-1))
+                return false;
 
-            ////
             //  Take care of the ideas neutral
-            ////
-            for (int i=0;i<ideasNeutralArray.length;i++){
-                if (!RMIInterface.setIdeasRelations(result, ideasNeutralArray[i], 1)) {
-                    //Alert the client that the idea is not valid
-                    if (!Common.sendMessage(Common.Message.ERR_IDEA_ID, outStream))
-                        return false;
-                    if (!Common.sendInt(ideasNeutralArray[i], outStream))
-                        return false;
-                }
-            }
+            if(!setRelations(result,ideasNeutralArray,0))
+                return false;
 
             //Everything ok
             if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
@@ -409,6 +404,7 @@ public class ServerClient implements Runnable {
         }catch(RemoteException r){
             System.err.println("Error while creating a new idea");
             //FIXME: Handle this!
+            return false;
         }
 
         return true;
@@ -464,7 +460,6 @@ public class ServerClient implements Runnable {
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
 
-
         ServerTopic[] topics = null;
         try {
             topics = RMIInterface.getTopics();
@@ -472,7 +467,7 @@ public class ServerClient implements Runnable {
         } catch (RemoteException e) {
             //FIXME: Handle this
             //e.printStackTrace();
-            System.out.println("Existiu uma remoteException! " + e.getMessage());
+            return false;
         }
 
         ////
@@ -496,15 +491,59 @@ public class ServerClient implements Runnable {
     }
 
     ////
-    //  Sends the history of a given client to that client
+    // Sends a topic for the client
     ////
-    private boolean handleGetHistory(){
+    private boolean handlegetTopic(){
+        int tid;
+        String name;
+        ServerTopic topic = null;
+
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
         }
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
+
+        if( (tid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (name = Common.recvString(inStream)) == null)
+            return false;
+
+        try{
+            topic = RMIInterface.getTopic(tid,name);
+        }catch(RemoteException r){
+            return false;
+        }
+
+        if (topic == null){
+            if(!Common.sendMessage(Common.Message.ERR_TOPIC_NOT_FOUND,outStream))
+                return false;
+        }
+        else{
+            //Confirm topic is ok
+            if(!Common.sendMessage(Common.Message.TOPIC_OK,outStream))
+                return false;
+            //Send topic
+            if(!topic.writeToDataStream(outStream))
+                return false;
+            //Send final ok
+            if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
+                return false;
+        }
+
+        System.out.println("Going to return true");
+        return true;
+    }
+
+    ////
+    //  Sends the history of a given client to that client
+    ////
+    private boolean handleGetHistory(){
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
 
         String[] history = null;
 
@@ -516,6 +555,7 @@ public class ServerClient implements Runnable {
             System.out.println("Existiu uma remoteException! " + r.getMessage());
         }
 
+        // MAndar mensagem a dizer que nao ha historico!!!!
         if (history == null){
             System.err.println("HI! I am in the handleGetHistory and history is null!!!");
             return false;

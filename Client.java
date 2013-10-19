@@ -136,6 +136,54 @@ public class Client {
         return devolve;
     }
 
+    ///
+    // Searchs a topic by its topic id and name
+    ////
+    private void searchTopic(){
+        String name = "", temp;
+        int tid = -1;
+        boolean repeat;
+
+        System.out.println("\n\nWelcome to the Topic's Search Engine!\nWe provide two ways of searching for a topic:" +
+                "By its name and by its topic id. You must insert at least one of these fields\n\n");
+
+        do{
+            repeat = false;
+            System.out.println("Please enter the id of the topic you want to search. If you don't know the topic id just press 'ENTER'");
+            temp = sc.nextLine();
+
+            //if the user pressed the enter key then we just ignore the topic id
+            if (!temp.equals("")){
+                try{
+                    tid = Integer.parseInt(temp);
+                } catch(NumberFormatException n){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }
+        }while (repeat);
+
+
+        System.out.println("Please enter the name of the topic you want to search. If you don't know the topic name just press 'ENTER'");
+        name = sc.nextLine();
+
+        if (tid == -1 && name.equals("")){
+            System.out.println("Topic id and/or name were not provided, no topic can be searched");
+            return ;
+        }
+
+        ClientTopic userSelectedTopic = conn.getTopic(tid,name);
+
+        if (userSelectedTopic == null){
+            System.out.println("No topic was found!");
+            return;
+        }
+
+        System.out.println("\nTopic:\n" + userSelectedTopic);
+
+        commentTopic(tid);
+    }
+
     ////
     //  Method responsible for collecting the information needed to create a new idea, and send a request to the TCP Server in
     //  order to create that new topic in the database
@@ -188,15 +236,18 @@ public class Client {
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         boolean typeInserted = false;
 
+        sc = new Scanner(System.in);
+
         System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
-        sc.nextLine();//Clear the buffer
         try{
             sentence = sc.nextLine();
             iid = Integer.parseInt(sentence);
         }catch(NumberFormatException n){}//We don't need to handle this exception
 
-        if (iid == -1)
+        if (iid == -1){
+            System.out.println("Vou sair");
             return false;
+        }
 
         System.out.println("Please enter the title of the idea:");
         title = sc.nextLine();
@@ -307,6 +358,8 @@ public class Client {
         System.out.println("3 - Submit an idea");
         System.out.println("4 - Delete an idea");
         System.out.println("5 - Show Transaction History");
+        System.out.println("6 - Search Idea");
+        System.out.println("7 - Search Topic");
         System.out.println("0 - Sair");
 
         do{
@@ -403,6 +456,22 @@ public class Client {
         mainLoop();
     }
 
+    private void commentTopic(int topic){
+        Idea[] ideasList = conn.getTopicIdeas(topic);
+
+        System.out.println("\nList of Ideas for the given topic:\n");
+        for (Idea anIdeasList : ideasList)
+            System.out.println(anIdeasList);
+
+        //Now we are going to ask the user if he wants to create an idea
+        ClientTopic[] temp = conn.getTopics();
+
+        if(!commentIdea(temp[topic-1].getTitle()))
+            System.err.println("Idea not commented");
+        else
+            System.out.println("Idea commented with success\n");
+    }
+
     private int listTopics(){
         int selected = -1, min_id_topic = 0, max_id_topic = 0;
         ClientTopic[] topics = conn.getTopics();
@@ -449,20 +518,7 @@ public class Client {
                 //Check a topic - List all the topics and ask the user which one he wants. While "inside" a topic list all ideas
                 case 1:{
                     topic = listTopics();
-
-                    Idea[] ideasList = conn.getTopicIdeas(topic);
-
-                    System.out.println("\nList of Ideas for the given topic:\n");
-                    for (Idea anIdeasList : ideasList)
-                        System.out.println(anIdeasList);
-
-                    //Now we are going to ask the user if he wants to create an idea
-                    ClientTopic[] temp = conn.getTopics();
-
-                    if(!commentIdea(temp[topic-1].getTitle()))
-                        System.err.println("Error while commenting the idea");
-                    else
-                        System.out.println("Idea commented with success\n");
+                    commentTopic(topic);
 
                     break;
                 }
@@ -484,7 +540,6 @@ public class Client {
 
                 //Delete an idea
                 case 4:{
-
                     //First we need to check if there is any idea which is fully owned by the user
                     System.out.println("Delete an idea!!!!");
                     break;
@@ -496,11 +551,25 @@ public class Client {
 
                     if (history == null || history.length == 0)
                         System.out.println("There are no previous transactions registered for this user");
-
                     else{
                         for (String aHistory : history)
                             System.out.println(aHistory);
                     }
+                    break;
+                }
+
+                //Search idea
+                case 6:{
+                    //RMI_Server = getIdeaByID
+                    //Criar getIdeaByName
+                    break;
+                }
+
+                //Search topic
+                case 7:{
+                    //Criar getTopicByID e getTopicByName no RMI_Server
+
+                    searchTopic();
 
                     break;
                 }
