@@ -335,7 +335,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult == null)
+        if (queryResult.size() == 0)
             return null;
 
         return new ServerTopic(queryResult.get(0));
