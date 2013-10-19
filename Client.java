@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -67,32 +68,43 @@ public class Client {
         return conn.createTopic(nome,descricao);
     }
 
-    private String[] askTopics(String sentence){
+    ////
+    //  Method responsible for asking the user information about the topics of an idea
+    //  atLeastOneElement - Indicates if the user actually needs to insert a topic or not
+    ////
+    private ArrayList<String> askTopics(String sentence, boolean atLeastOneElement){
         boolean repeat;
         String response;
+        String[] temp;
+        ArrayList<String> devolve = new ArrayList<String>();
 
         do{
             repeat = false;
             System.out.println(sentence);
             response = sc.nextLine();
 
-            if (response.equals("")){//Empty String, going to ask the user again
+            if (atLeastOneElement && response.equals("")){//Empty String, going to ask the user again
                 System.out.println("Invalid input!");
                 repeat = true;
-            }
+            }else if(response.equals(""))
+                return devolve;
 
         }while (repeat);
 
-        return response.split(";");
+        temp = response.split(";");
+        for (int i=0;i<temp.length;i++)
+            devolve.add(temp[i]);
+
+        return devolve;
     }
 
     ////
     //  Method responsible for asking the user information about the ideas
     ////
-    private int[] askIdeas(String sentence){
+    private ArrayList<Integer> askIdeas(String sentence){
         String ideas;
         String[] temp;
-        int[] devolve;
+        ArrayList<Integer> devolve = new ArrayList<Integer>();
         int pos = 0, temp_num;
         boolean repeat = false;
 
@@ -101,14 +113,18 @@ public class Client {
             ideas = sc.nextLine();
 
             temp = ideas.split(";");
-            devolve = new int[temp.length];
 
             for (String aTemp : temp) {
                 try {
                     temp_num = Integer.parseInt(aTemp);
                     if(temp_num == -1)
                         return null;
-                    devolve[pos] = temp_num;
+
+                    else if(devolve.contains(temp_num)){
+                        System.out.println("You have inserted the same idea twice, please enter again");
+                        repeat = true;
+                    }
+                    devolve.add(temp_num);
                     pos = pos + 1;
                 } catch (NumberFormatException n) {
                     System.out.println("Invalid input! Please enter again");
@@ -126,8 +142,8 @@ public class Client {
     ////
     private boolean createIdea(){
         String title, description;
-        String[] topics;
-        int[] ideasFor, ideasAgainst, ideasNeutral;
+        ArrayList<String> topics;
+        ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         int nshares, price, minNumShares;
 
         System.out.println("Please enter the title of the idea:");
@@ -152,12 +168,106 @@ public class Client {
 
         sc.nextLine();//Clear the buffer
 
-        topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)");
+        topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)",true);
         ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
         ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
         ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
 
         //FIXME: O METODO ASKIDES PODE DEVOLVER NULL!
+
+        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral);
+    }
+
+    ////
+    //  Creates a new idea, commenting directly on a topic
+    ////
+    private boolean commentIdea(String topicTitle){
+        String sentence,title, description;
+        int iid = -1, commentType = -2, nshares, price, minNumShares;
+        ArrayList<String> topics;
+        ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
+        boolean typeInserted = false;
+
+        System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
+        sc.nextLine();//Clear the buffer
+        try{
+            sentence = sc.nextLine();
+            iid = Integer.parseInt(sentence);
+        }catch(NumberFormatException n){}//We don't need to handle this exception
+
+        if (iid == -1)
+            return false;
+
+        System.out.println("Please enter the title of the idea:");
+        title = sc.nextLine();
+
+        System.out.println("Please enter the description of the idea:");
+        description = sc.nextLine();
+
+        System.out.println("Please enter the number of shares for the idea:");
+        nshares = sc.nextInt();
+
+        System.out.println("Please enter the price of each share of the idea:");
+        price = sc.nextInt();
+
+        do{
+            System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
+            minNumShares = sc.nextInt();
+            if (minNumShares<0 || minNumShares>nshares)
+                System.out.println("Invalid number!");
+        }while(minNumShares<0 || minNumShares>nshares);
+
+        sc.nextLine();//Clear the buffer
+
+        topics = askTopics("If you want to include this idea in other topics, please enter their titles (USAGE: topic1;topic2)\n" +
+                "If you just want to include the idea on the curren topic just press 'Enter'",false);
+
+        topics.add("" + topicTitle);
+
+        //Ask relation type
+        do{
+            System.out.println("Please select the relantionship between the idea you choose and the one you are just going to create\n(USAGE: 1-> For; -1->Against; 0-> Neutral)");
+            try{
+                commentType = sc.nextInt();
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+            }
+
+            sc.nextLine();//Clear the buffer
+
+            //FIXME: DO THIS MORE EFFICIENTLY?
+            if(commentType == 1 || commentType == -1 || commentType == 0)
+                typeInserted = true;
+
+        }while(!typeInserted);
+
+        ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+        ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+        ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+
+        if (commentType == 1){
+            if ( ideasFor == null){
+                ideasFor = new ArrayList<Integer>();
+                ideasFor.add(iid);
+            }else if(!ideasFor.contains(iid))
+                ideasFor.add(iid);
+        }
+
+        else if(commentType == -1){
+            if ( ideasAgainst == null){
+                ideasAgainst = new ArrayList<Integer>();
+                ideasAgainst.add(iid);
+            }else if(!ideasAgainst.contains(iid))
+                ideasAgainst.add(iid);
+        }
+
+        else{
+            if ( ideasNeutral == null){
+                ideasNeutral = new ArrayList<Integer>();
+                ideasNeutral.add(iid);
+            }else if(!ideasNeutral.contains(iid))
+                ideasNeutral.add(iid);
+        }
 
         return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral);
     }
@@ -317,7 +427,6 @@ public class Client {
                 selected = -1;
             }
         }while (selected < min_id_topic || selected > max_id_topic);
-
         return selected;
     }
 
@@ -337,7 +446,7 @@ public class Client {
                     break;
                 }
 
-                //Check a topic - List all the topcis and ask the user which one he wants. While "inside" a topic list all ideas
+                //Check a topic - List all the topics and ask the user which one he wants. While "inside" a topic list all ideas
                 case 1:{
                     topic = listTopics();
 
@@ -348,6 +457,12 @@ public class Client {
                         System.out.println(anIdeasList);
 
                     //Now we are going to ask the user if he wants to create an idea
+                    ClientTopic[] temp = conn.getTopics();
+
+                    if(!commentIdea(temp[topic-1].getTitle()))
+                        System.err.println("Error while commenting the idea");
+                    else
+                        System.out.println("Idea commented with success\n");
 
                     break;
                 }

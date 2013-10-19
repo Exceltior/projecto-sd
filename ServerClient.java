@@ -530,6 +530,9 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
         return true;
     }
 

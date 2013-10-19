@@ -156,16 +156,16 @@ public class ClientConnection {
         }
     }
 
-    boolean sendData(String[] data){
+    boolean sendData(ArrayList<String> data){
         //Send number of items
 
         if(data != null){
-            if (!Common.sendInt(data.length,outStream))
+            if (!Common.sendInt(data.size(),outStream))
                 return false;
 
             //Send itens
-            for (int i=0;i<data.length;i++) {
-                if (!Common.sendString(data[i], outStream))
+            for (int i=0;i<data.size();i++) {
+                if (!Common.sendString(data.get(i), outStream))
                     return false;
             }
         }else{
@@ -175,16 +175,17 @@ public class ClientConnection {
         return true;
     }
 
-    boolean sendInteger(int[] data){
+    boolean sendInteger(ArrayList<Integer> data){
         //Send number of items
 
-        if (data != null){
-            if (!Common.sendInt(data.length,outStream))
+        if (data != null && data.size()>0){
+            System.out.print(data.get(0));
+            if (!Common.sendInt(data.size(),outStream))
                 return false;
 
             //Send itens
-            for (int i=0;i<data.length;i++) {
-                if (!Common.sendInt(data[i], outStream))
+            for (int i=0;i<data.size();i++) {
+                if (!Common.sendInt(data.get(i), outStream))
                     return false;
             }
         }else{
@@ -195,9 +196,10 @@ public class ClientConnection {
         return true;
     }
 
-    boolean createIdea(String title, String description, int nshares, int price, String[] topics, int minNumShares, int[] ideasFor, int[] ideasAgainst, int[] ideasNeutral){
+    boolean createIdea(String title, String description, int nshares, int price, ArrayList<String> topics, int minNumShares, ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral){
         Common.Message reply;
         int devolve = -1;
+
 
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
@@ -423,6 +425,9 @@ public class ClientConnection {
                 }
                 history[i] = temp;
             }
+
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK )
+                return null;
 
             return history;
         }

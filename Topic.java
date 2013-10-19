@@ -30,4 +30,8 @@ public class Topic implements Serializable{
     public int getId(){
         return this.id;
     }
+
+    public String getTitle(){
+        return this.title;
+    }
 }
