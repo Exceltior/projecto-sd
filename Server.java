@@ -19,10 +19,13 @@ public class Server {
 
         Socket clientSocket = null;
 
+        RMIConnection connection = new RMIConnection();
+        connection.establishConnectionToRegistry();
+
         for(;;) {
             try {
                 clientSocket = acceptSocket.accept();
-                new Thread(new ServerClient(clientSocket)).start();
+                new Thread(new ServerClient(clientSocket, connection)).start();
             }
             catch (IOException e) {
                 System.err.println("Accept failed!");

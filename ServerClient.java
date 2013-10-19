@@ -17,7 +17,7 @@ public class ServerClient implements Runnable {
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
 
-    private Registry RMIregistry = null;
+    private RMIConnection connection;
     private RMI_Interface RMIInterface = null;
 
     // The client's uid. -1 means not logged in.
@@ -25,35 +25,26 @@ public class ServerClient implements Runnable {
 
     static int limit_characters_topic = 20;//Number of characters for the topic's name
 
-    public ServerClient(Socket currentSocket) {
+    public ServerClient(Socket currentSocket, RMIConnection connection) {
         this.socket = currentSocket;
+        this.connection = connection;
         try {
             this.outStream = new DataOutputStream(currentSocket.getOutputStream());
             this.inStream = new DataInputStream(currentSocket.getInputStream());
-            initRMIConnection();
         } catch (IOException e) {
             System.err.println("Error constructing a new ServerClient (did the connection die?");
         }
+
+        if(!initRMIConnection()) {
+            System.err.println("Error getting the RMI connection!");
+        }
     }
 
-    ////
-    // FIXME: This doesn't seem well thought out. We should have ONE RMI for all clients. For now,
-    // we'll keep this code, but we should fix it ASAP.
-    //
     private boolean initRMIConnection() {
 
-        try {
-            RMIregistry = LocateRegistry.getRegistry(7000);
-            RMIInterface = (RMI_Interface) RMIregistry.lookup("academica");
-        } catch (RemoteException e) {
-            System.err.println("Remote Exception no ServerClient!");
-            return false;
-        } catch (NotBoundException n) {
-            System.err.println("NotBoundException no ServerClient!");
-            return false;
-        }
+        RMIInterface = connection.getRMIInterface();
 
-        return true;
+        return RMIInterface != null;
     }
 
     private boolean isLoggedIn() {
