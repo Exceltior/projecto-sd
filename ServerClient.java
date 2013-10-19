@@ -123,9 +123,13 @@ public class ServerClient implements Runnable {
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEA){
-                if (!handleGetIdea()){
+                if (!handleGet_Idea()){
                     System.err.println("Error in the handle get idea method");
                     break;
+                }
+            }else if (msg == Common.Message.REQUEST_GET_TOPICS_OF_IDEA){
+                if (!handleGetTopicsOfIdea()){
+                    System.err.println("Error in the handle get topics of idea method");
                 }
             }
         }
@@ -182,6 +186,9 @@ public class ServerClient implements Runnable {
     }
 
 
+    ////
+    //  Creates a new topic
+    ////
     private boolean handleCreateTopicRequest(){
         String nome, descricao;
         boolean result = false;
@@ -215,6 +222,48 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    ////
+    //  Get the list of topics where a given idea is
+    ////
+    private boolean handleGetTopicsOfIdea(){
+        int iid = -1;
+        ServerTopic[] list_topics;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+            list_topics = RMIInterface.getIdeaTopics(iid);
+        }catch(RemoteException r){
+            System.err.println("Error while getting ideas from topic");
+            //FIXME: Handle this
+            return false;
+        }
+
+        if (!Common.sendInt(list_topics.length,outStream))
+            return false;
+
+        for (int i=0;i<list_topics.length;i++){
+            if (!list_topics[i].writeToDataStream(outStream))
+                return false;
+        }
+
+        if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
+            return false;
+
+        return true;
+    }
+
+    ////
+    // Get the list of ideas in a given topic
+    ////
     private boolean handleGetTopicsIdea(){
         int topicid = -1;
         Idea[] ideaslist = null;
@@ -238,12 +287,18 @@ public class ServerClient implements Runnable {
                 return false;
 
             //Send ideas
-            for (int i=0;i<ideaslist.length;i++)
-                ideaslist[i].writeToDataStream(outStream);
+            for (int i=0;i<ideaslist.length;i++){
+                if(!ideaslist[i].writeToDataStream(outStream))
+                    return false;
+            }
+
+            if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
+                return false;
 
         }catch (RemoteException r){
             System.err.println("Error while getting ideas from topic");
             //FIXME: Handle this
+            return false;
         }
 
         return true;
@@ -311,6 +366,9 @@ public class ServerClient implements Runnable {
     }
 
 
+    ////
+    //  Creates a new Idea
+    ////
     private boolean handleCreateIdea(){
         String title, description, topic;
         String[] topicsArray;
@@ -428,6 +486,59 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    ////
+    //  Searches ideas from its id and title
+    ////
+    private boolean handleGet_Idea(){
+        int iid;
+        String title;
+        Idea[] ideas;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+        if ( (title = Common.recvString(inStream)) == null)
+            return false;
+
+        try {
+            ideas = RMIInterface.getIdeaByIID(iid,title);
+        } catch (RemoteException e) {
+            System.err.println("RMI exception while fetching an idea by its IID");
+            return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
+        }
+
+        if ( ideas == null) {
+            // There is no idea with this ID
+            if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
+                return false;
+        } else {
+            // Got the idea, let's send it
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+
+            if (!Common.sendInt(ideas.length,outStream))
+                return false;
+
+            for (int i=0;i<ideas.length;i++){
+                if ( !ideas[i].writeToDataStream(outStream) )
+                    return false;
+            }
+
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+        }
+        return true;
+    }
+
+    ////
+    //  Gets an idea from its id
+    ////
     private boolean handleGetIdeaByIID() {
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -460,6 +571,9 @@ public class ServerClient implements Runnable {
                 return false;
 
             if ( !idea.writeToDataStream(outStream) )
+                return false;
+
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
                 return false;
         }
 
@@ -495,6 +609,9 @@ public class ServerClient implements Runnable {
             if (!topics[i].writeToDataStream(outStream))
                 return false;
         }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
 
         return true;
     }

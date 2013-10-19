@@ -179,7 +179,6 @@ public class ClientConnection {
         //Send number of items
 
         if (data != null && data.size()>0){
-            System.out.print(data.get(0));
             if (!Common.sendInt(data.size(),outStream))
                 return false;
 
@@ -297,10 +296,8 @@ public class ClientConnection {
             //Get Final Confirmation
             reply = Common.recvMessage(inStream);
 
-            if(reply != Common.Message.MSG_OK)
-                return false;
+            return reply == Common.Message.MSG_OK;
 
-            return true;
         }
     }
 
@@ -336,28 +333,28 @@ public class ClientConnection {
                 reconnect();continue;
             }
 
-            reply = Common.recvMessage(inStream);
-
-            if (reply == Common.Message.TOPIC_OK){
-
-                if ( (len = Common.recvInt(inStream)) == -1){
-                    reconnect();continue;
-                }
-
-                ideas = new Idea[len];
-
-                for (int i=0;i<len;i++){
-                    ideas[i] = new Idea();
-                    ideas[i].readFromDataStream(inStream);
-                }
-
-                reply = Common.recvMessage(inStream);
-                if (reply != Common.Message.MSG_OK)
-                    return null;
-                return ideas;
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
+                System.err.println("Bodega2");
+                return null;
             }
 
-            return null;
+            if ( (len = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            ideas = new Idea[len];
+
+            for (int i=0;i<len;i++){
+                ideas[i] = new Idea();
+                ideas[i].readFromDataStream(inStream);
+            }
+
+            reply = Common.recvMessage(inStream);
+
+            if (reply != Common.Message.MSG_OK)
+                return null;
+
+            return ideas;
         }
     }
 
@@ -410,6 +407,61 @@ public class ClientConnection {
         }
     }
 
+    ////
+    //  Get every topic for the given idea
+    ////
+    ClientTopic[] getIdeaTopics(int iid){
+        Common.Message reply;
+        ClientTopic[] devolve;
+        int len;
+        boolean needReconnect = false;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_TOPICS_OF_IDEA, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( !Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            if ( (len = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            devolve = new ClientTopic[len];
+
+            for (int i=0;i<len;i++){
+                if ( (devolve[i] = ClientTopic.fromDataStream(inStream)) == null ){
+                    needReconnect = true;
+                    break;
+                }
+            }
+
+            if ( needReconnect ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            return devolve;
+        }
+    }
+
     ///
     //  Get every idea in a given topic
     ///
@@ -456,6 +508,11 @@ public class ClientConnection {
 
              if ( needReconnect ) {
                  reconnect(); continue;
+             }
+
+             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                 System.err.println("Error in the getTopicsIdeas method! MSG_OK not received");
+                 return null;
              }
 
 
@@ -506,6 +563,11 @@ public class ClientConnection {
             }
             if ( needReconnect ) {
                 reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                System.err.println("Error in the getTopics method! MSG_OK not received");
+                return null;
             }
 
             return topics;

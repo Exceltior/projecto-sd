@@ -271,6 +271,27 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Get the given idea's list of topics
+    ////
+    public ServerTopic[] getIdeaTopics(int iid) throws RemoteException{
+        String query = "Select * from TopicosIdeias t where t.iid = " + iid;
+        ArrayList<String[]> queryResult = receiveData(query), topic;
+        ServerTopic[] listTopics;
+
+        if (queryResult == null)
+            return null;
+
+        listTopics = new ServerTopic[queryResult.size()];
+        for (int i=0;i<queryResult.size();i++){
+            query = "Select * from Topicos t where t.tid = " + queryResult.get(i)[0];
+            topic = receiveData(query);
+            listTopics[i] = new ServerTopic(topic.get(0));
+        }
+
+        return listTopics;
+    }
+
+    ////
     // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gathers
     // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
     // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()

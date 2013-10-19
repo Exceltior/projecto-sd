@@ -141,8 +141,12 @@ public class Client {
     ////
     private void searchIdea(){
         String temp, title;
-        int iid = -1;
+        int iid = -1, tid = -1;
         boolean repeat;
+        Idea[] userSelectedIdea;
+        ClientTopic[] listTopics;
+        ArrayList<Integer> listIdeasIDs = new ArrayList<Integer>();
+        ArrayList<String> listTopicsNames = new ArrayList<String>();
 
         System.out.println("\n\nWelcome to the Idea's Search Engine!\nWe provide two ways of searching for a topic:" +
                 "By its name and by its topic id. You must insert at least one of these fields\n\n");
@@ -171,19 +175,38 @@ public class Client {
             return ;
         }
 
-        Idea[] userSelectedIdea = conn.getIdea(iid,title);
+        userSelectedIdea = conn.getIdea(iid,title);
 
         if (userSelectedIdea == null){
-            System.out.println("No idea was found!");
+            System.out.println("No idea was found!5555");
             return;
         }
 
         System.out.println("\nIdeas found:");
-        for (int i=0;i<userSelectedIdea.length;i++)
+        for (int i=0;i<userSelectedIdea.length;i++){
+            listIdeasIDs.add(userSelectedIdea[i].getId());
             System.out.println(userSelectedIdea[i]);
+        }
 
         //Permitir comentar ideia
+        iid = -1;
+        System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
+        try{
+            temp = sc.nextLine();
+            iid = Integer.parseInt(temp);
+        }catch(NumberFormatException n){}//We don't need to handle this exception
 
+         if (listIdeasIDs.contains(iid)){
+             //Vamos comentar a ideia - Ir buscar o topico da ideia
+              listTopics = conn.getIdeaTopics(iid);
+
+             for (int i=0;i< listTopics.length;i++)
+                 listTopicsNames.add(listTopics[i].getTitle());
+
+             commentIdea(listTopicsNames,iid);
+
+         }else
+             System.out.println("Idea(s) not comented");
     }
 
     ////
@@ -279,25 +302,12 @@ public class Client {
     ////
     //  Creates a new idea, commenting directly on a topic
     ////
-    private boolean commentIdea(String topicTitle){
+    private boolean commentIdea(ArrayList<String> topicTitle, int iid){
         String sentence,title, description;
-        int iid = -1, commentType = -2, nshares, price, minNumShares;
+        int commentType = -2, nshares, price, minNumShares;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         boolean typeInserted = false;
-
-        sc = new Scanner(System.in);
-
-        System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
-        try{
-            sentence = sc.nextLine();
-            iid = Integer.parseInt(sentence);
-        }catch(NumberFormatException n){}//We don't need to handle this exception
-
-        if (iid == -1){
-            System.out.println("Vou sair");
-            return false;
-        }
 
         System.out.println("Please enter the title of the idea:");
         title = sc.nextLine();
@@ -323,7 +333,8 @@ public class Client {
         topics = askTopics("If you want to include this idea in other topics, please enter their titles (USAGE: topic1;topic2)\n" +
                 "If you just want to include the idea on the curren topic just press 'Enter'",false);
 
-        topics.add("" + topicTitle);
+        for(int i=0;i<topicTitle.size();i++)
+            topics.add(topicTitle.get(i));
 
         //Ask relation type
         do{
@@ -508,6 +519,8 @@ public class Client {
 
     private void commentTopic(int topic){
         Idea[] ideasList = conn.getTopicIdeas(topic);
+        String sentence;
+        int iid = -1;
 
         System.out.println("\nList of Ideas for the given topic:\n");
         for (Idea anIdeasList : ideasList)
@@ -516,7 +529,23 @@ public class Client {
         //Now we are going to ask the user if he wants to create an idea
         ClientTopic[] temp = conn.getTopics();
 
-        if(!commentIdea(temp[topic-1].getTitle()))
+        ArrayList<String> topicName = new ArrayList<String>();
+        topicName.add(temp[topic - 1].getTitle());
+
+        sc = new Scanner(System.in);
+
+        System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
+        try{
+            sentence = sc.nextLine();
+            iid = Integer.parseInt(sentence);
+        }catch(NumberFormatException n){}//We don't need to handle this exception
+
+        if (iid == -1){
+            System.out.println("Vou sair");
+            return ;
+        }
+
+        if(!commentIdea(topicName,iid))
             System.err.println("Idea not commented");
         else
             System.out.println("Idea commented with success\n");
