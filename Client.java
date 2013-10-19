@@ -334,6 +334,13 @@ public class Client {
         //  Connects to the TCP Primary Server
         conn.connect();
 
+        /** This is here for TESTING
+        conn.login("Joca","teste123");
+        conn.deleteIdea(3);
+
+        askUsername(); //Loop on something
+        **/
+
         do{
             choice = printWelcomeScreen();
 
