@@ -23,6 +23,8 @@ public class ClientConnection {
     private Socket currentSocket = null;
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
+    private boolean loggedIn = false;
+    private String lastUsername, lastPassword;
 
 
     ////
@@ -84,6 +86,12 @@ public class ClientConnection {
             }
 
             System.out.println("Estou no client connection " + (reply == Common.Message.MSG_OK));
+
+            if ( reply == Common.Message.MSG_OK) {
+                this.loggedIn = true;
+                this.lastPassword = pass;
+                this.lastUsername = username;
+            }
             return reply == Common.Message.MSG_OK;
 
         }
@@ -95,7 +103,16 @@ public class ClientConnection {
     private void reconnect() {
         System.out.println(" Connection to " + currentHost + " - '" + hosts[currentHost] + "':" + ports[currentHost]
                 + " dropped, initiating reconnecting process...");
+
+        currentHost--; //We do currentHost-- so that we retry the current host ONCE.
+        // FIXME: We might as well sleep for a while here too...
         connect();
+        if(this.loggedIn) {
+            this.loggedIn = false;
+            if (!this.login(lastUsername, lastPassword)) {
+                System.err.println("Something's gone HORRIBLY WRONG!!!!"); //FIXME: SHIT!
+            }
+        }
     }
 
     ////
