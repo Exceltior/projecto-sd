@@ -175,23 +175,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    //  Method responsible for validating an idea, before adding it to the database
-    ////
-    public boolean validateIdea(String description){
-        String query = "Select * from Ideias i where i.descricao='" + description + "'";
-        ArrayList<String[]> ideias = null;
-
-        try{
-            ideias = receiveData(query);
-        }catch(RemoteException r){
-            System.err.println("Remote Exception on the validateIdea method");
-            //FIXME: Deal with this
-        }
-
-        return ideias == null || ideias.size() == 0;
-    }
-
-    ////
     //  Method responsile for insering a new user in the database
     ////
     public boolean register(String user, String pass, String email, String date) throws RemoteException{
@@ -231,10 +214,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     public int createIdea(String title, String description, int uid) throws RemoteException{
          String query;
-        if (!validateIdea(description)){
-             System.out.println("Invalid Idea!");
-             return -1;
-         }
 
         num_ideas++;
 
@@ -306,6 +285,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return new Idea(queryResult.get(0));
     }
 
+    public Idea[] getIdeaByIID(int iid, String title) throws RemoteException{
+        String query;
+        Idea[] devolve;
+
+        if (iid != -1 && !title.equals(""))
+            query = "Select * from Ideias i where i.activa = 1 and i.iid = '" + iid +"' and i.titulo = " + title;
+        else if(iid != -1)
+            query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid;
+        else if (!title.equals(""))
+            query = "Select * from Ideias i where i.activa = 1 and i.titulo = '" + title;
+        else
+            return null;
+
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.size() == 0)
+            return null;
+
+        devolve = new Idea[queryResult.size()];
+        for (int i=0;i<queryResult.size();i++)
+            devolve[i] = new Idea(queryResult.get(i));
+
+        return devolve;
+    }
+
     ////
     // Build an idea from a title. Notice that this constructor does not give us parent topic and ideas, it only gathers
     // the title (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
@@ -338,7 +342,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if (queryResult.size() == 0)
             return null;
 
-        return new ServerTopic(queryResult.get(0));
+        ServerTopic topics = new ServerTopic(queryResult.get(0));
+
+        return topics;
     }
 
     ////

@@ -6,6 +6,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 
 ////
 // This class, which implements an independent thread, is responsible for handling all requests from a given client
@@ -119,6 +120,11 @@ public class ServerClient implements Runnable {
             }else if( msg == Common.Message.REQUEST_GETTOPIC){
                 if (!handlegetTopic()){
                     System.err.println("Error in the handle get topic method!!!!!");
+                    break;
+                }
+            }else if (msg == Common.Message.REQUEST_GET_IDEA){
+                if (!handleGetIdea()){
+                    System.err.println("Error in the handle get idea method");
                     break;
                 }
             }
@@ -276,6 +282,18 @@ public class ServerClient implements Runnable {
         }
 
         return data;
+    }
+
+    private boolean sendTopics(ServerTopic[] topics){
+
+        if(!Common.sendInt(topics.length,outStream))
+            return false;
+
+        for (int i=0;i<topics.length;i++){
+            if(!topics[i].writeToDataStream(outStream))
+                return false;
+        }
+        return true;
     }
 
     private boolean setRelations(int iid,int[] ideas, int relationType) throws RemoteException{
@@ -470,15 +488,6 @@ public class ServerClient implements Runnable {
             return false;
         }
 
-        ////
-        //  Here, if topics is null, it means that either the query went wrong (that should be handled in the RMI Server) or
-        //  that there are no topics stored in the databse.
-        ////
-        if ( topics == null ){
-            System.out.println("Hi! I am in the handleListTopicsRequest method and this is going to return false :)");
-            return false; //There was an error and there are no topics...
-        }
-
         if ( !Common.sendInt(topics.length,outStream) )
             return false;
 
@@ -491,7 +500,59 @@ public class ServerClient implements Runnable {
     }
 
     ////
-    // Sends a topic for the client
+    //  Sends an idea to the client
+    ////
+    private boolean handleGetIdea(){
+        int iid;
+        String title;
+        Idea[] ideas = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        if( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (title = Common.recvString(inStream)) == null)
+            return false;
+
+        try{
+            ideas = RMIInterface.getIdeaByIID(iid,title);
+        }catch(RemoteException r){
+            return false;
+        }
+
+        if (ideas == null){
+            if(!Common.sendMessage(Common.Message.ERR_NO_SUCH_IID,outStream))
+                return false;
+        }
+        else{
+            //Confirm topic is ok
+            if(!Common.sendMessage(Common.Message.TOPIC_OK,outStream))
+                return false;
+
+            //Send ideas
+            if (!Common.sendInt(ideas.length,outStream))
+                return false;
+
+            for (int i=0;i<ideas.length;i++)
+                ideas[i].writeToDataStream(outStream);
+
+            //Send final ok
+            if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
+                return false;
+        }
+
+        System.out.println("Going to return true");
+        return true;
+    }
+
+    ////
+    // Sends a topic to the client
     ////
     private boolean handlegetTopic(){
         int tid;
@@ -525,9 +586,10 @@ public class ServerClient implements Runnable {
             //Confirm topic is ok
             if(!Common.sendMessage(Common.Message.TOPIC_OK,outStream))
                 return false;
+
             //Send topic
-            if(!topic.writeToDataStream(outStream))
-                return false;
+            topic.writeToDataStream(outStream);
+
             //Send final ok
             if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
                 return false;

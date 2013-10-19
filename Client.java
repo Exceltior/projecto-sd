@@ -136,7 +136,57 @@ public class Client {
         return devolve;
     }
 
-    ///
+    ////
+    //  Searchs an idea by its idea id and title
+    ////
+    private void searchIdea(){
+        String temp, title;
+        int iid = -1;
+        boolean repeat;
+
+        System.out.println("\n\nWelcome to the Idea's Search Engine!\nWe provide two ways of searching for a topic:" +
+                "By its name and by its topic id. You must insert at least one of these fields\n\n");
+
+        do{
+            repeat = false;
+            System.out.println("Please enter the id of the idea you want to search. If you don't know the idea id just press 'ENTER'");
+            temp = sc.nextLine();
+
+            //if the user pressed the enter key then we just ignore the topic id
+            if (!temp.equals("")){
+                try{
+                    iid = Integer.parseInt(temp);
+                } catch(NumberFormatException n){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }
+        }while (repeat);
+
+        System.out.println("Please enter the title of the idea you want to search. If you don't know the idea title just press 'ENTER'");
+        title = sc.nextLine();
+
+        if (iid == -1 && title.equals("")){
+            System.out.println("Idea id and/or title were not provided, no idea can be searched");
+            return ;
+        }
+
+        Idea[] userSelectedIdea = conn.getIdea(iid,title);
+
+        if (userSelectedIdea == null){
+            System.out.println("No idea was found!");
+            return;
+        }
+
+        System.out.println("\nIdeas found:");
+        for (int i=0;i<userSelectedIdea.length;i++)
+            System.out.println(userSelectedIdea[i]);
+
+        //Permitir comentar ideia
+
+    }
+
+    ////
     // Searchs a topic by its topic id and name
     ////
     private void searchTopic(){
@@ -179,7 +229,7 @@ public class Client {
             return;
         }
 
-        System.out.println("\nTopic:\n" + userSelectedTopic);
+        System.out.println("\nTopic found:\n" + userSelectedTopic);
 
         commentTopic(tid);
     }
@@ -562,15 +612,14 @@ public class Client {
                 case 6:{
                     //RMI_Server = getIdeaByID
                     //Criar getIdeaByName
+                    searchIdea();
                     break;
                 }
 
                 //Search topic
                 case 7:{
                     //Criar getTopicByID e getTopicByName no RMI_Server
-
                     searchTopic();
-
                     break;
                 }
 

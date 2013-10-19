@@ -305,11 +305,69 @@ public class ClientConnection {
     }
 
     ////
+    //  Get an idea by its iid and title
+    ////
+    Idea[] getIdea(int iid, String title){
+        Common.Message reply;
+        Idea[] ideas;
+        int len;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEA, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( !Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            if ( !Common.sendString(title,outStream)){
+                reconnect();continue;
+            }
+
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.TOPIC_OK){
+
+                if ( (len = Common.recvInt(inStream)) == -1){
+                    reconnect();continue;
+                }
+
+                ideas = new Idea[len];
+
+                for (int i=0;i<len;i++){
+                    ideas[i] = new Idea();
+                    ideas[i].readFromDataStream(inStream);
+                }
+
+                reply = Common.recvMessage(inStream);
+                if (reply != Common.Message.MSG_OK)
+                    return null;
+                return ideas;
+            }
+
+            return null;
+        }
+    }
+
+    ////
     // Get a topic by its tid and name
     ////
     ClientTopic getTopic(int tid, String name){
         Common.Message reply;
         ClientTopic topic = null;
+        int len;
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPIC, outStream) ) {
@@ -340,6 +398,7 @@ public class ClientConnection {
             if (reply == Common.Message.TOPIC_OK){
 
                 topic = ClientTopic.fromDataStream(inStream);
+
 
                 reply = Common.recvMessage(inStream);
                 if (reply != Common.Message.MSG_OK)
