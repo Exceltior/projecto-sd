@@ -547,10 +547,8 @@ public class Client {
             iid = Integer.parseInt(sentence);
         }catch(NumberFormatException n){}//We don't need to handle this exception
 
-        if (iid == -1){
-            System.out.println("Vou sair");
+        if (iid == -1)
             return ;
-        }
 
         if(!commentIdea(topicName,iid))
             System.err.println("Idea not commented");
@@ -559,7 +557,7 @@ public class Client {
     }
 
     private int listTopics(){
-        int selected = -1, min_id_topic = 0, max_id_topic = 0;
+        int selected, min_id_topic = 0, max_id_topic = 0;
         ClientTopic[] topics = conn.getTopics();
 
         if (topics.length>0)

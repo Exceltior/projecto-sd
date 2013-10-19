@@ -769,11 +769,14 @@ public class ServerClient implements Runnable {
     //  Sends the history of a given client to that client
     ////
     private boolean handleGetHistory(){
+        String[] history = null;
+
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
         }
 
-        String[] history = null;
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
 
         try{
             history = RMIInterface.getHistory(uid);
@@ -783,7 +786,6 @@ public class ServerClient implements Runnable {
             System.err.println("Existiu uma remoteException! " + r.getMessage());
         }
 
-        // MAndar mensagem a dizer que nao ha historico!!!!
         if (history == null){
             System.err.println("HI! I am in the handleGetHistory and history is null!!!");
             return false;
@@ -798,10 +800,7 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
-
-        return true;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
     }
 
     ////

@@ -627,10 +627,14 @@ public class ClientConnection {
 
             for(int i=0; i<numTransactions;++i){
                 if ( (temp = Common.recvString(inStream)) == null ){
-                     needReconnect = true;
+                    needReconnect = true;
                     break;
                 }
                 history[i] = temp;
+            }
+
+            if ( needReconnect ) {
+                reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK )
