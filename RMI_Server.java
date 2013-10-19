@@ -77,6 +77,36 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Returns all the ideas associated with a given user
+    ////
+    public Idea[] getIdeasFromUser(int uid) throws RemoteException{
+        Idea[] ideas;
+        String query = "Select i.iid,i.titulo,i.descricao,i.userid from Ideias i, Shares s where i.activa = 1 and s.iid = i.iid" +
+                " and s.userid = " + uid;
+        ArrayList<String[]> queryResult = null;
+
+        try{
+            queryResult = receiveData(query);
+        }catch(RemoteException r){
+            System.err.println("Error accessing the database");
+        }
+
+        if (queryResult == null)
+            return null; //FIXME: We should do something about a query failing or something like that...
+
+        if (queryResult.size() == 0)
+            return null;
+
+        ideas = new Idea[queryResult.size()];
+
+        for (int i = 0; i < queryResult.size(); i++)
+            ideas[i] = new Idea(queryResult.get(i));
+
+
+        return ideas;
+    }
+
+    ////
     // This returns an array of ideas which belong to this Topic.
     //
     // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas

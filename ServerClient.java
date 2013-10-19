@@ -120,12 +120,18 @@ public class ServerClient implements Runnable {
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEA){
                 if (!handleGet_Idea()){
-                    System.err.println("Error in the handle get idea method");
+                    System.err.println("Error in the handle get idea method!!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_TOPICS_OF_IDEA){
                 if (!handleGetTopicsOfIdea()){
-                    System.err.println("Error in the handle get topics of idea method");
+                    System.err.println("Error in the handle get topics of idea method!!!!!!");
+                    break;
+                }
+            }else if (msg == Common.Message.REQUEST_GETUSERIDEAS){
+                if (!handleGetUserIdeas()){
+                    System.err.println("Error in the handle get user ideas method!!!!!!");
+                    break;
                 }
             }
         }
@@ -335,6 +341,9 @@ public class ServerClient implements Runnable {
         return data;
     }
 
+    ////
+    //  Method used to send topics
+    ////
     private boolean sendTopics(ServerTopic[] topics){
 
         if(!Common.sendInt(topics.length,outStream))
@@ -358,6 +367,49 @@ public class ServerClient implements Runnable {
                     return false;
             }
         }
+        return true;
+    }
+
+    ////
+    //  Sends a list of the ideas associated with a given user
+    ////
+    private boolean handleGetUserIdeas(){
+        Idea[] userIdeas;
+        int numUserIdeas;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        try{
+             userIdeas = RMIInterface.getIdeasFromUser(uid);
+        }catch (RemoteException r){
+            System.err.println("Error while getting user's ideas");
+            return false;
+        }
+
+        if (userIdeas == null){
+            Common.sendMessage(Common.Message.ERR_IDEAS_NOT_FOUND,outStream);
+            System.out.println("Error");
+            return false;
+        }
+
+        else{
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+        }
+
+        if (!Common.sendInt(userIdeas.length,outStream))
+            return false;
+
+        for (int i=0;i<userIdeas.length;i++){
+            if(!userIdeas[i].writeToDataStream(outStream))
+                return false;
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
         return true;
     }
 
@@ -453,8 +505,8 @@ public class ServerClient implements Runnable {
                 if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                     return false;
             }else{
-                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
-                    return false;
+                Common.sendMessage(Common.Message.MSG_ERR, outStream);
+                return false;
             }
 
             // Take care of the ideas for

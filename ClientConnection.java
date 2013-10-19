@@ -479,6 +479,66 @@ public class ClientConnection {
         }
     }
 
+    ////
+    //  Returns all the ideas associated with a given user
+    ////
+
+    Idea[] getIdeasFromUser(){
+        Idea[] devolve;
+        int numIdeas;
+        Common.Message reply;
+        boolean needReconnect = false;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GETUSERIDEAS, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if (reply == Common.Message.ERR_IDEAS_NOT_FOUND){
+                System.err.println("Idea not found!");
+                return null;
+            }
+
+            //No need to send the used id, because it is already stored in the Server
+
+            if ( (numIdeas = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            devolve = new Idea[numIdeas];
+
+            for (int i=0;i<numIdeas;i++){
+                devolve[i] = new Idea();
+                if ( !devolve[i].readFromDataStream(inStream) ){
+                    needReconnect = true;
+                    break;
+                }
+            }
+
+            if ( needReconnect ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                System.err.println("Error while receiving the user's ideas");
+                return null;
+            }
+
+            return devolve;
+        }
+    }
+
     ///
     //  Get every idea in a given topic
     ///
