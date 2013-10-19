@@ -11,12 +11,12 @@ import java.util.ArrayList;
 ////
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
-    private Connection conn;
     private String url;
     static int num_users;
     static int num_topics;
     static int num_ideas;
     static int starting_money = 10000;
+    private ConnectionPool connectionPool;
 
     ////
     //  Class constructor. Creates a new instance of the class RMI_Server
@@ -24,35 +24,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public RMI_Server(String servidor, String porto, String sid) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
-    }
-
-    public Connection getConn(){
-        return this.conn;
-    }
-
-    public String getUrl(){
-        return this.url;
-    }
-
-    public void setConn(Connection c){
-        this.conn = c;
-    }
-
-    public void closeConnection(){
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            System.err.println("Error closing the connection");
-        }
-
-        ////
-        //
-        //
-        //  FIXME: WHAT TO DO WITH THIS EXCEPTIONS???
-        //
-        //
-        ////
     }
 
     ////
@@ -487,13 +458,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement;
+        Connection conn = null;
+
 
         //System.out.println("\n-------------------------------\nRunning query: "+query);
 
         try {
+            conn = connectionPool.checkOutConnection();
             statement = conn.createStatement();
         } catch (SQLException e) {
             System.err.println("Error creating SQL statement '" + query + "'!");
+            if ( conn != null)
+                connectionPool.returnConnection(conn);
             return null;
         }
 
@@ -514,9 +490,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             statement.close();
         } catch (SQLException e) {
             System.err.println("Error executing SQL query '" + query + "'!");
+            connectionPool.returnConnection(conn);
             return null;
         }
 
+        connectionPool.returnConnection(conn);
         return result;
     }
 
@@ -529,17 +507,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     private boolean insertData(String query) throws RemoteException{
         Statement statement;
+        Connection conn = null;
         int update = -1;
 
         try{
+            conn = connectionPool.checkOutConnection();
             statement = conn.createStatement();
             update = statement.executeUpdate(query);
         }catch(SQLException s){
             System.err.println("SQLException in the insertData method");
+            if ( conn != null )
+                connectionPool.returnConnection(conn);
+            return false;
+
         }
 
         //System.out.println("O resultado foi " + (update!=0));
-
+        connectionPool.returnConnection(conn);
         return update != 0;
     }
 
@@ -553,13 +537,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         try{
 
-            conn = DriverManager.getConnection(url, username, password);
+            connectionPool = new ConnectionPool(url, username, password);
 
 
             //connect to database
+            //FIXME: Should this still be here? Should it be moved inside ConnectionPool?
             Class.forName("oracle.jdbc.driver.OracleDriver");
 
-            if (conn == null) {
+            if (connectionPool == null) {
                 System.out.println("Failed to make connection!");
                 return ;
             }
