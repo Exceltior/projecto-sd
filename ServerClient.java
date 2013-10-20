@@ -241,6 +241,7 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
+        server.queue.dequeue(createTopicsRequest);
         return true;
     }
 
