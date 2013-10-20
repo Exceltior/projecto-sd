@@ -647,10 +647,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException {
-        DataOutputStream out;
+        ObjectOutputStream out;
         try {
-            out = new DataOutputStream(new FileOutputStream(requestsQueueFilePath));
-        } catch (FileNotFoundException e) {
+            out = new ObjectOutputStream(new FileOutputStream(requestsQueueFilePath));
+        } catch (IOException e) {
             System.err.println("Error opening Queue file for writing!");
             return;
         }
@@ -671,10 +671,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException {
-        DataInputStream in;
+        ObjectInputStream in;
         try {
-            in = new DataInputStream(new FileInputStream(requestsQueueFilePath));
-        } catch (FileNotFoundException e) {
+            in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
+        } catch (IOException e) {
             System.err.println("Error opening Queue file for reading!");
             return null;
         }
