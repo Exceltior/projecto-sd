@@ -92,8 +92,10 @@ public class Client {
         }while (repeat);
 
         temp = response.split(";");
-        for (int i=0;i<temp.length;i++)
-            devolve.add(temp[i]);
+        for (int i=0;i<temp.length;i++){
+            if (!devolve.contains(temp[i]))
+                devolve.add(temp[i]);
+        }
 
         return devolve;
     }
@@ -260,6 +262,28 @@ public class Client {
     }
 
     ////
+    //  Method responsible for checking if the user hasn't selected the same idea for different relations
+    ////
+    private boolean checkIdeasRelations(ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral){
+
+        for (Integer anIdeasFor : ideasFor) {
+            if (ideasAgainst.contains(anIdeasFor) || ideasNeutral.contains(anIdeasFor)){
+                System.out.println("Vou devolver false");
+                return false;
+            }
+        }
+
+        //Here we know that none of the items from ideasFor is in ideasAgainst nor in ideasNeutral
+        for (Integer anIdeasAgainst : ideasAgainst){
+            if (ideasNeutral.contains(anIdeasAgainst)){
+                System.out.println("Vou devolver false2");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    ////
     //  Method responsible for collecting the information needed to create a new idea, and send a request to the TCP Server in
     //  order to create that new topic in the database
     ////
@@ -268,6 +292,7 @@ public class Client {
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         int nshares, price, minNumShares;
+        boolean repeat;
 
         System.out.println("Please enter the title of the idea:");
         title = sc.nextLine();
@@ -292,11 +317,15 @@ public class Client {
         sc.nextLine();//Clear the buffer
 
         topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)",true);
-        ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-        ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-        ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
 
-        //FIXME: O METODO ASKIDES PODE DEVOLVER NULL!
+        do{
+            ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+            ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+            ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+            repeat = checkIdeasRelations(ideasFor,ideasAgainst,ideasNeutral);
+            if (!repeat)
+                System.out.println("\nInvalid selection of the ideas' relations!Please repeat the selection!\n");
+        }while (!repeat);
 
         return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral);
     }
@@ -305,11 +334,11 @@ public class Client {
     //  Creates a new idea, commenting directly on a topic
     ////
     private boolean commentIdea(ArrayList<String> topicTitle, int iid){
-        String sentence,title, description;
+        String title, description;
         int commentType = -2, nshares, price, minNumShares;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
-        boolean typeInserted = false;
+        boolean typeInserted = false, repeat;
 
         System.out.println("Please enter the title of the idea:");
         title = sc.nextLine();
@@ -333,10 +362,12 @@ public class Client {
         sc.nextLine();//Clear the buffer
 
         topics = askTopics("If you want to include this idea in other topics, please enter their titles (USAGE: topic1;topic2)\n" +
-                "If you just want to include the idea on the curren topic just press 'Enter'",false);
+                "If you just want to include the idea on the current topic just press 'Enter'",false);
 
-        for(int i=0;i<topicTitle.size();i++)
-            topics.add(topicTitle.get(i));
+        for(int i=0;i<topicTitle.size();i++){
+            if (!topics.contains(topicTitle.get(i)))
+                topics.add(topicTitle.get(i));
+        }
 
         //Ask relation type
         do{
@@ -355,9 +386,14 @@ public class Client {
 
         }while(!typeInserted);
 
-        ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-        ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-        ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+        do{
+            ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+            ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+            ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
+            repeat = checkIdeasRelations(ideasFor,ideasAgainst,ideasNeutral);
+            if (!repeat)
+                System.out.println("\nInvalid selection of the ideas' relations!Please repeat the selection!\n");
+        }while (!repeat);
 
         if (commentType == 1){
             if ( ideasFor == null){
