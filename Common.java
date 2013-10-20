@@ -35,7 +35,10 @@ public class Common {
         ERR_IDEAS_NOT_FOUND,        // No Ideas were found (FIXME: Joca, you sure this isn't the only type of error 
                                     // and, hence, we couldn't just use MSG_ERR?
         
-        TOPIC_OK                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
+        TOPIC_OK,                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
+
+        MSG_USER_HAS_PENDING_REQUESTS,
+        MSG_USER_NOT_NOTIFIED_REQUESTS
     }
 
     static public boolean sendMessage(Message msg, DataOutputStream outStream) {

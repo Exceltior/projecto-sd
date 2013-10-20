@@ -123,7 +123,7 @@ public class ClientConnection {
     ////
     // Reconnect after a connection time out
     //
-    private void reconnect() {
+    private int reconnect() {
         System.out.println(" Connection to " + currentHost + " - '" + hosts[currentHost] + "':" + ports[currentHost]
                 + " dropped, initiating reconnecting process...");
 
@@ -132,10 +132,14 @@ public class ClientConnection {
         connect();
         if(this.loggedIn) {
             this.loggedIn = false;
-            if (!this.login(lastUsername, lastPassword)) {
+            int loginReply;
+            if (( loginReply = this.login(lastUsername, lastPassword) ) == 3) {
                 System.err.println("Something's gone HORRIBLY WRONG!!!!"); //FIXME: SHIT!
             }
+
+            return loginReply;
         }
+        return 0;
     }
 
     ////
@@ -143,7 +147,15 @@ public class ClientConnection {
     //
     // Returns: true on successful login; false otherwise.
     //
-    boolean login(String user, String pass) {
+    // FIXME: We're using magic numbers, but fuck it!
+    // 0: ALL OKAY
+    // 1: NEED_REPLY from server
+    // 2: NEED_DISPATCH from server
+    // 3: Problem logging in
+    //
+    // FIXME: All these reconnect()s here should probably be connect()s...since reconnect() will call login()!
+    //
+    int login(String user, String pass) {
         Common.Message reply;
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_LOGIN, outStream) ) {
@@ -161,7 +173,24 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
-            return reply == Common.Message.MSG_OK;
+            if ( reply == Common.Message.MSG_OK ) {
+                if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                    reconnect(); continue;
+                }
+
+                if ( reply == Common.Message.MSG_USER_HAS_PENDING_REQUESTS) {
+                    return 2;
+                } else if ( reply == Common.Message.MSG_USER_NOT_NOTIFIED_REQUESTS) {
+                    return 1;
+                } else {
+                    return 0; //MSG_OK; ALL OKAY!
+                }
+
+            } else {
+                return 3;
+            }
+
+
         }
     }
 

@@ -489,7 +489,8 @@ public class Client {
 
     private void execute(){
         int choice;
-        boolean login_result = false, stay = true;
+        int  login_result = 3;
+        boolean stay = true;
 
         //  Connects to the TCP Primary Server
         conn.connect();
@@ -517,7 +518,7 @@ public class Client {
         }while (choice < 1 || choice > 2);
 
 
-        while (!login_result){
+        while (login_result == 3){
 
             username = askUsername();
             password = askPassword();
@@ -553,7 +554,7 @@ public class Client {
 
             login_result = conn.login(username,password);
 
-            if (!login_result){
+            if (login_result == 3){
                 System.out.println("Login unsucessfull!\nIf you want to register just enter 2, otherwise press any key to login again");
                 String temp = sc.nextLine();
                 try{

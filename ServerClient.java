@@ -694,9 +694,8 @@ public class ServerClient implements Runnable {
         then the user will know this when reconnecting (the server checks for pending requests). Since the user knows
          it, it is responsible for skipping over the sending of all the data, and instead jump right to the part where
          it waits for an answer. So we do it here as well: if the user has already marked a pending request, we just
-         skip over receiving the Idea data and wait for that request to be dispatched. If not, then it means there was
+         ignore receiving the Idea data and wait for that request to be dispatched. If not, then it means there was
          no enqueued request and the user should send us the data again.
-         NOTE that the system isn't working yet!! The client is ready to do this!
          */
         Request removeIdeaRequest = null;
         boolean result = false;
@@ -732,7 +731,14 @@ public class ServerClient implements Runnable {
             removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
             //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
             server.queue.enqueueRequest(removeIdeaRequest);
+        } else {
+            // There is already a request, we only need to receive messages and ignore them
+            if ( Common.recvInt(inStream) == -1)
+                return false;
         }
+
+
+
         // Wait until it's dispatched
         removeIdeaRequest.waitUntilDispatched();
         //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
@@ -934,6 +940,21 @@ public class ServerClient implements Runnable {
 
         //FIXME: Right before we dequeue, this is where we'd set the user's state to OK (clearing notify)
         server.queue.dequeue(loginRequest);
+
+        /* Now that the user's logged in, check his queue! */
+        Request pendingRequest = null;
+        if ( (pendingRequest = server.queue.getFirstRequestByUID(uid)) != null ) {
+            if ( pendingRequest.dispatched ) {
+                if ( !Common.sendMessage(Common.Message.MSG_USER_NOT_NOTIFIED_REQUESTS, outStream) )
+                    return false;
+            } else {
+                if ( !Common.sendMessage(Common.Message.MSG_USER_HAS_PENDING_REQUESTS, outStream) )
+                    return false;
+            }
+        } else {
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+                return false;
+        }
 
         // Message was handled successfully
         return true;
