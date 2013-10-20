@@ -498,7 +498,8 @@ public class Client {
     ////
     private int Menu(Scanner sc){
         int choice = -1;
-        boolean repeat = false;
+        String line;
+        boolean repeat;
 
         System.out.println("\n\nMain Menu");
         System.out.println("1 - Check a topic");//List all topics and choose one. While "inside" a topic list all ideas
@@ -512,15 +513,19 @@ public class Client {
         System.out.println("0 - Sair");
 
         do{
+            repeat = false;
             System.out.print("Your choice: ");
 
         ////
         //  FIXME: INCOMPLETE, THERE ARE OPTIONS MISSING!!!!!!!
         ////
             try{
-                choice = sc.nextInt();
-                sc.nextLine();
-            }catch(InputMismatchException m){
+                line = sc.nextLine();
+                choice = Integer.parseInt(line);
+                System.out.println("AQUI " + choice);
+                if(choice < 0 || choice > 8)
+                    repeat = true;
+            }catch(NumberFormatException n){
                 repeat = true;
             }
 
@@ -604,7 +609,48 @@ public class Client {
 
         }while (choice < 1 || choice > 2);
 
+        while (stay){
+            username = askUsername();
+            password = askPassword();
 
+            if (choice == 2){
+
+                email = askEmail();
+                Date date = new Date();//Get current date
+
+                if (!conn.register(username,password,email,date)){
+                    do{
+                        System.out.print("Registration unsucessfull :(\n1-Try login in with another username\n2-Try registration again\nYour choice: ");
+                        choice = sc.nextInt();
+                        sc.nextLine();//Clear the buffer
+                        stay = true;
+                    } while (choice!=1 && choice!=2);
+
+                    if (choice==1 || choice==2)
+                        continue;
+                }
+                else{ //Now that the registration is sucessfull is time to login
+                    System.out.println("Registration sucessfull");
+                    stay = false;
+                }
+            }
+
+            login_result = conn.login(username,password);
+
+            if (login_result == 3){
+                stay = true;
+                System.out.println("Login unsucessfull!\nIf you want to register just enter 2, otherwise press any key to login again");
+                String temp = sc.nextLine();
+                try{
+                    if (Integer.parseInt(temp) == 2)
+                        choice = 2;
+                }catch(NumberFormatException ignored){}//We don't need to handle this exception
+            }
+            else
+                stay = false;
+        }
+
+        /*
         while (login_result == 3){
 
             username = askUsername();
@@ -624,13 +670,6 @@ public class Client {
                             choice = sc.nextInt();
                             sc.nextLine();//Clear the buffer
 
-                            ////
-                            //  If the user insert inserts "2" (try login with another username) we don't need to do anything,
-                            //  because it will be the next thing he sees
-                            ////
-
-                            if (choice == 1)
-                                stay = true;
 
                         } while (choice!=1 && choice!=2);
                     }
@@ -650,6 +689,7 @@ public class Client {
                 }catch(NumberFormatException ignored){}//We don't need to handle this exception
             }
         }
+        */
         ////
         //  Login was successfull
         ////
