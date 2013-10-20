@@ -378,8 +378,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
     public boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares)throws RemoteException{
+        String query = "select * from Shares where uid="+uid+" and "+"iid="+iid;
+        ArrayList<String[]> result = receiveData(query);
 
-        String query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
+        if (result.size() > 0) {
+            // This already exists, we should just update it
+            query = "update shares set nshares="+nshares+" where iid="+iid+" and uid="+uid;
+        } else
+            query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
 
         return insertData(query);
     }
