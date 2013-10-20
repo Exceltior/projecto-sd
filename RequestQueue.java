@@ -81,40 +81,51 @@ public class RequestQueue extends Thread {
      */
     @Override
     public void run() {
-        synchronized (requests) {
-            while ( requests.isEmpty() ) {
-                try {
-                    requests.wait();
-                } catch (InterruptedException e){}
-            }
 
-            //There is at least one request
-           for (int i = 0; i < requests.size(); i++) {
-                Request r = requests.get(i);
+        for(;;) {
 
-               /* If this request has been handled already (and is thus waiting for a dequeue() and clear of user
-               NEED_NOTIFY */
-                if ( r.dispatched ) continue;
-                try {
-                    if ( r.requestType == Request.RequestType.LOGIN ) {
+            // Wait until there's at least one request
+            synchronized (requests) {
+                while ( requests.isEmpty() ) {
+                    try {
+                        requests.wait();
+                    } catch (InterruptedException e){}
+                }
 
-                            int ans = RMI.login((String)r.requestArguments.get(0), (String)r.requestArguments.get(1));
-                            r.requestResult.add(ans);
+                //There is at least one request, process them
+               for (int i = 0; i < requests.size(); i++) {
+                    Request r = requests.get(i);
+
+                   /* If this request has been handled already (and is thus waiting for a dequeue() and clear of user
+                   NEED_NOTIFY, skip it */
+                    if ( r.dispatched ) continue;
+                    try {
+                        if ( r.requestType == Request.RequestType.LOGIN ) {
+                                int ans = RMI.login((String)r.requestArguments.get(0), (String)r.requestArguments.get(1));
+                                r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.HISTORY ) {
+                                String[] ans = RMI.getHistory((Integer) r.requestArguments.get(0));
+                                r.requestResult.add(ans);
+                        }
+                    } catch (RemoteException e) {
+                     //FIXME: talvez fazer isto 3 vezes!
                     }
-                } catch (RemoteException e) {
-                 //FIXME: talvez fazer isto 3 vezes!
-                }
 
-                r.dispatched = true;
-                synchronized(r) {
-                    r.notify();
-                }
-                try {
-                    RMI.writeRequestQueueFile(requests);
-                } catch (RemoteException e) {
-                    //FIXME: Talvez fazer isto 3 vezes!
-                }
 
+                   /* Mark the request as dispatched, notify anyone waiting for it,
+                    *  and continue working (the others are responsible for removing the request from the queue
+                    */
+                    r.dispatched = true;
+                    synchronized(r) {
+                        r.notify();
+                    }
+                    try {
+                        RMI.writeRequestQueueFile(requests);
+                    } catch (RemoteException e) {
+                        //FIXME: Talvez fazer isto 3 vezes!
+                    }
+
+                }
             }
         }
     }

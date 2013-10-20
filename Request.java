@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 
 public class Request implements Serializable {
-    public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN}
+    public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN, HISTORY}
     int uid;
     RequestType requestType;
     ArrayList<Object> requestArguments = new ArrayList<Object>();
@@ -20,7 +20,8 @@ public class Request implements Serializable {
     ArrayList<Object> requestResult = new ArrayList<Object>();
     boolean dispatched;
 
-    Request(RequestType requestType, ArrayList<Object> requestArguments) {
+    Request(int uid, RequestType requestType, ArrayList<Object> requestArguments) {
+        this.uid = uid;
         this.requestType = requestType;
         this.requestArguments = requestArguments;
 

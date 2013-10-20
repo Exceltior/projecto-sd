@@ -893,7 +893,7 @@ public class ServerClient implements Runnable {
         ArrayList<Object> objects = new ArrayList<Object>();
         objects.add(user);
         objects.add(pwd);
-        Request loginRequest = new Request(Request.RequestType.LOGIN,objects);
+        Request loginRequest = new Request(uid,Request.RequestType.LOGIN,objects);
         //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
         server.queue.enqueueRequest(loginRequest);
 
