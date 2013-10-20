@@ -9,10 +9,30 @@ import java.io.IOException;
 //
 public class Common {
     static enum Message {
-        REQUEST_GETTOPICS, MSG_OK, REQUEST_LOGIN, MSG_ERR, ERR_NO_MSG_RECVD, ERR_NOT_LOGGED_IN, REQUEST_REG,
-        REQUEST_CREATETOPICS, REQUEST_GET_IDEA_BY_IID, ERR_NO_SUCH_IID, REQUEST_CREATEIDEA, ERR_TOPIC_NAME,
-        REQUEST_GETTOPICSIDEAS, REQUEST_GET_HISTORY, REQUEST_GETTOPIC, ERR_TOPIC_NOT_FOUND, TOPIC_OK,
-        REQUEST_GET_IDEA, REQUEST_DELETE_IDEA, ERR_IDEA_HAS_CHILDREN,REQUEST_GET_TOPICS_OF_IDEA,ERR_NOT_PRIMARY
+        MSG_OK,                     // Generic OK message
+        MSG_ERR,                    // Generic ERROR message
+        REQUEST_GETTOPICS,          // Get topics
+        REQUEST_LOGIN,              // Initiate Login process
+        REQUEST_REG,                // Initiate Register process
+        REQUEST_CREATETOPICS,       // Create a topic
+        REQUEST_GET_IDEA_BY_IID,    // Get an Idea only by IID (FIXME: Joca, why do we have this and GET_IDEA??)
+        REQUEST_CREATEIDEA,         // Create an Idea
+        REQUEST_GETTOPICSIDEAS,     // Get ideas associated with topic
+        REQUEST_GET_HISTORY,        // Get Transaction History
+        REQUEST_GETTOPIC,           // Get a topic (FIXME: Joca, any more details to add?)
+        REQUEST_GET_IDEA,           // Get one or more ideas from an IID or title
+        REQUEST_DELETE_IDEA,        // Delete an Idea
+        REQUEST_GET_TOPICS_OF_IDEA, // Get Idea topics
+
+        ERR_NOT_LOGGED_IN,          // User Not logged in
+        ERR_TOPIC_NOT_FOUND,        // Topic not found
+        ERR_IDEA_HAS_CHILDREN,      // Idea has children (and shouldn't, in this cenario)
+        ERR_NOT_PRIMARY,            // Server isn't primary server, so tell client to disconnect
+        ERR_TOPIC_NAME,             // Invalid topic name (FIXME: Joca, anything else to add?)
+        ERR_NO_SUCH_IID,            // No idea by this IID
+        ERR_NO_MSG_RECVD,           // Used by our Common class to indicate a connection problem
+
+        TOPIC_OK                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
     }
 
     static public boolean sendMessage(Message msg, DataOutputStream outStream) {
