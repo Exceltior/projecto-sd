@@ -111,8 +111,9 @@ public class RequestQueue extends Thread {
      */
     @Override
     public void run() {
-
+        boolean autoDequeue = false;
         for(;;) {
+
 
             // Wait until there's at least one request
             synchronized (requests) {
@@ -166,6 +167,13 @@ public class RequestQueue extends Thread {
                                     (String) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2));
                             r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.REGISTER_USER ) {
+                            boolean ans = RMI.register((String) r.requestArguments.get(0),
+                                    (String) r.requestArguments.get(1),
+                                    (String) r.requestArguments.get(2),
+                                    (String) r.requestArguments.get(3));
+                            r.requestResult.add(ans);
+                            autoDequeue = true; // We instantly remove it as soon as we process it
                         }
                     } catch (RemoteException e) {
                      //FIXME: talvez fazer isto 3 vezes!
@@ -179,6 +187,12 @@ public class RequestQueue extends Thread {
                     synchronized(r) {
                         r.notify();
                     }
+
+                   if ( autoDequeue ) {
+                       autoDequeue = false;
+                       dequeue(r);
+                   }
+
                     try {
                         RMI.writeRequestQueueFile(requests);
                     } catch (RemoteException e) {

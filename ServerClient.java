@@ -179,13 +179,14 @@ public class ServerClient implements Runnable {
 
         System.out.println("Vou registar:" +  user + " " + pass + " " + email + " " + date);
 
-        try{
-            registration = RMIInterface.register(user,pass,email,date);
-            System.out.println("Estou no SeverClient e o registration e " + registration);
-        } catch(RemoteException r){
-            System.err.println("RemoteException in the ServerCliente while trying to register a new user");
-            return false;
-        }
+
+        ArrayList<Object> objects = new ArrayList<Object>(); objects.add(user); objects.add(pass); objects
+                .add(email); objects.add(date);
+        Request registerUserRequest = new Request(-1, Request.RequestType.REGISTER_USER,objects);
+        server.queue.enqueueRequest(registerUserRequest);
+        registerUserRequest.waitUntilDispatched();
+        registration = (Boolean)registerUserRequest.requestResult.get(0);
+        // We don't need to dequeue it, because since it's a registration request it's done automagically!
 
         if (registration){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
