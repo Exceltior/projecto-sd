@@ -421,6 +421,7 @@ public class Client {
         System.out.println("5 - Show Transaction History");
         System.out.println("6 - Search Idea");
         System.out.println("7 - Search Topic");
+        System.out.println("8 - Manage User Ideas");
         System.out.println("0 - Sair");
 
         do{
@@ -439,6 +440,51 @@ public class Client {
         }while(repeat);
 
         return choice;
+    }
+
+    ////
+    //  Display the Account Settings Menu
+    ////
+    private void manageUserIdeas(){
+        int option = -1;
+        String line;
+        Idea[] listIdeas;
+
+        //Display user ideas
+        listIdeas = conn.getIdeasFromUser();
+
+        System.out.println("\n\nUser Ideas List:");
+        for (int i=0;i<listIdeas.length;i++)
+            System.out.println(listIdeas[i]);
+
+        do{
+            System.out.println("\n\n             Manage User Ideas");
+            System.out.println("1 - Check idea's shares prices");
+            System.out.println("2 - Set idea's shares prices");
+            System.out.println("3 - Check idea's number of shares not to sell instantaneously");
+            System.out.println("4 - Set idea's number of shares not to sell instantaneously");
+            System.out.println("5 - Check ideas's relantionships");
+            System.out.println("6 - Add ideas relantionships");
+            System.out.println("0 - Return to Main Menu");
+            System.out.print("Your option: ");
+            try{
+                line = sc.nextLine();
+                option = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                option = -1;
+            }
+        }while (option<0 || option>6);
+
+        switch(option){
+
+            case 1:{
+                break;
+            }
+
+            default://Go back to Main Menu
+                break;
+        }
     }
 
     private void execute(){
@@ -547,10 +593,8 @@ public class Client {
             iid = Integer.parseInt(sentence);
         }catch(NumberFormatException n){}//We don't need to handle this exception
 
-        if (iid == -1){
-            System.out.println("Vou sair");
+        if (iid == -1)
             return ;
-        }
 
         if(!commentIdea(topicName,iid))
             System.err.println("Idea not commented");
@@ -559,7 +603,7 @@ public class Client {
     }
 
     private int listTopics(){
-        int selected = -1, min_id_topic = 0, max_id_topic = 0;
+        int selected, min_id_topic = 0, max_id_topic = 0;
         ClientTopic[] topics = conn.getTopics();
 
         if (topics.length>0)
@@ -646,16 +690,19 @@ public class Client {
 
                 //Search idea
                 case 6:{
-                    //RMI_Server = getIdeaByID
-                    //Criar getIdeaByName
                     searchIdea();
                     break;
                 }
 
                 //Search topic
                 case 7:{
-                    //Criar getTopicByID e getTopicByName no RMI_Server
                     searchTopic();
+                    break;
+                }
+
+                //Account Settings
+                case 8:{
+                    manageUserIdeas();
                     break;
                 }
 

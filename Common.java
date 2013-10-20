@@ -23,7 +23,8 @@ public class Common {
         REQUEST_GET_IDEA,           // Get one or more ideas from an IID or title
         REQUEST_DELETE_IDEA,        // Delete an Idea
         REQUEST_GET_TOPICS_OF_IDEA, // Get Idea topics
-
+        REQUEST_GETUSERIDEAS,       // Get the ideas of a given user
+        
         ERR_NOT_LOGGED_IN,          // User Not logged in
         ERR_TOPIC_NOT_FOUND,        // Topic not found
         ERR_IDEA_HAS_CHILDREN,      // Idea has children (and shouldn't, in this cenario)
@@ -31,7 +32,9 @@ public class Common {
         ERR_TOPIC_NAME,             // Invalid topic name (FIXME: Joca, anything else to add?)
         ERR_NO_SUCH_IID,            // No idea by this IID
         ERR_NO_MSG_RECVD,           // Used by our Common class to indicate a connection problem
-
+        ERR_IDEAS_NOT_FOUND,        // No Ideas were found (FIXME: Joca, you sure this isn't the only type of error 
+                                    // and, hence, we couldn't just use MSG_ERR?
+        
         TOPIC_OK                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
     }
 
