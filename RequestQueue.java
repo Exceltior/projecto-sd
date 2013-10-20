@@ -61,6 +61,22 @@ public class RequestQueue extends Thread {
     }
 
     /**
+     * Find the first request that exists in the queue given by this UID and type
+     * @param uid
+     * @paam type
+     * @return The Request, or null if no such request was found
+     */
+    synchronized Request getFirstRequestByUIDAndType(int uid, Request.RequestType type) {
+        synchronized (requests) {
+            for (Request r : requests)
+                if ( r.uid == uid && r.requestType == type)
+                    return r;
+        }
+
+        return null;
+    }
+
+    /**
      * Use this to aknowledge a request (right after you chang the NEED_NOTIFY variable of a user's request)
      * @param r
      */
@@ -106,6 +122,9 @@ public class RequestQueue extends Thread {
                         } else if ( r.requestType == Request.RequestType.HISTORY ) {
                                 String[] ans = RMI.getHistory((Integer) r.requestArguments.get(0));
                                 r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.DELETE_IDEA ) {
+                            boolean ans = RMI.removeIdea((Idea) r.requestArguments.get(0));
+                            r.requestResult.add(ans);
                         }
                     } catch (RemoteException e) {
                      //FIXME: talvez fazer isto 3 vezes!

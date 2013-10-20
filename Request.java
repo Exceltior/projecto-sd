@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 
 public class Request implements Serializable {
-    public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN, HISTORY}
+    public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN, DELETE_IDEA, HISTORY}
     int uid;
     RequestType requestType;
     ArrayList<Object> requestArguments = new ArrayList<Object>();

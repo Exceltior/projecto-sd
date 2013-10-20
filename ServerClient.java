@@ -692,6 +692,7 @@ public class ServerClient implements Runnable {
         int iid;
         Idea idea = null;
 
+
         if ( (iid = Common.recvInt(inStream)) == -1)
             return false;
 
@@ -714,12 +715,15 @@ public class ServerClient implements Runnable {
         }
 
         boolean result = false;
-        try {
-            result = RMIInterface.removeIdea(idea);
-        }catch(RemoteException r){
-            //FIXME: Handle this
-            System.err.println("Existiu uma remoteException2! " + r.getMessage());
-        }
+        ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea);
+        Request removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
+        //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
+        server.queue.enqueueRequest(removeIdeaRequest);
+        // Wait until it's dispatched
+        removeIdeaRequest.waitUntilDispatched();
+        //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
+        result = (Boolean)removeIdeaRequest.requestResult.get(0);
+
         if ( result ) {
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
                 return false;
@@ -730,6 +734,8 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
+        //FIXME: Right before we dequeue, this is where we'd set the user's state to OK (clearing notify)
+        server.queue.dequeue(removeIdeaRequest);
         return true;
 
     }
