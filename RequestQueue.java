@@ -67,10 +67,20 @@ public class RequestQueue extends Thread {
      * @return The Request, or null if no such request was found
      */
     synchronized Request getFirstRequestByUIDAndType(int uid, Request.RequestType type) {
+        return getNthRequestByUIDAndType(uid, type, 1);
+    }
+
+    /**
+     * Find the first request that exists in the queue given by this UID and type
+     * @param uid
+     * @paam type
+     * @return The Request, or null if no such request was found
+     */
+    synchronized Request getNthRequestByUIDAndType(int uid, Request.RequestType type, int n) {
         synchronized (requests) {
             for (Request r : requests)
                 if ( r.uid == uid && r.requestType == type)
-                    return r;
+                    if ( --n == 0 ) return r;
         }
 
         return null;
@@ -124,6 +134,28 @@ public class RequestQueue extends Thread {
                                 r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.DELETE_IDEA ) {
                             boolean ans = RMI.removeIdea((Idea) r.requestArguments.get(0));
+                            r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.CREATE_IDEA ) {
+                            int ans = RMI.createIdea((String)r.requestArguments.get(0),
+                                    (String)r.requestArguments.get(1),
+                                    (Integer)r.requestArguments.get(2));
+                            r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.SET_SHARES_IDEA ) {
+                            boolean ans = RMI.setSharesIdea((Integer) r.requestArguments.get(0),
+                                    (Integer) r.requestArguments.get(1),
+                                    (Integer) r.requestArguments.get(2),
+                                    (Integer) r.requestArguments.get(3),
+                                    (Integer) r.requestArguments.get(4));
+                            r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.SET_TOPICS_IDEA ) {
+                            boolean ans = RMI.setTopicsIdea((Integer) r.requestArguments.get(0),
+                                    (String) r.requestArguments.get(1),
+                                    (Integer) r.requestArguments.get(2));
+                            r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.SET_IDEAS_RELATIONS ) {
+                            boolean ans = RMI.setIdeasRelations((Integer) r.requestArguments.get(0),
+                                    (Integer) r.requestArguments.get(1),
+                                    (Integer) r.requestArguments.get(2));
                             r.requestResult.add(ans);
                         }
                     } catch (RemoteException e) {

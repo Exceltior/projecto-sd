@@ -117,8 +117,10 @@ public class Client {
             for (String aTemp : temp) {
                 try {
                     temp_num = Integer.parseInt(aTemp);
-                    if(temp_num == -1)
-                        return null;
+                    if(temp_num == -1) {
+                        System.out.println("Okay then, no ideas, fucker!"); //FIXME
+                        return devolve;
+                    }
 
                     else if(devolve.contains(temp_num)){
                         System.out.println("You have inserted the same idea twice, please enter again");
@@ -178,7 +180,7 @@ public class Client {
         userSelectedIdea = conn.getIdea(iid,title);
 
         if (userSelectedIdea == null){
-            System.out.println("No idea was found!5555");
+            System.out.println("No idea was found!");
             return;
         }
 

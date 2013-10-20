@@ -434,13 +434,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
 
-        String query = "Select i.iid from Ideias i where i.iid = '" + iid + "' and i.activa = 1";
-        ArrayList<String[]> ideas = null, topics = null;
+        //String query = "Select i.iid from Ideias i where i.iid = '" + iid + "' and i.activa = 1";
+        String query = null;
+        ArrayList<String[]> topics = null;
+        //ArrayList<String[]> ideias;
         int idea_id, topic_id;
         boolean check;
 
         try{
-            ideas = receiveData(query);
+            //ideas = receiveData(query);
             query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
             topics = receiveData(query);
 
@@ -459,19 +461,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                     //FIXME: What to do in this situation???
                 } else{
                     //Add the number of the topic to the ArrayList
-                    String []temp = {"" + (num_topics-1)};
-                    topics.add(temp);
+                    query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
+                    topics = receiveData(query);
                 }
             }
 
-            if ( (ideas.size() > 0) && (topics.size() > 0)){
-                idea_id = Integer.valueOf(ideas.get(0)[0]);//Get idea id
+            if ( (topics.size() > 0) ){
                 topic_id = Integer.valueOf(topics.get(0)[0]);//Get topic id
 
-                query = "INSERT INTO TopicosIdeias VALUES (" + topic_id + "," + idea_id + ")";
+                query = "INSERT INTO TopicosIdeias VALUES (" + topic_id + "," + iid + ")";
 
                 return insertData(query);
-            }
+            } //else FIXME: Shouldn't happen because there should always be a topic
         }catch(RemoteException r){
             System.err.println("Remote Exception on the setTopicsIdea method");
             //FIXME: Deal with this
@@ -514,7 +515,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Connection conn = null;
 
 
-        //System.out.println("\n-------------------------------\nRunning query: "+query);
+        System.out.println("\n-------------------------------\nRunning query: "+query);
 
         try {
             conn = connectionPool.checkOutConnection();
@@ -562,6 +563,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Statement statement;
         Connection conn = null;
         int update = -1;
+
+        System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
 
         try{
             conn = connectionPool.checkOutConnection();

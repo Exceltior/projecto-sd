@@ -228,7 +228,7 @@ public class ClientConnection {
     boolean sendData(ArrayList<String> data){
         //Send number of items
 
-        if(data != null){
+        if(data != null && data.size()>0){
             if (!Common.sendInt(data.size(),outStream))
                 return false;
 
@@ -257,7 +257,7 @@ public class ClientConnection {
                     return false;
             }
         }else{
-            if (!Common.sendInt(-2,outStream))
+            if (!Common.sendInt(0,outStream))
                 return false;
         }
 
@@ -330,6 +330,8 @@ public class ClientConnection {
             }
 
             //Get Confirmations of data except topics and ideas relations
+            // OS DADOS QUE FORAM ENVIADOS, EXCEPTO AS IDEIAS E OS TÓPICOS, 'TÁ TUDO BEM, INCLUSIVE AS SHARES, TÁ TUDO
+            // MARADINHO, MANINHO, FIXME
             reply = Common.recvMessage(inStream);
 
             if (reply == Common.Message.ERR_NO_MSG_RECVD){
@@ -337,33 +339,58 @@ public class ClientConnection {
                 return false;
             }
 
-            //Get more confirmations of topics
-            reply = Common.recvMessage(inStream);
-
-            while (reply != Common.Message.MSG_OK){
-                if (reply == Common.Message.MSG_ERR)//Error, going to return false
-                    System.out.println("Error while associating topics to the idea. All of the topics may not be associated with it");
-                else if (reply == Common.Message.ERR_TOPIC_NAME){
-                    //Invalid topic name
-                    String wrongTopic = Common.recvString(inStream);
-                    System.out.println("Topic name '" + wrongTopic + "' is invalid!");
+            for (int i = 0; i < topics.size(); i++) {
+                reply = Common.recvMessage(inStream);
+                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                    System.err.println("Error while merdas"); /* FIXME */
+                    return false;
                 }
+                if (reply == Common.Message.ERR_TOPIC_NAME)
+                    System.out.println("Error while associating topic "+topics.get(i)+": Invalid topic name");
+                else if (reply == Common.Message.MSG_ERR)
+                    System.out.println("Error while associating topic "+topics.get(i)+": RMI FODEU-SE");
             }
 
-            //Get Confirmation of idea's relations
-            reply = Common.recvMessage(inStream);
-
-            while (reply != Common.Message.MSG_OK){
-                if(reply == Common.Message.ERR_NO_SUCH_IID){
-                    //Invalid Idea ID
-                    System.out.println("ERR_IDEA_ID");
-                    int id = Common.recvInt(inStream);
-                    System.out.println("Idea ID " + id + " is invalid!");
+            for (int i = 0; i < ideasFor.size(); i++) {
+                reply = Common.recvMessage(inStream);
+                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                    System.err.println("Error while merdas 1"); /* FIXME */
+                    return false;
                 }
+                if (reply == Common.Message.ERR_NO_SUCH_IID)
+                    System.out.println("Error while associating idea "+ideasFor.get(i)+": Invalid idea name");
+                /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
+            }
+
+            for (int i = 0; i < ideasAgainst.size(); i++) {
+                reply = Common.recvMessage(inStream);
+                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                    System.err.println("Error while merdas 2"); /* FIXME */
+                    return false;
+                }
+                if (reply == Common.Message.ERR_NO_SUCH_IID)
+                    System.out.println("Error while associating idea "+ideasAgainst.get(i)+": Invalid idea name");
+                /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
+            }
+
+            for (int i = 0; i < ideasNeutral.size(); i++) {
+                reply = Common.recvMessage(inStream);
+                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                    System.err.println("Error while merdas 3"); /* FIXME */
+                    return false;
+                }
+                if (reply == Common.Message.ERR_NO_SUCH_IID)
+                    System.out.println("Error while associating idea "+ideasNeutral.get(i)+": Invalid idea name");
+                /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
             }
 
             //Get Final Confirmation
             reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                System.err.println("Error while merdas 4"); /* FIXME */
+                return false;
+            }
 
             return reply == Common.Message.MSG_OK;
 
@@ -403,7 +430,7 @@ public class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
-                System.err.println("Bodega2");
+                System.err.println("Bodega2: "+reply);
                 return null;
             }
 

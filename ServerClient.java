@@ -341,21 +341,21 @@ public class ServerClient implements Runnable {
         return data;
     }
 
-    private int[] receiveInt(){
+    private boolean receiveInt(ArrayList<Integer> ideias){
         int[] data;
         int numIdeas, temp;
 
-        if ( (numIdeas = Common.recvInt(inStream)) == -2)
-            return new int[0];
-
-        data = new int[numIdeas];
-        for (int i=0;i<numIdeas;i++){
-            if( (temp = Common.recvInt(inStream)) == -1)
-                return null;
-            data[i] = temp;
+        if ( (numIdeas = Common.recvInt(inStream)) == -1) {
+            return false;
         }
 
-        return data;
+        for (int i=0;i<numIdeas;i++){
+            if( (temp = Common.recvInt(inStream)) == -1)
+                return false;
+            ideias.add(temp);
+        }
+
+        return true;
     }
 
     ////
@@ -373,17 +373,38 @@ public class ServerClient implements Runnable {
         return true;
     }
 
-    private boolean setRelations(int iid,int[] ideas, int relationType) throws RemoteException{
+    private boolean setRelations(int iid,ArrayList<Integer> ideas, int relationType, ArrayList<Request> requests,
+                                 int oldI){
+        for (int i=0;i<ideas.size();i++) {
+            boolean result;
+            Request setIdeasRelationsRequest = null;
 
-        for (int i=0;i<ideas.length;i++){
-            if (!RMIInterface.setIdeasRelations(iid, ideas[i], 1)) {
+            if ( (setIdeasRelationsRequest = server.queue.getNthRequestByUIDAndType(uid,
+                    Request.RequestType.SET_IDEAS_RELATIONS, oldI+i+1)) ==
+                    null) {
+
+                ArrayList<Object> objects = new ArrayList<Object>(); objects.add(iid); objects.add(ideas.get(i)); objects
+                        .add(relationType);
+                setIdeasRelationsRequest = new Request(uid, Request.RequestType.SET_IDEAS_RELATIONS,objects);
+                server.queue.enqueueRequest(setIdeasRelationsRequest);
+            }
+
+            requests.add(setIdeasRelationsRequest);
+            setIdeasRelationsRequest.waitUntilDispatched();
+
+            result = (Boolean)setIdeasRelationsRequest.requestResult.get(0);
+            System.out.println("IID +"+iid+" ideas[i]: "+ideas.get(i)+" relationType: "+relationType+" i: "+i+
+            " oldI:" +  oldI + "result: "+ result); //FIXME
+            if (!result) {
                 //Alert the client that the idea is not valid
                 if (!Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
                     return false;
-                if (!Common.sendInt(ideas[i], outStream))
+            } else {
+                if (!Common.sendMessage(Common.Message.MSG_OK, outStream))
                     return false;
             }
         }
+
         return true;
     }
 
@@ -437,7 +458,10 @@ public class ServerClient implements Runnable {
     private boolean handleCreateIdea(){
         String title, description, topic;
         String[] topicsArray;
-        int[] ideasForArray, ideasAgainstArray, ideasNeutralArray;
+        //int[] ideasForArray, ideasAgainstArray, ideasNeutralArray;
+        ArrayList<Integer> ideasForArray = new ArrayList<Integer>(),
+                           ideasAgainstArray = new ArrayList<Integer>(),
+                           ideasNeutralArray = new ArrayList<Integer>();
         int nshares, price, result, numMinShares;
         boolean result_topics = false, result_shares;
 
@@ -466,88 +490,143 @@ public class ServerClient implements Runnable {
         if ( (topicsArray = receiveData()) == null )
             return false;
 
+        System.out.println("CÁ ESTÃO OS TÓPICOS: ");
+        for (String topico : topicsArray)
+                System.out.println("TOPIC: "+topico);
+
         //Receive Ideas For
-        if ( (ideasForArray = receiveInt()) == null)
+        if ( !receiveInt(ideasForArray) )
             return false;
 
         //Receive Ideas Against
-        if ( (ideasAgainstArray = receiveInt()) == null)
+        if ( !receiveInt(ideasAgainstArray))
             return false;
 
         //Receive Ideas Neutral
-        if ( (ideasNeutralArray = receiveInt()) == null)
+        if ( !receiveInt(ideasNeutralArray))
             return false;
 
-        try{
-            result = RMIInterface.createIdea(title,description,this.uid);
-            //result has the idea id
+        Request createIdeaRequest = null;
 
-            if (result < 0){
-                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
-                    return false;
-                return true;
-            }
+        if ( (createIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.CREATE_IDEA)) ==
+                null) {
 
-           result_shares = RMIInterface.setSharesIdea(this.uid,result,nshares,price,numMinShares);
-
-            if (!result_shares){
-                if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
-                    return false;
-                return true;
-            }
-
-            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
-                return false;
-
-            ////
-            //  Take care of the topics
-            ////
-
-            //1st - Verify if the topics' names are correct
-            for (String aTopicsArray : topicsArray) {
-                topic = aTopicsArray;
-                if (topic.length() > limit_characters_topic) {//Topic name too long, tell that to the client
-                    if (!Common.sendMessage(Common.Message.ERR_TOPIC_NAME, outStream))
-                        return false;
-                    if (!Common.sendString(topic, outStream))//Send name of the topic that was wrong
-                        return false;
-                } else if (!Common.sendMessage(Common.Message.MSG_OK, outStream))//Everything went well with the topic
-                    return false;
-
-                //2nd - Actually bind them to the idea
-                result_topics = RMIInterface.setTopicsIdea(result, topic, uid);
-            }
-
-            if (result_topics){
-                if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
-                    return false;
-            }else{
-                Common.sendMessage(Common.Message.MSG_ERR, outStream);
-                return false;
-            }
-
-            // Take care of the ideas for
-            if (!setRelations(result, ideasForArray, 1))
-                return false;
-
-            //  Take care of the ideas against
-            if (!setRelations(result,ideasAgainstArray,-1))
-                return false;
-
-            //  Take care of the ideas neutral
-            if(!setRelations(result,ideasNeutralArray,0))
-                return false;
-
-            //Everything ok
-            if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
-                return false;
-
-        }catch(RemoteException r){
-            System.err.println("Error while creating a new idea");
-            //FIXME: Handle this!
-            return false;
+            ArrayList<Object> objects = new ArrayList<Object>(); objects.add(title); objects.add(description); objects.add(this.uid);
+            createIdeaRequest = new Request(uid, Request.RequestType.CREATE_IDEA,objects);
+            server.queue.enqueueRequest(createIdeaRequest);
         }
 
+        createIdeaRequest.waitUntilDispatched();
+
+        result = (Integer)createIdeaRequest.requestResult.get(0);
+
+        if (result < 0){
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                return false;
+
+            server.queue.dequeue(createIdeaRequest);
+            return true;
+        }
+
+
+        Request setSharesIdeaRequest = null;
+
+        if ( (setSharesIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.SET_SHARES_IDEA)) ==
+                null) {
+
+            ArrayList<Object> objects = new ArrayList<Object>(); objects.add(this.uid); objects.add(result);
+            objects.add(nshares);objects.add(price);objects.add(numMinShares);
+            setSharesIdeaRequest = new Request(uid, Request.RequestType.SET_SHARES_IDEA,objects);
+            server.queue.enqueueRequest(setSharesIdeaRequest);
+        }
+
+        setSharesIdeaRequest.waitUntilDispatched();
+
+        result_shares = (Boolean)setSharesIdeaRequest.requestResult.get(0);
+
+        if (!result_shares){
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
+                return false;
+
+            server.queue.dequeue(createIdeaRequest);
+            server.queue.dequeue(setSharesIdeaRequest);
+            return true;
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
+            return false;
+
+        ////
+        //  Take care of the topics
+        ////
+
+        //1st - Verify if the topics' names are correct
+        for (int i = 0; i < topicsArray.length; i++) {
+            topic = topicsArray[i];
+            if (topic.length() > limit_characters_topic) {//Topic name too long, tell that to the client
+                if (! Common.sendMessage(Common.Message.ERR_TOPIC_NAME, outStream))
+                    return false;
+                if (! Common.sendString(topic, outStream))//Send name of the topic that was wrong
+                    return false;
+            }
+
+            //2nd - Actually bind them to the idea
+
+
+            Request setTopicsIdeaRequest = null;
+
+            if ((setTopicsIdeaRequest = server.queue.getNthRequestByUIDAndType(uid,
+                    Request.RequestType.SET_TOPICS_IDEA,i+1)) ==
+                    null) {
+
+                ArrayList<Object> objects = new ArrayList<Object>();
+                objects.add(result);
+                objects.add(topic);
+                objects.add(uid);
+                setTopicsIdeaRequest = new Request(uid, Request.RequestType.SET_TOPICS_IDEA, objects);
+                server.queue.enqueueRequest(setTopicsIdeaRequest);
+            }
+
+            setTopicsIdeaRequest.waitUntilDispatched();
+
+            result_topics = (Boolean) setTopicsIdeaRequest.requestResult.get(0);
+            if (result_topics) {
+                if (! Common.sendMessage(Common.Message.MSG_OK, outStream))
+                    return false;
+            } else {
+                if (! Common.sendMessage(Common.Message.MSG_ERR, outStream)) //ISTO SÓ DA MERDA SE O RMI DER MERDA,
+                    return false;
+            }
+        }
+
+
+
+        ArrayList<Request> requests1 = new ArrayList<Request>();
+        int iState = 0;
+        // Take care of the ideas for
+        if (!setRelations(result, ideasForArray, 1, requests1, iState))
+            return false;
+
+        iState += ideasForArray.size();
+
+        //  Take care of the ideas against
+        if (!setRelations(result,ideasAgainstArray,-1, requests1, iState))
+            return false;
+
+        iState += ideasAgainstArray.size();
+
+        //  Take care of the ideas neutral
+        if(!setRelations(result,ideasNeutralArray,0, requests1, iState))
+            return false;
+
+        //Everything ok
+        if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
+            return false;
+
+        server.queue.dequeue(createIdeaRequest);
+        server.queue.dequeue(setSharesIdeaRequest);
+        for (Request r : requests1)
+            server.queue.dequeue(r);
         return true;
     }
 
@@ -758,58 +837,6 @@ public class ServerClient implements Runnable {
         server.queue.dequeue(removeIdeaRequest);
         return true;
 
-    }
-
-    ////
-    //  Sends an idea to the client
-    ////
-    private boolean handleGetIdea(){
-        int iid;
-        String title;
-        Idea[] ideas = null;
-
-        if ( !isLoggedIn() ) {
-            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
-        }
-
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
-
-        if( (iid = Common.recvInt(inStream)) == -1)
-            return false;
-
-        if ( (title = Common.recvString(inStream)) == null)
-            return false;
-
-        try{
-            ideas = RMIInterface.getIdeaByIID(iid,title);
-        }catch(RemoteException r){
-            return false;
-        }
-
-        if (ideas == null){
-            if(!Common.sendMessage(Common.Message.ERR_NO_SUCH_IID,outStream))
-                return false;
-        }
-        else{
-            //Confirm topic is ok
-            if(!Common.sendMessage(Common.Message.TOPIC_OK,outStream))
-                return false;
-
-            //Send ideas
-            if (!Common.sendInt(ideas.length,outStream))
-                return false;
-
-            for (int i=0;i<ideas.length;i++)
-                ideas[i].writeToDataStream(outStream);
-
-            //Send final ok
-            if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
-                return false;
-        }
-
-        System.out.println("Going to return true");
-        return true;
     }
 
     ////
