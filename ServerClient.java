@@ -361,21 +361,6 @@ public class ServerClient implements Runnable {
         return true;
     }
 
-    ////
-    //  Method used to send topics
-    ////
-    private boolean sendTopics(ServerTopic[] topics){
-
-        if(!Common.sendInt(topics.length,outStream))
-            return false;
-
-        for (int i=0;i<topics.length;i++){
-            if(!topics[i].writeToDataStream(outStream))
-                return false;
-        }
-        return true;
-    }
-
     private boolean setRelations(int iid,ArrayList<Integer> ideas, int relationType, ArrayList<Request> requests,
                                  int oldI){
         for (int i=0;i<ideas.size();i++) {
@@ -493,6 +478,7 @@ public class ServerClient implements Runnable {
         if ( (topicsArray = receiveData()) == null )
             return false;
 
+        //FIXME: prints
         System.out.println("CÁ ESTÃO OS TÓPICOS: ");
         for (String topico : topicsArray)
                 System.out.println("TOPIC: "+topico);
