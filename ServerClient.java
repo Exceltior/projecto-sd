@@ -689,36 +689,50 @@ public class ServerClient implements Runnable {
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
 
+        /*
+          We have developed our system assuming that if there is a crash after the Request has been added to the queue,
+        then the user will know this when reconnecting (the server checks for pending requests). Since the user knows
+         it, it is responsible for skipping over the sending of all the data, and instead jump right to the part where
+         it waits for an answer. So we do it here as well: if the user has already marked a pending request, we just
+         skip over receiving the Idea data and wait for that request to be dispatched. If not, then it means there was
+         no enqueued request and the user should send us the data again.
+         NOTE that the system isn't working yet!! The client is ready to do this!
+         */
+        Request removeIdeaRequest = null;
+        boolean result = false;
+
         int iid;
         Idea idea = null;
 
-
-        if ( (iid = Common.recvInt(inStream)) == -1)
-            return false;
-
-        try {
-            idea = RMIInterface.getIdeaByIID(iid);
-        }catch(RemoteException r){
-            //FIXME: Handle this
-            System.err.println("Existiu uma remoteException! " + r.getMessage());
-        }
-
-        // At this point we will only send ONE message:
-        // --> ERR_NO_SUCH_IID: In case we've found no idea with this IDD
-        // --> ERR_IDEA_HAS_CHILDREN: In case we've found it, but it has children
-        // --> MSG_OK: In case everything's fine
-
-        if ( idea == null ) {
-            if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
+        if ( (removeIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.DELETE_IDEA)) ==
+                null) {
+            // The user should send us the data, sinc there was no pending request
+            if ( (iid = Common.recvInt(inStream)) == -1)
                 return false;
-            return true;
-        }
 
-        boolean result = false;
-        ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea);
-        Request removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
-        //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
-        server.queue.enqueueRequest(removeIdeaRequest);
+            try {
+                idea = RMIInterface.getIdeaByIID(iid);
+            }catch(RemoteException r){
+                //FIXME: Handle this
+                System.err.println("Existiu uma remoteException! " + r.getMessage());
+            }
+
+            // At this point we will only send ONE message:
+            // --> ERR_NO_SUCH_IID: In case we've found no idea with this IDD
+            // --> ERR_IDEA_HAS_CHILDREN: In case we've found it, but it has children
+            // --> MSG_OK: In case everything's fine
+
+            if ( idea == null ) {
+                if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
+                    return false;
+                return true;
+            }
+
+            ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea);
+            removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
+            //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
+            server.queue.enqueueRequest(removeIdeaRequest);
+        }
         // Wait until it's dispatched
         removeIdeaRequest.waitUntilDispatched();
         //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
