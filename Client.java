@@ -58,12 +58,26 @@ public class Client {
     ////
     private boolean createTopic(){
         String nome, descricao;
+        boolean repeat = false;
 
-        System.out.println("Please enter the name of the topic:");
-        nome = sc.nextLine();
+        do{
+            System.out.println("Please enter the name of the topic:");
+            nome = sc.nextLine();
+            if (nome.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
 
-        System.out.println("Please enter the description of the topic:");
-        descricao = sc.nextLine();
+        repeat = false;
+        do{
+            System.out.println("Please enter the description of the topic:");
+            descricao = sc.nextLine();
+            if (descricao.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
 
         return conn.createTopic(nome,descricao);
     }
@@ -113,6 +127,12 @@ public class Client {
         do{
             System.out.println(sentence);
             ideas = sc.nextLine();
+
+            if (ideas.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+                continue;
+            }
 
             temp = ideas.split(";");
 
@@ -292,13 +312,28 @@ public class Client {
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         int nshares, price, minNumShares;
-        boolean repeat;
+        boolean repeat = false;
 
-        System.out.println("Please enter the title of the idea:");
-        title = sc.nextLine();
+        do{
+            System.out.println("Please enter the title of the idea:");
+            title = sc.nextLine();
+            if (title.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
 
-        System.out.println("Please enter the description of the idea:");
-        description = sc.nextLine();
+        repeat = false;
+
+        do{
+            System.out.println("Please enter the description of the idea:");
+            description = sc.nextLine();
+            if (description.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
+
 
         System.out.println("Please enter the number of shares for the idea:");
         nshares = sc.nextInt();
@@ -338,13 +373,27 @@ public class Client {
         int commentType = -2, nshares, price, minNumShares;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
-        boolean typeInserted = false, repeat;
+        boolean typeInserted = false, repeat = false;
 
-        System.out.println("Please enter the title of the idea:");
-        title = sc.nextLine();
+        do{
+            System.out.println("Please enter the title of the idea:");
+            title = sc.nextLine();
+            if (title.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
 
-        System.out.println("Please enter the description of the idea:");
-        description = sc.nextLine();
+        repeat = false;
+
+        do{
+            System.out.println("Please enter the description of the idea:");
+            description = sc.nextLine();
+            if (description.equals("")){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
 
         System.out.println("Please enter the number of shares for the idea:");
         nshares = sc.nextInt();
