@@ -94,7 +94,11 @@ public class RequestQueue extends Thread {
         synchronized (requests) {
             requests.remove(r);
         }
-
+        try {
+            RMI.writeRequestQueueFile(requests);
+        } catch (RemoteException e) {
+            //FIXME: Talvez fazer isto 3 vezes!
+        }
     }
 
     /**
