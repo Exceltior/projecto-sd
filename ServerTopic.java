@@ -5,12 +5,7 @@ import java.io.DataOutputStream;
 // FIXME: Since this is the servertopic, it might be useful to store the id of the creator in here
 //
 public class ServerTopic extends Topic {
-    public ServerTopic() {
-    }
 
-    public ServerTopic(int id, String title, String body) {
-        super(id, title, body);
-    }
     public boolean writeToDataStream(DataOutputStream out) {
         if ( ! Common.sendInt(id, out) )
             return false;

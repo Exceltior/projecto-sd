@@ -228,51 +228,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return -1;
     }
 
-    ////
-    // Add the parent topics of this idea to it
-    //
-    public boolean addParentTopicsToIdea(Idea idea) throws  RemoteException{
-        String query = "select * from TopicosIdeias t where t.iid = " + idea.getId();
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult == null)
-            return false;
-
-        idea.addParentTopicsFromSQL(queryResult);
-
-        return true;
-    }
-
-    ////
-    // Add the parent ideas of this idea to it
-    //
-    public boolean addParentIdeasToIdea(Idea idea) throws RemoteException {
-        String query = "select * from RelacaoIdeias r where r.iidfilho = " + idea.getId();
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult == null)
-            return false;
-
-        idea.addParentIdeasFromSQL(queryResult);
-
-        return true;
-    }
-
-    ////
-    // Add the children ideas of this idea to it
-    //
-    public boolean addChildrenIdeasToIdea(Idea idea) throws  RemoteException {
-        String query = "select * from RelacaoIdeias r where r.iidpai = " + idea.getId();
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult == null)
-            return false;
-
-        idea.addChildrenIdeasFromSQL(queryResult);
-
-        return true;
-    }
-
     public boolean ideaHasChildren(int iid) throws RemoteException {
         String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
