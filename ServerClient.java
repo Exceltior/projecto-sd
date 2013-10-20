@@ -507,17 +507,13 @@ public class ServerClient implements Runnable {
             return false;
 
         Request createIdeaRequest = null;
-
         if ( (createIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.CREATE_IDEA)) ==
                 null) {
-
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(title); objects.add(description); objects.add(this.uid);
             createIdeaRequest = new Request(uid, Request.RequestType.CREATE_IDEA,objects);
             server.queue.enqueueRequest(createIdeaRequest);
         }
-
         createIdeaRequest.waitUntilDispatched();
-
         result = (Integer)createIdeaRequest.requestResult.get(0);
 
         if (result < 0){
@@ -530,18 +526,14 @@ public class ServerClient implements Runnable {
 
 
         Request setSharesIdeaRequest = null;
-
         if ( (setSharesIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.SET_SHARES_IDEA)) ==
                 null) {
-
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(this.uid); objects.add(result);
             objects.add(nshares);objects.add(price);objects.add(numMinShares);
             setSharesIdeaRequest = new Request(uid, Request.RequestType.SET_SHARES_IDEA,objects);
             server.queue.enqueueRequest(setSharesIdeaRequest);
         }
-
         setSharesIdeaRequest.waitUntilDispatched();
-
         result_shares = (Boolean)setSharesIdeaRequest.requestResult.get(0);
 
         if (!result_shares){
@@ -574,11 +566,9 @@ public class ServerClient implements Runnable {
 
 
             Request setTopicsIdeaRequest = null;
-
             if ((setTopicsIdeaRequest = server.queue.getNthRequestByUIDAndType(uid,
                     Request.RequestType.SET_TOPICS_IDEA,i+1)) ==
                     null) {
-
                 ArrayList<Object> objects = new ArrayList<Object>();
                 objects.add(result);
                 objects.add(topic);
@@ -586,7 +576,6 @@ public class ServerClient implements Runnable {
                 setTopicsIdeaRequest = new Request(uid, Request.RequestType.SET_TOPICS_IDEA, objects);
                 server.queue.enqueueRequest(setTopicsIdeaRequest);
             }
-
             setTopicsIdeaRequest.waitUntilDispatched();
 
             result_topics = (Boolean) setTopicsIdeaRequest.requestResult.get(0);
@@ -595,6 +584,7 @@ public class ServerClient implements Runnable {
                     return false;
             } else {
                 if (! Common.sendMessage(Common.Message.MSG_ERR, outStream)) //ISTO SÓ DA MERDA SE O RMI DER MERDA,
+                // FIXME^
                     return false;
             }
         }
