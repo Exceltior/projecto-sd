@@ -897,10 +897,8 @@ public class ServerClient implements Runnable {
         //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
         server.queue.enqueueRequest(loginRequest);
 
-        synchronized (loginRequest) {
-            while ( !loginRequest.dispatched )
-                try { loginRequest.wait(); } catch (InterruptedException e) {}
-        }
+        // Wait until it's dispatched
+        loginRequest.waitUntilDispatched();
 
         //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
         uid = (Integer)loginRequest.requestResult.get(0);

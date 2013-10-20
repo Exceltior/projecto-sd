@@ -12,6 +12,13 @@ public class Request implements Serializable {
     ArrayList<Object> requestArguments = new ArrayList<Object>();
     Timestamp timestamp;
 
+    void waitUntilDispatched() {
+        synchronized (this) {
+            while ( !dispatched )
+                try { wait(); } catch (InterruptedException e) {}
+        }
+    }
+
     // We need to store the queryResult here for various reasons. Most notably, because after the dispatcher thread is
     // done working with a Request, the original thread must have access to the output...
     //
