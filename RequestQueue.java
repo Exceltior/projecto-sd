@@ -12,6 +12,7 @@ public class RequestQueue extends Thread {
      */
     RequestQueue(RMI_Interface RMI) {
         ArrayList<Request> r = null;
+        this.RMI = RMI;
         try {
             r = RMI.readRequestsFromQueueFile();
         } catch (RemoteException e) {
@@ -60,7 +61,23 @@ public class RequestQueue extends Thread {
     }
 
     /**
+     * Use this to aknowledge a request (right after you chang the NEED_NOTIFY variable of a user's request)
+     * @param r
+     */
+    synchronized void dequeue(Request r) {
+        synchronized (requests) {
+            requests.remove(r);
+        }
+
+    }
+
+    /**
      * This function just continuously loops the request list.
+     * * FIXME: We can only do something for a user if that user is NOT in the NEED_NOTIFY state. If it is in that
+     * state, then we need to wait until we notify the user. If we find something to do and it's the user is in
+     * NEED_NOTIFY, we will sleep for a while (like 3 seconds or so) to give the user time to reconnect and check one
+     * of the dispatched requests
+     * --> This means we need a function to explicitly remove requests
      */
     @Override
     public void run() {
@@ -72,13 +89,32 @@ public class RequestQueue extends Thread {
             }
 
             //There is at least one request
-            for (Request r : requests) {
-                // FIXME: Process request r in here!
-                // 1. Run the Query
-                // 2. Save the Query output in r.queryOutput
-                // 3. do r.dispatched = true
-                // 4. Do notify()
-                // 5. Do RMI.writeRequestQueueFile(requests);
+           for (int i = 0; i < requests.size(); i++) {
+                Request r = requests.get(i);
+
+               /* If this request has been handled already (and is thus waiting for a dequeue() and clear of user
+               NEED_NOTIFY */
+                if ( r.dispatched ) continue;
+                try {
+                    if ( r.requestType == Request.RequestType.LOGIN ) {
+
+                            int ans = RMI.login((String)r.requestArguments.get(0), (String)r.requestArguments.get(1));
+                            r.requestResult.add(ans);
+                    }
+                } catch (RemoteException e) {
+                 //FIXME: talvez fazer isto 3 vezes!
+                }
+
+                r.dispatched = true;
+                synchronized(r) {
+                    r.notify();
+                }
+                try {
+                    RMI.writeRequestQueueFile(requests);
+                } catch (RemoteException e) {
+                    //FIXME: Talvez fazer isto 3 vezes!
+                }
+
             }
         }
     }

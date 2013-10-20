@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 
 public class Request implements Serializable {
-    enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA}
+    public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN}
     int uid;
     RequestType requestType;
     ArrayList<Object> requestArguments = new ArrayList<Object>();
@@ -20,6 +20,14 @@ public class Request implements Serializable {
     ArrayList<Object> requestResult = new ArrayList<Object>();
     boolean dispatched;
 
+    Request(RequestType requestType, ArrayList<Object> requestArguments) {
+        this.requestType = requestType;
+        this.requestArguments = requestArguments;
+
+        // timestamp is NOW
+        this.timestamp = new Timestamp(new java.util.Date().getTime());
+    }
+
     /**
      * Writes a Request object to a DataOutputStream so that it can later be read by a @Request constructor.
      * @param out
@@ -31,6 +39,7 @@ public class Request implements Serializable {
             out.writeUTF(timestamp.toString());
             out.writeObject(requestResult);
             out.writeObject(requestType);
+            out.writeObject(dispatched);
 
         } catch (IOException e) {
             System.err.println("Error writing a request to a stream!");
@@ -42,7 +51,6 @@ public class Request implements Serializable {
      * @param in
      */
     Request(ObjectInputStream in) {
-        this.dispatched = false;
 
         try {
             this.uid = in.readInt();
@@ -54,6 +62,7 @@ public class Request implements Serializable {
 
             requestResult = (ArrayList<Object>) in.readObject();
             requestType = (RequestType) in.readObject();
+            dispatched = (Boolean)in.readObject();
 
         } catch (IOException e) {
             System.err.println("Error reading a request from a stream!");

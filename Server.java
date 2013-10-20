@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 
 public class Server {
     static ServerSocket acceptSocket;
+    RequestQueue queue;
     boolean primary = true;
 
     void goSecondary() {
@@ -80,6 +81,9 @@ public class Server {
 
         //FIXME: 'localhost' should be the IP of the other server. Also fix port
         new UDPTransmitter("localhost", 1235, 1000).start();
+
+        queue = new RequestQueue(connection.getRMIInterface());
+        queue.start();
 
         for(;;) {
             try {
