@@ -1,3 +1,4 @@
+import java.io.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 ////
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
+    private static final String requestsQueueFilePath = "requests.bin";
     private String url;
     static int num_users;
     static int num_topics;
@@ -642,6 +644,53 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         //
         //
         ////
+    }
+
+    public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException {
+        DataOutputStream out;
+        try {
+            out = new DataOutputStream(new FileOutputStream(requestsQueueFilePath));
+        } catch (FileNotFoundException e) {
+            System.err.println("Error opening Queue file for writing!");
+            return;
+        }
+
+        try {
+            out.writeInt(queue.size());
+            for (Request r : queue)
+                r.writeToStream(out);
+        } catch (IOException e) {
+            System.err.println("Error writing Queue to file!!");
+        }
+
+        try {
+            out.close();
+        } catch (IOException e) {
+            //FIXME: What damn exception can we get here?
+        }
+    }
+
+    public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException {
+        DataInputStream in;
+        try {
+            in = new DataInputStream(new FileInputStream(requestsQueueFilePath));
+        } catch (FileNotFoundException e) {
+            System.err.println("Error opening Queue file for reading!");
+            return null;
+        }
+
+        ArrayList<Request> requests = new ArrayList<Request>();
+        int size = 0;
+        try {
+            size = in.readInt();
+        } catch (IOException e) {
+            System.err.println("Error reading size from Queue File!");
+            return null;
+        }
+        for (int i = 0; i < size; i++)
+            requests.add(new Request(in));
+
+        return requests;
     }
 
     public static void main(String[] args) {

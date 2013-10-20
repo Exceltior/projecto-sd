@@ -1,5 +1,6 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 
 ////
@@ -26,4 +27,6 @@ public interface RMI_Interface extends Remote {
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
     public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
+    public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException;
+    public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;
 }
