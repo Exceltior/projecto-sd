@@ -222,13 +222,16 @@ public class ServerClient implements Runnable {
         if ( (descricao = Common.recvString(inStream)) == null)
             return false;
 
-        try{
-             result = RMIInterface.createTopic(nome,descricao,this.uid);
-        }catch(RemoteException e){
-            //FIXME: Handle this!
-            System.out.println("Existiu uma remoteException no handlecreatetopicrequest! " + e.getMessage());
-            return false; /* FIXME: Do this? */
+        Request createTopicsRequest = null;
+        if ( (createTopicsRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.CREATE_TOPIC))
+                == null) {
+            ArrayList<Object> objects = new ArrayList<Object>(); objects.add(nome); objects.add(descricao); objects
+                    .add(this.uid);
+            createTopicsRequest = new Request(uid, Request.RequestType.CREATE_TOPIC,objects);
+            server.queue.enqueueRequest(createTopicsRequest);
         }
+        createTopicsRequest.waitUntilDispatched();
+        result = (Boolean)createTopicsRequest.requestResult.get(0);
 
         if (result){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )

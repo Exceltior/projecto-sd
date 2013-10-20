@@ -161,6 +161,11 @@ public class RequestQueue extends Thread {
                                     (Integer) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2));
                             r.requestResult.add(ans);
+                        } else if ( r.requestType == Request.RequestType.CREATE_TOPIC ) {
+                            boolean ans = RMI.createTopic((String) r.requestArguments.get(0),
+                                    (String) r.requestArguments.get(1),
+                                    (Integer) r.requestArguments.get(2));
+                            r.requestResult.add(ans);
                         }
                     } catch (RemoteException e) {
                      //FIXME: talvez fazer isto 3 vezes!
