@@ -10,7 +10,6 @@ public class Request implements Serializable {
     int uid;
     RequestType requestType;
     ArrayList<Object> requestArguments = new ArrayList<Object>();
-    // FIXME: We might possibly have to add the queryType in another variable (to know which type of function to use...
     Timestamp timestamp;
 
     // We need to store the queryResult here for various reasons. Most notably, because after the dispatcher thread is
