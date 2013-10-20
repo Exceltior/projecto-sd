@@ -19,15 +19,17 @@ public class ServerClient implements Runnable {
 
     private RMIConnection connection;
     private RMI_Interface RMIInterface = null;
+    private Server server;
 
     // The client's uid. -1 means not logged in.
     private int uid = -1;
 
     static int limit_characters_topic = 20;//Number of characters for the topic's name
 
-    public ServerClient(Socket currentSocket, RMIConnection connection) {
+    public ServerClient(Socket currentSocket, RMIConnection connection, Server server) {
         this.socket = currentSocket;
         this.connection = connection;
+        this.server = server;
         try {
             this.outStream = new DataOutputStream(currentSocket.getOutputStream());
             this.inStream = new DataInputStream(currentSocket.getInputStream());
@@ -54,6 +56,21 @@ public class ServerClient implements Runnable {
 
     @Override
     public void run() {
+
+        if ( !server.isPrimary() ) {
+            // We don't even care if the message goes out!
+            Common.sendMessage(Common.Message.ERR_NOT_PRIMARY,outStream);
+            try {
+                socket.close();
+            } catch (IOException e)
+            {} //FIXME: Should we not ignore this?
+            return ;
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream)) {
+            System.out.println("Connection to a client dropped while starting!");
+            return;
+        }
 
         for(;;) {
             Common.Message msg;

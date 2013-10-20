@@ -40,10 +40,33 @@ public class ClientConnection {
                 currentSocket = new Socket(hosts[currentHost], ports[currentHost]);
                 outStream = new DataOutputStream(currentSocket.getOutputStream());
                 inStream = new DataInputStream(currentSocket.getInputStream());
+
             } catch (IOException e) {
                 System.err.println("connect ERR"); e.printStackTrace();
             }
         } while ( currentSocket == null);
+
+        Common.Message serverMsg;
+        if ( (serverMsg = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+
+            //Try to connect again...I know this is recursive-based looping...but oh baby it feels so right.
+            connect();
+
+            return;
+        }
+
+        if ( serverMsg == Common.Message.ERR_NOT_PRIMARY ) {
+
+            //Close the connection and keep trying until we find the primary server
+            try {
+                currentSocket.close();
+            } catch (IOException e) {}
+
+            //Try to connect again...I know this is recursive-based looping...but oh baby it feels so right.
+            connect();
+
+            //Once we get here, we're guaranteed to be connected to the primary...
+        }
     }
 
     ////

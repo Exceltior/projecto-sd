@@ -84,7 +84,7 @@ public class Server {
         for(;;) {
             try {
                 clientSocket = acceptSocket.accept();
-                new Thread(new ServerClient(clientSocket, connection)).start();
+                new Thread(new ServerClient(clientSocket, connection, this)).start();
             }
             catch (IOException e) {
                 System.err.println("Accept failed!");
