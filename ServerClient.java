@@ -890,12 +890,20 @@ public class ServerClient implements Runnable {
         if ( (pwd = Common.recvString(inStream)) == null)
             return false;
 
-        try {
-            uid = RMIInterface.login(user, pwd);
-        } catch (RemoteException e) {
-            System.err.println("Remote exception while handling login!");
-            return false; //FIXME: we should do something about a remote exception!
+        ArrayList<Object> objects = new ArrayList<Object>();
+        objects.add(user);
+        objects.add(pwd);
+        Request loginRequest = new Request(Request.RequestType.LOGIN,objects);
+        //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
+        server.queue.enqueueRequest(loginRequest);
+
+        synchronized (loginRequest) {
+            while ( !loginRequest.dispatched )
+                try { loginRequest.wait(); } catch (InterruptedException e) {}
         }
+
+        //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
+        uid = (Integer)loginRequest.requestResult.get(0);
 
         if (uid != -1){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
@@ -905,6 +913,9 @@ public class ServerClient implements Runnable {
                 return false;
             }
         }
+
+        //FIXME: Right before we dequeue, this is where we'd set the user's state to OK (clearing notify)
+        server.queue.dequeue(loginRequest);
 
         // Message was handled successfully
         return true;
