@@ -254,7 +254,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean addFile(int iid, NetworkingFile file) throws RemoteException {
-        String path="./"+lastFile;
+        String path="./"+lastFile+".bin";
 
         try {
             file.writeTo(path);
