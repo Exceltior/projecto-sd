@@ -1041,6 +1041,9 @@ public class ServerClient implements Runnable {
         //FIXME: Right before we dequeue, this is where we'd set the user's state to OK (clearing notify)
         server.queue.dequeue(loginRequest);
 
+        if ( uid == -1 )
+            return true;
+
         /* Now that the user's logged in, check his queue! */
         Request pendingRequest = null;
         if ( (pendingRequest = server.queue.getFirstRequestByUID(uid)) != null ) {
