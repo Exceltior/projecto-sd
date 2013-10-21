@@ -605,7 +605,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ArrayList<String[]> queryDataResult;
         boolean res = false;
         try {
-            queryDataResult = receiveData(queryData);
+            queryDataResult = receiveData(queryData, conn);
             query = query + ", to_date(" + queryDataResult.get(0)[0] + "'yyyy.mm.dd hh.mm.ss')";
             res = insertData(query, conn);
         } catch (RemoteException e) {
