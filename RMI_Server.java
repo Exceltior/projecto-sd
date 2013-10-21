@@ -462,6 +462,27 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return insertData(query);
     }
 
+
+    /**
+     * This just picks any connection available from the pool and uses it. If you need transactional support you can
+     * specify a connection in another overloaded method
+     * @param query
+     * @return
+     * @throws RemoteException
+     */
+    private ArrayList<String[]> receiveData(String query) throws RemoteException{
+
+        Connection conn = null;
+        try {
+            conn = connectionPool.checkOutConnection();
+        } catch (SQLException e) {
+            System.err.println("Error checking out connection for receiveData");
+        }
+        ArrayList<String[]> ret = receiveData(query, conn);
+        if ( conn != null )
+            connectionPool.returnConnection(conn);
+        return ret;
+    }
     ////
     //  Method responsible for executing queries like "Select..."
     //
@@ -469,22 +490,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // produces an empty table.
     //
     ////
-    private ArrayList<String[]> receiveData(String query) throws RemoteException{
+    private ArrayList<String[]> receiveData(String query, Connection conn) throws RemoteException{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement;
-        Connection conn = null;
-
 
         System.out.println("\n-------------------------------\nRunning query: "+query);
 
         try {
-            conn = connectionPool.checkOutConnection();
             statement = conn.createStatement();
         } catch (SQLException e) {
             System.err.println("Error creating SQL statement '" + query + "'!");
-            if ( conn != null)
-                connectionPool.returnConnection(conn);
             return null;
         }
 
@@ -505,12 +521,58 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             statement.close();
         } catch (SQLException e) {
             System.err.println("Error executing SQL query '" + query + "'!");
-            connectionPool.returnConnection(conn);
             return null;
         }
 
-        connectionPool.returnConnection(conn);
         return result;
+    }
+
+    private Connection getTransactionalConnection() {
+        //FIXME: Implement this well
+        Connection connection = null;
+        try {
+            connection = connectionPool.checkOutConnection();
+        } catch (SQLException e) {
+            System.err.println("Error checkout out a new connection for transactions!");
+            return null;
+        }
+
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            System.err.println("Error setting autocommit!");
+        }
+
+        return connection;
+    }
+
+    private void returnTransactionalConnection(Connection c) {
+        try {
+            c.setAutoCommit(true);
+        } catch (SQLException e) {
+            System.err.println("Error setting autocommit to true!");
+        }
+        connectionPool.returnConnection(c);
+    }
+
+    /**
+     * This is used for most queries because it grabs any available connection. One might want to use the specialized
+     * version which can operate on a given connection (for things such as transactions...)
+     * @param query
+     * @return
+     * @throws RemoteException
+     */
+    private boolean insertData(String query) throws RemoteException{
+        Connection conn = null;
+        try {
+            conn = connectionPool.checkOutConnection();
+        } catch (SQLException e) {
+            System.err.println("Error checking out connection for insertData");
+        }
+        boolean ret = insertData(query, conn);
+        if ( conn != null )
+            connectionPool.returnConnection(conn);
+        return ret;
     }
 
     ////
@@ -520,27 +582,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // FIXME: We are going to have to do more than just print a pretty message to stderr. In fact, we should never let
     // execution go through or we may have unpredicteable results
     ////
-    private boolean insertData(String query) throws RemoteException{
+    private boolean insertData(String query, Connection conn) throws RemoteException{
         Statement statement;
-        Connection conn = null;
         int update = -1;
 
         System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
 
         try{
-            conn = connectionPool.checkOutConnection();
             statement = conn.createStatement();
             update = statement.executeUpdate(query);
         }catch(SQLException s){
             System.err.println("SQLException in the insertData method");
-            if ( conn != null )
-                connectionPool.returnConnection(conn);
+
             return false;
 
         }
 
         //System.out.println("O resultado foi " + (update!=0));
-        connectionPool.returnConnection(conn);
         return update != 0;
     }
 
