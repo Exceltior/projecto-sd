@@ -28,6 +28,8 @@ public interface RMI_Interface extends Remote {
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException;
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException;
+    public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice, int minTargetShares) throws
+            RemoteException;
     public int getUserMoney(int uid) throws RemoteException;
     public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException;
 }

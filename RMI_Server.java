@@ -5,6 +5,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 ////
 //  This is the RMI Server class, which will be responsible for interacting with the database, allowing the TCP Servers to commit
@@ -416,6 +417,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return new Share(result.get(0));
     }
 
+    private void sortByPriceRatio(ArrayList<Share> shares) {
+        Collections.sort(shares);
+    }
+
+    /**
+     * Gets the money for the given UID
+     * @param uid
+     * @return
+     * @throws RemoteException
+     */
     public int getUserMoney(int uid) throws RemoteException {
         String query = "select dinheiro from Utilizadores where uid="+uid;
 
@@ -441,6 +452,106 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         return ((conn == null) ? insertData(query) : insertData(query, conn));
     }
+
+    /**
+     * This tries to GET numShare shares. Notice that it doesn't try to BUY. If the user already has them,
+     * it just quits and errors out.
+     * @param uid
+     * @param iid
+     * @param numShares
+     * @param targetPrice  The desired target price of the shares of this user after buying. If the user already has
+     *                     shares, then -2 means we should keep the price already set
+     * @param minTargetShares The desired number of minimum shares that the user wants to keep after buying. If the
+     *                        user already has shares, then -2 means we should keep the minimum already set
+     * @return 1 on success, 0 on error (can't buy because there aren't any appropriate sellers....)
+     * @throws RemoteException
+     */
+    public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice, int minTargetShares) throws
+            RemoteException {
+
+        Share currentShares = getSharesIdeaForUid(iid, uid);
+        int userMoney = getUserMoney(uid);
+
+        if ( currentShares != null) {
+            // User already has shares
+            if ( targetPrice == -2 )
+                targetPrice = currentShares.getPrice();
+            if (minTargetShares == -2)
+                minTargetShares = currentShares.getNumMin();
+
+            numShares -= currentShares.getNum();
+
+            if ( numShares <= 0) {
+                //FIXME: Should we update the shares' targetPrice and min target shares here?!?!?! JOCA!
+                System.out.println("User tried to get X shares, but already has them!"); //FIXME?
+                return 1; //Got them!
+            }
+        }
+
+        ArrayList<Share> shares = getSharesIdea(iid);
+        ArrayList<Share> sharesToBuy = new ArrayList<Share>();
+        ArrayList<Integer> sharesToBuyNum = new ArrayList<Integer>();
+
+        sortByPriceRatio(shares);
+
+        // We have sorted them by price per share, so the best options are first
+
+        for (Share s : shares) {
+            int availShares = s.getAvailableShares();
+            if ( availShares > 0 ) {
+                if ( availShares >= numShares ) {
+                    // There are enough for us to finish!
+                    int toBuy = availShares-numShares;
+
+                    if ( s.getPriceForNum(toBuy) > userMoney ) {
+                        // Not enough money...
+                        double pricePerShare = s.getPricePerShare();
+
+                        // See how many we can buy. Round down!
+
+                        toBuy = (int)(((double)userMoney) / pricePerShare);
+                    }
+                    sharesToBuy.add(s);
+                    sharesToBuyNum.add(toBuy);
+                    numShares = 0; //No shares remaining to buy
+                    userMoney -= s.getPriceForNum(toBuy);
+                    break;
+                } else {
+                    sharesToBuy.add(s);
+                    sharesToBuyNum.add(availShares);
+                    numShares -= availShares; //Still some left to buy...
+                }
+            }
+        }
+
+        if ( numShares > 0 ) {
+            //Can't buy shares!!!
+            return 0;
+        }
+
+        // We need to check the money! FIXME
+
+        //Okay, move on and let's buy them. this must be transactional
+        Connection conn = getTransactionalConnection();
+        for (int i = 0; i < sharesToBuy.size(); i++) {
+            Share s = sharesToBuy.get(i);
+            int num = sharesToBuyNum.get(i);
+            int resultingShares = s.getNum()-num;
+
+            setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),s.getNumMin(),conn);
+            insertIntoHistory(uid, iid, num,s.getPrice(),conn);
+            setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), conn);
+        }
+
+
+        setSharesIdea(uid,iid,numShares,targetPrice,minTargetShares,conn);
+        setUserMoney(uid,userMoney, conn);
+
+        // UNLEASH THE BEAST!
+        returnTransactionalConnection(conn);
+        return 1;
+    }
+
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
