@@ -311,6 +311,22 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return -1;
     }
 
+    private boolean ideaHasFiles(int iid) {
+        String query = "select * from IdeiasFicheiros i where i.iid = " + iid;
+        ArrayList<String[]> queryResult = null;
+        try {
+            queryResult = receiveData(query);
+        } catch (RemoteException e) {
+            System.err.println("should never happen!!!!!");
+            return false;
+        }
+
+        if (queryResult == null)
+            return false; //FIXME: We should handle the query getting all fucked up (NULL case)
+
+        return !queryResult.isEmpty();
+    }
+
     public boolean ideaHasChildren(int iid) throws RemoteException {
         String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
