@@ -471,6 +471,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         return conn ==null ? insertData(query) : insertData(query, conn);
     }
+
+    private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn) {
+        //FIXME FIXME FIXME: Ver se a ordem dos values é esta (vê bem o nshares e o price!!); adicionar o campo da
+        // data para o instante actual,
+        // porque
+        // isso está em FALTA!! JOCA JOCA JOCA
+        String query = "insert into Transaccoes values(" + uidBuyer + "," + uidSeller + "," + nshares + "," + price + ")";
+
+        boolean res = false;
+        try {
+            res = insertData(query, conn);
+        } catch (RemoteException e) {
+            System.err.println("Remote exception, wtf!"); //FIXME
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return res;
     }
 
     ////
