@@ -867,6 +867,78 @@ public class ClientConnection {
         }
     }
 
+    Idea[] getIdeaRelations(int iid, int relationType){
+        Common.Message reply;
+        Idea[] ideasList;
+        int numIdeas;
+        boolean needReconnect = false;
+
+        for(;;){
+            if (relationType == 1){
+                if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASFAVOUR,outStream) ) {
+                    System.err.println("AQUI");
+                    reconnect(); continue;
+                }
+            }
+
+            else if(relationType == 0){
+                if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASNEUTRAL,outStream) ) {
+                    System.err.println("AQUI2");
+                    reconnect(); continue;
+                }
+            }
+
+            else if(relationType == -1){
+                if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASAGAINST,outStream) ) {
+                    System.err.println("AQUI3");
+                    reconnect(); continue;
+                }
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI4");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if (!Common.sendInt(iid,outStream)){
+                System.err.println("AQUI5");
+                reconnect();continue;
+            }
+
+            if ( (numIdeas = Common.recvInt(inStream)) == -1) {
+                System.err.println("AQUI6");
+                reconnect(); continue;
+            }
+
+            ideasList = new Idea[numIdeas];
+
+            for (int i=0;i<numIdeas;i++){
+                ideasList[i] = new Idea();
+                if ( !ideasList[i].readFromDataStream(inStream) ){
+                    needReconnect = true;
+                    break;
+                }
+            }
+
+            if ( needReconnect ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                System.err.println("Error in the getIdeaRelations method! MSG_OK not received");
+                return null;
+            }
+
+            return ideasList;
+        }
+    }
+
     boolean deleteIdea(int iid) {
         Common.Message reply;
         for(;;){

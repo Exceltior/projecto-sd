@@ -286,6 +286,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    // Method responsible for getting all the ideas in favou, neutral or against a given idea
+    ////
+    public Idea[] getIdeRelations(int iid, int relationshipType) throws RemoteException{
+        String query = "Select * from Ideais i, RelacaoIdeias r where r.iidpai = i.iid and r.iid = " + iid +
+                " and r.tipo_relacao = " + relationshipType;
+        ArrayList<String[]> queryResult = receiveData(query);
+        Idea[] devolve = null;
+
+        if (queryResult == null || queryResult.size()==0)
+            return null;//FIXME Deal with this!
+
+        devolve = new Idea[queryResult.size()];
+
+        for (int i=0;i<queryResult.size();i++)
+            devolve[i] = new Idea(queryResult.get(i));
+
+        return devolve;
+    }
+
+    ////
     //  Method responsible for creating a new topic in the database
     ////
     synchronized public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{

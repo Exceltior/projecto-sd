@@ -36,4 +36,5 @@ public interface RMI_Interface extends Remote {
     public boolean isUserIn(int uid) throws RemoteException;
     public boolean addFile(int iid, NetworkingFile file) throws RemoteException;
     public NetworkingFile getFile(int iid) throws RemoteException;
+    public Idea[] getIdeRelations(int iid, int relationshipType) throws RemoteException;
 }
