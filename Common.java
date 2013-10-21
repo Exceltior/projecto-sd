@@ -24,7 +24,12 @@ public class Common {
         REQUEST_DELETE_IDEA,        // Delete an Idea
         REQUEST_GET_TOPICS_OF_IDEA, // Get Idea topics
         REQUEST_GETUSERIDEAS,       // Get the ideas of a given user
-        
+        REQUEST_GETIDEASFAVOUR,     //Get the ideas in favour of a given idea
+        REQUEST_GETIDEASAGAINST,    //Get the ideas against a given idea
+        REQUEST_GETIDEASNEUTRAL,    //Get the ideas neutral to a given idea
+
+
+
         ERR_NOT_LOGGED_IN,          // User Not logged in
         ERR_TOPIC_NOT_FOUND,        // Topic not found
         ERR_IDEA_HAS_CHILDREN,      // Idea has children (and shouldn't, in this cenario)

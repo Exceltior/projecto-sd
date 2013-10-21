@@ -40,4 +40,5 @@ public interface RMI_Interface extends Remote {
     public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException;
     public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
             RemoteException;
+    public Idea[] getIdeRelations(int iid, int relationshipType) throws RemoteException;
 }

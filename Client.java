@@ -162,16 +162,149 @@ public class Client {
     }
 
     ////
+    //  Prints the ideas in favour, against and neutral to a given idea
+    ////
+    private boolean printRelationsIdea(ArrayList<Integer> listIdeasIDs, int relationType){
+        String temp;
+        int iid = -2;
+        Idea[] ideasList;
+
+        if (relationType == 1)
+            System.out.println("Please insert the id of the idea you want to see the ideas in favour:");
+        else if(relationType == -1)
+            System.out.println("Please insert the id of the idea you want to see the ideas against:");
+        else if(relationType == 0)
+            System.out.println("Please insert the id of the idea you want to see the ideas neutral:");
+
+        try{
+            temp = sc.nextLine();
+            iid = Integer.parseInt(temp);
+        }catch(NumberFormatException n){
+            System.out.println("Invalid input!");
+            return false;
+        }//We don't need to handle this exception
+
+        if (listIdeasIDs.contains(iid)){
+            //Get ideas
+            ideasList = conn.getIdeaRelations(iid,relationType);
+
+            if (relationType == 1)
+                System.out.println("List of ideas in favour:");
+            else if(relationType == -1)
+                System.out.println("List of ideas against:");
+            else if(relationType == 0)
+                System.out.println("List of ideas neutral:");
+
+            for (Idea anIdeasList : ideasList)
+                System.out.println(anIdeasList);
+        }
+
+        return true;
+    }
+
+
+    ////
+    //  Provides a number of options to perform over a list of ideas
+    ////
+    private void ideaOptions(ArrayList<Integer> listIdeasIDs){
+        ////
+        // Idea options:
+        // 1 - Comment one idea
+        // 2 - See ideas in favour of a given idea
+        // 3 - See ideas against a given idea
+        ////
+
+        boolean stay = true;
+        String line, temp;
+        int choice, iid = -2;
+        ArrayList<String> listTopicsNames;
+        ClientTopic[] listTopics;
+
+
+        while (stay){
+            System.out.println("\nIdea Options:");
+            System.out.println("1 - Comment an idea");
+            System.out.println("2 - See ideas in favour of a given idea");
+            System.out.println("3 - See ideas against a given idea");
+            System.out.println("4 - See ideas neutral for the given idea");
+            System.out.print("Your choice: ");
+            try{
+                line = sc.nextLine();
+                choice = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid option!");
+                continue;
+            }
+
+            switch (choice){
+                case 1:{
+                    //Comment an idea
+                    listTopicsNames = new ArrayList<String>();
+
+                    System.out.println("Please insert the id of the idea you want comment.");
+                    try{
+                        temp = sc.nextLine();
+                        iid = Integer.parseInt(temp);
+                    }catch(NumberFormatException n){
+                        System.out.println("Invalid input!");
+                        break;
+                    }//We don't need to handle this exception
+
+                    if (listIdeasIDs.contains(iid)){
+                        //Going to get the idea's topic
+                        listTopics = conn.getIdeaTopics(iid);
+
+                        for (int i=0;i< listTopics.length;i++)
+                            listTopicsNames.add(listTopics[i].getTitle());
+
+                        commentIdea(listTopicsNames,iid);
+
+                    }else
+                        System.out.println("Error! Idea(s) not comented");
+                    break;
+                }
+
+                case 2:{
+                    //See ideas in favour
+                    if (!printRelationsIdea(listIdeasIDs,1))
+                        System.out.println("Error! Could not show ideas in favour");
+
+                    break;
+                }
+
+                case 3:{
+                    //See ideas against
+                    if (!printRelationsIdea(listIdeasIDs,-1))
+                        System.out.println("Error! Could not show ideas in against");
+
+                    break;
+                }
+
+                case 4:{
+                    //See ideas neutral
+                    if (!printRelationsIdea(listIdeasIDs,0))
+                        System.out.println("Error! Could not show ideas in against");
+
+                    break;
+                }
+
+                default:{
+                    System.out.println("Invalid option!");
+                    break;
+                }
+            }
+        }
+    }
+
+    ////
     //  Searchs an idea by its idea id and title
     ////
     private void searchIdea(){
         String temp, title;
-        int iid = -1, tid = -1;
+        int iid = -1;
         boolean repeat;
         Idea[] userSelectedIdea;
-        ClientTopic[] listTopics;
         ArrayList<Integer> listIdeasIDs = new ArrayList<Integer>();
-        ArrayList<String> listTopicsNames = new ArrayList<String>();
 
         System.out.println("\n\nWelcome to the Idea's Search Engine!\nWe provide two ways of searching for a topic:" +
                 "By its name and by its topic id. You must insert at least one of these fields\n\n");
@@ -213,25 +346,7 @@ public class Client {
             System.out.println(userSelectedIdea[i]);
         }
 
-        //Permitir comentar ideia
-        iid = -1;
-        System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
-        try{
-            temp = sc.nextLine();
-            iid = Integer.parseInt(temp);
-        }catch(NumberFormatException n){}//We don't need to handle this exception
-
-         if (listIdeasIDs.contains(iid)){
-             //Vamos comentar a ideia - Ir buscar o topico da ideia
-              listTopics = conn.getIdeaTopics(iid);
-
-             for (int i=0;i< listTopics.length;i++)
-                 listTopicsNames.add(listTopics[i].getTitle());
-
-             commentIdea(listTopicsNames,iid);
-
-         }else
-             System.out.println("Idea(s) not comented");
+        ideaOptions(listIdeasIDs);
     }
 
     ////
@@ -391,11 +506,12 @@ public class Client {
     //  Creates a new idea, commenting directly on a topic
     ////
     private boolean commentIdea(ArrayList<String> topicTitle, int iid){
-        String title, description;
+        String title, description, file, filePath;
         int commentType = -2, nshares, price, minNumShares;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         boolean typeInserted = false, repeat = false;
+        NetworkingFile ficheiro = null;
 
         do{
             System.out.println("Please enter the title of the idea:");
@@ -490,9 +606,27 @@ public class Client {
                 ideasNeutral.add(iid);
         }
 
-        /* FIXME JOCA ESTA MERDA NAO VAI SER NULL!!! */
-        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,
-                ideasNeutral,null);
+        repeat = false;
+        do{
+            System.out.println("Do you want to attach a file?(Y/N)");
+            file = sc.nextLine();
+            if (file.equals("Y")){
+                System.out.println("Please enter the path to the file you wnat to attach:");
+                filePath = sc.nextLine();
+                try {
+                    ficheiro = new NetworkingFile(filePath);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Invalid file path");
+                    repeat = true;
+                }
+            }
+            else if(!file.equals("N")){//The user selected something different from "Y" or "N"
+                repeat = true;
+                System.out.println("Invalid input");
+            }
+        }while (repeat);
+
+        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral,ficheiro);
     }
 
     ////
@@ -534,6 +668,7 @@ public class Client {
         System.out.println("6 - Search Idea");
         System.out.println("7 - Search Topic");
         System.out.println("8 - Manage User Ideas");
+        System.out.println("9 - Add relation between two ideas");
         System.out.println("0 - Sair");
 
         do{
@@ -562,16 +697,20 @@ public class Client {
     //  Display the Account Settings Menu
     ////
     private void manageUserIdeas(){
-        int option = -1;
+        int option = -1, choice = -2;
         String line;
         Idea[] listIdeas;
+        ArrayList<Integer> listUserIdeasIDs = new ArrayList<Integer>();
+
 
         //Display user ideas
         listIdeas = conn.getIdeasFromUser();
 
         System.out.println("\n\nUser Ideas List:");
-        for (int i=0;i<listIdeas.length;i++)
+        for (int i=0;i<listIdeas.length;i++){
             System.out.println(listIdeas[i]);
+            listUserIdeasIDs.add(listIdeas[i].getId());
+        }
 
         do{
             System.out.println("\n\n             Manage User Ideas");
@@ -594,6 +733,55 @@ public class Client {
         switch(option){
 
             case 1:{
+                break;
+            }
+
+            case 2:{
+                break;
+            }
+
+            case 3:{
+                break;
+            }
+
+            case 4:{
+                break;
+            }
+
+            case 5:{
+                //Pedir ideia e depois listar todas as relacoes
+                do{
+                    System.out.println("Please insert the idea id whose relations you want to check:");
+                    try{
+                        line = sc.nextLine();
+                        choice = Integer.parseInt(line);
+                    }catch(NumberFormatException n){
+                        System.out.println("Invalid option");
+                        choice = -2;
+                    }
+                }while (!listUserIdeasIDs.contains(choice));
+
+                //Print Ideas in Favour
+                listIdeas = conn.getIdeaRelations(choice,1);
+
+                System.out.println("List of ideas in favour:");
+                for (Idea anIdeasList : listIdeas)
+                    System.out.println(anIdeasList);
+
+                //Print Ideas in Against
+                listIdeas = conn.getIdeaRelations(choice,-1);
+
+                System.out.println("List of ideas in against:");
+                for (Idea anIdeasList : listIdeas)
+                    System.out.println(anIdeasList);
+
+                //Print Ideas Neutral
+                listIdeas = conn.getIdeaRelations(choice,0);
+
+                System.out.println("List of ideas in neutral:");
+                for (Idea anIdeasList : listIdeas)
+                    System.out.println(anIdeasList);
+
                 break;
             }
 
@@ -649,8 +837,8 @@ public class Client {
                         stay = true;
                     } while (choice!=1 && choice!=2);
 
-                    if (choice==1 || choice==2)
-                        continue;
+                    //if (choice==1 || choice==2)
+                    continue;
                 }
                 else{ //Now that the registration is sucessfull is time to login
                     System.out.println("Registration sucessfull");
@@ -673,52 +861,29 @@ public class Client {
                 stay = false;
         }
 
-        /*
-        while (login_result == 3){
-
-            username = askUsername();
-            password = askPassword();
-
-            if (choice == 2){
-                while (stay){
-                    stay = false;
-
-                    email = askEmail();
-
-                    Date date = new Date();//Get current date
-
-                    if (!conn.register(username,password,email,date)){
-                        do{
-                            System.out.print("Registration unsucessfull :(\n1-Try registration again\n2-try login in with another username?\nYour choice: ");
-                            choice = sc.nextInt();
-                            sc.nextLine();//Clear the buffer
-
-
-                        } while (choice!=1 && choice!=2);
-                    }
-                    else //Now tht the registration is sucessfull is time to login
-                        System.out.println("Registration sucessfull");
-                }
-            }
-
-            login_result = conn.login(username,password);
-
-            if (login_result == 3){
-                System.out.println("Login unsucessfull!\nIf you want to register just enter 2, otherwise press any key to login again");
-                String temp = sc.nextLine();
-                try{
-                    if (Integer.parseInt(temp) == 2)
-                        choice = 2;
-                }catch(NumberFormatException ignored){}//We don't need to handle this exception
-            }
-        }
-        */
-        ////
         //  Login was successfull
-        ////
         System.out.println("Login Successfull!");
 
         mainLoop();
+    }
+
+    private boolean deleteIdea(){
+        int iid = -2;
+        String line;
+        boolean repeat = false;
+
+        do{
+            System.out.println("Please insert the id of the idea you want to delete:");
+            line = sc.nextLine();
+            try{
+                iid = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
+
+        return !conn.deleteIdea(iid);
     }
 
     private void commentTopic(int topic){
@@ -780,6 +945,49 @@ public class Client {
         return selected;
     }
 
+    private void setRelationIdeas(){
+        int iidparent = -2, iidchild = -2, type = -2;
+        String line;
+        boolean repeat = true;
+
+        while (repeat){
+            System.out.println("Please select the id for the first idea in the relationship:");
+            try{
+                line = sc.nextLine();
+                iidparent = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                continue;
+            }
+            System.out.println("Please select the id for the second idea in the relationship:");
+            try{
+                line = sc.nextLine();
+                iidchild = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                continue;
+            }
+
+            System.out.println("Please insert the type of the relationship (1->For;-1->Against;0->Neutral)");
+            try{
+                line = sc.nextLine();
+                type = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+            }
+
+            if (type == 1 || type == 0 || type == -1)//Valid option
+                repeat = false;
+            else
+                repeat = true;
+        }
+
+        if (conn.setRelationBetweenIdeas(iidparent,iidchild,type))
+            System.out.println("Relationship between ideas successfully!");
+        else
+            System.out.println("Relationship between ideas was not added");
+    }
+
     private void mainLoop(){
         int choice, topic, idea;
         boolean stay = true;
@@ -821,8 +1029,10 @@ public class Client {
 
                 //Delete an idea
                 case 4:{
-                    //First we need to check if there is any idea which is fully owned by the user
-                    System.out.println("Delete an idea!!!!");
+                    if (!deleteIdea())
+                        System.out.println("Error while deleting the idea!");
+                    else
+                        System.out.println("Idea deleted with success");
                     break;
                 }
 
@@ -854,6 +1064,12 @@ public class Client {
                 //Account Settings
                 case 8:{
                     manageUserIdeas();
+                    break;
+                }
+
+                //Add Relation Between ideas
+                case 9:{
+                    setRelationIdeas();
                     break;
                 }
 

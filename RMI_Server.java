@@ -7,6 +7,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -282,6 +283,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             System.err.println("Shouldn't happen! DB corrupted?");
             return null;
         }
+    }
+
+    ////
+    // Method responsible for getting all the ideas in favour, neutral or against a given idea
+    ////
+    public Idea[] getIdeRelations(int iid, int relationshipType) throws RemoteException{
+        String query = "Select * from Ideais i, RelacaoIdeias r where r.iidpai = i.iid and r.iid = " + iid +
+                " and r.tipo_relacao = " + relationshipType;
+        ArrayList<String[]> queryResult = receiveData(query);
+        Idea[] devolve = null;
+
+        if (queryResult == null || queryResult.size()==0)
+            return null;//FIXME Deal with this!
+
+        devolve = new Idea[queryResult.size()];
+
+        for (int i=0;i<queryResult.size();i++)
+            devolve[i] = new Idea(queryResult.get(i));
+
+        return devolve;
     }
 
     ////
@@ -760,11 +781,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public boolean isUserIn(int uid) throws RemoteException{
         String query = "Select u.dataUltimoLogin from Utilizadores u where u.userid = " + uid;
         ArrayList<String[]> resultQuery = null;
-        Date actualDate = new Date();
+        Date actualDate = new Date(),userDate;
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy:mm:dd:hh:mm:ss");
-        String[] currentDate, userDate;
-        String s_date = format1.format(actualDate);
-        currentDate = s_date.split(":");
+        String[] user_date;
+        String finalUserDate = "";
 
         try{
             resultQuery = receiveData(query);
@@ -776,28 +796,28 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if (resultQuery == null)
             return false;
 
-        userDate = resultQuery.get(0)[0].split(":");
+        user_date = resultQuery.get(0)[0].split(":");
 
-        if (dateDifference(currentDate,userDate,limit_time_active))//Has been active in less than 5 minutes
+        for (int i=0;i<user_date.length;i++){
+             finalUserDate = finalUserDate + user_date[i];
+            if (i<user_date.length - 1)
+                finalUserDate = finalUserDate + ":";
+        }
+
+        try{
+            userDate = format1.parse(finalUserDate);
+        }catch(ParseException p){
+            System.err.println("Error while parsing the date");
+            p.printStackTrace();
+            return false;
+        }
+
+        long difference = actualDate.getTime() - userDate.getTime();
+        long diffMinutes = difference / (60 * 1000) % 60;
+
+        if (diffMinutes > limit_time_active)//Has been active in less than 5 minutes
             return true;
         return false;
-    }
-
-    //FIXME: Joca merda isto
-    private boolean dateDifference(String[] date1, String[] date2, int maxSeconds){
-        int year, month, day, hour, minute, second, timeDifference;
-
-
-        year = Integer.parseInt(date1[0]) - Integer.parseInt(date2[0]);
-        month = Integer.parseInt(date1[1]) - Integer.parseInt(date2[1]);
-        day = Integer.parseInt(date1[2]) - Integer.parseInt(date2[2]);
-        hour = Integer.parseInt(date1[3]) - Integer.parseInt(date2[3]);
-        minute = Integer.parseInt(date1[4]) - Integer.parseInt(date2[4]);
-        second = Integer.parseInt(date1[5]) - Integer.parseInt(date2[5]);
-
-        timeDifference = second + (minute*60) + (hour*60*60) + (day*24*60*60) + (month*30*24*60*60) + (year*12*30*24*60*60);
-
-        return timeDifference > maxSeconds;
     }
 
     ////
