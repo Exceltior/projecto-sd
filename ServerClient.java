@@ -465,6 +465,7 @@ public class ServerClient implements Runnable {
         int nshares, price, result, numMinShares;
         boolean result_topics = false, result_shares;
         NetworkingFile ficheiro = null;
+        Request addFileRequest = null;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -617,6 +618,19 @@ public class ServerClient implements Runnable {
             try{
                 objectStream = new ObjectInputStream(inStream);
                 ficheiro = (NetworkingFile)objectStream.readObject();
+
+                boolean fileResult = false;
+                if ( (addFileRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.ADD_FILE)) ==
+                        null) {
+                    ArrayList<Object> objects = new ArrayList<Object>(); objects.add(title); objects.add(description); objects.add(this.uid);
+                    addFileRequest = new Request(uid, Request.RequestType.ADD_FILE,objects);
+                    server.queue.enqueueRequest(addFileRequest);
+                }
+                addFileRequest.waitUntilDispatched();
+                fileResult = (Boolean)addFileRequest.requestResult.get(0);
+
+                //FIXME: Deal with fileResult
+
             }catch(IOException i){
                 System.out.println("IO Exception");
                 i.printStackTrace();
@@ -632,6 +646,8 @@ public class ServerClient implements Runnable {
         if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
             return false;
 
+        if ( addFileRequest != null )
+            server.queue.dequeue(addFileRequest);
         server.queue.dequeue(createIdeaRequest);
         server.queue.dequeue(setSharesIdeaRequest);
         for (Request r : requests1)
