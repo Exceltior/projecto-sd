@@ -483,6 +483,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
             if ( numShares <= 0) {
                 //FIXME: Should we update the shares' targetPrice and min target shares here?!?!?! JOCA!
+
+                ////
+                //  Super Answer by Joca:
+                //  Dude, if he already has them why do we need to update? Isn't that already in the database?
+                //  Just tell them "Dude, I can't buy something you already have..."
+                ////
                 System.out.println("User tried to get X shares, but already has them!"); //FIXME?
                 return 1; //Got them!
             }
@@ -537,7 +543,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             int resultingShares = s.getNum()-num;
 
             setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),s.getNumMin(),conn);
-            insertIntoHistory(uid, iid, num,s.getPrice(),conn);
+            insertIntoHistory(uid, iid, num,s.getPrice(),conn,iid);
             setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), conn);
         }
 
@@ -581,15 +587,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return conn ==null ? insertData(query) : insertData(query, conn);
     }
 
-    private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn) {
+    private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn, int iid) {
         //FIXME FIXME FIXME: Ver se a ordem dos values é esta (vê bem o nshares e o price!!); adicionar o campo da
         // data para o instante actual,
         // porque
         // isso está em FALTA!! JOCA JOCA JOCA
-        String query = "insert into Transaccoes values(" + uidBuyer + "," + uidSeller + "," + nshares + "," + price + ")";
 
+        ////
+        //  FIXME FIXME FIXME MAXI Falta aqui o id da ideia que foi comprada!
+        //  A partida o resto estará bem!
+        ////
+
+        //  First we are going to extract the system date, and them we are going to add it to the query. It appears to have
+        //  to be like this, ORACLE SQL is a very good one, and does not allow us to select sysdate inside a query...
+        String queryData = "Select to_char(sysdate, 'yyyy.mm.dd hh.mm.ss') from dual";
+        String query = "insert into Transaccoes values(" + uidBuyer + "," + uidSeller + "," + price  + "," + nshares + "," + iid ;
+        ArrayList<String[]> queryDataResult;
         boolean res = false;
         try {
+            queryDataResult = receiveData(queryData);
+            query = query + ", to_date(" + queryDataResult.get(0)[0] + "'yyyy.mm.dd hh.mm.ss')";
             res = insertData(query, conn);
         } catch (RemoteException e) {
             System.err.println("Remote exception, wtf!"); //FIXME
@@ -597,6 +614,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
 
         return res;
+    }
+
+    ////
+    //  Mehtod responsible for updating the time when the user was logged in
+    ////
+    public boolean updateUserTime(int uid) throws RemoteException{
+        String queryData = "Select to_char(sysdate, 'yyyy.mm.dd hh.mm.ss') from dual";
+        ArrayList<String[]> queryDataResult;
+        boolean result = false;
+
+        try{
+            queryDataResult = receiveData(queryData);
+            queryData = "Update Utilizadores set dataUltimoLogin = to_date(" + queryDataResult.get(0)[0] + "" +
+                    "'yyyy.mm.dd hh.mm.ss') where userid = " + uid;
+            result = insertData(queryData);
+        }catch(RemoteException r){
+            System.err.println("RemoteException!");
+            r.printStackTrace();//FIXME: Deal with this!
+        }
+        return result;
     }
 
     ////

@@ -32,4 +32,5 @@ public interface RMI_Interface extends Remote {
             RemoteException;
     public int getUserMoney(int uid) throws RemoteException;
     public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException;
+    public boolean updateUserTime(int uid) throws RemoteException;
 }
