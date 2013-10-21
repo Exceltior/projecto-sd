@@ -841,7 +841,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         try{
             queryDataResult = receiveData(queryData);
-            queryData = "Update Utilizadores set dataUltimoLogin = to_date(" + queryDataResult.get(0)[0] + "" +
+            queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] + "'" +
                     "'yyyy:mm:dd:hh:mm:ss') where userid = " + uid;
             result = insertData(queryData);
         }catch(RemoteException r){
@@ -949,6 +949,38 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Method responible for checking if there ins't already a relationship between two ideas of a different
+    //  type of the relation we want to create
+    ////
+    synchronized private boolean checkOtherRelations(int iidpai, int iidfilho, int tipo) throws RemoteException{
+        String query, query2;
+
+        if (tipo == 1){
+            query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                    " and tipo_relacao = " + 0;
+
+            query2 = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                    " and tipo_relacao = " + -1;
+        }else if (tipo == -1){
+            query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                    " and tipo_relacao = " + 0;
+
+            query2 = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                    " and tipo_relacao = " + 1;
+        }else{ //tipo == 0
+            query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                    " and tipo_relacao = " + 1;
+
+            query2 = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                    " and tipo_relacao = " + -1;
+        }
+
+        //Return if there is a relationship of other type between the two ideas
+        return receiveData(query).size() == 0 && receiveData(query2).size() == 0;
+
+    }
+
+    ////
     //  Method responsible for creating the different relationships between ideas
     ////
     synchronized public boolean setIdeasRelations(int iidpai,int iidfilho, int tipo) throws RemoteException{
@@ -962,6 +994,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         query = "Select * from Ideias i where i.iid = " + iidfilho;
         if (receiveData(query).size() == 0)
             return false;
+
+        //Check if there isn't already a relationship in the database between these two ideas, but of a different type
+        if (!checkOtherRelations(iidpai,iidfilho,tipo))
+            return false;
+
+        //Check if the relationship we want to add is already in the database
+        query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                " and tipo_relacao = " + tipo;
+        if (receiveData(query).size() > 0)
+            return true;
+
+
+        //Check if there isn't already the same relation in the database. If there is we just don't insert that relation
+        query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
+                " and tipo_relacao = " + tipo;
+        if (receiveData(query).size() > 0)
+            return true;
 
         query = "INSERT INTO RelacaoIdeias Values(" + iidpai + ", " + iidfilho + ", " + tipo + ")";
 

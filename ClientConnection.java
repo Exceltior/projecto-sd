@@ -158,6 +158,7 @@ public class ClientConnection {
     //
     int login(String user, String pass) {
         Common.Message reply;
+
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_LOGIN, outStream) ) {
                 reconnect(); continue;
