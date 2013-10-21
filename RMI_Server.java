@@ -416,6 +416,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return new Share(result.get(0));
     }
 
+    public int getUserMoney(int uid) throws RemoteException {
+        String query = "select dinheiro from Utilizadores where uid="+uid;
+
+        ArrayList<String[]> result = receiveData(query);
+
+        if ( result == null || result.size() == 0) /* FIXME: Should NEVER NEVER happen! */
+            return 0;
+
+        return Integer.valueOf(result.get(0)[0]);
+    }
+
+    /**
+     * Sets the money for UID. UID must exist
+     * @param uid
+     * @param money
+     * @param conn The connection to use, for instance, for transactional operations. null if don't care which
+     *             connection to use
+     * @return
+     * @throws RemoteException
+     */
+    public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException {
+        String query = "update Utilizadores set dinheiro="+money+" where uid="+uid;
+
+        return ((conn == null) ? insertData(query) : insertData(query, conn));
+    }
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
