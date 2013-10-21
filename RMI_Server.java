@@ -303,6 +303,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             f = new RandomAccessFile(path, "r");
         } catch (FileNotFoundException e) {
             lastFile = 0;
+            return;
         }
 
         try {
