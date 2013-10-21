@@ -84,6 +84,8 @@ public class Common {
             return false;
         }
         try {
+            if (i==-1)
+                System.out.println("WE ARE SENDING THE INTEGER -1 -> THIS WILL NOT END WELL");
             outStream.writeInt(i);
         } catch (IOException e) {
             //System.err.println("sendInt ERR"); e.printStackTrace();

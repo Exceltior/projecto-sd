@@ -338,7 +338,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // Method responsible for getting all the ideas in favour, neutral or against a given idea
     ////
     public Idea[] getIdeaRelations(int iid, int relationshipType) throws RemoteException{
-        String query = "Select * from Ideais i, RelacaoIdeias r where r.iidpai = i.iid and r.iid = " + iid +
+        String query = "Select * from Ideias i, RelacaoIdeias r where r.iidfilho = i.iid and r.iidpai = " + iid +
                 " and r.tipo_relacao = " + relationshipType;
         ArrayList<String[]> queryResult = receiveData(query);
         Idea[] devolve = null;
@@ -835,14 +835,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Mehtod responsible for updating the time when the user was logged in
     ////
     public boolean updateUserTime(int uid) throws RemoteException{
-        String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mm:ss') from dual";
+        String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
         ArrayList<String[]> queryDataResult;
         boolean result = false;
 
         try{
             queryDataResult = receiveData(queryData);
-            queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] + "'" +
-                    "',yyyy:mm:dd:hh:mm:ss') where userid = " + uid;
+            queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] +
+                    "','yyyy:mm:dd:hh:mi:ss') where userid = " + uid;
             result = insertData(queryData);
         }catch(RemoteException r){
             System.err.println("RemoteException!");
@@ -858,7 +858,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "Select u.dataUltimoLogin from Utilizadores u where u.userid = " + uid;
         ArrayList<String[]> resultQuery = null;
         Date actualDate = new Date(),userDate;
-        SimpleDateFormat format1 = new SimpleDateFormat("yyyy:mm:dd:hh:mm:ss");
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
         String[] user_date;
         String finalUserDate = "";
 

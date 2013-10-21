@@ -269,6 +269,11 @@ public class ClientConnection {
     boolean setRelationBetweenIdeas(int iidparent,int iidchild, int type){
         Common.Message reply;
 
+        //We do this to stop the "They're trying to hack us" message
+        //Don't send -1 fields
+        if (type == -1)
+            type = -2;
+
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_SETIDEARELATION, outStream) ) {
                 reconnect(); continue;

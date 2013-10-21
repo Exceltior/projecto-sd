@@ -164,6 +164,21 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle set idea relationship method!!!!!!");
                     break;
                 }
+            }else if (msg == Common.Message.REQUEST_GETIDEASFAVOUR){
+                if (!handleGetIdeasRelation(1)){
+                    System.err.println("Error in the handle get ideas relation 1 method!!!!!!");
+                    break;
+                }
+            }else if(msg == Common.Message.REQUEST_GETIDEASAGAINST){
+                if (!handleGetIdeasRelation(-1)){
+                    System.err.println("Error in the handle get ideas relation -1 method!!!!!!");
+                    break;
+                }
+            }else if(msg == Common.Message.REQUEST_GETIDEASNEUTRAL){
+                if (!handleGetIdeasRelation(0)){
+                    System.err.println("Error in the handle get ideas relation 0 method!!!!!!");
+                    break;
+                }
             }
         }
 
@@ -408,6 +423,44 @@ public class ServerClient implements Runnable {
                     return false;
             }
         }
+
+        return true;
+    }
+
+    ////
+    //  Gets the ideas' relation where iidpai is given and the type is a parameter
+    ////
+    private boolean handleGetIdeasRelation(int type){
+        int iid = -1;
+        Idea[] ideasList;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+             ideasList = RMIInterface.getIdeaRelations(iid,type);
+        }catch(RemoteException r){
+            System.err.println("RemoteException in the handleGetIdeasRelation method");
+            return false;
+        }
+
+        if (!Common.sendInt(ideasList.length,outStream))
+            return false;
+
+        for (int i=0;i<ideasList.length;i++){
+            if (!ideasList[i].writeToDataStream(outStream))
+                return false;
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
 
         return true;
     }
@@ -978,6 +1031,10 @@ public class ServerClient implements Runnable {
 
         if ( (type = Common.recvInt(inStream)) == -1)
             return false;
+
+        //Becuase we can't send -1 fields
+        if (type == -2)
+            type = -1;
 
         try{
             devolve = RMIInterface.setIdeasRelations(iidFather,iidSoon,type);

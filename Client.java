@@ -164,10 +164,10 @@ public class Client {
     ////
     //  Prints the ideas in favour, against and neutral to a given idea
     ////
-    private boolean printRelationsIdea(ArrayList<Integer> listIdeasIDs, int relationType){
+    private int printRelationsIdea(ArrayList<Integer> listIdeasIDs, int relationType){
         String temp;
         int iid = -2;
-        Idea[] ideasList;
+        Idea[] ideasList = null;
 
         if (relationType == 1)
             System.out.println("Please insert the id of the idea you want to see the ideas in favour:");
@@ -181,7 +181,7 @@ public class Client {
             iid = Integer.parseInt(temp);
         }catch(NumberFormatException n){
             System.out.println("Invalid input!");
-            return false;
+            return -1;
         }//We don't need to handle this exception
 
         if (listIdeasIDs.contains(iid)){
@@ -197,9 +197,14 @@ public class Client {
 
             for (Idea anIdeasList : ideasList)
                 System.out.println(anIdeasList);
+
+            if(ideasList.length == 0)
+                System.out.println("No ideas were found!");
+
+            return ideasList.length;
         }
 
-        return true;
+        return -1;
     }
 
 
@@ -216,7 +221,7 @@ public class Client {
 
         boolean stay = true;
         String line, temp;
-        int choice, iid = -2;
+        int choice, iid = -2, result;
         ArrayList<String> listTopicsNames;
         ClientTopic[] listTopics;
 
@@ -266,25 +271,32 @@ public class Client {
 
                 case 2:{
                     //See ideas in favour
-                    if (!printRelationsIdea(listIdeasIDs,1))
+                    result = printRelationsIdea(listIdeasIDs,1);
+                    if ( result == -1)
                         System.out.println("Error! Could not show ideas in favour");
+                    else
+                        stay = false;
 
                     break;
                 }
 
                 case 3:{
                     //See ideas against
-                    if (!printRelationsIdea(listIdeasIDs,-1))
+                    result = printRelationsIdea(listIdeasIDs,-1);
+                    if (result == -1 )
                         System.out.println("Error! Could not show ideas in against");
-
+                    else
+                        stay = false;
                     break;
                 }
 
                 case 4:{
                     //See ideas neutral
-                    if (!printRelationsIdea(listIdeasIDs,0))
-                        System.out.println("Error! Could not show ideas in against");
-
+                    result = printRelationsIdea(listIdeasIDs,0);
+                    if (result == -1)
+                        System.out.println("Error! Could not show ideas neutral");
+                    else
+                        stay = false;
                     break;
                 }
 
