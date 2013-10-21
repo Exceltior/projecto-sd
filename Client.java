@@ -391,11 +391,12 @@ public class Client {
     //  Creates a new idea, commenting directly on a topic
     ////
     private boolean commentIdea(ArrayList<String> topicTitle, int iid){
-        String title, description;
+        String title, description, file, filePath;
         int commentType = -2, nshares, price, minNumShares;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         boolean typeInserted = false, repeat = false;
+        NetworkingFile ficheiro = null;
 
         do{
             System.out.println("Please enter the title of the idea:");
@@ -490,9 +491,28 @@ public class Client {
                 ideasNeutral.add(iid);
         }
 
+        repeat = false;
+        do{
+            System.out.println("Do you want to attach a file?(Y/N)");
+            file = sc.nextLine();
+            if (file.equals("Y")){
+                System.out.println("Please enter the path to the file you wnat to attach:");
+                filePath = sc.nextLine();
+                try {
+                    ficheiro = new NetworkingFile(filePath);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Invalid file path");
+                    repeat = true;
+                }
+            }
+            else if(!file.equals("N")){//The user selected something different from "Y" or "N"
+                repeat = true;
+                System.out.println("Invalid input");
+            }
+        }while (repeat);
+
         /* FIXME JOCA ESTA MERDA NAO VAI SER NULL!!! */
-        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,
-                ideasNeutral,null);
+        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral,ficheiro);
     }
 
     ////
@@ -534,6 +554,7 @@ public class Client {
         System.out.println("6 - Search Idea");
         System.out.println("7 - Search Topic");
         System.out.println("8 - Manage User Ideas");
+        System.out.println("9 - Add relation between two ideas");
         System.out.println("0 - Sair");
 
         do{
@@ -854,6 +875,12 @@ public class Client {
                 //Account Settings
                 case 8:{
                     manageUserIdeas();
+                    break;
+                }
+
+                //Add Relation Between ideas
+                case 9:{
+                    setRelationIdeas();
                     break;
                 }
 

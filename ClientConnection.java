@@ -265,6 +265,67 @@ public class ClientConnection {
         return true;
     }
 
+    boolean setRelationBetweenIdeas(int iidparent,int iidchild, int type){
+        Common.Message reply;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply=Common.recvMessage(inStream)) == Common.Message.MSG_ERR ){
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            //Send idea1
+            if (!Common.sendInt(iidparent,outStream)){
+                reconnect();continue;
+            }
+
+            //Send idea2
+            if (!Common.sendInt(iidchild,outStream)){
+                reconnect();continue;
+            }
+
+            //Send Relationship Type
+            if(!Common.sendInt(type,outStream)){
+                reconnect();continue;
+            }
+
+            //Get Confirmation of idea 1
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.ERR_NO_SUCH_IID){
+                System.out.println("Error! Idea id for the parent idea is invalid!");
+                return false;
+            }
+
+            //Get Confirmation of idea 2
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.ERR_NO_SUCH_IID){
+                System.out.println("Error! Idea id for the child idea is invalid!");
+                return false;
+            }
+
+            //Get final confirmation
+            reply = Common.recvMessage(inStream);
+
+            return reply == Common.Message.MSG_OK;
+        }
+    }
+
     boolean createIdea(String title, String description, int nshares, int price, ArrayList<String> topics, int minNumShares, ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral,NetworkingFile ficheiro){
         Common.Message reply;
         int devolve = -1;
