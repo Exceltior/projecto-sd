@@ -374,6 +374,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return  history;
     }
 
+    /**
+     * Get all the shares that are about this idea
+     * @param iid The IID
+     * @return The shares associated with the idea
+     * @throws RemoteException
+     */
+    public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
+        ArrayList<Share> shares = new ArrayList<Share>();
+        String query = "select * from Shares where iid="+iid;
+
+        ArrayList<String[]> result = receiveData(query);
+
+        if ( result == null ) return null; //FIXME: Wh're not dealing with this!
+
+        for ( String[] row : result)
+            shares.add(new Share(row));
+
+        return shares;
+    }
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////

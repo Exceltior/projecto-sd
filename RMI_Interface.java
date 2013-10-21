@@ -25,4 +25,5 @@ public interface RMI_Interface extends Remote {
     public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
     public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException;
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;
+    public ArrayList<Share> getSharesIdea(int iid) throws RemoteException;
 }
