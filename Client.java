@@ -162,6 +162,48 @@ public class Client {
     }
 
     ////
+    //  Prints the ideas in favour, against and neutral to a given idea
+    ////
+    private boolean printRelationsIdea(ArrayList<Integer> listIdeasIDs, int relationType){
+        String temp;
+        int iid = -2;
+        Idea[] ideasList;
+
+        if (relationType == 1)
+            System.out.println("Please insert the id of the idea you want to see the ideas in favour:");
+        else if(relationType == -1)
+            System.out.println("Please insert the id of the idea you want to see the ideas against:");
+        else if(relationType == 0)
+            System.out.println("Please insert the id of the idea you want to see the ideas neutral:");
+
+        try{
+            temp = sc.nextLine();
+            iid = Integer.parseInt(temp);
+        }catch(NumberFormatException n){
+            System.out.println("Invalid input!");
+            return false;
+        }//We don't need to handle this exception
+
+        if (listIdeasIDs.contains(iid)){
+            //Get ideas
+            ideasList = conn.getIdeaRelations(iid,relationType);
+
+            if (relationType == 1)
+                System.out.println("List of ideas in favour:");
+            else if(relationType == -1)
+                System.out.println("List of ideas against:");
+            else if(relationType == 0)
+                System.out.println("List of ideas neutral:");
+
+            for (Idea anIdeasList : ideasList)
+                System.out.println(anIdeasList);
+        }
+
+        return true;
+    }
+
+
+    ////
     //  Provides a number of options to perform over a list of ideas
     ////
     private void ideaOptions(ArrayList<Integer> listIdeasIDs){
@@ -177,7 +219,7 @@ public class Client {
         int choice, iid = -2;
         ArrayList<String> listTopicsNames;
         ClientTopic[] listTopics;
-        Idea[] ideasList;
+
 
         while (stay){
             System.out.println("\nIdea Options:");
@@ -224,24 +266,7 @@ public class Client {
 
                 case 2:{
                     //See ideas in favour
-                    System.out.println("Please insert the id of the idea you want to see the ideas in favour.");
-                    try{
-                        temp = sc.nextLine();
-                        iid = Integer.parseInt(temp);
-                    }catch(NumberFormatException n){
-                        System.out.println("Invalid input!");
-                        break;
-                    }//We don't need to handle this exception
-
-                    if (listIdeasIDs.contains(iid)){
-                        //Get ideas in favour
-                        ideasList = conn.getIdeaRelations(iid,1);
-
-                        System.out.println("List of ideas in favour:");
-                        for (Idea anIdeasList : ideasList)
-                            System.out.println(anIdeasList);
-
-                    }else
+                    if (!printRelationsIdea(listIdeasIDs,1))
                         System.out.println("Error! Could not show ideas in favour");
 
                     break;
@@ -249,48 +274,16 @@ public class Client {
 
                 case 3:{
                     //See ideas against
-                    System.out.println("Please insert the id of the idea you want to see the ideas in favour.");
-                    try{
-                        temp = sc.nextLine();
-                        iid = Integer.parseInt(temp);
-                    }catch(NumberFormatException n){
-                        System.out.println("Invalid input!");
-                        break;
-                    }//We don't need to handle this exception
+                    if (!printRelationsIdea(listIdeasIDs,-1))
+                        System.out.println("Error! Could not show ideas in against");
 
-                    if (listIdeasIDs.contains(iid)){
-                        //Get ideas in favour
-                        ideasList = conn.getIdeaRelations(iid,-11);
-
-                        System.out.println("List of ideas in favour:");
-                        for (Idea anIdeasList : ideasList)
-                            System.out.println(anIdeasList);
-
-                    }else
-                        System.out.println("Error! Could not show ideas in favour");
                     break;
                 }
 
                 case 4:{
-                    System.out.println("Please insert the id of the idea you want to see the ideas in favour.");
-                    try{
-                        temp = sc.nextLine();
-                        iid = Integer.parseInt(temp);
-                    }catch(NumberFormatException n){
-                        System.out.println("Invalid input!");
-                        break;
-                    }//We don't need to handle this exception
-
-                    if (listIdeasIDs.contains(iid)){
-                        //Get ideas in favour
-                        ideasList = conn.getIdeaRelations(iid,0);
-
-                        System.out.println("List of ideas in favour:");
-                        for (Idea anIdeasList : ideasList)
-                            System.out.println(anIdeasList);
-
-                    }else
-                        System.out.println("Error! Could not show ideas in favour");
+                    //See ideas neutral
+                    if (!printRelationsIdea(listIdeasIDs,0))
+                        System.out.println("Error! Could not show ideas in against");
 
                     break;
                 }
@@ -705,16 +698,20 @@ public class Client {
     //  Display the Account Settings Menu
     ////
     private void manageUserIdeas(){
-        int option = -1;
+        int option = -1, choice = -2;
         String line;
         Idea[] listIdeas;
+        ArrayList<Integer> listUserIdeasIDs = new ArrayList<Integer>();
+
 
         //Display user ideas
         listIdeas = conn.getIdeasFromUser();
 
         System.out.println("\n\nUser Ideas List:");
-        for (int i=0;i<listIdeas.length;i++)
+        for (int i=0;i<listIdeas.length;i++){
             System.out.println(listIdeas[i]);
+            listUserIdeasIDs.add(listIdeas[i].getId());
+        }
 
         do{
             System.out.println("\n\n             Manage User Ideas");
@@ -737,6 +734,55 @@ public class Client {
         switch(option){
 
             case 1:{
+                break;
+            }
+
+            case 2:{
+                break;
+            }
+
+            case 3:{
+                break;
+            }
+
+            case 4:{
+                break;
+            }
+
+            case 5:{
+                //Pedir ideia e depois listar todas as relacoes
+                do{
+                    System.out.println("Please insert the idea id whose relations you want to check:");
+                    try{
+                        line = sc.nextLine();
+                        choice = Integer.parseInt(line);
+                    }catch(NumberFormatException n){
+                        System.out.println("Invalid option");
+                        choice = -2;
+                    }
+                }while (!listUserIdeasIDs.contains(choice));
+
+                //Print Ideas in Favour
+                listIdeas = conn.getIdeaRelations(choice,1);
+
+                System.out.println("List of ideas in favour:");
+                for (Idea anIdeasList : listIdeas)
+                    System.out.println(anIdeasList);
+
+                //Print Ideas in Against
+                listIdeas = conn.getIdeaRelations(choice,-1);
+
+                System.out.println("List of ideas in against:");
+                for (Idea anIdeasList : listIdeas)
+                    System.out.println(anIdeasList);
+
+                //Print Ideas Neutral
+                listIdeas = conn.getIdeaRelations(choice,0);
+
+                System.out.println("List of ideas in neutral:");
+                for (Idea anIdeasList : listIdeas)
+                    System.out.println(anIdeasList);
+
                 break;
             }
 

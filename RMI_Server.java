@@ -286,10 +286,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
-    // Method responsible for getting all the ideas in favou, neutral or against a given idea
+    // Method responsible for getting all the ideas in favour, neutral or against a given idea
     ////
+
+
+    ////
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME           MAXI, O SELECT ESTA BENM????? E O PAI OU O FILHO????
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    //  FIXME FIXME FIXME
+    ////
+
     public Idea[] getIdeRelations(int iid, int relationshipType) throws RemoteException{
-        String query = "Select * from Ideais i, RelacaoIdeias r where r.iidpai = i.iid and r.iid = " + iid +
+        String query = "Select * from Ideais i, RelacaoIdeias r where r.iidfilho = i.iid and r.iid = " + iid +
                 " and r.tipo_relacao = " + relationshipType;
         ArrayList<String[]> queryResult = receiveData(query);
         Idea[] devolve = null;
