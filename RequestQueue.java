@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class RequestQueue extends Thread {
     private final ArrayList<Request> requests = new ArrayList<Request>();
-    RMI_Interface RMI;
+    private RMI_Interface RMI;
 
     /**
      * Builds a request queue. If there was any data on the RMI server, then it is loaded
