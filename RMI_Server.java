@@ -357,6 +357,29 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return !queryResult.isEmpty();
     }
 
+    private void deleteIdeaFiles(int iid) {
+        String query = "select path from IdeiasFicheiros i where i.iid = " + iid;ArrayList<String[]> queryResult =
+                null;
+        try {
+            queryResult = receiveData(query);
+        } catch (RemoteException e) {
+            System.err.println("should never happen!!!!!");
+            return;
+        }
+
+        if (queryResult == null)
+            return; //FIXME: We should handle the query getting all fucked up (NULL case)
+
+        if (queryResult.size() > 0) {
+            for (String[] row : queryResult ) {
+                String filepath = row[0];
+                File f = new File(filepath);
+                f.delete();
+            }
+        }
+
+    }
+
     public boolean ideaHasChildren(int iid) throws RemoteException {
         String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
@@ -370,6 +393,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public boolean removeIdea(Idea idea) throws  RemoteException {
         if ( ideaHasChildren(idea.id) ) {
             return false;
+        }
+
+        if ( ideaHasFiles(idea.id) ) {
+            deleteIdeaFiles(idea.id);
         }
 
         String query = "update Ideias set activa = 0 where iid="+idea.id;
