@@ -4,8 +4,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 ////
 //  This is the RMI Server class, which will be responsible for interacting with the database, allowing the TCP Servers to commit
@@ -19,6 +21,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     static int num_topics;
     static int num_ideas;
     static int starting_money = 10000;
+    static int limit_time_active = 300;//5 minutes
     private ConnectionPool connectionPool;
 
     ////
@@ -620,20 +623,64 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Mehtod responsible for updating the time when the user was logged in
     ////
     public boolean updateUserTime(int uid) throws RemoteException{
-        String queryData = "Select to_char(sysdate, 'yyyy.mm.dd hh.mm.ss') from dual";
+        String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mm:ss') from dual";
         ArrayList<String[]> queryDataResult;
         boolean result = false;
 
         try{
             queryDataResult = receiveData(queryData);
             queryData = "Update Utilizadores set dataUltimoLogin = to_date(" + queryDataResult.get(0)[0] + "" +
-                    "'yyyy.mm.dd hh.mm.ss') where userid = " + uid;
+                    "'yyyy:mm:dd:hh:mm:ss') where userid = " + uid;
             result = insertData(queryData);
         }catch(RemoteException r){
             System.err.println("RemoteException!");
             r.printStackTrace();//FIXME: Deal with this!
         }
         return result;
+    }
+
+    ////
+    //  Method that returns true if the user has been actived in the last 5 minutes
+    ////
+    public boolean isUserIn(int uid) throws RemoteException{
+        String query = "Select u.dataUltimoLogin from Utilizadores u where u.userid = " + uid;
+        ArrayList<String[]> resultQuery = null;
+        Date actualDate = new Date();
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy:mm:dd:hh:mm:ss");
+        String[] currentDate, userDate;
+        String s_date = format1.format(actualDate);
+        currentDate = s_date.split(":");
+
+        try{
+            resultQuery = receiveData(query);
+        }catch (RemoteException r){
+            System.err.println("RemoteException!");
+            r.printStackTrace();//FIXME: Deal with this!
+        }
+
+        if (resultQuery == null)
+            return false;
+
+        userDate = resultQuery.get(0)[0].split(":");
+
+        if (dateDifference(currentDate,userDate,limit_time_active))//Has been active in less than 5 minutes
+            return true;
+        return false;
+    }
+
+    private boolean dateDifference(String[] date1, String[] date2, int maxSeconds){
+        int year, month, day, hour, minute, second, timeDifference;
+
+        year = Integer.parseInt(date1[0]) - Integer.parseInt(date2[0]);
+        month = Integer.parseInt(date1[1]) - Integer.parseInt(date2[1]);
+        day = Integer.parseInt(date1[2]) - Integer.parseInt(date2[2]);
+        hour = Integer.parseInt(date1[3]) - Integer.parseInt(date2[3]);
+        minute = Integer.parseInt(date1[4]) - Integer.parseInt(date2[4]);
+        second = Integer.parseInt(date1[5]) - Integer.parseInt(date2[5]);
+
+        timeDifference = second + (minute*60) + (hour*60*60) + (day*24*60*60) + (month*30*24*60*60) + (year*12*30*24*60*60);
+
+        return timeDifference > maxSeconds;
     }
 
     ////
