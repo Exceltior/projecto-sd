@@ -159,6 +159,11 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get user ideas method!!!!!!");
                     break;
                 }
+            }else if(msg == Common.Message.REQUEST_SETIDEARELATION){
+                if (!handleSetIdeaRelationship()){
+                    System.err.println("Error in the handle set idea relationship method!!!!!!");
+                    break;
+                }
             }
         }
 
@@ -932,6 +937,7 @@ public class ServerClient implements Runnable {
             //FIXME: Handle this
             //e.printStackTrace();
             System.err.println("Existiu uma remoteException! " + r.getMessage());
+            return false;
         }
 
         if (history == null){
@@ -949,6 +955,41 @@ public class ServerClient implements Runnable {
         }
 
         return Common.sendMessage(Common.Message.MSG_OK, outStream);
+    }
+
+    ////
+    //  Set the relationship between two ideas
+    ////
+    private boolean handleSetIdeaRelationship(){
+        int iidFather = -2, iidSoon = -2, type = -2;
+        boolean devolve = false;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+        if ( (iidFather = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (iidSoon = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (type = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+            devolve = RMIInterface.setIdeasRelations(iidFather,iidSoon,type);
+        }catch(RemoteException r){
+            System.out.println("Remote exception in the handle set idea relationship");
+            return false;
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        return devolve;
     }
 
     ////

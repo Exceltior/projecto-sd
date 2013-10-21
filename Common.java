@@ -27,6 +27,7 @@ public class Common {
         REQUEST_GETIDEASFAVOUR,     //Get the ideas in favour of a given idea
         REQUEST_GETIDEASAGAINST,    //Get the ideas against a given idea
         REQUEST_GETIDEASNEUTRAL,    //Get the ideas neutral to a given idea
+        REQUEST_SETIDEARELATION,    //Set the relationship between two ideas
 
 
 

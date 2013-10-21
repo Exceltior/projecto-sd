@@ -269,7 +269,7 @@ public class ClientConnection {
         Common.Message reply;
 
         for(;;){
-            if ( !Common.sendMessage(Common.Message.REQUEST_CREATEIDEA, outStream) ) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_SETIDEARELATION, outStream) ) {
                 reconnect(); continue;
             }
 
@@ -301,22 +301,6 @@ public class ClientConnection {
             //Send Relationship Type
             if(!Common.sendInt(type,outStream)){
                 reconnect();continue;
-            }
-
-            //Get Confirmation of idea 1
-            reply = Common.recvMessage(inStream);
-
-            if (reply == Common.Message.ERR_NO_SUCH_IID){
-                System.out.println("Error! Idea id for the parent idea is invalid!");
-                return false;
-            }
-
-            //Get Confirmation of idea 2
-            reply = Common.recvMessage(inStream);
-
-            if (reply == Common.Message.ERR_NO_SUCH_IID){
-                System.out.println("Error! Idea id for the child idea is invalid!");
-                return false;
             }
 
             //Get final confirmation
