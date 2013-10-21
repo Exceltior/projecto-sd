@@ -801,6 +801,49 @@ public class Client {
         return selected;
     }
 
+    private void setRelationIdeas(){
+        int iidparent = 1, iidchild = -1, type = -2;
+        String line;
+        boolean repeat = true;
+
+        while (repeat){
+            System.out.println("Please select the id for the first idea in the relationship:");
+            try{
+                line = sc.nextLine();
+                iidparent = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                continue;
+            }
+            System.out.println("Please select the id for the second idea in the relationship:");
+            try{
+                line = sc.nextLine();
+                iidchild = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                continue;
+            }
+
+            System.out.println("Please insert the type of the relationship (1->For;-1->Against;0->Neutral)");
+            try{
+                line = sc.nextLine();
+                type = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+            }
+
+            if (type == 1 || type == 0 || type == -1)//Valid option
+                repeat = false;
+            else
+                repeat = true;
+        }
+
+        if (conn.setRelationBetweenIdeas(iidparent,iidchild,type))
+            System.out.println("Relationship between ideas successfully!");
+        else
+            System.out.println("Relationship between ideas was not added");
+    }
+
     private void mainLoop(){
         int choice, topic, idea;
         boolean stay = true;
