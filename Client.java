@@ -626,7 +626,6 @@ public class Client {
             }
         }while (repeat);
 
-        /* FIXME JOCA ESTA MERDA NAO VAI SER NULL!!! */
         return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral,ficheiro);
     }
 
