@@ -260,8 +260,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         String query = "insert into IdeiasFicheiros values ("+iid+path+")";
 
-        insertData(query); //IGNORE if it fails... FIXME: if it fails we should retry...it may be a DB transient
-                                                                                                    // failure
+        insertData(query); //IGNORE if it fails... FIXME: if it fails we should retry...it may be a DB transient                                                                                                    // failure
 
         lastFile++;
         return true;
