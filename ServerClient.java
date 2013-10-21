@@ -622,7 +622,8 @@ public class ServerClient implements Runnable {
                 boolean fileResult = false;
                 if ( (addFileRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.ADD_FILE)) ==
                         null) {
-                    ArrayList<Object> objects = new ArrayList<Object>(); objects.add(title); objects.add(description); objects.add(this.uid);
+                    ArrayList<Object> objects = new ArrayList<Object>(); objects.add(result); objects.add
+                            (ficheiro);
                     addFileRequest = new Request(uid, Request.RequestType.ADD_FILE,objects);
                     server.queue.enqueueRequest(addFileRequest);
                 }
