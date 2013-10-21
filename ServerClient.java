@@ -81,6 +81,14 @@ public class ServerClient implements Runnable {
                 break ;
             }
 
+            if ( isLoggedIn() ) {
+                try {
+                    RMIInterface.updateUserTime(uid);
+                } catch (RemoteException e) {
+                    System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism?
+                }
+            }
+
 
             // Handle the request
             // FIXME: All of these prints are mostly here just for debugging. In practice, they will mean that we've
@@ -940,6 +948,12 @@ public class ServerClient implements Runnable {
         if (uid != -1){
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                 return false;
+            try {
+                RMIInterface.updateUserTime(uid);
+            } catch (RemoteException e) {
+                System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism? ALSO,
+                // should this really be here
+            }
         } else {
             if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){
                 return false;
