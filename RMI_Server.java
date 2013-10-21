@@ -20,11 +20,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     private static final String requestsQueueFilePath = "requests.bin";
     private String url;
-    static int num_users;
-    static int num_topics;
-    static int num_ideas;
-    static int starting_money = 10000;
-    static int limit_time_active = 300;//5 minutes
+    private int num_users;
+    private int num_topics;
+    private int num_ideas;
+    private int starting_money = 10000;
+    private int limit_time_active = 300;//5 minutes
     private ConnectionPool connectionPool;
     private int lastFile = 0; //FIXME: Update this dynamically
 
@@ -222,7 +222,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsile for insering a new user in the database
     ////
-    public boolean register(String user, String pass, String email, String date) throws RemoteException{
+    synchronized public boolean register(String user, String pass, String email, String date) throws RemoteException{
         boolean check;
 
         if (! validateData(user)){
@@ -230,11 +230,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return false;
         }
         pass = hashPassword(pass);
-        num_users++;
-        String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +
+
+        String query = "INSERT INTO Utilizadores VALUES (" + (num_users+1) + ",'" + email + "','" + user + "'," +
+                "'" + pass +
                 "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'), null)";
 
         check = insertData(query);
+
+        if ( check )
+            num_users++;
 
         return check;
     }
@@ -283,30 +287,35 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsible for creating a new topic in the database
     ////
-    public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{
+    synchronized public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{
         if (! validateTopic(nome)){
             System.err.println("Topico invalido");
             return false;
         }
-        num_topics++;
 
-        String query = "INSERT INTO Topicos VALUES (" + num_topics + ",'" + nome + "','" + descricao + "'," + uid + ")";
+        String query = "INSERT INTO Topicos VALUES (" + (num_topics+1) + ",'" + nome + "','" + descricao + "'," +
+                "" + uid + ")";
 
-        return insertData(query);
+        if(insertData(query)) {
+            ++num_topics; return true;
+        }
+        else
+            return false;
     }
 
     ////
     //  Method responsible for creating a new idea in the database
     ////
-    public int createIdea(String title, String description, int uid) throws RemoteException{
+    synchronized public int createIdea(String title, String description, int uid) throws RemoteException{
          String query;
 
-        num_ideas++;
 
-        query = "INSERT INTO Ideias VALUES (" + num_ideas + ",'" + title + "','" + description + "'," + uid + "," + "1)";
+        query = "INSERT INTO Ideias VALUES (" + (num_ideas+1) + ",'" + title + "','" + description + "'," +
+                "" + uid + "," +
+                "" + "1)";
 
         if(insertData(query))
-            return num_ideas;
+            return ++num_ideas;
         else
             return -1;
     }
@@ -564,7 +573,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return 1 on success, 0 on error (can't buy because there aren't any appropriate sellers....)
      * @throws RemoteException
      */
-    public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice, int minTargetShares) throws
+    synchronized public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice,
+                                              int minTargetShares) throws
             RemoteException {
 
         Share currentShares = getSharesIdeaForUid(iid, uid);
@@ -665,7 +675,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
-    public boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares)throws RemoteException{
+    synchronized public boolean setSharesIdea(int uid, int iid,int nshares, int price,
+                                       int numMinShares)throws RemoteException{
         /* null here means no transactional connection */
         return setSharesIdea(uid, iid, nshares,price,numMinShares,null);
     }
@@ -673,7 +684,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
-    private boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares,
+    private synchronized boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares,
                                   Connection conn)throws RemoteException{
         String query = "select * from Shares where uid="+uid+" and "+"iid="+iid;
         ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));
@@ -693,7 +704,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return conn ==null ? insertData(query) : insertData(query, conn);
     }
 
-    private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn, int iid) {
+    synchronized private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn,
+                                         int iid) {
         //FIXME FIXME FIXME: Ver se a ordem dos values é esta (vê bem o nshares e o price!!); adicionar o campo da
         // data para o instante actual,
         // porque
@@ -771,8 +783,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return false;
     }
 
+    //FIXME: Joca merda isto
     private boolean dateDifference(String[] date1, String[] date2, int maxSeconds){
         int year, month, day, hour, minute, second, timeDifference;
+
 
         year = Integer.parseInt(date1[0]) - Integer.parseInt(date2[0]);
         month = Integer.parseInt(date1[1]) - Integer.parseInt(date2[1]);
@@ -789,7 +803,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsible for creating the connection between an idea and one or more topics
     ////
-    public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
+    synchronized public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
 
         //String query = "Select i.iid from Ideias i where i.iid = '" + iid + "' and i.activa = 1";
         String query = null;
@@ -841,7 +855,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsible for creating the different relationships between ideas
     ////
-    public boolean setIdeasRelations(int iidpai,int iidfilho, int tipo) throws RemoteException{
+    synchronized public boolean setIdeasRelations(int iidpai,int iidfilho, int tipo) throws RemoteException{
         String query;
 
         //  Tipo = 1 -> For
@@ -944,6 +958,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     private void returnTransactionalConnection(Connection c) {
         try {
+            c.commit();
             c.setAutoCommit(true);
         } catch (SQLException e) {
             System.err.println("Error setting autocommit to true!");

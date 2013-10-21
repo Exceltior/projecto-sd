@@ -490,7 +490,9 @@ public class Client {
                 ideasNeutral.add(iid);
         }
 
-        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral);
+        /* FIXME JOCA ESTA MERDA NAO VAI SER NULL!!! */
+        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,
+                ideasNeutral,null);
     }
 
     ////
