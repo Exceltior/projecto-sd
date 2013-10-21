@@ -191,7 +191,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         num_users++;
         String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +
-                "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'))";
+                "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'), null)";
 
         check = insertData(query);
 

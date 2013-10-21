@@ -1,6 +1,6 @@
 /*Criacao dos Utilizadores*/
-INSERT INTO Utilizadores VALUES (1,'hakuna@matata.com','Hakuna','Matata', 10000, to_date('2013.10.12', 'yyyy.mm.dd'));
-INSERT INTO Utilizadores VALUES (2,'joca@joca.com', 'Joca', 'teste123', 10000, to_date('2013.10.14', 'yyyy.mm.dd'));
+INSERT INTO Utilizadores VALUES (1,'hakuna@matata.com','Hakuna','Matata', 10000, to_date('2013.10.12', 'yyyy.mm.dd'), null);
+INSERT INTO Utilizadores VALUES (2,'joca@joca.com', 'Joca', 'teste123', 10000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
 
 /*Criacao dos Topicos*/
 INSERT INTO Topicos VALUES (1,'Tenis','Joao Sousa fecha top50 ATP!',1);
