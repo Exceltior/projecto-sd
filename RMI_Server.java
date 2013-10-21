@@ -529,8 +529,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return 0;
         }
 
-        // We need to check the money! FIXME
-
         //Okay, move on and let's buy them. this must be transactional
         Connection conn = getTransactionalConnection();
         for (int i = 0; i < sharesToBuy.size(); i++) {
