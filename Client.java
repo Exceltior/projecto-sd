@@ -681,8 +681,7 @@ public class Client {
             try{
                 line = sc.nextLine();
                 choice = Integer.parseInt(line);
-                System.out.println("AQUI " + choice);
-                if(choice < 0 || choice > 8)
+                if(choice < 0 || choice > 9)
                     repeat = true;
             }catch(NumberFormatException n){
                 repeat = true;

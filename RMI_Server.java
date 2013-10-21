@@ -842,7 +842,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try{
             queryDataResult = receiveData(queryData);
             queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] + "'" +
-                    "'yyyy:mm:dd:hh:mm:ss') where userid = " + uid;
+                    "',yyyy:mm:dd:hh:mm:ss') where userid = " + uid;
             result = insertData(queryData);
         }catch(RemoteException r){
             System.err.println("RemoteException!");
