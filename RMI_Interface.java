@@ -26,4 +26,5 @@ public interface RMI_Interface extends Remote {
     public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException;
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException;
+    public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException;
 }
