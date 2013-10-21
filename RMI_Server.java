@@ -502,6 +502,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         // We have sorted them by price per share, so the best options are first
 
+        /**
+         * This is a version of the Knapsack problem, and it seems a little bit too farfetched for us to be solving
+         * it here when we're worrying about distributed systems.
+         *
+         * Our solution is not the optimal solution. It is a greedy approximation algorithm which we later found out
+         * to be George Dantzig's greedy algorithm. It does the job.
+         */
+
         for (Share s : shares) {
             int availShares = s.getAvailableShares();
             if ( availShares > 0 ) {
