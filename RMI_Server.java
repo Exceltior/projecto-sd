@@ -69,6 +69,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public RMI_Server(String servidor, String porto, String sid) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
+        readLastFile();
     }
 
     ////
@@ -267,9 +268,56 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         insertData(query); //IGNORE if it fails... FIXME: if it fails we should retry...it may be a DB transient                                                                                                    // failure
 
-        lastFile++;
+        updateLastFile();
         return true;
     }
+
+    synchronized private void updateLastFile() {
+        String path="./lastFile_counter.bin";
+        lastFile++;
+        RandomAccessFile f = null;
+        try {
+            f = new RandomAccessFile(path, "w");
+        } catch (FileNotFoundException e) {
+            return ; //FIXME: Should never happen
+        }
+
+        try {
+            f.writeInt(lastFile);
+        } catch (IOException e) {
+            System.err.println("IO Exception while writing lastFile filefile!");
+        } finally {
+            try {
+                f.close();
+            } catch (IOException e) {
+                System.err.println("Woohoo, more exceptions!"); //FIXME
+            }
+        }
+    }
+
+    synchronized private void readLastFile() {
+        String path="./lastFile_counter.bin";
+        RandomAccessFile f = null;
+
+        try {
+            f = new RandomAccessFile(path, "r");
+        } catch (FileNotFoundException e) {
+            lastFile = 0;
+        }
+
+        try {
+            lastFile=f.readInt();
+        } catch (IOException e) {
+            System.err.println("IO Exception while reading lastFile filefile!");
+        } finally {
+            try {
+                f.close();
+            } catch (IOException e) {
+                System.err.println("Woohoo, more exceptions!"); //FIXME
+            }
+        }
+    }
+
 
     public NetworkingFile getFile(int iid) throws RemoteException {
         String query = "select path fromIdeiasFicheiros where iid ="+iid;
