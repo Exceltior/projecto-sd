@@ -445,16 +445,32 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
     public boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares)throws RemoteException{
+        /* null here means no transactional connection */
+        return setSharesIdea(uid, iid, nshares,price,numMinShares,null);
+    }
+
+    ////
+    //  Set up the number of shares for a given idea, and the price of each share for that idea
+    ////
+    private boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares,
+                                  Connection conn)throws RemoteException{
         String query = "select * from Shares where uid="+uid+" and "+"iid="+iid;
-        ArrayList<String[]> result = receiveData(query);
+        ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));
 
         if (result.size() > 0) {
             // This already exists, we should just update it
-            query = "update shares set nshares="+nshares+" where iid="+iid+" and uid="+uid;
+
+            if ( nshares == 0 ) {
+                // Set to 0!! We should delete it! FIXME: is this right?
+                query = "delete from shares where uid="+uid+" and iid="+iid;
+            } else {
+                query = "update shares set nshares="+nshares+" where iid="+iid+" and uid="+uid;
+            }
         } else
             query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
 
-        return insertData(query);
+        return conn ==null ? insertData(query) : insertData(query, conn);
+    }
     }
 
     ////
