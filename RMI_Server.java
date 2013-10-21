@@ -1,8 +1,11 @@
 import java.io.*;
+import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +26,41 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     static int starting_money = 10000;
     static int limit_time_active = 300;//5 minutes
     private ConnectionPool connectionPool;
+    private int lastFile = 0; //FIXME: Update this dynamically
+
+    /**
+     * Hashes the password using MD5 and returns it.
+     * @param pass The plaintext password to be hashed.
+     * @return The hashed password.
+     */
+    //TODO: maybe change this
+    private String hashPassword(String pass)
+    {
+        MessageDigest m = null;
+        try {
+            m = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Cannot find hashing algorithm:\n" + e);
+            System.exit(-1); //FIXME?
+        }
+        if(m == null)
+        {
+            System.out.println("Cannot find hashing algorithm.");
+            System.exit(-1);
+        }
+
+        m.reset();
+        m.update(pass.getBytes());
+
+        byte[] digest = m.digest();
+        BigInteger bigInt = new BigInteger(1,digest);
+        String hashText = bigInt.toString(16);
+
+        while(hashText.length() < 32)
+            hashText = "0" + hashText;
+
+        return hashText;
+    }
 
     ////
     //  Class constructor. Creates a new instance of the class RMI_Server
@@ -40,7 +78,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         String query;
         ArrayList<String[]> result;
-
+        pwd = hashPassword(pwd);
         query = "select u.userid from Utilizadores u where u.username = '" + user + "' and u.pass = '" + pwd + "'";
 
         result = receiveData(query);
@@ -191,7 +229,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             System.err.println("O validate data devolveu false");
             return false;
         }
-
+        pass = hashPassword(pass);
         num_users++;
         String query = "INSERT INTO Utilizadores VALUES (" + num_users + ",'" + email + "','" + user + "','" + pass +
                 "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'), null)";
@@ -199,6 +237,48 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         check = insertData(query);
 
         return check;
+    }
+
+    /**
+     * Adds a given file to the server, and associates it with an idea. Note that if we fail to associate it with the
+     * idea (crash), lastFile isn't updated, so next time this is called, we will overwrite this file. This also means
+     * that lastFile's value should be kept in DB, or in a file, not be the result of counting files!
+     * @param iid The idea to associate it with
+     * @param file The file, which has already been sent by the client
+     * @return true on success, false on error (may file because we can't create the file)
+     * @throws RemoteException
+     */
+    synchronized public boolean addFile(int iid, NetworkingFile file) throws RemoteException {
+        String path="./"+lastFile;
+
+        try {
+            file.writeTo(path);
+        } catch (FileNotFoundException e) {
+            System.err.println("Should never happen!");
+            return false;
+        }
+
+        String query = "insert into IdeiasFicheiros values ("+iid+path+")";
+
+        insertData(query); //IGNORE if it fails... FIXME: if it fails we should retry...it may be a DB transient
+                                                                                                    // failure
+
+        lastFile++;
+        return true;
+    }
+
+    public NetworkingFile getFile(int iid) throws RemoteException {
+        String query = "select path fromIdeiasFicheiros where iid ="+iid;
+        ArrayList<String[]> queryResult = receiveData(query);
+        if ( queryResult == null || queryResult.size() == 0) //FIXME: Deal with this!
+        return null;
+
+        try {
+            return new NetworkingFile(queryResult.get(0)[0]);
+        } catch (FileNotFoundException e) {
+            System.err.println("Shouldn't happen! DB corrupted?");
+            return null;
+        }
     }
 
     ////

@@ -34,7 +34,7 @@ public class NetworkingFile implements Serializable {
     }
 
     public boolean writeTo(String path) throws FileNotFoundException {
-        RandomAccessFile f = new RandomAccessFile(path, "r");
+        RandomAccessFile f = new RandomAccessFile(path, "w");
 
         if ( this.data == null )
             return false;
