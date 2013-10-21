@@ -38,7 +38,9 @@ public class Common {
         TOPIC_OK,                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
 
         MSG_USER_HAS_PENDING_REQUESTS,
-        MSG_USER_NOT_NOTIFIED_REQUESTS
+        MSG_USER_NOT_NOTIFIED_REQUESTS,
+        MSG_IDEA_HAS_FILE,
+        MSG_IDEA_DOESNT_HAVE_FILE
     }
 
     static public boolean sendMessage(Message msg, DataOutputStream outStream) {

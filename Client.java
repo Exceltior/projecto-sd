@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.InputMismatchException;
@@ -308,10 +309,11 @@ public class Client {
     //  order to create that new topic in the database
     ////
     private boolean createIdea(){
-        String title, description;
+        String title, description, file, filePath;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         int nshares, price, minNumShares;
+        NetworkingFile ficheiro = null;
         boolean repeat = false;
 
         do{
@@ -362,7 +364,27 @@ public class Client {
                 System.out.println("\nInvalid selection of the ideas' relations!Please repeat the selection!\n");
         }while (!repeat);
 
-        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral);
+        repeat = false;
+        do{
+            System.out.println("Do you want to attach a file?(Y/N)");
+            file = sc.nextLine();
+            if (file.equals("Y")){
+                System.out.println("Please enter the path to the file you wnat to attach:");
+                filePath = sc.nextLine();
+                try {
+                    ficheiro = new NetworkingFile(filePath);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Invalid file path");
+                    repeat = true;
+                }
+            }
+            else if(!file.equals("N")){//The user selected something different from "Y" or "N"
+                repeat = true;
+                System.out.println("Invalid input");
+            }
+        }while (repeat);
+
+        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral,ficheiro);
     }
 
     ////
@@ -556,7 +578,6 @@ public class Client {
             System.out.println("3 - Check idea's number of shares not to sell instantaneously");
             System.out.println("4 - Set idea's number of shares not to sell instantaneously");
             System.out.println("5 - Check ideas's relantionships");
-            System.out.println("6 - Add ideas relantionships");
             System.out.println("0 - Return to Main Menu");
             System.out.print("Your option: ");
             try{

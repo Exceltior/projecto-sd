@@ -1,6 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -454,6 +455,7 @@ public class ServerClient implements Runnable {
     //  Creates a new Idea
     ////
     private boolean handleCreateIdea(){
+        Common.Message reply;
         String title, description, topic;
         String[] topicsArray;
         //int[] ideasForArray, ideasAgainstArray, ideasNeutralArray;
@@ -462,6 +464,7 @@ public class ServerClient implements Runnable {
                            ideasNeutralArray = new ArrayList<Integer>();
         int nshares, price, result, numMinShares;
         boolean result_topics = false, result_shares;
+        NetworkingFile ficheiro = null;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -607,6 +610,23 @@ public class ServerClient implements Runnable {
         //  Take care of the ideas neutral
         if(!setRelations(result,ideasNeutralArray,0, requests1, iState))
             return false;
+
+        if ( (reply=Common.recvMessage(inStream)) == Common.Message.MSG_IDEA_HAS_FILE){
+            //Receive File
+            ObjectInputStream objectStream = null;
+            try{
+                objectStream = new ObjectInputStream(inStream);
+                ficheiro = (NetworkingFile)objectStream.readObject();
+            }catch(IOException i){
+                System.out.println("IO Exception");
+                i.printStackTrace();
+                return false;
+            }catch(ClassNotFoundException c){
+                System.out.println("Class not found");
+                c.printStackTrace();
+                return false;
+            }
+        }
 
         //Everything ok
         if(!Common.sendMessage(Common.Message.MSG_OK,outStream))

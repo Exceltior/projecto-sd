@@ -174,6 +174,11 @@ public class RequestQueue extends Thread {
                                     (String) r.requestArguments.get(3));
                             r.requestResult.add(ans);
                             autoDequeue = true; // We instantly remove it as soon as we process it
+                        }  else if (r.requestType == Request.RequestType.ADD_FILE){
+                            boolean ans = RMI.addFile((Integer) r.requestArguments.get(0),
+                                    (NetworkingFile) r.requestArguments.get(1));
+                            r.requestResult.add(ans);
+                            autoDequeue = true; // We instantly remove it as soon as we process it
                         }
                     } catch (RemoteException e) {
                      //FIXME: talvez fazer isto 3 vezes!

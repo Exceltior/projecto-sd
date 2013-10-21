@@ -1,6 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -264,7 +265,7 @@ public class ClientConnection {
         return true;
     }
 
-    boolean createIdea(String title, String description, int nshares, int price, ArrayList<String> topics, int minNumShares, ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral){
+    boolean createIdea(String title, String description, int nshares, int price, ArrayList<String> topics, int minNumShares, ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral,NetworkingFile ficheiro){
         Common.Message reply;
         int devolve = -1;
 
@@ -382,6 +383,28 @@ public class ClientConnection {
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
                     System.out.println("Error while associating idea "+ideasNeutral.get(i)+": Invalid idea name");
                 /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
+            }
+
+            //Send fie
+            if (ficheiro != null){
+                if(!Common.sendMessage(Common.Message.MSG_IDEA_HAS_FILE,outStream)){
+                    reconnect();continue;
+                }
+
+                ObjectOutputStream objectStream = null;
+                try {
+                    objectStream = new ObjectOutputStream(outStream);
+                    objectStream.writeObject(ficheiro);
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    System.err.println("FILHA DA PUTA");
+                    return false;
+                }
+
+
+
+            }else if(!Common.sendMessage(Common.Message.MSG_IDEA_DOESNT_HAVE_FILE,outStream)){
+                reconnect();continue;
             }
 
             //Get Final Confirmation
