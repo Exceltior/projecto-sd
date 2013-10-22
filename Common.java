@@ -30,6 +30,8 @@ public class Common {
         REQUEST_SETIDEARELATION,    //Set the relationship between two ideas
         REQUEST_GETIDEASHARES,      //Get the number of shares for a given idea and its price
         REQUEST_SETPRICESHARES,     //Set the price of a user's given idea's shares to a value defined by the user
+        REQUEST_GETSHARESNOTSELL,   //Get the number of shares of a given idea not to sell instantaneously
+        REQUEST_SETSHARESNOTSELL,   //Set the number of shares of a given idea not to sell instantaneously
 
 
 

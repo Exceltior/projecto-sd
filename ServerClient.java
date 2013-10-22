@@ -189,6 +189,16 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get idea shares method!!!!!!!!");
                     break;
                 }
+            }else if(msg == Common.Message.REQUEST_GETSHARESNOTSELL){
+                if(!handleGetSharesNotSell()){
+                    System.err.println("Error in the handle get shares not sell method!!!!!");
+                    break;
+                }
+            }else if(msg == Common.Message.REQUEST_SETSHARESNOTSELL){
+                if (!handleSetSharesNotSell()){
+                    System.err.println("Error in the handle set shares not sell method!!!!!");
+                    break;
+                }
             }
         }
 
@@ -840,7 +850,7 @@ public class ServerClient implements Runnable {
             System.out.println("Existem " + topics.length + " topicos");
         } catch (RemoteException e) {
             //FIXME: Handle this
-            //e.printStackTrace();
+            e.printStackTrace();
             return false;
         }
 
@@ -854,6 +864,81 @@ public class ServerClient implements Runnable {
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
+
+        return true;
+    }
+
+    private boolean handleGetSharesNotSell(){
+        int iid, shares = -2;
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Receive Data
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+            shares = RMIInterface.getSharesNotSell(iid,uid);
+        }catch (RemoteException r){
+            r.printStackTrace();
+            return false;
+        }
+
+        //Confirm data
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Send data
+        if (!Common.sendInt(shares,outStream))
+            return false;
+
+        //Send final confirmation
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
+
+    }
+
+    private boolean handleSetSharesNotSell(){
+        int iid, numberShares;
+        boolean check = false;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Receive data
+        if ( (iid = Common.recvInt(inStream)) == -1){
+            return false;
+        }
+
+        //Receive data
+        if ( (numberShares = Common.recvInt(inStream)) == -1){
+            return false;
+        }
+
+        try{
+            check = RMIInterface.setSharesNotSell(iid, uid, numberShares);
+        }catch(RemoteException r){
+            r.printStackTrace();
+            return false;
+        }
+
+        //Send final confirmation
+        if (check){
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+        }
+
+        else{
+            if (!Common.sendMessage(Common.Message.MSG_ERR,outStream))
+                return false;
+        }
 
         return true;
     }
@@ -890,8 +975,15 @@ public class ServerClient implements Runnable {
             return false;
 
         //Send final confirmation
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        if (check){
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+        }
+
+        else{
+            if (!Common.sendMessage(Common.Message.MSG_ERR,outStream))
+                return false;
+        }
 
         return true;
     }

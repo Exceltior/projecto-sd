@@ -943,6 +943,114 @@ public class ClientConnection {
     }
 
     ////
+    //  Get the number of shares of a given idea not to sell instantaneously
+    ////
+    int getSharesNotSell(int iid){
+        Common.Message reply;
+        int shares = -1;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GETSHARESNOTSELL,outStream) ) {
+                System.err.println("AQUI");
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return -1;
+            }
+
+            //Send data
+            if (!Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            //Receive Data confirmation
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return -1;
+            }
+
+            //Receive data
+            if( (shares = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            //Receive final confirmation
+            reply = Common.recvMessage(inStream);
+
+            if (reply == Common.Message.MSG_OK)
+                return shares;
+
+            return -1;
+        }
+    }
+
+    ////
+    //  Method responsible to set the number of shares of a given idea that a user does not want to sell instantaneously
+    ////
+    boolean setSharesNotSell(int iid, int numberShares){
+        Common.Message reply;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_SETSHARESNOTSELL,outStream) ) {
+                System.err.println("AQUI");
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            //Send data
+            if (!Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            //Send data
+            if (!Common.sendInt(numberShares,outStream)){
+                reconnect();continue;
+            }
+
+            //Receive Data confirmation
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            //Receive final confirmation
+            reply = Common.recvMessage(inStream);
+
+            return reply == Common.Message.MSG_OK;
+        }
+    }
+
+    ////
     //  Set the price of the shares of a given idea to a value defined by the user
     ////
     boolean setPriceShares(int iid,int price){
@@ -965,7 +1073,6 @@ public class ClientConnection {
                 return false;
             }
 
-            //Send data
             //Send data
             if (!Common.sendInt(iid,outStream)){
                 reconnect();continue;

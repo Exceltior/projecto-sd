@@ -670,7 +670,7 @@ public class Client {
     //  Shows the user all its shares of every idea he/she has and its price
     ////
     private void showPriceShares(ArrayList<Integer> listUserIdeasIDs){
-        int iid = -1;
+        int iid = -2;
         String line;
         String[] pricesShares;
 
@@ -682,7 +682,7 @@ public class Client {
                 iid = Integer.parseInt(line);
             }catch(NumberFormatException n){
                 System.out.println("Invalid input!");
-                iid = -1;
+                iid = -2;
             }
         }while(!listUserIdeasIDs.contains(iid));
 
@@ -695,9 +695,71 @@ public class Client {
             System.out.println("Share{iid = " + pricesShares[0] + ",Number of Shares = " + pricesShares[1] +
                     ",Value = " + pricesShares[2] + ", Minimum Number of Shares = " + pricesShares[3] + "}");
         }
-
     }
 
+    ////
+    //  Method that shows the number of shares not to sell instantaneously of a given idea
+    ////
+    private void checkSharesNotSell(ArrayList<Integer> listUserIdeasIDs){
+        int iid = -2, shares = -1;
+        String line;
+
+        do{
+            System.out.println("Please insert the id of the idea whose number of shares not to sell instantaneously " +
+                    "you would like to check:");
+            line = sc.nextLine();
+            try{
+                iid = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                iid = -2;
+            }
+        }while (!listUserIdeasIDs.contains(iid));
+
+        shares = conn.getSharesNotSell(iid);
+        if (shares >= 0)
+            System.out.println("The number of shares not to sell instantaneously of the idea " + iid + "for this user is " + shares);
+        else
+            System.out.println("Error while getting information!");
+    }
+
+    ////
+    //  Method that sets the number of shares not to sell instantaneously of a given idea owned (totally or partially) by
+    //  a given user
+    ////
+    private void setSharesNotSell(ArrayList<Integer> listUserIdeasIDs){
+        int numberShares = -2, iid = -2;
+        boolean repeat = false;
+        String line;
+
+        do{
+            System.out.println("Please insert the id of the idea whose number of shares no to sell instantaneously you" +
+                    "want to update:");
+            line = sc.nextLine();
+            try{
+                iid = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                iid = -2;
+            }
+        }while (!listUserIdeasIDs.contains(iid));
+
+        do{
+            System.out.println("Please enter the new number of shares you dont want to sell instantaneously:");
+            line = sc.nextLine();
+            try{
+                numberShares = Integer.parseInt(line);
+            }catch (NumberFormatException n){
+                System.out.println("Invalid input!");
+                numberShares = -2;
+            }
+        }while (repeat);
+
+        if (conn.setSharesNotSell(iid,numberShares))
+            System.out.println("Number of shares no to sell instantaneously updated with success!");
+        else
+            System.out.println("Error while updating number of shares no to sell instantaneously!");
+    }
 
     ////
     //  Prints the Welcome Screen, when the users connects to the Server
@@ -807,6 +869,7 @@ public class Client {
             }
 
             case 2:{
+                //FIXME FIXME FIXME VER COM O MAXI SISTEMA NOTIFICAÇOES
                 if(setPriceShares(listUserIdeasIDs))
                     System.out.println("Operation completed with success!");
                 else
@@ -815,10 +878,15 @@ public class Client {
             }
 
             case 3:{
+                //Check idea's shares not to sell instantaneously
+                checkSharesNotSell(listUserIdeasIDs);
                 break;
             }
 
             case 4:{
+                //Set idea's shares not to sell instantaneously
+                setSharesNotSell(listUserIdeasIDs);
+                //FIXME FIXME FIXME VER COM O MAXI SISTEMA NOTIFICAÇOES
                 break;
             }
 

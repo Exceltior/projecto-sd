@@ -573,12 +573,87 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Get the number of shares that a user doesnt want to sel for a given idea
+    ////
+    public int getSharesNotSell(int iid,int uid) throws RemoteException{
+        String query = "Select s.numMin from Shares s where s.userid = " + uid + " and s.iid = " + iid;
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.size() == 0)
+            return -2;
+
+        return Integer.parseInt(queryResult.get(0)[0]);
+    }
+
+
+    ////
     //  Set sthe price of the shares of the user for a given idea to a given value
     ////
 
+    ////
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
+    //              MAXI LE ISTO
     //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    ////
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
         String query = "Update Shares set valor = " + price + " where userid = " + uid;
+
+        return insertData(query);
+    }
+
+    synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
+        String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
 
         return insertData(query);
     }
