@@ -894,7 +894,7 @@ public class Client {
             }
         }while (repeat);
 
-        return !conn.deleteIdea(iid);
+        return conn.deleteIdea(iid);
     }
 
     private void commentTopic(int topic){
