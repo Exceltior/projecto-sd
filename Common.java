@@ -28,6 +28,8 @@ public class Common {
         REQUEST_GETIDEASAGAINST,    //Get the ideas against a given idea
         REQUEST_GETIDEASNEUTRAL,    //Get the ideas neutral to a given idea
         REQUEST_SETIDEARELATION,    //Set the relationship between two ideas
+        REQUEST_GETIDEASHARES,      //Get the number of shares for a given idea and its price
+        REQUEST_SETPRICESHARES,     //Set the price of a user's given idea's shares to a value defined by the user
 
 
 

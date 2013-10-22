@@ -179,6 +179,16 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get ideas relation 0 method!!!!!!");
                     break;
                 }
+            }else if(msg == Common.Message.REQUEST_GETIDEASHARES){
+                if (!handleGetIdeaShares()){
+                    System.err.println("Error in the handle get idea shares method!!!!!!!!");
+                    break;
+                }
+            }else if (msg == Common.Message.REQUEST_SETPRICESHARES){
+                if (!handleSetPriceShares()){
+                    System.err.println("Error in the handle get idea shares method!!!!!!!!");
+                    break;
+                }
             }
         }
 
@@ -442,6 +452,10 @@ public class ServerClient implements Runnable {
             return false;
 
         if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        //Confirm data
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
 
         try{
@@ -838,6 +852,92 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        return true;
+    }
+
+    private boolean handleSetPriceShares(){
+        int iid = -1, price = -1;
+        boolean check = false;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Receive data
+        if ( (iid = Common.recvInt(inStream)) == -1){
+            return false;
+        }
+
+        if ( (price = Common.recvInt(inStream)) == -1){
+            return false;
+        }
+
+        try{
+           check = RMIInterface.setPricesShares(iid,uid,price);
+        }catch(RemoteException r){
+            System.out.println("RemoteException in the handle set prices shares method");
+            return false;
+        }
+
+        //Send data confirmation
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Send final confirmation
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        return true;
+    }
+
+    private boolean handleGetIdeaShares(){
+        int iid = -1;
+        String[] ideaShares = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Receive data
+        if ( (iid = Common.recvInt(inStream)) == -1){
+            return false;
+        }
+
+        try{
+            ideaShares = RMIInterface.getIdeaShares(iid,uid);
+        }catch(RemoteException r){
+            System.err.println("RemoteException in the handle get idea shares method!!");
+            return false;
+        }
+
+        if (ideaShares == null){
+            if (!Common.sendMessage(Common.Message.MSG_ERR,outStream))
+                return false;
+        }else{
+            //Send data confirmation
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+        }
+
+        //Send Data
+        if (!Common.sendInt(ideaShares.length,outStream))
+            return false;
+
+        for (int i=0;i<ideaShares.length;i++){
+            if (!Common.sendString(ideaShares[i],outStream))
+                return false;
+        }
+
+        //Send final confirmation
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
 

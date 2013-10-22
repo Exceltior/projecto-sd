@@ -896,9 +896,22 @@ public class ClientConnection {
                 return null;
             }
 
+            //Send data
             if (!Common.sendInt(iid,outStream)){
                 System.err.println("AQUI5");
                 reconnect();continue;
+            }
+
+            //Get data confirmation
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
             }
 
             if ( (numIdeas = Common.recvInt(inStream)) == -1) {
@@ -926,6 +939,128 @@ public class ClientConnection {
             }
 
             return ideasList;
+        }
+    }
+
+    ////
+    //  Set the price of the shares of a given idea to a value defined by the user
+    ////
+    boolean setPriceShares(int iid,int price){
+        Common.Message reply;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_SETPRICESHARES,outStream) ) {
+                System.err.println("AQUI");
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            //Send data
+            //Send data
+            if (!Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            //Send data
+            if (!Common.sendInt(price,outStream)){
+                reconnect();continue;
+            }
+
+            //Receive Data confirmation
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            //Receive final confirmation
+            reply = Common.recvMessage(inStream);
+
+            return reply == Common.Message.MSG_OK;
+        }
+    }
+
+    ////
+    //  Shows the price of the shares of a given idea
+    ////
+    String[] showPricesShares(int iid){
+        Common.Message reply;
+        String[] ideaShares = null;
+        int len;
+        boolean needReconnect = false;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASHARES,outStream) ) {
+                System.err.println("AQUI");
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            //Send data
+            if (!Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            //Get data confirmation
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( (len = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            ideaShares = new String[len];
+
+            for (int i=0;i<len;i++){
+                if ( (ideaShares[i] = Common.recvString(inStream)) == null)
+                    needReconnect = true;
+            }
+
+            if (needReconnect){
+                reconnect();
+                continue;
+            }
+
+            //Get final confirmation
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                System.err.println("Error in the getIdeaRelations method! MSG_OK not received");
+                return null;
+            }
+
+            return ideaShares;
         }
     }
 

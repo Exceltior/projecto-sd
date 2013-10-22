@@ -41,4 +41,6 @@ public interface RMI_Interface extends Remote {
     public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
             RemoteException;
     public Idea[] getIdeaRelations(int iid, int relationshipType) throws RemoteException;
+    public String[] getIdeaShares(int iid,int uid) throws RemoteException;
+    boolean setPricesShares(int iid, int uid, int price) throws RemoteException;
 }

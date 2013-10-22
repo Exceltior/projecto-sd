@@ -642,6 +642,64 @@ public class Client {
     }
 
     ////
+    //  Sets the price per share of a given idea
+    ////
+    private boolean setPriceShares(ArrayList<Integer> listUserIdeasIDs){
+        int iid = -1, price = -1;
+        String line, line2;
+
+        //Ask which idea we would like to set the shares' prices
+        do{
+            System.out.println("Please insert the id of the idea you would like to see the shares' prices:");
+            line = sc.nextLine();
+            System.out.println("Please insert the new price per share you would like to set:");
+            line2 = sc.nextLine();
+            try{
+                iid = Integer.parseInt(line);
+                price = Integer.parseInt(line2);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                iid = -1;
+            }
+        }while(!listUserIdeasIDs.contains(iid));
+
+        return conn.setPriceShares(iid,price);
+    }
+
+    ////
+    //  Shows the user all its shares of every idea he/she has and its price
+    ////
+    private void showPriceShares(ArrayList<Integer> listUserIdeasIDs){
+        int iid = -1;
+        String line;
+        String[] pricesShares;
+
+        //Ask which idea we would like to see the shares' prices
+        do{
+            System.out.println("Please insert the id of the idea you would like to see the shares' prices:");
+            line = sc.nextLine();
+            try{
+                iid = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                iid = -1;
+            }
+        }while(!listUserIdeasIDs.contains(iid));
+
+        pricesShares = conn.showPricesShares(iid);
+
+        if (pricesShares == null || pricesShares.length == 0)
+            System.out.println("The user doesnt have any share for this idea");//FIXME: This should never happen right?
+        else{
+            //Print the shares' information
+            System.out.println("Share{iid = " + pricesShares[0] + ",Number of Shares = " + pricesShares[1] +
+                    ",Value = " + pricesShares[2] + ", Minimum Number of Shares = " + pricesShares[3] + "}");
+        }
+
+    }
+
+
+    ////
     //  Prints the Welcome Screen, when the users connects to the Server
     ////
     private int printWelcomeScreen(){
@@ -744,10 +802,15 @@ public class Client {
         switch(option){
 
             case 1:{
+                showPriceShares(listUserIdeasIDs);
                 break;
             }
 
             case 2:{
+                if(setPriceShares(listUserIdeasIDs))
+                    System.out.println("Operation completed with success!");
+                else
+                    System.out.println("Operation could not be completed");
                 break;
             }
 

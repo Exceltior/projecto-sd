@@ -334,6 +334,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
     }
 
+
+    ////
+    //  Method responsible for getting all the information about all the shares of a given idea
+    ////
+    synchronized public String[] getIdeaShares(int iid, int uid) throws RemoteException{
+        String query = "Select s.iid, s.numshares, s.valor, s.numMin from Shares s where s.iid = " + iid +
+                " and s.userid = " + uid;
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.size()==0 )
+            return null;
+
+        return queryResult.get(0);
+    }
+
     ////
     // Method responsible for getting all the ideas in favour, neutral or against a given idea
     ////
@@ -558,6 +573,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     ////
+    //  Set sthe price of the shares of the user for a given idea to a given value
+    ////
+
+    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
+    synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
+        String query = "Update Shares set valor = " + price + " where userid = " + uid;
+
+        return insertData(query);
+    }
+
+    ////
     //  Send to the Server the history of transactions for a given client
     ////
     public String[] getHistory(int uid) throws RemoteException{
@@ -652,7 +678,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException {
-        String query = "update Utilizadores set dinheiro="+money+" where uid="+uid;
+        String query = "update Utilizadores set dinheiro="+money+" where userid="+uid;
 
         return ((conn == null) ? insertData(query) : insertData(query, conn));
     }
