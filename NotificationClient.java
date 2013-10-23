@@ -66,6 +66,9 @@ public class NotificationClient implements Runnable {
             return ;
         }
 
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return;
+
         System.out.println("Notification: User "+uid+" logged in.");
 
         /*
@@ -90,6 +93,7 @@ public class NotificationClient implements Runnable {
              */
             NotificationQueue queue = new NotificationQueue(RMIInterface, uid);
 
+            //queue.enqueue(new Notification(1,2,3,4,"Hey","Dei")); <-- Testing Code
             Notification n;
 
             while ( (n = queue.getNextNotification() ) != null) {
@@ -97,6 +101,7 @@ public class NotificationClient implements Runnable {
                     System.out.println("Notification: User "+uid+" dropped!");
                     return;
                 }
+                queue.dequeue(n);
 
             }
 
