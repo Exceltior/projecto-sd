@@ -35,4 +35,9 @@ public class Notification implements Serializable {
         return true;
     }
 
+    public String toString() {
+        return usernameBuyer + "(UID "+uidbuyer+") bought "+amount+" shares, at "+pricePerShare+" DEICoins per share " +
+                "from "+usernameSeller + "(UID "+uidSeller+")";
+    }
+
 }
