@@ -9,6 +9,7 @@ import java.io.Serializable;
  */
 public class NetworkingFile implements Serializable {
     private byte[] data;
+    private static final long serialVersionUID = 1L;
 
     public NetworkingFile(String path) throws FileNotFoundException {
         // Open file

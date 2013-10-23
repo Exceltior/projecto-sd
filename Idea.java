@@ -3,6 +3,9 @@ import java.io.DataOutputStream;
 import java.io.Serializable;
 
 public class Idea implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     public int getId() {
         return id;
     }

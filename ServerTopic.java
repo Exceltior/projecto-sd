@@ -6,6 +6,8 @@ import java.io.DataOutputStream;
 //
 public class ServerTopic extends Topic {
 
+    private static final long serialVersionUID = 1L;
+
     public boolean writeToDataStream(DataOutputStream out) {
         if ( ! Common.sendInt(id, out) )
             return false;

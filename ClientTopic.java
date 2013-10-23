@@ -3,6 +3,8 @@ import java.io.DataInputStream;
 // Specialized class which handles reading a Topic from an input stream, thus receiving it.
 //
 public class ClientTopic extends Topic {
+    private static final long serialVersionUID = 1L;
+
     private ClientTopic() {
         super();
     }

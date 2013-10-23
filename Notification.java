@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -10,6 +9,8 @@ public class Notification implements Serializable {
     String  usernameBuyer, usernameSeller;
 
     Timestamp timestamp;
+
+    private static final long serialVersionUID = 1L;
 
     Notification(int uidBuyer, int uidSeller, int amount, int pricePerShare, String usernameBuyer, String usernameSeller) {
         this.uidbuyer = uidBuyer;

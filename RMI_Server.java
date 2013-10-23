@@ -29,6 +29,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private ConnectionPool connectionPool;
     private int lastFile = 0; //FIXME: Update this dynamically
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Hashes the password using MD5 and returns it.
      * @param pass The plaintext password to be hashed.

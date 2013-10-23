@@ -7,6 +7,8 @@ public class Share  implements Comparable<Share>, Serializable {
     private int numMin;
     private int num;
 
+     private static final long serialVersionUID = 1L;
+
     /**
      * Create shares from a SQL row
      * @param row

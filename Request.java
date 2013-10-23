@@ -13,6 +13,8 @@ public class Request implements Serializable {
     ArrayList<Object> requestArguments = new ArrayList<Object>();
     Timestamp timestamp;
 
+    private static final long serialVersionUID = 1L;
+
     void waitUntilDispatched() {
         synchronized (this) {
             while ( !dispatched )
