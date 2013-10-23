@@ -1399,7 +1399,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         synchronized ( notificationsLock ) {
             ObjectInputStream in;
             try {
-                in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
+                String path = "./"+uid+"notifications.bin";
+                in = new ObjectInputStream(new FileInputStream(path));
             } catch (IOException e) {
                 //System.err.println("Error opening Queue file for reading!");
                 return null;
