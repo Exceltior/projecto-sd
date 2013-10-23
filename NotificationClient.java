@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.rmi.RemoteException;
 
 public class NotificationClient implements Runnable {
     private Socket socket = null;
@@ -39,5 +40,37 @@ public class NotificationClient implements Runnable {
     public void run() {
         // Get the user to give us username and password
         // If it works, cool, enter message loop otherwise, drop the connection
+        String user, pwd;
+
+        // Read the next Message/Request
+        if ( ( user = Common.recvString(inStream)) == null){
+            System.out.println("Error No Message Received!!!");
+            return ;
+        }
+
+        if ( ( pwd = Common.recvString(inStream)) == null){
+            System.out.println("Error No Message Received!!!");
+            return ;
+        }
+
+        try {
+            int uid = RMIInterface.canLogin(user, pwd);
+        } catch (RemoteException e) {
+            //FIXME: Try catch the merda
+        }
+
+        if ( uid == -1 ) {
+            Common.sendMessage(Common.Message.MSG_ERR, outStream);
+            return ;
+        }
+
+        System.out.println("Notification: User "+uid+" logged in.");
+
+        for(;;) {
+
+
+        }
+
+
     }
 }
