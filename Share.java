@@ -22,7 +22,7 @@ public class Share  implements Comparable<Share>, Serializable {
         this.numMin = Integer.valueOf(row[4]);
     }
 
-    public double getPricePerShare() {
+    public double getPriceShareRatio() {
         if ( num == 0 )
             return 0;
 
@@ -53,12 +53,17 @@ public class Share  implements Comparable<Share>, Serializable {
 
     @Override
     public int compareTo(Share share) {
-        if ( this.getPricePerShare() < share.getPricePerShare() )
+        /*if ( this.getPriceShareRatio() < share.getPriceShareRatio() )
             return -1;
-        else if  ( this.getPricePerShare() == share.getPricePerShare() )
+        else if  ( this.getPriceShareRatio() == share.getPriceShareRatio() )
             return 0;
         else
+            return 1;*/
+        if ( this.price < share.price )
+            return -1;
+        else if ( this.price > share.price )
             return 1;
+        else return 0;
     }
 
     public int getNumMin() {

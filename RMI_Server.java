@@ -726,7 +726,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return new Share(result.get(0));
     }
 
-    private void sortByPriceRatio(ArrayList<Share> shares) {
+    private void sortByPrice(ArrayList<Share> shares) {
         Collections.sort(shares);
     }
 
@@ -760,6 +760,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "update Utilizadores set dinheiro="+money+" where userid="+uid;
 
         return ((conn == null) ? insertData(query) : insertData(query, conn));
+    }
+
+    public String getUsername(int uid) throws RemoteException {
+        String query = "select username from  Utilizadores where uid="+uid;
+
+        ArrayList<String[]> result = receiveData(query);
+        if ( result== null || result.isEmpty())
+            return null;
+
+        return result.get(0)[0];
     }
 
     /**
@@ -808,7 +818,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ArrayList<Share> sharesToBuy = new ArrayList<Share>();
         ArrayList<Integer> sharesToBuyNum = new ArrayList<Integer>();
 
-        sortByPriceRatio(shares);
+        sortByPrice(shares);
 
         // We have sorted them by price per share, so the best options are first
 
@@ -818,6 +828,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
          *
          * Our solution is not the optimal solution. It is a greedy approximation algorithm which we later found out
          * to be George Dantzig's greedy algorithm. It does the job.
+         * FIXME: This sounds wrong now x)
          */
 
         for (Share s : shares) {
@@ -829,7 +840,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
                     if ( s.getPriceForNum(toBuy) > userMoney ) {
                         // Not enough money...
-                        double pricePerShare = s.getPricePerShare();
+                        int pricePerShare = s.getPrice();
 
                         // See how many we can buy. Round down!
 
@@ -871,6 +882,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         // UNLEASH THE BEAST!
         returnTransactionalConnection(conn);
+
+        for (int i = 0; i < sharesToBuy.size(); i++) {
+            Share s = sharesToBuy.get(i);
+            new NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
+                    s.getPrice(), getUsername(uid), getUsername(s.getUid())));
+            new NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
+                    s.getPrice(), getUsername(uid), getUsername(s.getUid())));
+        }
         return 1;
     }
 
