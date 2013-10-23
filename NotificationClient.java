@@ -101,6 +101,8 @@ public class NotificationClient implements Runnable {
 
             }
 
+            queue.checkRMI();
+
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {}

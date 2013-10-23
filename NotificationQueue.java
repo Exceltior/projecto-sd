@@ -11,19 +11,9 @@ public class NotificationQueue {
      * @param RMI
      */
     NotificationQueue(RMI_Interface RMI, int uid) {
-        ArrayList<Notification> r = null;
         this.RMI = RMI;
         this.uid = uid;
-        try {
-            r = RMI.readNotificationsFromQueueFile(uid);
-        } catch (RemoteException e) {
-            //FIXME: Retry 3 times here!
-        }
-
-        if ( r != null ) {
-            for (Notification i : r)
-                notifications.add(i);
-        }
+        checkRMI();
     }
 
     synchronized Notification getNextNotification() {
@@ -63,6 +53,20 @@ public class NotificationQueue {
                 //FIXME: Retry 3 times here!
             }
 
+        }
+    }
+
+    public void checkRMI() {
+        ArrayList<Notification> r = null;
+        try {
+            r = RMI.readNotificationsFromQueueFile(uid);
+        } catch (RemoteException e) {
+            //FIXME: Retry 3 times here!
+        }
+
+        if ( r != null ) {
+            for (Notification i : r)
+                notifications.add(i);
         }
     }
 }
