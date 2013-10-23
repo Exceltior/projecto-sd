@@ -477,18 +477,21 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
-        if (!Common.sendInt(ideasList.length,outStream))
-            return false;
-
-        for (int i=0;i<ideasList.length;i++){
-            if (!ideasList[i].writeToDataStream(outStream))
+        else{
+            //Send data
+            if (!Common.sendInt(ideasList.length,outStream))
                 return false;
+
+            for (int i=0;i<ideasList.length;i++){
+                if (!ideasList[i].writeToDataStream(outStream))
+                    return false;
+            }
+
         }
 
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        //Final confirmation
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-        return true;
     }
 
     ////

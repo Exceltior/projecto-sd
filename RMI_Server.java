@@ -587,82 +587,44 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return Integer.parseInt(queryResult.get(0)[0]);
     }
 
-
-    ////
-    //  Set sthe price of the shares of the user for a given idea to a given value
-    ////
-
-    ////
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //              MAXI LE ISTO
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    //FIXME FIXME FIXME: THIS METHOD NEEDS A CONNECTION OBJECT??
-    ////
+    /**
+     * Sets the price of the shares of the user for a given idea to a given value
+     * @param iid The id of the idea
+     * @param uid The id of the user that performs this operation
+     * @param price The new price per share
+     * @return a boolean value indicating if the operation went well or not
+     * @throws RemoteException
+     */
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
-        String query = "Update Shares set valor = " + price + " where userid = " + uid;
+        String query = "Update Shares set valor = " + price + " where userid = " + uid + " and iid = " + iid;
+        Connection conn = getTransactionalConnection();
+        boolean check = insertData(query,conn);
+        returnTransactionalConnection(conn);
 
-        return insertData(query);
+        return check;
     }
 
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
         String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
+        Connection conn = getTransactionalConnection();
+        boolean check = insertData(query,conn);
+        returnTransactionalConnection(conn);
 
-        return insertData(query);
+        System.out.println("Vou sair");
+
+        return check;
     }
 
     ////
-    //  Send to the Server the history of transactions for a given client
+    //
     ////
+
+    /**
+     * Send to the Server the history of transactions for a given client
+     * @param uid The id of the user
+     * @return an array of objects of type String containing the transactional history for the given user
+     * @throws RemoteException
+     */
     public String[] getHistory(int uid) throws RemoteException{
         String[] history = null;
         String query = "Select t.comprador, t.vendedor, t.valor, i.titulo from Transacoes t, Ideias i " +

@@ -1032,18 +1032,6 @@ public class ClientConnection {
                 reconnect();continue;
             }
 
-            //Receive Data confirmation
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI2");
-                reconnect(); continue;
-            }
-
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                //Shouldn't happen, FIXME!
-                System.err.println("Bodega");
-                return false;
-            }
-
             //Receive final confirmation
             reply = Common.recvMessage(inStream);
 

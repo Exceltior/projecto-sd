@@ -232,6 +232,7 @@ public class Client {
             System.out.println("2 - See ideas in favour of a given idea");
             System.out.println("3 - See ideas against a given idea");
             System.out.println("4 - See ideas neutral for the given idea");
+            System.out.println("0 - Voltar");
             System.out.print("Your choice: ");
             try{
                 line = sc.nextLine();
@@ -242,6 +243,10 @@ public class Client {
             }
 
             switch (choice){
+                case 0:
+                    stay = false;
+                    break;
+
                 case 1:{
                     //Comment an idea
                     listTopicsNames = new ArrayList<String>();
@@ -718,7 +723,7 @@ public class Client {
 
         shares = conn.getSharesNotSell(iid);
         if (shares >= 0)
-            System.out.println("The number of shares not to sell instantaneously of the idea " + iid + "for this user is " + shares);
+            System.out.println("The number of shares not to sell instantaneously of the idea " + iid + " for this user is " + shares);
         else
             System.out.println("Error while getting information!");
     }
@@ -728,12 +733,13 @@ public class Client {
     //  a given user
     ////
     private void setSharesNotSell(ArrayList<Integer> listUserIdeasIDs){
-        int numberShares = -2, iid = -2;
-        boolean repeat = false;
+        int numberShares, iid = -2, numberSharesIdea = -2;
+        boolean repeat;
         String line;
+        String[] priceShares;
 
         do{
-            System.out.println("Please insert the id of the idea whose number of shares no to sell instantaneously you" +
+            System.out.println("Please insert the id of the idea whose number of shares no to sell instantaneously you " +
                     "want to update:");
             line = sc.nextLine();
             try{
@@ -745,10 +751,21 @@ public class Client {
         }while (!listUserIdeasIDs.contains(iid));
 
         do{
+            repeat = false;
             System.out.println("Please enter the new number of shares you dont want to sell instantaneously:");
             line = sc.nextLine();
             try{
                 numberShares = Integer.parseInt(line);
+
+                //Get the number of shares for the given idea
+                priceShares = conn.showPricesShares(iid);
+                numberSharesIdea = Integer.parseInt(priceShares[1]);
+
+                if(numberShares > numberSharesIdea){
+                    System.out.println("Invalid number of shares!");
+                    repeat = true;
+                }
+
             }catch (NumberFormatException n){
                 System.out.println("Invalid input!");
                 numberShares = -2;
