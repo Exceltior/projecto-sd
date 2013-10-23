@@ -24,13 +24,15 @@ public class Notification implements Serializable {
         this.timestamp = new Timestamp(new java.util.Date().getTime());
     }
 
-    void writeToStream(ObjectOutputStream out) {
+    boolean writeToStream(ObjectOutputStream out) {
         try {
             out.writeObject(this);
 
         } catch (IOException e) {
             System.err.println("Error writing a request to a stream!");
+            return false;
         }
+        return true;
     }
 
 }
