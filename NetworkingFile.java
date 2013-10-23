@@ -13,7 +13,8 @@ public class NetworkingFile implements Serializable {
     private String name;
 
     public NetworkingFile(String path) throws FileNotFoundException {
-        // Open file
+        name = path.substring(path.lastIndexOf('/')+1); //Get the file name (note that if there's no /,
+        // we get the whole string
         RandomAccessFile f = new RandomAccessFile(path, "r");
         try {
             // Get and check length
@@ -37,27 +38,8 @@ public class NetworkingFile implements Serializable {
 
 
     public NetworkingFile(String path, String fileName) throws FileNotFoundException {
+        this(path);
         name = fileName;
-        // Open file
-        RandomAccessFile f = new RandomAccessFile(path, "r");
-        try {
-            // Get and check length
-            long longlength = f.length();
-            int length = (int) longlength;
-            if (length != longlength)
-                throw new IOException("File size >= 2 GB");
-            // Read file and return data
-            data = new byte[length];
-            f.readFully(data);
-        } catch (IOException e) {
-            System.err.println("IO Exception while reading file!");
-        } finally {
-            try {
-                f.close();
-            } catch (IOException e) {
-                System.err.println("IO Exception while closing file!");
-            }
-        }
     }
 
     public boolean writeTo(String path) throws FileNotFoundException {
