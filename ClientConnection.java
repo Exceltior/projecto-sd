@@ -131,7 +131,7 @@ public class ClientConnection {
         System.out.println("AQUI " + lastUsername + " " + lastPassword + "\n\n\n");
 
         if(this.loggedIn) {
-
+            notificationThread.stop();
             System.out.println("Estou logado");
             this.loggedIn = false;
             int loginReply;

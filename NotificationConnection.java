@@ -13,6 +13,7 @@ public class NotificationConnection extends Thread {
     private String user, password;
 
     NotificationConnection(String host, String user, String pwd) {
+        //System.out.println("NotificationConnection!"); //FIXME
         try {
             socket = new Socket(host, port);
         } catch (IOException e) {
@@ -24,6 +25,7 @@ public class NotificationConnection extends Thread {
 
     @Override
     public void run() {
+        //System.out.println("Running!!"); //FIXME
         if ( this.socket == null )
             return;
         try {
@@ -34,6 +36,8 @@ public class NotificationConnection extends Thread {
             System.err.println("Error constructing a new Notification connection (did the connection die?");
             return;
         }
+
+        //System.out.println("Aqui me estoy");
 
         if ( !Common.sendString(user, outStream) )
             return;
@@ -49,6 +53,7 @@ public class NotificationConnection extends Thread {
         }
 
         for(;;) {
+            //System.out.println("Waiting...!"); //FIXME
             try {
                 Notification n = (Notification)inObjStream.readObject();
 

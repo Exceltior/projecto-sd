@@ -25,6 +25,7 @@ public class NotificationServer extends Thread {
         for(;;) {
             try {
                 clientSocket = acceptSocket.accept();
+                System.err.println("New NOTIFICATION client!!");
                 new Thread(new NotificationClient(clientSocket, server.getConnection(), server)).start();
             }
             catch (IOException e) {

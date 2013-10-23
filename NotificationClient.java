@@ -10,6 +10,7 @@ public class NotificationClient implements Runnable {
     private Socket socket = null;
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
+    ObjectOutputStream objStream = null;
 
     private RMIConnection connection;
     private RMI_Interface RMIInterface = null;
@@ -25,6 +26,7 @@ public class NotificationClient implements Runnable {
         try {
             this.outStream = new DataOutputStream(currentSocket.getOutputStream());
             this.inStream = new DataInputStream(currentSocket.getInputStream());
+            this.objStream = new ObjectOutputStream(outStream);
         } catch (IOException e) {
             System.err.println("Error constructing a new NotificationClient (did the connection die?");
         }
@@ -56,7 +58,7 @@ public class NotificationClient implements Runnable {
         }
 
         try {
-            int uid = RMIInterface.canLogin(user, pwd);
+            uid = RMIInterface.canLogin(user, pwd);
         } catch (RemoteException e) {
             //FIXME: Try catch the merda
         }
@@ -79,13 +81,7 @@ public class NotificationClient implements Runnable {
             return ;
         }
         */
-        ObjectOutputStream objStream = null;
-        try {
-            objStream = new ObjectOutputStream(outStream);
-        } catch (IOException e) {
-            System.err.println("Error creating object output stream");
-            return;
-        }
+
         for(;;) {
             /**
              * Note that when we do new NotificationQueue(RMIInterface, uid) we are talking to the RMI server and
@@ -93,7 +89,7 @@ public class NotificationClient implements Runnable {
              */
             NotificationQueue queue = new NotificationQueue(RMIInterface, uid);
 
-            //queue.enqueue(new Notification(1,2,3,4,"Hey","Dei")); <-- Testing Code
+            //queue.enqueue(new Notification(1,2,3,4,"Hey","Dei")); <-- testing
             Notification n;
 
             while ( (n = queue.getNextNotification() ) != null) {
