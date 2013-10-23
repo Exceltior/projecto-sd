@@ -9,6 +9,12 @@ public class Server {
     RequestQueue queue;
     boolean primary = true;
 
+    private RMIConnection connection;
+
+    public RMIConnection getConnection() {
+        return connection;
+    }
+
     void goSecondary() {
         System.out.println("Becoming SECONDARY server...");
         primary = false;
@@ -71,8 +77,11 @@ public class Server {
 
         Socket clientSocket = null;
 
-        RMIConnection connection = new RMIConnection();
+        connection = new RMIConnection();
         connection.establishConnectionToRegistry();
+
+        // Start the notification server
+        new NotificationServer(this).start();
 
 
         // Port 1235 is where we will wait for the other server's ping. If we don't get it, means we can't reach it, or
