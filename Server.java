@@ -80,6 +80,9 @@ public class Server {
         connection = new RMIConnection();
         connection.establishConnectionToRegistry();
 
+        // Start the notification server
+        new NotificationServer(this).start();
+
 
         // Port 1235 is where we will wait for the other server's ping. If we don't get it, means we can't reach it, or
         // it can't reach us...
