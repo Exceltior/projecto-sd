@@ -131,7 +131,17 @@ public class ClientConnection {
         currentHost--; //We do currentHost-- so that we retry the current host ONCE.
         // FIXME: We might as well sleep for a while here too...
         connect();
+
+        ////
+        //  FIXME O QUE FAZER QUANDO LASTUSERNAME E LASTPASSWORD SAO NULOS??????
+        //  MAXI AQUI
+        ////
+        System.out.println("AQUI " + lastUsername + " " + lastPassword + "\n\n\n");
+        login(lastUsername,lastPassword);//FIXME FIXME: O JOCA METEU ESTA LINHA AQUI
+
         if(this.loggedIn) {
+
+            System.out.println("Estou logado");
             this.loggedIn = false;
             int loginReply;
             if (( loginReply = this.login(lastUsername, lastPassword) ) == 3) {
@@ -176,6 +186,11 @@ public class ClientConnection {
             }
 
             if ( reply == Common.Message.MSG_OK ) {
+
+                //FIXME FIXME O JOCA ADICIONOU AS PROXIMAS DUAS LINHAS
+                this.lastUsername = user;
+                this.lastPassword = pass;
+
                 if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
                     reconnect(); continue;
                 }

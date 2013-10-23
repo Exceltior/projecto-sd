@@ -291,7 +291,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return false;
         }
 
-        String query = "insert into IdeiasFicheiros values ("+iid+","+path+")";
+        String query = "Insert into IdeiasFicheiros values (" + iid + ",'" + path + "')";
 
         insertData(query); //IGNORE if it fails... FIXME: if it fails we should retry...it may be a DB transient                                                                                                    // failure
 
@@ -304,7 +304,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         lastFile++;
         RandomAccessFile f = null;
         try {
-            f = new RandomAccessFile(path, "w");
+            f = new RandomAccessFile(path, "rw");//FIXME: O JOCA MUDOU O "w" PARA "rw" PORQUE ISTO DAVA EXCEPÇÃO A DIZER QUE O ARGUMENTO ESTAVA MAL!!!!!!!!!!
         } catch (FileNotFoundException e) {
             return ; //FIXME: Should never happen
         }
@@ -542,11 +542,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Idea[] devolve;
 
         if (iid != -1 && !title.equals(""))
-            query = "Select * from Ideias i where i.activa = 1 and i.iid = '" + iid +"' and i.titulo = " + title;
+            query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid +" and i.titulo = '" + title + "'";
         else if(iid != -1)
             query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid;
         else if (!title.equals(""))
-            query = "Select * from Ideias i where i.activa = 1 and i.titulo = '" + title;
+            query = "Select * from Ideias i where i.activa = 1 and i.titulo = '" + title + "'";
         else
             return null;
 

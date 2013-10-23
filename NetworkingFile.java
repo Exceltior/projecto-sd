@@ -35,7 +35,8 @@ public class NetworkingFile implements Serializable {
     }
 
     public boolean writeTo(String path) throws FileNotFoundException {
-        RandomAccessFile f = new RandomAccessFile(path, "w");
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+        //FIXME: O JOCA MUDOU O "w" PARA "rw" PORQUE ISTO DAVA EXCEPÇÃO A DIZER QUE O ARGUMENTO ESTAVA MAL!!!!!!!!!!
 
         if ( this.data == null )
             return false;

@@ -763,6 +763,27 @@ public class ServerClient implements Runnable {
         if ( (title = Common.recvString(inStream)) == null)
             return false;
 
+        if (iid == -2)
+            iid = -1; //To avoid "Because they're trying to hack us" <- 0   0To Maxi
+        ////
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        //FIXME FIXME FIXME MAXI VE ISTO!!!
+        ////
+
         try {
             ideas = RMIInterface.getIdeaByIID(iid,title);
         } catch (RemoteException e) {

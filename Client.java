@@ -142,6 +142,7 @@ public class Client {
                     temp_num = Integer.parseInt(aTemp);
                     if(temp_num == -1) {
                         System.out.println("Okay then, no ideas, fucker!"); //FIXME
+                        temp_num = -2;
                         return devolve;
                     }
 
@@ -318,7 +319,7 @@ public class Client {
     ////
     private void searchIdea(){
         String temp, title;
-        int iid = -1;
+        int iid = -2;
         boolean repeat;
         Idea[] userSelectedIdea;
         ArrayList<Integer> listIdeasIDs = new ArrayList<Integer>();
@@ -370,8 +371,8 @@ public class Client {
     // Searchs a topic by its topic id and name
     ////
     private void searchTopic(){
-        String name = "", temp;
-        int tid = -1;
+        String name, temp;
+        int tid = -2;
         boolean repeat;
 
         System.out.println("\n\nWelcome to the Topic's Search Engine!\nWe provide two ways of searching for a topic:" +
@@ -500,19 +501,20 @@ public class Client {
         do{
             System.out.println("Do you want to attach a file?(Y/N)");
             file = sc.nextLine();
-            if (file.equals("Y")){
-                System.out.println("Please enter the path to the file you wnat to attach:");
+            if (file.equals("Y") || file.equals("y")){
+                System.out.println("Please enter the path to the file you want to attach:");
                 filePath = sc.nextLine();
                 try {
                     ficheiro = new NetworkingFile(filePath);
+                    System.out.println("AQUI " + ficheiro == null);
                 } catch (FileNotFoundException e) {
-                    System.out.println("Invalid file path");
+                    System.out.println("Invalid file path!");
                     repeat = true;
                 }
             }
             else if(!file.equals("N")){//The user selected something different from "Y" or "N"
                 repeat = true;
-                System.out.println("Invalid input");
+                System.out.println("Invalid input!");
             }
         }while (repeat);
 
@@ -627,8 +629,8 @@ public class Client {
         do{
             System.out.println("Do you want to attach a file?(Y/N)");
             file = sc.nextLine();
-            if (file.equals("Y")){
-                System.out.println("Please enter the path to the file you wnat to attach:");
+            if (file.equals("Y") || file.equals("y")){
+                System.out.println("Please enter the path to the file you want to attach:");
                 filePath = sc.nextLine();
                 try {
                     ficheiro = new NetworkingFile(filePath);
@@ -637,7 +639,7 @@ public class Client {
                     repeat = true;
                 }
             }
-            else if(!file.equals("N")){//The user selected something different from "Y" or "N"
+            else if(!file.equals("N") || file.equals("n")){//The user selected something different from "Y" or "N"
                 repeat = true;
                 System.out.println("Invalid input");
             }
