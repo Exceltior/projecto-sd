@@ -30,6 +30,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private int lastFile = 0; //FIXME: Update this dynamically
 
     private static final long serialVersionUID = 1L;
+    final Object notificationsLock = new Object();
 
     /**
      * Hashes the password using MD5 and returns it.
@@ -1399,63 +1400,67 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException {
-        ObjectInputStream in;
-        try {
-            in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
-        } catch (IOException e) {
-            System.err.println("Error opening Queue file for reading!");
-            return null;
-        }
-
-        ArrayList<Notification> notifications = new ArrayList<Notification>();
-        int size = 0;
-        try {
-            size = in.readInt();
-        } catch (IOException e) {
-            System.err.println("Error reading size from Notification Queue File!");
-            return null;
-        }
-        for (int i = 0; i < size; i++)
+        synchronized ( notificationsLock ) {
+            ObjectInputStream in;
             try {
-                notifications.add((Notification)in.readObject());
+                in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
             } catch (IOException e) {
-                System.err.println("Error reading from Notification Queue File!");
-                return null;
-            } catch (ClassNotFoundException e) {
-                System.err.println("Error reading from Notification Queue File! (Class not found)");
+                System.err.println("Error opening Queue file for reading!");
                 return null;
             }
 
-        return notifications;
+            ArrayList<Notification> notifications = new ArrayList<Notification>();
+            int size = 0;
+            try {
+                size = in.readInt();
+            } catch (IOException e) {
+                System.err.println("Error reading size from Notification Queue File!");
+                return null;
+            }
+            for (int i = 0; i < size; i++)
+                try {
+                    notifications.add((Notification)in.readObject());
+                } catch (IOException e) {
+                    System.err.println("Error reading from Notification Queue File!");
+                    return null;
+                } catch (ClassNotFoundException e) {
+                    System.err.println("Error reading from Notification Queue File! (Class not found)");
+                    return null;
+                }
+
+            return notifications;
+        }
     }
 
     public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
             RemoteException {
-        String path = "./"+uid+"notifications.bin";
-        ObjectOutputStream out;
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(path));
-        } catch (IOException e) {
-            System.err.println("Error opening Notification Queue file for writing!");
-            return false;
-        }
+        synchronized ( notificationsLock ) {
+            String path = "./"+uid+"notifications.bin";
+            ObjectOutputStream out;
+            try {
+                out = new ObjectOutputStream(new FileOutputStream(path));
+            } catch (IOException e) {
+                System.err.println("Error opening Notification Queue file for writing!");
+                return false;
+            }
 
-        try {
-            out.writeInt(notifications.size());
-            for (Notification r : notifications)
-                r.writeToStream(out);
-        } catch (IOException e) {
-            System.err.println("Error writing Notification Queue to file!!");
-            return false;
-        }
+            try {
+                out.writeInt(notifications.size());
+                for (Notification r : notifications)
+                    r.writeToStream(out);
+            } catch (IOException e) {
+                System.err.println("Error writing Notification Queue to file!!");
+                return false;
+            }
 
-        try {
-            out.close();
-        } catch (IOException e) {
-            //FIXME: What damn exception can we get here?
-        }
+            try {
+                out.close();
+            } catch (IOException e) {
+                //FIXME: What damn exception can we get here?
+            }
 
-        return true;
+            return true;
+        }
     }
 
     public static void main(String[] args) {
