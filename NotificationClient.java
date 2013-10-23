@@ -1,7 +1,9 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 
 public class NotificationClient implements Runnable {
@@ -66,11 +68,42 @@ public class NotificationClient implements Runnable {
 
         System.out.println("Notification: User "+uid+" logged in.");
 
-        for(;;) {
-
-
+        /*
+        try {
+            socket.setSoTimeout(100);
+        } catch (SocketException e) {
+            System.err.println("Error accessing socket!");
+            return ;
         }
+        */
+        ObjectOutputStream objStream = null;
+        try {
+            objStream = new ObjectOutputStream(outStream);
+        } catch (IOException e) {
+            System.err.println("Error creating object output stream");
+            return;
+        }
+        for(;;) {
+            /**
+             * Note that when we do new NotificationQueue(RMIInterface, uid) we are talking to the RMI server and
+             * getting the notification queue from it!
+             */
+            NotificationQueue queue = new NotificationQueue(RMIInterface, uid);
 
+            Notification n;
+
+            while ( (n = queue.getNextNotification() ) != null) {
+                if(!n.writeToStream(objStream)) {
+                    System.out.println("Notification: User "+uid+" dropped!");
+                    return;
+                }
+
+            }
+
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {}
+        }
 
     }
 }
