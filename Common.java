@@ -34,6 +34,7 @@ public class Common {
         REQUEST_SETSHARESNOTSELL,   //Set the number of shares of a given idea not to sell instantaneously
         REQUEST_GETFILE,            //Get a file associated with a given idea
         REQUEST_GET_IDEAS_FILES,    //Get a list with the id's of the files which have a file attached
+        REQUEST_GET_IDEA_FILE,      //Get a file from an idea
 
 
 
@@ -46,6 +47,7 @@ public class Common {
         ERR_NO_MSG_RECVD,           // Used by our Common class to indicate a connection problem
         ERR_IDEAS_NOT_FOUND,        // No Ideas were found (FIXME: Joca, you sure this isn't the only type of error 
                                     // and, hence, we couldn't just use MSG_ERR?
+        ERR_NO_FILE,                // Error while getting the file
         
         TOPIC_OK,                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
 

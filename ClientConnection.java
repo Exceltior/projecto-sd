@@ -592,7 +592,7 @@ public class ClientConnection {
         ObjectInputStream objectStream = null;
 
         for(;;){
-            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEAS_FILES, outStream) ) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEA_FILE, outStream) ) {
                 reconnect(); continue;
             }
 
@@ -657,6 +657,7 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
+            //Receive first confirmation
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
                 System.err.println("AQUI2");
                 reconnect(); continue;
@@ -668,6 +669,19 @@ public class ClientConnection {
                 return null;
             }
 
+            //Receive second confirmation
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NO_FILE ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega2");
+                return null;
+            }
+
+            //Receive Data
             if ( (len = Common.recvInt(inStream)) == -1){
                 reconnect();continue;
             }

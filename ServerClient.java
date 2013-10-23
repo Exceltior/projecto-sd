@@ -199,8 +199,13 @@ public class ServerClient implements Runnable {
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GET_IDEAS_FILES){
-                if (!handleGetIdeasFile()){
-                    System.err.println("Error in the handle get ideas file method!!!!!");
+                if (!handleGetIdeasFiles()){
+                    System.err.println("Error in the handle get ideas files method!!!!!");
+                    break;
+                }
+            }else if (msg == Common.Message.REQUEST_GET_IDEA_FILE){
+                if (!handleGetIdeaFile()){
+                    System.err.println("Error in the handle get idea file method!!!!!");
                     break;
                 }
             }
@@ -1017,7 +1022,54 @@ public class ServerClient implements Runnable {
 
     }
 
-    private boolean handleGetIdeasFile(){
+    private boolean handleGetIdeaFile(){
+        NetworkingFile file;
+        int iid;
+        ObjectOutputStream objectstream = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Receive Data
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+            file = RMIInterface.getFile(iid);
+        }catch(RemoteException r){
+            System.err.println("RemoteException in the handle get idea file method!");
+            return false;
+        }
+
+        if (file == null){
+            Common.sendMessage(Common.Message.MSG_ERR,outStream);
+            return false;
+        }
+        else{
+            //Send Data confirmation
+            if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
+                return false;
+            try{
+                objectstream = new ObjectOutputStream(outStream);
+                objectstream.writeObject(file);
+            }catch(IOException i){
+                System.out.println("Error sending the file");
+                return false;
+            }
+
+            //Send final confirmation
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+
+            return true;
+        }
+    }
+
+    private boolean handleGetIdeasFiles(){
         int iid = -1;
         Idea[] ideasFiles;
 
@@ -1031,9 +1083,18 @@ public class ServerClient implements Runnable {
         try{
             ideasFiles = RMIInterface.getFilesIdeas();
         }catch(RemoteException r){
-            System.out.println("RemoteException in the handle get file method");
+            System.out.println("RemoteException in the handle get ideas files method");
             return false;
         }
+
+        if (ideasFiles == null){
+            Common.sendMessage(Common.Message.ERR_NO_FILE,outStream);
+            return false;
+        }
+
+        //2nd Confirmation Message
+        if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
+            return false;
 
         //Send data
         if(!Common.sendInt(ideasFiles.length,outStream))

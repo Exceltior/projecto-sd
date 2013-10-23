@@ -353,7 +353,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public NetworkingFile getFile(int iid) throws RemoteException {
-        String query = "select path, OriginalFile fromIdeiasFicheiros where iid ="+iid;
+        String query = "select path, OriginalFile from IdeiasFicheiros where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
         if ( queryResult == null || queryResult.size() == 0) //FIXME: Deal with this!
         return null;
@@ -368,7 +368,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
 
     public Idea[] getFilesIdeas()throws RemoteException{
-        String query = "Select i.iid from IdeiasFicheiros i";
+        String query = "Select i.iid, f.titulo, f.descricao, f.userid from IdeiasFicheiros i, Ideias f where i.iid = f.iid";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null || queryResult.size() == 0)
@@ -1462,7 +1462,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     public static void main(String[] args) {
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");

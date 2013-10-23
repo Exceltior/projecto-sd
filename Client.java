@@ -183,7 +183,7 @@ public class Client {
                 line = sc.nextLine();
                 iid = Integer.parseInt(line);
             }catch(NumberFormatException n){
-                System.out.println("Invlaid input!");
+                System.out.println("Invalid input!");
                 iid = -2;
             }
         }while(!listIdeasIDsFiles.contains(iid));
@@ -340,6 +340,7 @@ public class Client {
 
                 case 5:{
                      downloadFile();
+                    break;
                 }
 
                 default:{
@@ -481,9 +482,10 @@ public class Client {
         String title, description, file, filePath;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
-        int nshares, price, minNumShares;
+        int nshares = 1, price = 1, minNumShares = 1;
         NetworkingFile ficheiro = null;
         boolean repeat = false;
+        String line;
 
         do{
             System.out.println("Please enter the title of the idea:");
@@ -506,21 +508,53 @@ public class Client {
         }while (repeat);
 
 
-        System.out.println("Please enter the number of shares for the idea:");
-        nshares = sc.nextInt();
-
-        System.out.println("Please enter the price of each share of the idea:");
-        price = sc.nextInt();
+        do{
+            repeat = false;
+            System.out.println("Please enter the number of shares for the idea:");
+            line = sc.nextLine();
+            try{
+                nshares = Integer.parseInt(line);
+                if (nshares <= 0){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while(repeat);
 
         do{
+            repeat = false;
+            System.out.println("Please enter the price of each share of the idea:");
+            line = sc.nextLine();
+            try{
+                price = Integer.parseInt(line);
+                if (price <= 0){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while(repeat);
+
+        do{
+            repeat = false;
             System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
-            minNumShares = sc.nextInt();
-            if (minNumShares<0 || minNumShares>nshares)
+            line = sc.nextLine();
+            try{
+                minNumShares = Integer.parseInt(line);
+                if (minNumShares<0 || minNumShares>nshares){
+                    System.out.println("Invalid number!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
                 System.out.println("Invalid number!");
-        }while(minNumShares<0 || minNumShares>nshares);
-
-
-        sc.nextLine();//Clear the buffer
+                repeat = true;
+            }
+        }while(repeat);
 
         topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)",true);
 
