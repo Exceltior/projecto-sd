@@ -32,6 +32,8 @@ public class Common {
         REQUEST_SETPRICESHARES,     //Set the price of a user's given idea's shares to a value defined by the user
         REQUEST_GETSHARESNOTSELL,   //Get the number of shares of a given idea not to sell instantaneously
         REQUEST_SETSHARESNOTSELL,   //Set the number of shares of a given idea not to sell instantaneously
+        REQUEST_GETFILE,            //Get a file associated with a given idea
+        REQUEST_GET_IDEAS_FILES,    //Get a list with the id's of the files which have a file attached
 
 
 

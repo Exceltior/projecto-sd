@@ -1,7 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -194,6 +191,16 @@ public class ServerClient implements Runnable {
             }else if(msg == Common.Message.REQUEST_SETSHARESNOTSELL){
                 if (!handleSetSharesNotSell()){
                     System.err.println("Error in the handle set shares not sell method!!!!!");
+                    break;
+                }
+            }else if(msg == Common.Message.REQUEST_GETFILE){
+                if (!handleGetFile()){
+                    System.err.println("Error in the handle get file method!!!!!");
+                    break;
+                }
+            }else if(msg == Common.Message.REQUEST_GET_IDEAS_FILES){
+                if (!handleGetIdeasFile()){
+                    System.err.println("Error in the handle get ideas file method!!!!!");
                     break;
                 }
             }
@@ -967,6 +974,78 @@ public class ServerClient implements Runnable {
         }
 
         return true;
+    }
+
+    private boolean handleGetFile(){
+        NetworkingFile ficheiro;
+        int iid;
+        ObjectOutputStream objectStream = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Get data
+        if ((iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        try{
+            ficheiro = RMIInterface.getFile(iid);
+        }catch(RemoteException r){
+            System.out.println("RemoteException in the handle get File method");
+            return false;
+        }
+
+        //Send confirmation
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Send Data
+        try {
+            objectStream = new ObjectOutputStream(outStream);
+            objectStream.writeObject(ficheiro);
+        }catch(IOException e){
+            System.err.println("Error while sending file");
+            return false;
+        }
+
+        //Send Final Confirmation
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
+
+    }
+
+    private boolean handleGetIdeasFile(){
+        int iid = -1;
+        Idea[] ideasFiles;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        try{
+            ideasFiles = RMIInterface.getFilesIdeas();
+        }catch(RemoteException r){
+            System.out.println("RemoteException in the handle get file method");
+            return false;
+        }
+
+        //Send data
+        if(!Common.sendInt(ideasFiles.length,outStream))
+            return false;
+
+        for (int i=0;i<ideasFiles.length;i++){
+            if (!ideasFiles[i].writeToDataStream(outStream))
+                return false;
+        }
+
+        //Send final confirmation
+        return Common.sendMessage(Common.Message.MSG_OK,outStream);
     }
 
     private boolean handleSetPriceShares(){

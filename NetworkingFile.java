@@ -10,8 +10,34 @@ import java.io.Serializable;
 public class NetworkingFile implements Serializable {
     private byte[] data;
     private static final long serialVersionUID = 1L;
+    private String name;
 
     public NetworkingFile(String path) throws FileNotFoundException {
+        // Open file
+        RandomAccessFile f = new RandomAccessFile(path, "r");
+        try {
+            // Get and check length
+            long longlength = f.length();
+            int length = (int) longlength;
+            if (length != longlength)
+                throw new IOException("File size >= 2 GB");
+            // Read file and return data
+            data = new byte[length];
+            f.readFully(data);
+        } catch (IOException e) {
+            System.err.println("IO Exception while reading file!");
+        } finally {
+            try {
+                f.close();
+            } catch (IOException e) {
+                System.err.println("IO Exception while closing file!");
+            }
+        }
+    }
+
+
+    public NetworkingFile(String path, String fileName) throws FileNotFoundException {
+        name = fileName;
         // Open file
         RandomAccessFile f = new RandomAccessFile(path, "r");
         try {
@@ -56,5 +82,13 @@ public class NetworkingFile implements Serializable {
         }
 
         return true;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public void setName(String n){
+        this.name = n;
     }
 }

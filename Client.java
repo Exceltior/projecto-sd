@@ -162,6 +162,44 @@ public class Client {
         return devolve;
     }
 
+    private void downloadFile(){
+        Idea[] listIdeasFiles;
+        ArrayList<Integer> listIdeasIDsFiles = new ArrayList<Integer>();
+        int iid;
+        String line;
+        NetworkingFile ficheiro;
+
+        listIdeasFiles = conn.getIdeasFiles();
+
+        System.out.println("List of Ideas with Files Attached:");
+        for (int i=0;i<listIdeasFiles.length;i++){
+            listIdeasIDsFiles.add(listIdeasFiles[i].getId());
+            System.out.println(listIdeasFiles[i]);
+        }
+
+        do{
+            System.out.println("Please insert the id whose file you want to download:");
+            try{
+                line = sc.nextLine();
+                iid = Integer.parseInt(line);
+            }catch(NumberFormatException n){
+                System.out.println("Invlaid input!");
+                iid = -2;
+            }
+        }while(!listIdeasIDsFiles.contains(iid));
+
+        ficheiro = conn.getIdeaFile(iid);
+
+        //Write the file to disk
+        if(ficheiro != null){
+            try {
+                ficheiro.writeTo("./" + ficheiro.getName());
+            } catch (FileNotFoundException e) {
+                System.out.println("Error while writing file to disk");
+            }
+        }
+    }
+
     ////
     //  Prints the ideas in favour, against and neutral to a given idea
     ////
@@ -213,16 +251,9 @@ public class Client {
     //  Provides a number of options to perform over a list of ideas
     ////
     private void ideaOptions(ArrayList<Integer> listIdeasIDs){
-        ////
-        // Idea options:
-        // 1 - Comment one idea
-        // 2 - See ideas in favour of a given idea
-        // 3 - See ideas against a given idea
-        ////
-
         boolean stay = true;
         String line, temp;
-        int choice, iid = -2, result;
+        int choice, iid, result;
         ArrayList<String> listTopicsNames;
         ClientTopic[] listTopics;
 
@@ -233,7 +264,8 @@ public class Client {
             System.out.println("2 - See ideas in favour of a given idea");
             System.out.println("3 - See ideas against a given idea");
             System.out.println("4 - See ideas neutral for the given idea");
-            System.out.println("0 - Voltar");
+            System.out.println("5 - Download File Submited with the given idea");
+            System.out.println("0 - Go Back");
             System.out.print("Your choice: ");
             try{
                 line = sc.nextLine();
@@ -290,7 +322,7 @@ public class Client {
                     //See ideas against
                     result = printRelationsIdea(listIdeasIDs,-1);
                     if (result == -1 )
-                        System.out.println("Error! Could not show ideas in against");
+                        System.out.println("Error! Could not show ideas against");
                     else
                         stay = false;
                     break;
@@ -304,6 +336,10 @@ public class Client {
                     else
                         stay = false;
                     break;
+                }
+
+                case 5:{
+                     downloadFile();
                 }
 
                 default:{

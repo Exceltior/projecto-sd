@@ -1,7 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -446,7 +443,7 @@ public class ClientConnection {
                 /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
             }
 
-            //Send fie
+            //Send file
             if (ficheiro != null){
                 if(!Common.sendMessage(Common.Message.MSG_IDEA_HAS_FILE,outStream)){
                     reconnect();continue;
@@ -587,6 +584,119 @@ public class ClientConnection {
         }
     }
 
+    NetworkingFile getIdeaFile(int iid){
+        Common.Message reply;
+        NetworkingFile ficheiro;
+        ObjectInputStream objectStream = null;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEAS_FILES, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            //Send Data
+            if (!Common.sendInt(iid,outStream)){
+                reconnect();continue;
+            }
+
+            //Receive Data Confirmation
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                System.err.println("Couldnt receive the file!");
+                return null;
+            }
+
+            //Receive Data
+            try {
+                objectStream = new ObjectInputStream(inStream);
+                ficheiro = (NetworkingFile) objectStream.readObject();
+            }catch(ClassNotFoundException c){
+                System.err.println("Error while receiving file: Class Not Found");
+                return null;
+            }catch(IOException i){
+                System.err.println("Error while receiving file: IO Exception");
+                return null;
+            }
+
+            //Receive Final Confirmation
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
+                System.err.println("Couldnt receive the file!");
+                return null;
+            }
+
+            return ficheiro;
+        }
+    }
+
+    /**
+     * Returns an array of "Idea" objects containing all the ideas that have a file attached
+     * @return Array of "Idea" objects containing all the ideas that have a file attached
+     */
+    Idea[] getIdeasFiles(){
+        Idea[] ideaFiles;
+        Common.Message reply;
+        int len, read;
+        boolean needReconnect = false;
+        ObjectInputStream objectStream = null;
+
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEAS_FILES, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            if ( (len = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            ideaFiles = new Idea[len];
+
+            for (int i=0;i<len;i++){
+                ideaFiles[i] = new Idea();
+                if ( !ideaFiles[i].readFromDataStream(inStream) ){
+                    needReconnect = true;
+                    break;
+                }
+            }
+
+            if (needReconnect){
+                reconnect();
+                continue;
+            }
+
+            //Get Final Confirmation
+            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
+                System.err.println("AQUI2");
+                return null;
+            }
+
+            return ideaFiles;
+        }
+    }
+
+
+
     ////
     //  Get every topic for the given idea
     ////
@@ -635,7 +745,7 @@ public class ClientConnection {
 
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
                 System.err.println("AQUI2");
-                reconnect(); continue;
+                return null;
             }
 
             return devolve;

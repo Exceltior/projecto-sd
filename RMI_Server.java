@@ -346,21 +346,42 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
     }
 
-
+    /**
+     * Gets the file associated with a given idea
+     * @param iid The id of the idea in the database
+     * @return NetworkingFile, containing the file associated with the idea
+     * @throws RemoteException
+     */
     public NetworkingFile getFile(int iid) throws RemoteException {
-        String query = "select path fromIdeiasFicheiros where iid ="+iid;
+        String query = "select path, OriginalFile fromIdeiasFicheiros where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
         if ( queryResult == null || queryResult.size() == 0) //FIXME: Deal with this!
         return null;
 
         try {
-            return new NetworkingFile(queryResult.get(0)[0]);
+            return new NetworkingFile(queryResult.get(0)[0],queryResult.get(0)[1]);
         } catch (FileNotFoundException e) {
             System.err.println("Shouldn't happen! DB corrupted?");
             return null;
         }
     }
 
+
+    public Idea[] getFilesIdeas()throws RemoteException{
+        String query = "Select i.iid from IdeiasFicheiros i";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.size() == 0)
+            return null;
+
+        Idea[] listIdeasFiles = new Idea[queryResult.size()];
+
+        for (int i=0;i<queryResult.size();i++){
+            listIdeasFiles[i] = new Idea(queryResult.get(i));
+        }
+
+        return listIdeasFiles;
+    }
 
     ////
     //  Method responsible for getting all the information about all the shares of a given idea
@@ -635,14 +656,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         boolean check = insertData(query,conn);
         returnTransactionalConnection(conn);
 
-        System.out.println("Vou sair");
-
         return check;
     }
-
-    ////
-    //
-    ////
 
     /**
      * Send to the Server the history of transactions for a given client
