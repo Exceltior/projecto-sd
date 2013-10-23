@@ -92,7 +92,7 @@ public class Server {
         new UDPTransmitter("localhost", 1235, 1000).start();
 
         queue = new RequestQueue(connection.getRMIInterface());
-        queue.start();
+        new Thread(queue).start();
 
         for(;;) {
             try {

@@ -2,8 +2,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 
-public class RequestQueue extends Thread {
-    private final ArrayList<Request> requests = new ArrayList<Request>();
+public class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
     private RMI_Interface RMI;
 
     /**
@@ -21,7 +20,7 @@ public class RequestQueue extends Thread {
 
         if ( r != null ) {
             for (Request i : r)
-                requests.add(i);
+                queue.add(i);
         }
     }
 
@@ -29,19 +28,16 @@ public class RequestQueue extends Thread {
         int i;
 
         /* Look for the right place to put it */
-        synchronized (requests) {
-            for (i = 0; i < requests.size() && requests.get(i).timestamp.compareTo(request.timestamp)<=0; i++) ;
-
-            requests.add(i, request);
+        synchronized (queue) {
+            super.enqueue(request);
 
             try {
-                RMI.writeRequestQueueFile(requests);
+                RMI.writeRequestQueueFile(queue);
             } catch (RemoteException e) {
                 //FIXME: Retry 3 times here!
             }
 
-            // Notify the RequestQueue processing thread (not implemented yet)
-            requests.notify();
+            queue.notify();
         }
     }
 
@@ -51,8 +47,8 @@ public class RequestQueue extends Thread {
      * @return The Request, or null if no such request was found
      */
     synchronized Request getFirstRequestByUID(int uid) {
-        synchronized (requests) {
-            for (Request r : requests)
+        synchronized (queue) {
+            for (Request r : queue)
                 if ( r.uid == uid )
                     return r;
         }
@@ -77,8 +73,8 @@ public class RequestQueue extends Thread {
      * @return The Request, or null if no such request was found
      */
     synchronized Request getNthRequestByUIDAndType(int uid, Request.RequestType type, int n) {
-        synchronized (requests) {
-            for (Request r : requests)
+        synchronized (queue) {
+            for (Request r : queue)
                 if ( r.uid == uid && r.requestType == type)
                     if ( --n == 0 ) return r;
         }
@@ -91,13 +87,13 @@ public class RequestQueue extends Thread {
      * @param r
      */
     synchronized void dequeue(Request r) {
-        synchronized (requests) {
-            requests.remove(r);
-        }
-        try {
-            RMI.writeRequestQueueFile(requests);
-        } catch (RemoteException e) {
-            //FIXME: Talvez fazer isto 3 vezes!
+        synchronized (queue) {
+            super.dequeue(r);
+            try {
+                RMI.writeRequestQueueFile(queue);
+            } catch (RemoteException e) {
+                //FIXME: Talvez fazer isto 3 vezes!
+            }
         }
     }
 
@@ -116,16 +112,16 @@ public class RequestQueue extends Thread {
 
 
             // Wait until there's at least one request
-            synchronized (requests) {
-                while ( requests.isEmpty() ) {
+            synchronized (queue) {
+                while ( queue.isEmpty() ) {
                     try {
-                        requests.wait();
+                        queue.wait();
                     } catch (InterruptedException e){}
                 }
 
                 //There is at least one request, process them
-               for (int i = 0; i < requests.size(); i++) {
-                    Request r = requests.get(i);
+               for (int i = 0; i < queue.size(); i++) {
+                    Request r = queue.get(i);
 
                    /* If this request has been handled already (and is thus waiting for a dequeue() and clear of user
                    NEED_NOTIFY, skip it */
@@ -199,7 +195,7 @@ public class RequestQueue extends Thread {
                    }
 
                     try {
-                        RMI.writeRequestQueueFile(requests);
+                        RMI.writeRequestQueueFile(queue);
                     } catch (RemoteException e) {
                         //FIXME: Talvez fazer isto 3 vezes!
                     }

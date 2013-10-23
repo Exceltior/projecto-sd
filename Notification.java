@@ -2,13 +2,13 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
-public class Notification implements Serializable {
+public class Notification implements Serializable, TimestampClass {
     int uidbuyer, uidSeller, amount, pricePerShare;
 
     // These are shared only because they are useful
     String  usernameBuyer, usernameSeller;
 
-    Timestamp timestamp;
+    private Timestamp timestamp;
 
     private static final long serialVersionUID = 1L;
 
@@ -21,7 +21,7 @@ public class Notification implements Serializable {
         this.usernameSeller = usernameSeller;
 
         // timestamp is NOW
-        this.timestamp = new Timestamp(new java.util.Date().getTime());
+        this.setTimestamp(new Timestamp(new java.util.Date().getTime()));
     }
 
     boolean writeToStream(ObjectOutputStream out) {
@@ -40,4 +40,11 @@ public class Notification implements Serializable {
                 "from "+usernameSeller + "(UID "+uidSeller+")";
     }
 
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
 }
