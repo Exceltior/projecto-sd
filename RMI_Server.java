@@ -95,6 +95,30 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return -1;
     }
 
+    /**
+     * This is the same as login, except it doesn't do anything to say we're online. It's meant to be used by the
+     * notification server.
+     * @param user
+     * @param pwd
+     * @return
+     * @throws RemoteException
+     */
+    public int canLogin(String user, String pwd) throws  RemoteException {
+        String query;
+        ArrayList<String[]> result;
+        pwd = hashPassword(pwd);
+        query = "select u.userid from Utilizadores u where u.username = '" + user + "' and u.pass = '" + pwd + "'";
+
+        result = receiveData(query);
+
+        System.out.println("Query: " + query + " has " + result.size() + " results");
+
+        if ( result.size() > 0 )//Return the user's id
+            return Integer.valueOf(result.get(0)[0]);
+        else
+            return -1;
+    }
+
     ////
     //  Method responsible for getting all the topics stored in the database.
     ////
