@@ -111,11 +111,6 @@ public class ClientConnection {
 
             System.out.println("Estou no client connection " + (reply == Common.Message.MSG_OK));
 
-            if ( reply == Common.Message.MSG_OK) {
-                this.loggedIn = true;
-                this.lastPassword = pass;
-                this.lastUsername = username;
-            }
             return reply == Common.Message.MSG_OK;
 
         }
@@ -137,7 +132,6 @@ public class ClientConnection {
         //  MAXI AQUI
         ////
         System.out.println("AQUI " + lastUsername + " " + lastPassword + "\n\n\n");
-        login(lastUsername,lastPassword);//FIXME FIXME: O JOCA METEU ESTA LINHA AQUI
 
         if(this.loggedIn) {
 
@@ -190,6 +184,7 @@ public class ClientConnection {
                 //FIXME FIXME O JOCA ADICIONOU AS PROXIMAS DUAS LINHAS
                 this.lastUsername = user;
                 this.lastPassword = pass;
+                this.loggedIn = true;
 
                 if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
                     reconnect(); continue;
