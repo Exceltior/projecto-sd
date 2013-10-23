@@ -26,6 +26,7 @@ public class ClientConnection {
     private DataInputStream inStream = null;
     private boolean loggedIn = false;
     private String lastUsername, lastPassword;
+    private NotificationConnection notificationThread = null;
 
 
     ////
@@ -34,7 +35,6 @@ public class ClientConnection {
     void connect() {
         do {
             try {
-
                 currentHost = (currentHost+1) % hosts.length;
                 System.out.println(" Trying host " + currentHost + " - '" + hosts[currentHost] + "':" +
                         ports[currentHost]);
@@ -185,6 +185,8 @@ public class ClientConnection {
                 this.lastUsername = user;
                 this.lastPassword = pass;
                 this.loggedIn = true;
+                notificationThread = new NotificationConnection(hosts[currentHost], user, pass);
+                notificationThread.start();
 
                 if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
                     reconnect(); continue;
