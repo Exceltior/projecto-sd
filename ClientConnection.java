@@ -919,6 +919,7 @@ public class ClientConnection {
                 reconnect(); continue;
             }
 
+
             ideasList = new Idea[numIdeas];
 
             for (int i=0;i<numIdeas;i++){

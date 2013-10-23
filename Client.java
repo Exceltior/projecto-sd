@@ -906,23 +906,35 @@ public class Client {
                 //Print Ideas in Favour
                 listIdeas = conn.getIdeaRelations(choice,1);
 
-                System.out.println("List of ideas in favour:");
-                for (Idea anIdeasList : listIdeas)
-                    System.out.println(anIdeasList);
+                if (listIdeas.length > 0){
+                    System.out.println("List of ideas in favour:");
+                    for (Idea anIdeasList : listIdeas)
+                        System.out.println(anIdeasList);
+                }
+                else
+                    System.out.println("There are no ideas in favour!");
 
                 //Print Ideas in Against
                 listIdeas = conn.getIdeaRelations(choice,-1);
 
-                System.out.println("List of ideas in against:");
-                for (Idea anIdeasList : listIdeas)
-                    System.out.println(anIdeasList);
+                if (listIdeas.length > 0){
+                    System.out.println("List of ideas in against:");
+                    for (Idea anIdeasList : listIdeas)
+                        System.out.println(anIdeasList);
+                }
+                else
+                    System.out.println("There are no ideas against!");
 
                 //Print Ideas Neutral
                 listIdeas = conn.getIdeaRelations(choice,0);
 
-                System.out.println("List of ideas in neutral:");
-                for (Idea anIdeasList : listIdeas)
-                    System.out.println(anIdeasList);
+                if (listIdeas.length > 0){
+                    System.out.println("List of ideas in neutral:");
+                    for (Idea anIdeasList : listIdeas)
+                        System.out.println(anIdeasList);
+                }
+                else
+                   System.out.println("There are no ideas neutral!");
 
                 break;
             }

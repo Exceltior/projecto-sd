@@ -472,6 +472,11 @@ public class ServerClient implements Runnable {
             return false;
         }
 
+        if (ideasList == null){
+            if (!Common.sendInt(0,outStream))
+                return false;
+        }
+
         if (!Common.sendInt(ideasList.length,outStream))
             return false;
 
