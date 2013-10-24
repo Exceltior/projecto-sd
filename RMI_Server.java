@@ -750,8 +750,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         history = new String[queryResult.size()];
 
         for (int i=0;i<queryResult.size();i++)
-            history[i] = "Buyer id: " + queryResult.get(i)[0] + " Seller id: " +  queryResult.get(i)[1] + "Transaction Money: "
-                    + queryResult.get(i)[2] + "Idea: " + queryResult.get(i)[3];
+            history[i] = "Buyer id: " + queryResult.get(i)[0] + " Seller id: " +  queryResult.get(i)[1] + " Transaction Money: "
+                    + queryResult.get(i)[2] + " Idea: " + queryResult.get(i)[3];
 
         return  history;
     }
