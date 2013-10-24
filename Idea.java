@@ -11,7 +11,7 @@ public class Idea implements Serializable {
     }
 
     protected int id, uid;
-    protected String body, title;
+    protected String body, title, file;
 
     ////
     // Class Constructor
@@ -19,6 +19,7 @@ public class Idea implements Serializable {
     public Idea() {
         this.id = this.uid = 0;
         this.body = this.title = null;
+        this.file = "N";
     }
 
     ////
@@ -32,6 +33,8 @@ public class Idea implements Serializable {
         if ( ! Common.sendString(title, out) )
             return false;
         if ( ! Common.sendString(body, out) )
+            return false;
+        if ( ! Common.sendString(file, out) )
             return false;
 
         return true;
@@ -50,6 +53,8 @@ public class Idea implements Serializable {
             return false;
         if ( (this.body = Common.recvString(in)) == null )
             return false;
+        if ( (this.file = Common.recvString(in)) == null )
+            return false;
 
         return true;
     }
@@ -63,6 +68,15 @@ public class Idea implements Serializable {
         this.title = row[1]; //title comes before the body
         this.body = row[2];
         this.uid = Integer.valueOf(row[3]);
+        this.file = "N";
+    }
+
+    public void setFile(String f){
+        this.file = f;
+    }
+
+    public String getFile(){
+        return this.file;
     }
 
     public String toString(){
@@ -70,7 +84,8 @@ public class Idea implements Serializable {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
-                ", userid = " + uid +
+                ", userid = " + uid + '\'' +
+                ", file = " + file +
                 '}';
     }
 

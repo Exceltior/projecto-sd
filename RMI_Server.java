@@ -189,6 +189,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 ".tid = "+tid+" and e.activa = 1";
 
         ArrayList<String[]> result = null;
+        String[] temp;
 
         try{
             result = receiveData(query);
@@ -204,8 +205,27 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         Idea[] ideas = new Idea[result.size()];
 
-        for (int i = 0; i < result.size(); i++)
-            ideas[i] = new Idea(result.get(i));
+        for (int i = 0; i < result.size(); i++){
+            temp = new String[result.get(i).length +1];
+
+            //Copy info into temp
+            for (int j=0;j<result.get(i).length;j++)
+                temp[j] = result.get(i)[j];
+
+            //Idea doesnt have file
+            NetworkingFile teste = getFile(Integer.parseInt(temp[0]));
+            System.out.println("AQUI " + teste==null);
+            if ( teste!= null)
+                  temp[temp.length-1] = "Y";
+            else
+                temp[temp.length-1] = "N";
+
+            ideas[i] = new Idea(temp);
+        }
+
+
+        //Check which ideas have files
+
 
         return ideas;
     }
@@ -366,7 +386,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
     }
 
-
+    /**
+     * Gets all the ideas with files attached
+     * @return An array of objects "Idea" with the ideas that have fles attached
+     * @throws RemoteException
+     */
     public Idea[] getFilesIdeas()throws RemoteException{
         String query = "Select i.iid, f.titulo, f.descricao, f.userid from IdeiasFicheiros i, Ideias f where i.iid = f.iid";
         ArrayList<String[]> queryResult = receiveData(query);

@@ -162,44 +162,6 @@ public class Client {
         return devolve;
     }
 
-    private void downloadFile(){
-        Idea[] listIdeasFiles;
-        ArrayList<Integer> listIdeasIDsFiles = new ArrayList<Integer>();
-        int iid;
-        String line;
-        NetworkingFile ficheiro;
-
-        listIdeasFiles = conn.getIdeasFiles();
-
-        System.out.println("List of Ideas with Files Attached:");
-        for (int i=0;i<listIdeasFiles.length;i++){
-            listIdeasIDsFiles.add(listIdeasFiles[i].getId());
-            System.out.println(listIdeasFiles[i]);
-        }
-
-        do{
-            System.out.println("Please insert the id whose file you want to download:");
-            try{
-                line = sc.nextLine();
-                iid = Integer.parseInt(line);
-            }catch(NumberFormatException n){
-                System.out.println("Invalid input!");
-                iid = -2;
-            }
-        }while(!listIdeasIDsFiles.contains(iid));
-
-        ficheiro = conn.getIdeaFile(iid);
-
-        //Write the file to disk
-        if(ficheiro != null){
-            try {
-                ficheiro.writeTo("./" + ficheiro.getName());
-            } catch (FileNotFoundException e) {
-                System.out.println("Error while writing file to disk");
-            }
-        }
-    }
-
     ////
     //  Prints the ideas in favour, against and neutral to a given idea
     ////
@@ -264,7 +226,7 @@ public class Client {
             System.out.println("2 - See ideas in favour of a given idea");
             System.out.println("3 - See ideas against a given idea");
             System.out.println("4 - See ideas neutral for the given idea");
-            System.out.println("5 - Download File Submited with the given idea");
+            System.out.println("5 - Download file attached to an idea");
             System.out.println("0 - Go Back");
             System.out.print("Your choice: ");
             try{
@@ -338,8 +300,8 @@ public class Client {
                     break;
                 }
 
-                case 5:{
-                     downloadFile();
+                case 5: {
+                    //Download file attached to an idea
                     break;
                 }
 
@@ -1130,13 +1092,44 @@ public class Client {
     }
 
     private void commentTopic(int topic){
-        Idea[] ideasList = conn.getTopicIdeas(topic);
+        Idea[] ideasList = conn.getTopicIdeas(topic);//Already says if has file or not
+        ArrayList<Integer> ideasListIds = new ArrayList<Integer>();
         String sentence;
-        int iid = -1;
+        int iid = -1, ideaFile = -1;
+        NetworkingFile ficheiro;
+
+        sc.reset();
 
         System.out.println("\nList of Ideas for the given topic:\n");
-        for (Idea anIdeasList : ideasList)
+        for (Idea anIdeasList : ideasList){
             System.out.println(anIdeasList);
+            if (anIdeasList.getFile().equals("Y"))
+                ideasListIds.add(anIdeasList.getId());
+        }
+
+        //Ask about the files
+        System.out.println("If you want to download a file from any idea listed please insert its id. Otherwise just press any key");
+        try{
+            sentence = sc.nextLine();
+            ideaFile = Integer.parseInt(sentence);
+        }catch(NumberFormatException n){}
+
+        if (ideasListIds.contains(ideaFile)){
+            //Download file
+            ficheiro = conn.getIdeaFile(ideaFile);
+
+            //Write file to disk
+            if (ficheiro != null){
+                try {
+                    ficheiro.writeTo("./" + ficheiro.getName());
+                } catch (FileNotFoundException e) {
+                    System.out.println("Error while writing file to disk");
+                }
+            }
+        }
+
+        else
+            System.out.println("No file is going to be downloaded");
 
         //Now we are going to ask the user if he wants to create an idea
         ClientTopic[] temp = conn.getTopics();
@@ -1144,7 +1137,7 @@ public class Client {
         ArrayList<String> topicName = new ArrayList<String>();
         topicName.add(temp[topic - 1].getTitle());
 
-        sc = new Scanner(System.in);
+        sc.reset();
 
         System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
         try{
@@ -1164,6 +1157,7 @@ public class Client {
     private int listTopics(){
         int selected, min_id_topic = 0, max_id_topic = 0;
         ClientTopic[] topics = conn.getTopics();
+        String line;
 
         if (topics.length>0)
             min_id_topic = topics[0].getId();
@@ -1180,7 +1174,8 @@ public class Client {
         do{
             System.out.print("Which topic do you want to see? ");
             try{
-                selected = sc.nextInt();
+                line = sc.nextLine();
+                selected = Integer.parseInt(line);
             }catch(InputMismatchException m){
                 selected = -1;
             }
