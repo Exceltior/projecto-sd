@@ -1091,23 +1091,11 @@ public class Client {
         return conn.deleteIdea(iid);
     }
 
-    private void commentTopic(int topic){
-        Idea[] ideasList = conn.getTopicIdeas(topic);//Already says if has file or not
-        ArrayList<Integer> ideasListIds = new ArrayList<Integer>();
+    private void downloadFile(ArrayList<Integer> ideasListIds){
         String sentence;
-        int iid = -1, ideaFile = -1;
+        int ideaFile = -1;
         NetworkingFile ficheiro;
 
-        sc.reset();
-
-        System.out.println("\nList of Ideas for the given topic:\n");
-        for (Idea anIdeasList : ideasList){
-            System.out.println(anIdeasList);
-            if (anIdeasList.getFile().equals("Y"))
-                ideasListIds.add(anIdeasList.getId());
-        }
-
-        //Ask about the files
         System.out.println("If you want to download a file from any idea listed please insert its id. Otherwise just press any key");
         try{
             sentence = sc.nextLine();
@@ -1130,6 +1118,27 @@ public class Client {
 
         else
             System.out.println("No file is going to be downloaded");
+    }
+
+    private void commentTopic(int topic){
+        Idea[] ideasList = conn.getTopicIdeas(topic);//Already says if has file or not
+        ArrayList<Integer> ideasListIds = new ArrayList<Integer>();
+        String sentence;
+        int iid = -1;
+
+        sc.reset();
+
+        System.out.println("\nList of Ideas for the given topic:\n");
+        for (Idea anIdeasList : ideasList){
+            System.out.println(anIdeasList);
+            if (anIdeasList.getFile().equals("Y"))
+                ideasListIds.add(anIdeasList.getId());
+        }
+
+        //Ask about the files
+        if (ideasListIds.size()>0){
+            downloadFile(ideasListIds);
+        }
 
         //Now we are going to ask the user if he wants to create an idea
         ClientTopic[] temp = conn.getTopics();
