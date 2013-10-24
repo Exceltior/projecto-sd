@@ -835,11 +835,11 @@ public class ServerClient implements Runnable {
                 //FIXME: Deal with fileResult
 
             }catch(IOException i){
-                System.out.println("IO Exception");
+                System.out.println("IO Exception"); //FIXME Can't just return (remember to dequeue!!)
                 i.printStackTrace();
                 return false;
             }catch(ClassNotFoundException c){
-                System.out.println("Class not found");
+                System.out.println("Class not found");//FIXME Can't just return (remember to dequeue!!)
                 c.printStackTrace();
                 return false;
             }

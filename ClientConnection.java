@@ -15,8 +15,9 @@ import java.util.Date;
 // message to any available server. This eases our error checking code when using this class.
 //
 public class ClientConnection {
-    private static final String[] hosts = { "localhost", "server2"};
-    private static final int[] ports = { 1234, 1234 };
+    private static final String[] hosts = { "localhost", "localhost"};
+    private static final int[] ports = { 1234, 4000 };
+    private static final int[] notificationPorts = { 1237, 4001 };
     private int currentHost = -1;
     private Socket currentSocket = null;
     private DataOutputStream outStream = null;
@@ -40,7 +41,7 @@ public class ClientConnection {
                 inStream = new DataInputStream(currentSocket.getInputStream());
 
             } catch (IOException e) {
-                System.err.println("connect ERR"); e.printStackTrace();
+                //System.err.println("connect ERR"); e.printStackTrace();
             }
         } while ( currentSocket == null);
 
@@ -182,7 +183,8 @@ public class ClientConnection {
                 this.lastUsername = user;
                 this.lastPassword = pass;
                 this.loggedIn = true;
-                notificationThread = new NotificationConnection(hosts[currentHost], user, pass);
+                notificationThread = new NotificationConnection(hosts[currentHost], user, pass,
+                        notificationPorts[currentHost]);
                 notificationThread.start();
 
                 if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {

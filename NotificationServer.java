@@ -4,14 +4,14 @@ import java.net.Socket;
 
 public class NotificationServer extends Thread {
     private Server server;
+    private int port;
 
-    NotificationServer(Server server) {
-        this.server = server;
+    NotificationServer(Server server, int port) {
+        this.server = server; this.port = port;
     }
 
     @Override
     public void run() {
-        int port = 1237;
 
         Socket clientSocket = null;
         ServerSocket acceptSocket = null;

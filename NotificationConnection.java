@@ -5,14 +5,14 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 
 public class NotificationConnection extends Thread {
-    private static final int port = 1237;
+    private int port;
     private Socket socket;
     private DataOutputStream outStream;
     private DataInputStream inStream;
     private ObjectInputStream inObjStream;
     private String user, password;
 
-    NotificationConnection(String host, String user, String pwd) {
+    NotificationConnection(String host, String user, String pwd, int port) {
         //System.out.println("NotificationConnection!"); //FIXME
         try {
             socket = new Socket(host, port);
@@ -21,6 +21,7 @@ public class NotificationConnection extends Thread {
             return;
         }
         this.user = user; this.password = pwd;
+        this.port = port;
     }
 
     @Override

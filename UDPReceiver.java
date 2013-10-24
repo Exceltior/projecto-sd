@@ -45,8 +45,8 @@ public class UDPReceiver extends Thread{
                     if ( !currentlyDead ) {
                         server.notifyConnectionToOtherServerDead();
                         currentlyDead = true;
-                        continue;
                     }
+                    continue;
                 } catch (IOException e2) {
                     //FIXME: What to do here? What exceptions can we get and why?
                     System.err.println("Error receiving packet!");
