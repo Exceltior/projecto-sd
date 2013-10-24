@@ -710,6 +710,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return check;
     }
 
+    /**
+     * Sets the number of shares for a given idea that the user doesnt want to sell
+     * @param iid Id of the idea in question
+     * @param uid Id of the user requesting the operation
+     * @param numberShares Number of shares that the user doesnt want to seel
+     * @return A boolean value, indicating if the operation went well, or not
+     * @throws RemoteException
+     */
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
         String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
@@ -824,6 +832,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return ((conn == null) ? insertData(query) : insertData(query, conn));
     }
 
+    /**
+     * Gets the username of a given user, stored in the database
+     * @param uid The id of the user
+     * @return The username of the user specified by "uid"
+     * @throws RemoteException
+     */
     public String getUsername(int uid) throws RemoteException {
         String query = "select username from  Utilizadores where uid="+uid;
 
@@ -974,9 +988,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return setSharesIdea(uid, iid, nshares,price,numMinShares,null);
     }
 
-    ////
-    //  Set up the number of shares for a given idea, and the price of each share for that idea
-    ////
+    /**
+     * Set up the number of shares for a given idea, and the price of each share for that idea
+     * @param uid   The id of the user who requested the operation
+     * @param iid   The id of the idea whose number of shares we are going to edit
+     * @param nshares The number of shares we are going to assign to the given idea
+     * @param price   The price of each share of the idea
+     * @param numMinShares The minimum number of shares the user doesnt want to sell
+     * @param conn Connection to the RMI Server
+     * @return A boolean value, indicating if the operation went well, or not
+     * @throws RemoteException
+     */
     private synchronized boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares,
                                   Connection conn)throws RemoteException{
         String query = "select * from Shares where uid="+uid+" and "+"iid="+iid;
@@ -997,17 +1019,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return conn ==null ? insertData(query) : insertData(query, conn);
     }
 
+
     synchronized private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn,
                                          int iid) {
-        //FIXME FIXME FIXME: Ver se a ordem dos values é esta (vê bem o nshares e o price!!); adicionar o campo da
-        // data para o instante actual,
-        // porque
-        // isso está em FALTA!! JOCA JOCA JOCA
-
-        ////
-        //  FIXME FIXME FIXME MAXI Falta aqui o id da ideia que foi comprada!
-        //  A partida o resto estará bem!
-        ////
 
         //  First we are going to extract the system date, and them we are going to add it to the query. It appears to have
         //  to be like this, ORACLE SQL is a very good one, and does not allow us to select sysdate inside a query...
@@ -1027,9 +1041,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return res;
     }
 
-    ////
-    //  Mehtod responsible for updating the time when the user was logged in
-    ////
+    /**
+     * Mehtod responsible for updating the time when the user was logged in
+     * @param uid The id of the user
+     * @return A boolean value, indicating if the operation went well, or not
+     * @throws RemoteException
+     */
     public boolean updateUserTime(int uid) throws RemoteException{
         String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
         ArrayList<String[]> queryDataResult;

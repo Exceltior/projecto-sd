@@ -1044,8 +1044,7 @@ public class Client {
                 if (ideasFilesListIds.size()>0)
                     downloadFile(ideasFilesListIds);
                 else
-                    System.out.println("There are no ideas with files associated!" +
-                            "");
+                    System.out.println("There are no ideas with files associated!");
                 break;
             }
 
