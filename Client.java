@@ -907,7 +907,7 @@ public class Client {
             try{
                 line = sc.nextLine();
                 choice = Integer.parseInt(line);
-                if(choice < 0 || choice > 9)
+                if(choice < 0 || choice > 10)
                     repeat = true;
             }catch(NumberFormatException n){
                 repeat = true;
@@ -1407,7 +1407,7 @@ public class Client {
                 //Logout
                 case 0:{
                     System.out.println("Thank you for posting with us, hope you have a nice day! Goodbye!");
-                    stay = false;
+                    System.exit(0);
                     break;
                 }
 
@@ -1498,6 +1498,5 @@ public class Client {
     public static void main(String[] args) {
         Client client = new Client();
         client.execute();
-        System.out.println("Vou sair do main");
     }
 }
