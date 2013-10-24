@@ -37,6 +37,8 @@ public class Idea implements Serializable {
             return false;
         if ( ! Common.sendString(file, out) )
             return false;
+        if ( ! Common.sendInt(shares_to_buy, out) )
+            return false;
 
         return true;
     }
@@ -55,6 +57,8 @@ public class Idea implements Serializable {
         if ( (this.body = Common.recvString(in)) == null )
             return false;
         if ( (this.file = Common.recvString(in)) == null )
+            return false;
+        if ( (this.shares_to_buy = Common.recvInt(in)) == -1)
             return false;
 
         return true;
@@ -97,6 +101,7 @@ public class Idea implements Serializable {
                 ", userid = " + uid + '\'' +
                 ", file = " + file +
                 '}';
+
         return "Idea{" +
                 "id=" + id +
                 ", title='" + title + '\'' +

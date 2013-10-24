@@ -594,7 +594,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
         ArrayList<Idea> devolve = new ArrayList<Idea>();
-        String query = "Select * from Shares s where s.userid !=" +  uid + " and s.nummin < s.numshares";
+        String query = "Select i.iid, i.titulo, i.descricao, i.userid, s.numShares, s.numMin from Shares s, " +
+                "Ideias i where s.userid != " +  uid + " and s.nummin < s.numshares and s.iid = i.iid";
         ArrayList<String[]> queryResult = receiveData(query);
         Idea temp;
 
@@ -605,7 +606,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             for (int i=0;i<queryResult.size();i++){
                 if (!hasElement(devolve,queryResult.get(i))){
                     temp = new Idea(queryResult.get(i));
-                    temp.setSharesBuy(Integer.parseInt(queryResult.get(i)[2]) - Integer.parseInt(queryResult.get(i)[4]));
+                    temp.setSharesBuy( Integer.parseInt(queryResult.get(i)[4]) - (Integer.parseInt(queryResult.get(i)[5])) );
                     devolve.add(temp);
                 }
             }
@@ -776,14 +777,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     /**
      * Get the shares of this user for this idea
-     * @param iid
-     * @param uid
+     * @param iid  The id of the idea
+     * @param uid  The id of the user whose number of shares of the given idea we want to know
      * @return A Share object with the info of the shares, or null in case there are no shares
      * @throws RemoteException
      */
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
         ArrayList<Share> shares = new ArrayList<Share>();
-        String query = "select * from Shares where iid="+iid+" and uid="+uid;
+        String query = "select * from Shares where iid="+iid+" and userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -792,6 +793,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if ( result.size() == 0 ) {
             return null;
         }
+
+        System.out.println("SSSSS");
 
         return new Share(result.get(0));
     }
