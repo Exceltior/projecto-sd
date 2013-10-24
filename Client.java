@@ -857,6 +857,7 @@ public class Client {
     ////
     private int printWelcomeScreen(){
         int choice;
+        String line;
 
         System.out.println("\n               Welcome!");
         System.out.println("--------------------------------------------------");
@@ -865,9 +866,10 @@ public class Client {
         System.out.println("2 - Register");
         System.out.print("Your choice: ");
         try{
-            choice = sc.nextInt();
-            sc.nextLine();
-        }catch(InputMismatchException m){
+            line = sc.nextLine();
+            choice = Integer.parseInt(line);
+        }catch(NumberFormatException n){
+            System.out.println("Invalid input!");
             choice = 5;//So that we run the cicle again
         }
 
@@ -1056,6 +1058,7 @@ public class Client {
         int choice;
         int  login_result = 3;
         boolean stay = true;
+        String line;
 
         //  Connects to the TCP Primary Server
         conn.connect();
@@ -1094,8 +1097,15 @@ public class Client {
                 if (!conn.register(username,password,email,date)){
                     do{
                         System.out.print("Registration unsucessfull :(\n1-Try login in with another username\n2-Try registration again\nYour choice: ");
-                        choice = sc.nextInt();
-                        sc.nextLine();//Clear the buffer
+                        line = sc.nextLine();
+                        try{
+                            choice = Integer.parseInt(line);
+                            if (choice!=1 && choice!=2)
+                                System.out.println("Invalid input!");
+                        }catch(NumberFormatException n){
+                            System.out.println("Invalid input!");
+                            choice = 6;//To enter the loop again
+                        }
                         stay = true;
                     } while (choice!=1 && choice!=2);
 
