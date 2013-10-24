@@ -846,7 +846,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public String getUsername(int uid) throws RemoteException {
-        String query = "select username from  Utilizadores where uid="+uid;
+        String query = "select username from  Utilizadores where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
         if ( result== null || result.isEmpty())
@@ -935,7 +935,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 if ( availShares >= numShares ) {
                     System.out.println("ALready, good to finish! shares!: "+numShares+" was needed!");
                     // There are enough for us to finish!
-                    int toBuy = availShares-numShares;
+                    int toBuy = numShares;
 
                     if ( s.getPriceForNum(toBuy) > userMoney ) {
                         System.out.println("Not enough money...:"+userMoney+", "+s.getPriceForNum(toBuy));

@@ -54,7 +54,7 @@ public class NotificationQueue extends OrderedTimestampQueue<Notification> {
             //FIXME: Retry 3 times here!
         }
 
-        if ( r != null ) {
+        if ( r != null && r.size() > 0 ) {
             System.out.println("There are notifications!");
             for (Notification i : r) {
                 queue.add(i);
