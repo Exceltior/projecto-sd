@@ -10,6 +10,7 @@ public class Server {
     boolean primary = true;
 
     private RMIConnection connection;
+    private Thread requestThread;
 
     public RMIConnection getConnection() {
         return connection;
@@ -18,11 +19,13 @@ public class Server {
     void goSecondary() {
         System.out.println("Becoming SECONDARY server...");
         primary = false;
+        requestThread.stop();
     }
 
     void goPrimary() {
         System.out.println("Becoming PRIMARY server...");
         primary = true;
+        requestThread.start();
     }
 
     // For a client to know if we're primary or not
@@ -86,13 +89,14 @@ public class Server {
 
         // Port 1235 is where we will wait for the other server's ping. If we don't get it, means we can't reach it, or
         // it can't reach us...
-        new UDPReceiver(1235, this, 2000).start();
+        new UDPReceiver(udpReceiverPort, this, 2000).start();
 
         //FIXME: 'localhost' should be the IP of the other server. Also fix port
-        new UDPTransmitter("localhost", 1235, 1000).start();
+        new UDPTransmitter("localhost", udpTransmitterPort, 1000).start();
 
         queue = new RequestQueue(connection.getRMIInterface());
-        new Thread(queue).start();
+        requestThread = new Thread(queue);
+        requestThread.start();
 
         for(;;) {
             try {
