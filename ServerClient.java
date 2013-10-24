@@ -464,10 +464,15 @@ public class ServerClient implements Runnable {
         try{
             //1º - Obter numero de shares que o user ja tem para ver com quantas e que ele vai ficar;
             Share currentShares = RMIInterface.getSharesIdeaForUid(iid,uid);
-            numSharesAlreadyHas = currentShares.getNum();
-            numMinSharesAlreadyHas = currentShares.getNumMin();
+            if ( currentShares != null ) {
+                numSharesAlreadyHas = currentShares.getNum();
+            } else {
+                numSharesAlreadyHas = 0;
+            }
+            System.out.println(uid+", "+iid+", "+numSharesAlreadyHas +", "+price+", " +
+                    ""+minNumberShares);
              check = RMIInterface.registerGetSharesRequest(uid,iid,(numberSharesToBuy+numSharesAlreadyHas),price,
-                     (numMinSharesAlreadyHas+minNumberShares));
+                     minNumberShares);
         }catch(RemoteException r){
             System.err.println("Error in the handle buy shares!");
             return false;
@@ -476,10 +481,10 @@ public class ServerClient implements Runnable {
         if (check){
             if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
                 return false;
+        } else {
+            if(!Common.sendMessage(Common.Message.MSG_ERR,outStream))
+                return false;
         }
-
-        if(!Common.sendMessage(Common.Message.MSG_ERR,outStream))
-            return false;
 
         return true;
     }

@@ -800,6 +800,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     private void sortByPrice(ArrayList<Share> shares) {
+        System.out.println("DUmping share owners:");
+        for (Share s : shares) {
+            System.out.println(s);
+        }
         Collections.sort(shares);
     }
 
@@ -853,6 +857,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice,
                                                     int minTargetShares)  throws RemoteException {
+        System.out.println("registerGetSharesRequest called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
+                ", targetPrice="+targetPrice+", minTargetShares="+minTargetShares);
         int ret = tryGetSharesIdea(uid, iid, numShares, targetPrice, minTargetShares);
 
         if ( ret == 0 )
@@ -877,7 +883,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     synchronized public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice,
                                               int minTargetShares) throws
             RemoteException {
-
+        System.out.println("tryGetSharesIdea called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
+                ", targetPrice="+targetPrice+", minTargetShares="+minTargetShares);
         Share currentShares = getSharesIdeaForUid(iid, uid);
         int userMoney = getUserMoney(uid);
 
@@ -921,19 +928,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
          */
 
         for (Share s : shares) {
+            System.out.println("processing share: "+s);
             int availShares = s.getAvailableShares();
             if ( availShares > 0 ) {
+                System.out.println("ALready, available shares!: "+availShares);
                 if ( availShares >= numShares ) {
+                    System.out.println("ALready, good to finish! shares!: "+numShares+" was needed!");
                     // There are enough for us to finish!
                     int toBuy = availShares-numShares;
 
                     if ( s.getPriceForNum(toBuy) > userMoney ) {
+                        System.out.println("Not enough money...:"+userMoney+", "+s.getPriceForNum(toBuy));
                         // Not enough money...
                         int pricePerShare = s.getPrice();
 
                         // See how many we can buy. Round down!
 
                         toBuy = (int)(((double)userMoney) / pricePerShare);
+                        if ( toBuy == 0 )
+                            break;
+                        System.out.println("Will still try to buy "+toBuy);
                     }
                     sharesToBuy.add(s);
                     sharesToBuyNum.add(toBuy);
@@ -941,15 +955,37 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                     userMoney -= s.getPriceForNum(toBuy);
                     break;
                 } else {
+
+
+
+                    // COPY PASTE FIXME
+                    if ( s.getPriceForNum(availShares) > userMoney ) {
+                        System.out.println("Not enough money...:"+userMoney+", "+s.getPriceForNum(availShares));
+                        // Not enough money...
+                        int pricePerShare = s.getPrice();
+
+                        // See how many we can buy. Round down!
+
+                        availShares = (int)(((double)userMoney) / pricePerShare);
+                        if ( availShares == 0 )
+                            break;
+                        System.out.println("Will still try to buy "+availShares);
+                    }
                     sharesToBuy.add(s);
                     sharesToBuyNum.add(availShares);
                     numShares -= availShares; //Still some left to buy...
+                    userMoney -= s.getPriceForNum(availShares);
+                    // FIXME
+
+
+                    System.out.println("Still "+numShares+" to go!");
                 }
             }
         }
 
         if ( numShares > 0 ) {
             //Can't buy shares!!!
+            System.out.println("Failed to buy shares!!");
             return 0;
         }
 
@@ -959,6 +995,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             Share s = sharesToBuy.get(i);
             int num = sharesToBuyNum.get(i);
             int resultingShares = s.getNum()-num;
+            System.out.println("Buying "+num+"from "+s.getUid()+"!!");
 
             setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),s.getNumMin(),conn);
             insertIntoHistory(uid, iid, num,s.getPrice(),conn,iid);
@@ -974,10 +1011,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         for (int i = 0; i < sharesToBuy.size(); i++) {
             Share s = sharesToBuy.get(i);
+            System.out.println("To buy: "+s);
+            System.out.println("(Buying): "+sharesToBuyNum.get(i));
             new NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
-                    s.getPrice(), getUsername(uid), getUsername(s.getUid())));
+                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
             new NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
-                    s.getPrice(), getUsername(uid), getUsername(s.getUid())));
+                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
         }
         return 1;
     }
@@ -1554,7 +1593,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     public static void main(String[] args) {
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");

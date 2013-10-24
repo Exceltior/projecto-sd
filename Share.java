@@ -73,4 +73,15 @@ public class Share  implements Comparable<Share>, Serializable {
     public int getPrice() {
         return price;
     }
+
+    @Override
+    public String toString() {
+        return "Share{" +
+                "uid=" + uid +
+                ", iid=" + iid +
+                ", price=" + price +
+                ", numMin=" + numMin +
+                ", num=" + num +
+                '}';
+    }
 }
