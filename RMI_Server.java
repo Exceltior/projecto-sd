@@ -24,6 +24,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private int num_users;
     private int num_topics;
     private int num_ideas;
+    private int num_transactions;
     private int starting_money = 10000;
     private int limit_time_active = 300;//5 minutes
     private ConnectionPool connectionPool;
@@ -1068,13 +1069,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         //  First we are going to extract the system date, and them we are going to add it to the query. It appears to have
         //  to be like this, ORACLE SQL is a very good one, and does not allow us to select sysdate inside a query...
         String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
-        String query = "insert into Transacoes values(" + uidBuyer + "," + uidSeller + "," + price  + "," + nshares + "," + iid ;
+        String query = "insert into Transacoes values(" + (num_transactions+1) + "," + uidBuyer + "," + uidSeller + "," + price
+                + "," + nshares + "," + iid ;
         ArrayList<String[]> queryDataResult;
         boolean res = false;
         try {
             queryDataResult = receiveData(queryData, conn);
             query = query + ", to_date('" + queryDataResult.get(0)[0] + "','yyyy:mm:dd:hh:mi:ss'))";
             res = insertData(query, conn);
+            if (res)//It went well
+                num_transactions++;
         } catch (RemoteException e) {
             System.err.println("Remote exception, wtf!"); //FIXME
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -1445,6 +1449,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
                 teste = receiveData("Select count(*) from Ideias");
                 num_ideas = Integer.parseInt(teste.get(0)[0]);
+
+                teste = receiveData("Select count(*) from Transacoes");
+                num_transactions = Integer.parseInt(teste.get(0)[0]);
             }catch(RemoteException r){
                 System.err.println("Remote Exception while trying to get the number of users....");
                 //FIXME: HOW TO DEAL WITH THIS EXCEPTION????
@@ -1600,7 +1607,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     public static void main(String[] args) {
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");
