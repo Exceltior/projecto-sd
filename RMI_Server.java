@@ -1068,7 +1068,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         //  First we are going to extract the system date, and them we are going to add it to the query. It appears to have
         //  to be like this, ORACLE SQL is a very good one, and does not allow us to select sysdate inside a query...
         String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
-        String query = "insert into Transaccoes values(" + uidBuyer + "," + uidSeller + "," + price  + "," + nshares + "," + iid ;
+        String query = "insert into Transacoes values(" + uidBuyer + "," + uidSeller + "," + price  + "," + nshares + "," + iid ;
         ArrayList<String[]> queryDataResult;
         boolean res = false;
         try {
