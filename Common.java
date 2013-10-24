@@ -35,6 +35,8 @@ public class Common {
         REQUEST_GETFILE,            //Get a file associated with a given idea
         REQUEST_GET_IDEAS_FILES,    //Get a list with the id's of the files which have a file attached
         REQUEST_GET_IDEA_FILE,      //Get a file from an idea
+        REQUEST_GET_IDEAS_BUY,      //Gets all the ideas a user can buy
+        REQUEST_BUYSHARES,          //The user wants to buy shares
 
 
 

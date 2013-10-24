@@ -480,13 +480,135 @@ public class ClientConnection {
         }
     }
 
-    ////
-    //  Get an idea by its iid and title
-    ////
+    /**
+     * Buys shares of an idea
+     * @param iid The idea id
+     * @param numberSharesToBuy  Number of shares the user wants to buy
+     * @param price  The price that he wants to sell each share
+     * @param minNumberShares Minimum nunber of shares he doesnt want to sell (from the shares he bought)
+     * @return boolean value, indicating if the transaction happened
+     */
+    public boolean buyShares(int iid,int numberSharesToBuy,int price,int minNumberShares){
+        Common.Message reply;
+
+        if (iid == -1)//FIXME: THIS SHOULD NEVER HAPPEN?????
+            return false;
+
+        if (price == -1)//To avoid the "They're trying to hack us" message
+            price = -2;
+
+        if (minNumberShares == -1)//To avoid the "They're trying to hack us" message
+            minNumberShares = -2;
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_BUYSHARES, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return false;
+            }
+
+            //Send data
+            if (!Common.sendInt(iid,outStream) ){
+                reconnect();continue;
+            }
+
+            if (!Common.sendInt(numberSharesToBuy,outStream) ){
+                reconnect();continue;
+            }
+
+            if (!Common.sendInt(price,outStream) ){
+                reconnect();continue;
+            }
+
+            if (!Common.sendInt(minNumberShares,outStream) ){
+                reconnect();continue;
+            }
+
+            //Get Confirmation
+            reply = Common.recvMessage(inStream);
+
+            return reply == Common.Message.MSG_OK;
+        }
+    }
+
+    /**
+     * Gets an ArrayList of objects of type "Idea" containing all the ideas the user can buy
+     * @return
+     */
+    ArrayList<Idea> getIdeasBuy(){
+        Common.Message reply;
+        int len;
+        Idea temp;
+        boolean needReconnect = false;
+        ArrayList<Idea> devolve = new ArrayList<Idea>();
+
+        for(;;){
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEAS_BUY, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return null;
+            }
+
+            //Receive Data
+            if ( (len = Common.recvInt(inStream)) == -1){
+                reconnect();continue;
+            }
+
+            for (int i=0;i<len;i++){
+                temp = new Idea();
+                if (!temp.readFromDataStream(inStream)){
+                    needReconnect = true;
+                    break;
+                }
+                devolve.add(temp);
+            }
+
+            if (needReconnect){
+                needReconnect = false;
+                reconnect();
+                continue;
+            }
+
+            //Receive Final confirmation
+            reply = Common.recvMessage(inStream);
+
+            if (reply != Common.Message.MSG_OK)
+                return null;
+
+            return devolve;
+        }
+
+    }
+
+    /**
+     * Gets ideas by its iid and title
+     * @param iid  The id of the idea (can be ommitted - Value = -1)
+     * @param title The title of the idea (can be ommitted - Value = -1)
+     * @return
+     */
     Idea[] getIdea(int iid, String title){
         Common.Message reply;
         Idea[] ideas;
         int len;
+        boolean needReconnect = false;
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEA, outStream) ) {
@@ -525,7 +647,16 @@ public class ClientConnection {
 
             for (int i=0;i<len;i++){
                 ideas[i] = new Idea();
-                ideas[i].readFromDataStream(inStream);
+                if (!ideas[i].readFromDataStream(inStream)){
+                    needReconnect = true;
+                    break;
+                }
+            }
+
+            if (needReconnect == true){
+                needReconnect = false;
+                reconnect();
+                continue;
             }
 
             reply = Common.recvMessage(inStream);
@@ -697,6 +828,7 @@ public class ClientConnection {
             }
 
             if (needReconnect){
+                needReconnect = false;
                 reconnect();
                 continue;
             }
@@ -1282,6 +1414,7 @@ public class ClientConnection {
             }
 
             if (needReconnect){
+                needReconnect = false;
                 reconnect();
                 continue;
             }

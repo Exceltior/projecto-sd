@@ -892,6 +892,7 @@ public class Client {
         System.out.println("7 - Search Topic");
         System.out.println("8 - Manage User Ideas");
         System.out.println("9 - Add relation between two ideas");
+        System.out.println("10 - Buy shares of an idea");
         System.out.println("0 - Sair");
 
         do{
@@ -1287,6 +1288,104 @@ public class Client {
             System.out.println("Relationship between ideas was not added");
     }
 
+    private int hasElement(ArrayList<Idea> ideasList, int iid){
+        for (int i=0;i<ideasList.size();i++){
+            if (ideasList.get(i).getId() == iid)
+                return i;
+        }
+        return -1;
+    }
+
+    private boolean buyShares(){
+        //Lista ideias das quais o user nao detem 100% das shares
+        ArrayList<Idea> canBuyIdeas = conn.getIdeasBuy();//List of ideas the user can buy
+        boolean repeat;
+        String line;
+        int iid = -1, price = 1, numberSharesToBuy = 1, index = -1, minNumberShares = 0;
+
+        if (canBuyIdeas==null || canBuyIdeas.size() == 0){
+            System.out.println("There are no ideas to sell");
+            return false;
+        }
+
+        System.out.println("List of ideas the user can buy:");
+        for (int i=0;i<canBuyIdeas.size();i++)
+            System.out.println(canBuyIdeas.get(i));
+
+        //Pedir ao user que ideias quer comprar
+        do{
+            repeat = false;
+            System.out.println("Please insert the id of the idea whose shares you want to buy:");
+            line = sc.nextLine();
+            try{
+                iid = Integer.parseInt(line);
+                index = hasElement(canBuyIdeas,iid);
+                if (iid < 1 || index == -1){
+                    System.out.println("Invalid option!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid option!");
+                repeat = true;
+            }
+        }while (repeat);
+
+        //Get how many shares are available for the given idea
+        do{
+            repeat = false;
+            System.out.println("Please insert the number of shares you want to buy from the given idea:");
+            line = sc.nextLine();
+            try{
+                numberSharesToBuy = Integer.parseInt(line);
+                if (canBuyIdeas.get(index).getSharesBuy() < numberSharesToBuy){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
+
+        do{
+            repeat = false;
+            System.out.println("Please insert the selling price of each share you are going to buy, or -1 if you dont" +
+                    " want to change it:");
+            line = sc.nextLine();
+            try{
+                price = Integer.parseInt(line);
+                if(price < -1){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
+
+        do{
+
+            repeat = false;
+            System.out.println("Please insert the minimum number of shares you dont want to sell from the shares you " +
+                    " are going to buy (If you already have shares and want to keep the same number enter -1)");
+            line = sc.nextLine();
+            try{
+                minNumberShares = Integer.parseInt(line);
+                if(minNumberShares < -1 || minNumberShares > numberSharesToBuy){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
+
+
+        return conn.buyShares(iid,numberSharesToBuy,price,minNumberShares);
+    }
+
     private void mainLoop(){
         int choice, topic, idea;
         boolean stay = true;
@@ -1372,6 +1471,12 @@ public class Client {
                     break;
                 }
 
+                //Buy shares of an idea
+                case 10:{
+                    buyShares();
+                    break;
+                }
+
                 //Wrong choice
                 default:{
                     System.out.println("Invalid option!");
@@ -1379,8 +1484,6 @@ public class Client {
                 }
             }
         }
-
-        System.out.println("SAI");
     }
 
     public static void main(String[] args) {

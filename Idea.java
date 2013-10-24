@@ -10,7 +10,7 @@ public class Idea implements Serializable {
         return id;
     }
 
-    protected int id, uid;
+    protected int id, uid, shares_to_buy;
     protected String body, title, file;
 
     ////
@@ -20,6 +20,7 @@ public class Idea implements Serializable {
         this.id = this.uid = 0;
         this.body = this.title = null;
         this.file = "N";
+        this.shares_to_buy = -2;
     }
 
     ////
@@ -79,13 +80,30 @@ public class Idea implements Serializable {
         return this.file;
     }
 
+    public void setSharesBuy(int n){
+        this.shares_to_buy = n;
+    }
+
+    public int getSharesBuy(){
+        return this.shares_to_buy;
+    }
+
     public String toString(){
-        return "Idea{" +
+        if (this.shares_to_buy == -2)
+            return "Idea{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
                 ", userid = " + uid + '\'' +
                 ", file = " + file +
+                '}';
+        return "Idea{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                ", userid = " + uid + '\'' +
+                ", file = " + file + '\'' +
+                ", shares to buy = " + shares_to_buy +
                 '}';
     }
 

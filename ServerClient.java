@@ -208,6 +208,16 @@ public class ServerClient implements Runnable {
                     System.err.println("Error in the handle get idea file method!!!!!");
                     break;
                 }
+            }else if (msg == Common.Message.REQUEST_GET_IDEAS_BUY){
+                if (!handleGetIdeasCanBuy()){
+                    System.err.println("Error in the handle get ideas can buy method!!!!!");
+                    break;
+                }
+            }else if (msg == Common.Message.REQUEST_BUYSHARES){
+                if (!handleBuyShares()){
+                    System.err.println("Error in the handle buy shares method!!!!!");
+                    break;
+                }
             }
         }
 
@@ -421,6 +431,59 @@ public class ServerClient implements Runnable {
         return true;
     }
 
+    private boolean handleBuyShares(){
+        int iid, price, numberSharesToBuy, minNumberShares, numSharesAlreadyHas, numMinSharesAlreadyHas;
+        boolean check = false;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Receive Data
+        if ( (iid = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (numberSharesToBuy = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if ( (price = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if (price == -2)//To void the "They're trying to hack us" message
+            price = -1;
+
+        if ( (minNumberShares = Common.recvInt(inStream)) == -1)
+            return false;
+
+        if (minNumberShares == -2)//To avoid the "They're trying to hack us" message
+            minNumberShares = -1;
+
+        try{
+            //1º - Obter numero de shares que o user ja tem para ver com quantas e que ele vai ficar;
+            Share currentShares = RMIInterface.getSharesIdeaForUid(iid,uid);
+            numSharesAlreadyHas = currentShares.getNum();
+            numMinSharesAlreadyHas = currentShares.getNumMin();
+             check = RMIInterface.registerGetSharesRequest(uid,iid,(numberSharesToBuy+numSharesAlreadyHas),price,
+                     (numMinSharesAlreadyHas+minNumberShares));
+        }catch(RemoteException r){
+            System.err.println("Error in the handle buy shares!");
+            return false;
+        }
+
+        if (check){
+            if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
+                return false;
+        }
+
+        if(!Common.sendMessage(Common.Message.MSG_ERR,outStream))
+            return false;
+
+        return true;
+    }
+
     private boolean setRelations(int iid,ArrayList<Integer> ideas, int relationType, ArrayList<Request> requests,
                                  int oldI){
         for (int i=0;i<ideas.size();i++) {
@@ -452,6 +515,44 @@ public class ServerClient implements Runnable {
                     return false;
             }
         }
+
+        return true;
+    }
+
+    private boolean handleGetIdeasCanBuy(){
+        ArrayList<Idea> ideasUserCanBuy = null;
+
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        try{
+             ideasUserCanBuy = RMIInterface.getIdeasCanBuy(uid);
+        }catch(RemoteException r){
+            System.err.println("Error while getting ideas the user can buy");
+            return false;
+        }
+
+        if (ideasUserCanBuy == null){
+            Common.sendMessage(Common.Message.MSG_ERR,outStream);
+            return false;
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        //Send Data
+        if (!Common.sendInt(ideasUserCanBuy.size(),outStream))
+            return false;
+
+        for (int i=0;i<ideasUserCanBuy.size();i++){
+            if (!ideasUserCanBuy.get(i).writeToDataStream(outStream))
+                return false;
+        }
+
+        //Final confirmation
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
 
         return true;
     }

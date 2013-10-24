@@ -578,6 +578,41 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return devolve;
     }
 
+    ////
+    //  Indica se o primeiro array list tem alguma ideia com o referido id
+    ////
+    private boolean hasElement(ArrayList<Idea> listIdeas,String[] queryResult){
+        int i;
+
+        for (i=0;i<listIdeas.size();i++){
+            if ( Integer.parseInt(queryResult[0]) == listIdeas.get(i).getId() )
+                return true;
+        }
+        return false;
+
+    }
+
+    synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
+        ArrayList<Idea> devolve = new ArrayList<Idea>();
+        String query = "Select * from Shares s where s.userid !=" +  uid + " and s.nummin < s.numshares";
+        ArrayList<String[]> queryResult = receiveData(query);
+        Idea temp;
+
+        if (queryResult== null || queryResult.size()==0)
+            return null;
+
+        else{
+            for (int i=0;i<queryResult.size();i++){
+                if (!hasElement(devolve,queryResult.get(i))){
+                    temp = new Idea(queryResult.get(i));
+                    temp.setSharesBuy(Integer.parseInt(queryResult.get(i)[2]) - Integer.parseInt(queryResult.get(i)[4]));
+                    devolve.add(temp);
+                }
+            }
+        }
+        return devolve;
+    }
+
     public Idea[] getIdeaByIID(int iid, String title) throws RemoteException{
         String query;
         Idea[] devolve;
