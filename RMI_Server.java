@@ -814,7 +814,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public int getUserMoney(int uid) throws RemoteException {
-        String query = "select dinheiro from Utilizadores where uid="+uid;
+        String query = "select dinheiro from Utilizadores where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -1555,6 +1555,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                     System.err.println("Error reading from Notification Queue File! (Class not found)");
                     return null;
                 }
+
+
+            if ( notifications != null && notifications.size()>0 ) {
+                System.out.println("Just found notifications!");
+                for (Notification n : notifications)
+                    System.out.println("SUch as: "+n);
+            }
 
             return notifications;
         }

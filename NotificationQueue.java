@@ -55,8 +55,11 @@ public class NotificationQueue extends OrderedTimestampQueue<Notification> {
         }
 
         if ( r != null ) {
-            for (Notification i : r)
+            System.out.println("There are notifications!");
+            for (Notification i : r) {
                 queue.add(i);
+                System.out.println("Adding not: "+i);
+            }
         }
     }
 }

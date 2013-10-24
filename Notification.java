@@ -10,8 +10,6 @@ public class Notification implements Serializable, TimestampClass {
 
     private Timestamp timestamp;
 
-    private static final long serialVersionUID = 1L;
-
     Notification(int uidBuyer, int uidSeller, int amount, int pricePerShare, String usernameBuyer,
                  String usernameSeller, int iid) {
         this.uidbuyer = uidBuyer;

@@ -93,6 +93,7 @@ public class NotificationClient implements Runnable {
             Notification n;
 
             while ( (n = queue.getNextNotification() ) != null) {
+                System.out.println("Grabbed notification: "+n);
                 if(!n.writeToStream(objStream)) {
                     System.out.println("Notification: User "+uid+" dropped!");
                     return;
