@@ -554,7 +554,7 @@ public class Client {
                     repeat = true;
                 }
             }
-            else if(!file.equals("N") || !file.equals("n")){//The user selected something different from "Y" or "N"
+            else if(!file.equals("N") && !file.equals("n")){
                 repeat = true;
                 System.out.println("Invalid input!");
             }
@@ -711,7 +711,7 @@ public class Client {
                     repeat = true;
                 }
             }
-            else if(!file.equals("N") || file.equals("n")){//The user selected something different from "Y" or "N"
+            else if(!file.equals("N") && file.equals("n")){
                 repeat = true;
                 System.out.println("Invalid input");
             }
