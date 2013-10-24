@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 public class Transaction implements Serializable, TimestampClass {
     int uid, iid, numTargetShares, targetPrice, minTargetShares;
     private Timestamp timestamp;
+    private static final long serialVersionUID = 1L;
+
     Transaction(int uid, int iid, int numTargetShares, int targetPrice, int minTargetShares) {
         this.uid = uid; this.iid = iid; this.numTargetShares = numTargetShares;
         this.targetPrice = targetPrice; this.minTargetShares = minTargetShares;

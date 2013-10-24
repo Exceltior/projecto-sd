@@ -175,9 +175,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         ideas = new Idea[queryResult.size()];
 
-        for (int i = 0; i < queryResult.size(); i++)
+        for (int i = 0; i < queryResult.size(); i++){
             ideas[i] = new Idea(queryResult.get(i));
-
+            if(getFile(Integer.parseInt(queryResult.get(i)[0])) != null)
+                ideas[i].setFile("Y");
+        }
 
         return ideas;
     }
@@ -208,15 +210,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         Idea[] ideas = new Idea[result.size()];
 
-
-
         for (int i = 0; i < result.size(); i++){
             ideas[i] = new Idea(result.get(i));
 
-            if(getFile(Integer.parseInt(result.get(i)[0])) != null){
-                System.out.println("IDEA HAS FILE!!!");
+            if(getFile(Integer.parseInt(result.get(i)[0])) != null)
                 ideas[i].setFile("Y");
-            }
         }
 
         return ideas;
@@ -566,12 +564,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public Idea getIdeaByIID(int iid) throws RemoteException {
         String query = "select * from Ideias t where t.iid = " + iid + " and t.activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
+        Idea devolve;
 
         //FIXME: Maybe we should handle the case where the query fails in a different way
         if (queryResult == null || queryResult.isEmpty())
             return null;
 
-        return new Idea(queryResult.get(0));
+        devolve = new Idea(queryResult.get(0));
+
+        if (getFile(iid) != null)
+            devolve.setFile("Y");
+
+        return devolve;
     }
 
     public Idea[] getIdeaByIID(int iid, String title) throws RemoteException{
@@ -593,8 +597,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
 
         devolve = new Idea[queryResult.size()];
-        for (int i=0;i<queryResult.size();i++)
+        for (int i=0;i<queryResult.size();i++){
             devolve[i] = new Idea(queryResult.get(i));
+            if (getFile(devolve[i].getId()) != null)
+                devolve[i].setFile("Y");
+        }
 
         return devolve;
     }

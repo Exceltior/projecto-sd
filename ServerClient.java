@@ -779,7 +779,7 @@ public class ServerClient implements Runnable {
             return false;
 
         if (iid == -2)
-            iid = -1; //To avoid "Because they're trying to hack us" <- 0   0To Maxi
+            iid = -1; //To avoid "Because they're trying to hack us" <- To Maxi
         ////
         //FIXME FIXME FIXME MAXI VE ISTO!!!
         //FIXME FIXME FIXME MAXI VE ISTO!!!

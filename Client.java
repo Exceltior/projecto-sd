@@ -212,7 +212,7 @@ public class Client {
     ////
     //  Provides a number of options to perform over a list of ideas
     ////
-    private void ideaOptions(ArrayList<Integer> listIdeasIDs){
+    private void ideaOptions(ArrayList<Integer> listIdeasIDs, ArrayList<Integer> ideasFilesListIds){
         boolean stay = true;
         String line, temp;
         int choice, iid, result;
@@ -302,6 +302,12 @@ public class Client {
 
                 case 5: {
                     //Download file attached to an idea
+                    if (ideasFilesListIds.size()>0){
+                        downloadFile(ideasFilesListIds);
+                    }
+                    else
+                        System.out.println("There are no ideas with files associated");
+
                     break;
                 }
 
@@ -321,7 +327,8 @@ public class Client {
         int iid = -2;
         boolean repeat;
         Idea[] userSelectedIdea;
-        ArrayList<Integer> listIdeasIDs = new ArrayList<Integer>();
+        ArrayList<Integer> listIdeasIDs = new ArrayList<Integer>();//List of user's ideas ids
+        ArrayList<Integer> listIdeasFilesListIDs = new ArrayList<Integer>();//List of ideas' ids with file
 
         System.out.println("\n\nWelcome to the Idea's Search Engine!\nWe provide two ways of searching for a topic:" +
                 "By its name and by its topic id. You must insert at least one of these fields\n\n");
@@ -361,9 +368,12 @@ public class Client {
         for (int i=0;i<userSelectedIdea.length;i++){
             listIdeasIDs.add(userSelectedIdea[i].getId());
             System.out.println(userSelectedIdea[i]);
+            if (userSelectedIdea[i].getFile().equals("Y")){
+                 listIdeasFilesListIDs.add(userSelectedIdea[i].getId());
+            }
         }
 
-        ideaOptions(listIdeasIDs);
+        ideaOptions(listIdeasIDs,listIdeasFilesListIDs);
     }
 
     ////
@@ -544,7 +554,7 @@ public class Client {
                     repeat = true;
                 }
             }
-            else if(!file.equals("N")){//The user selected something different from "Y" or "N"
+            else if(!file.equals("N") || !file.equals("n")){//The user selected something different from "Y" or "N"
                 repeat = true;
                 System.out.println("Invalid input!");
             }
@@ -557,11 +567,11 @@ public class Client {
     //  Creates a new idea, commenting directly on a topic
     ////
     private boolean commentIdea(ArrayList<String> topicTitle, int iid){
-        String title, description, file, filePath;
-        int commentType = -2, nshares, price, minNumShares;
+        String title, description, file, filePath, line;
+        int commentType = -2, nshares = 1, price = 1, minNumShares = 1;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
-        boolean typeInserted = false, repeat = false;
+        boolean repeat = false;
         NetworkingFile ficheiro = null;
 
         do{
@@ -573,9 +583,8 @@ public class Client {
             }
         }while (repeat);
 
-        repeat = false;
-
         do{
+            repeat = false;
             System.out.println("Please enter the description of the idea:");
             description = sc.nextLine();
             if (description.equals("")){
@@ -584,20 +593,52 @@ public class Client {
             }
         }while (repeat);
 
-        System.out.println("Please enter the number of shares for the idea:");
-        nshares = sc.nextInt();
+        do{
+            repeat = false;
+            System.out.println("Please enter the number of shares for the idea:");
+            line = sc.nextLine();
+            try{
+                nshares = Integer.parseInt(line);
+                if (nshares < 1){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while (repeat);
 
-        System.out.println("Please enter the price of each share of the idea:");
-        price = sc.nextInt();
+        do{
+            repeat = false;
+            System.out.println("Please enter the price of each share of the idea:");
+            line = sc.nextLine();
+            try{
+                price = Integer.parseInt(line);
+                if (price < 1){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input");
+                repeat = true;
+            }
+        }while(repeat);
 
         do{
             System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
-            minNumShares = sc.nextInt();
-            if (minNumShares<0 || minNumShares>nshares)
-                System.out.println("Invalid number!");
-        }while(minNumShares<0 || minNumShares>nshares);
-
-        sc.nextLine();//Clear the buffer
+            line = sc.nextLine();
+            try{
+                minNumShares = Integer.parseInt(line);
+                if (minNumShares<0 || minNumShares>nshares){
+                    System.out.println("Invalid input!");
+                    repeat = true;
+                }
+            }catch(NumberFormatException n){
+                System.out.println("Invalid input!");
+                repeat = true;
+            }
+        }while(repeat);
 
         topics = askTopics("If you want to include this idea in other topics, please enter their titles (USAGE: topic1;topic2)\n" +
                 "If you just want to include the idea on the current topic just press 'Enter'",false);
@@ -611,18 +652,17 @@ public class Client {
         do{
             System.out.println("Please select the relantionship between the idea you choose and the one you are just going to create\n(USAGE: 1-> For; -1->Against; 0-> Neutral)");
             try{
-                commentType = sc.nextInt();
+                line = sc.nextLine();
+                commentType = Integer.parseInt(line);
+                if(commentType == 1 || commentType == -1 || commentType == 0)
+                    repeat = false;
+                else
+                    repeat = true;
             }catch(NumberFormatException n){
                 System.out.println("Invalid input!");
+                repeat = true;
             }
-
-            sc.nextLine();//Clear the buffer
-
-            //FIXME: DO THIS MORE EFFICIENTLY?
-            if(commentType == 1 || commentType == -1 || commentType == 0)
-                typeInserted = true;
-
-        }while(!typeInserted);
+        }while(repeat);
 
         do{
             ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
@@ -882,7 +922,10 @@ public class Client {
         int option = -1, choice = -2;
         String line;
         Idea[] listIdeas;
+        //List of ideas owned by the user (totally or partially)
         ArrayList<Integer> listUserIdeasIDs = new ArrayList<Integer>();
+        //List of ideas owned by the user (totally or partially) that have files associated
+        ArrayList<Integer> ideasFilesListIds = new ArrayList<Integer>();
 
 
         //Display user ideas
@@ -892,6 +935,8 @@ public class Client {
         for (int i=0;i<listIdeas.length;i++){
             System.out.println(listIdeas[i]);
             listUserIdeasIDs.add(listIdeas[i].getId());
+            if (listIdeas[i].getFile().equals("Y"))
+                ideasFilesListIds.add(listIdeas[i].getId());
         }
 
         do{
@@ -901,6 +946,7 @@ public class Client {
             System.out.println("3 - Check idea's number of shares not to sell instantaneously");
             System.out.println("4 - Set idea's number of shares not to sell instantaneously");
             System.out.println("5 - Check ideas's relantionships");
+            System.out.println("6 - Download file associated with an idea");
             System.out.println("0 - Return to Main Menu");
             System.out.print("Your option: ");
             try{
@@ -943,6 +989,7 @@ public class Client {
 
             case 5:{
                 //Pedir ideia e depois listar todas as relacoes
+                //FIXME FIXME FIXME FAZER FUNCAO BONITINHA PARA ISTO
                 do{
                     System.out.println("Please insert the idea id whose relations you want to check:");
                     try{
@@ -987,6 +1034,15 @@ public class Client {
                 else
                    System.out.println("There are no ideas neutral!");
 
+                break;
+            }
+
+            case 6:{
+                if (ideasFilesListIds.size()>0)
+                    downloadFile(ideasFilesListIds);
+                else
+                    System.out.println("There are no ideas with files associated!" +
+                            "");
                 break;
             }
 
@@ -1122,22 +1178,20 @@ public class Client {
 
     private void commentTopic(int topic){
         Idea[] ideasList = conn.getTopicIdeas(topic);//Already says if has file or not
-        ArrayList<Integer> ideasListIds = new ArrayList<Integer>();
+        ArrayList<Integer> ideasFilesListIds = new ArrayList<Integer>();
         String sentence;
         int iid = -1;
-
-        sc.reset();
 
         System.out.println("\nList of Ideas for the given topic:\n");
         for (Idea anIdeasList : ideasList){
             System.out.println(anIdeasList);
             if (anIdeasList.getFile().equals("Y"))
-                ideasListIds.add(anIdeasList.getId());
+                ideasFilesListIds.add(anIdeasList.getId());
         }
 
-        //Ask about the files
-        if (ideasListIds.size()>0){
-            downloadFile(ideasListIds);
+        //Ask to download files, if there are ideas with files
+        if (ideasFilesListIds.size()>0){
+            downloadFile(ideasFilesListIds);
         }
 
         //Now we are going to ask the user if he wants to create an idea
@@ -1145,8 +1199,6 @@ public class Client {
 
         ArrayList<String> topicName = new ArrayList<String>();
         topicName.add(temp[topic - 1].getTitle());
-
-        sc.reset();
 
         System.out.println("If you want to comment an idea, please insert its id. Otherwise just press any key");
         try{
@@ -1327,10 +1379,13 @@ public class Client {
                 }
             }
         }
+
+        System.out.println("SAI");
     }
 
     public static void main(String[] args) {
         Client client = new Client();
         client.execute();
+        System.out.println("Vou sair do main");
     }
 }
