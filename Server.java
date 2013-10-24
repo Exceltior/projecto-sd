@@ -67,11 +67,28 @@ public class Server {
     }
 
     void execute(String[] args) throws IOException {
-        int port;
-        if ( args.length == 2 )
+        int port, udpReceiverPort, udpTransmitterPort;
+        String otherHost;
+
+        if ( args.length >= 2 )
             port = Integer.valueOf(args[1]);
         else
             port = 1234;
+
+        if ( args.length >= 3 )
+            udpReceiverPort = Integer.valueOf(args[2]);
+        else
+            udpReceiverPort = 1235;
+
+        if ( args.length >= 4 )
+            udpTransmitterPort = Integer.valueOf(args[3]);
+        else
+            udpTransmitterPort = 1235;
+
+        if ( args.length >= 5 )
+            otherHost = args[4];
+        else
+            otherHost = "localhost";
         try {
             acceptSocket = new ServerSocket(port);
         } catch (IOException e) {
