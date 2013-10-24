@@ -49,4 +49,6 @@ public interface RMI_Interface extends Remote {
     public Idea[] getFilesIdeas()throws RemoteException;
 
     public String getUsername(int uid) throws RemoteException;
+    public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice,
+                                         int minTargetShares)  throws RemoteException;
 }

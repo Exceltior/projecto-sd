@@ -1,8 +1,7 @@
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class NotificationQueue {
-    private final ArrayList<Notification> notifications = new ArrayList<Notification>();
+public class NotificationQueue extends OrderedTimestampQueue<Notification> {
     private RMI_Interface RMI;
     private int uid;
 
@@ -17,24 +16,17 @@ public class NotificationQueue {
     }
 
     synchronized Notification getNextNotification() {
-        synchronized (notifications) {
-            if ( notifications.size() == 0 )
-                return null;
-            else {
-                Notification n = notifications.get(0);
-                return n;
-            }
-        }
+        return getNextElement();
     }
 
     synchronized void dequeue(Notification r) {
-        synchronized (notifications) {
-            notifications.remove(r);
-        }
-        try {
-            RMI.writeNotificationsQueueFile(notifications, uid);
-        } catch (RemoteException e) {
-            //FIXME: Talvez fazer isto 3 vezes!
+        synchronized (queue) {
+            super.dequeue(r);
+            try {
+                RMI.writeNotificationsQueueFile(queue, uid);
+            } catch (RemoteException e) {
+                //FIXME: Talvez fazer isto 3 vezes!
+            }
         }
     }
 
@@ -42,13 +34,11 @@ public class NotificationQueue {
         int i;
 
         /* Look for the right place to put it */
-        synchronized (notifications) {
-            for (i = 0; i < notifications.size() && notifications.get(i).timestamp.compareTo(notification.timestamp)<=0; i++) ;
-
-            notifications.add(i, notification);
+        synchronized (queue) {
+            super.enqueue(notification);
 
             try {
-                RMI.writeNotificationsQueueFile(notifications, uid);
+                RMI.writeNotificationsQueueFile(queue, uid);
             } catch (RemoteException e) {
                 //FIXME: Retry 3 times here!
             }
@@ -56,7 +46,7 @@ public class NotificationQueue {
         }
     }
 
-    public void checkRMI() {
+    synchronized public void checkRMI() {
         ArrayList<Notification> r = null;
         try {
             r = RMI.readNotificationsFromQueueFile(uid);
@@ -66,7 +56,7 @@ public class NotificationQueue {
 
         if ( r != null ) {
             for (Notification i : r)
-                notifications.add(i);
+                queue.add(i);
         }
     }
 }

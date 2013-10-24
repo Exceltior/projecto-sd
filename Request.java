@@ -5,13 +5,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
-public class Request implements Serializable {
+public class Request implements Serializable, TimestampClass {
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN, DELETE_IDEA, HISTORY, CREATE_IDEA,
         SET_SHARES_IDEA, SET_IDEAS_RELATIONS, CREATE_TOPIC, REGISTER_USER /*Note that in this case uid=-1*/, ADD_FILE}
     int uid;
     RequestType requestType;
     ArrayList<Object> requestArguments = new ArrayList<Object>();
-    Timestamp timestamp;
+    private Timestamp timestamp;
 
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +44,7 @@ public class Request implements Serializable {
         this.requestArguments = requestArguments;
 
         // timestamp is NOW
-        this.timestamp = new Timestamp(new java.util.Date().getTime());
+        this.setTimestamp(new Timestamp(new java.util.Date().getTime()));
     }
 
     /**
@@ -47,7 +55,7 @@ public class Request implements Serializable {
         try {
             out.writeInt(uid);
             out.writeObject(requestArguments);
-            out.writeUTF(timestamp.toString());
+            out.writeUTF(getTimestamp().toString());
             out.writeObject(requestResult);
             out.writeObject(requestType);
             out.writeObject(dispatched);
@@ -69,7 +77,7 @@ public class Request implements Serializable {
             String timeStampStr = in.readUTF();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
             java.util.Date date = sdf.parse(timeStampStr);
-            this.timestamp = new Timestamp(date.getTime());
+            this.setTimestamp(new Timestamp(date.getTime()));
 
             requestResult = (ArrayList<Object>) in.readObject();
             requestType = (RequestType) in.readObject();

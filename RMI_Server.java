@@ -30,7 +30,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private int lastFile = 0; //FIXME: Update this dynamically
 
     private static final long serialVersionUID = 1L;
-    final Object notificationsLock = new Object();
+    private final Object notificationsLock = new Object();
+    private TransactionQueue transactionQueue;
 
     /**
      * Hashes the password using MD5 and returns it.
@@ -73,6 +74,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
         readLastFile();
+        transactionQueue = new TransactionQueue(this);
+        new Thread(transactionQueue).start();
     }
 
     ////
@@ -671,6 +674,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         boolean check = insertData(query,conn);
         returnTransactionalConnection(conn);
 
+        transactionQueue.checkQueue();
+
         return check;
     }
 
@@ -679,6 +684,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Connection conn = getTransactionalConnection();
         boolean check = insertData(query,conn);
         returnTransactionalConnection(conn);
+
+        transactionQueue.checkQueue();
 
         return check;
     }
@@ -794,6 +801,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
 
         return result.get(0)[0];
+    }
+
+    public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice,
+                                                    int minTargetShares)  throws RemoteException {
+        int ret = tryGetSharesIdea(uid, iid, numShares, targetPrice, minTargetShares);
+
+        if ( ret == 0 )
+            transactionQueue.enqueue(new Transaction(uid, iid, numShares, targetPrice, minTargetShares));
+
+        return ret == 1;
     }
 
     /**
