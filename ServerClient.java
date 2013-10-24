@@ -655,6 +655,7 @@ public class ServerClient implements Runnable {
         ////
 
         //1st - Verify if the topics' names are correct
+        ArrayList<Request> requests1 = new ArrayList<Request>();
         for (int i = 0; i < topicsArray.length; i++) {
             topic = topicsArray[i];
             if (topic.length() > limit_characters_topic) {//Topic name too long, tell that to the client
@@ -677,6 +678,7 @@ public class ServerClient implements Runnable {
                 objects.add(uid);
                 setTopicsIdeaRequest = new Request(uid, Request.RequestType.SET_TOPICS_IDEA, objects);
                 server.queue.enqueueRequest(setTopicsIdeaRequest);
+                requests1.add(setTopicsIdeaRequest);
             }
             setTopicsIdeaRequest.waitUntilDispatched();
 
@@ -693,7 +695,7 @@ public class ServerClient implements Runnable {
 
 
 
-        ArrayList<Request> requests1 = new ArrayList<Request>();
+
         int iState = 0;
         // Take care of the ideas for
         if (!setRelations(result, ideasForArray, 1, requests1, iState))
@@ -745,6 +747,7 @@ public class ServerClient implements Runnable {
         //Everything ok
         if(!Common.sendMessage(Common.Message.MSG_OK,outStream))
             return false;
+
 
         if ( addFileRequest != null )
             server.queue.dequeue(addFileRequest);
