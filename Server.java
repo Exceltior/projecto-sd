@@ -124,7 +124,7 @@ public class Server {
 
     void execute(String[] args) throws IOException {
         int port, udpReceiverPort, udpTransmitterPort, notificationPort;
-        String otherHost;
+        String otherHost, RMIHost;
 
         if ( args.length >= 1 )
             port = Integer.valueOf(args[0]);
@@ -150,6 +150,10 @@ public class Server {
         else
             notificationPort = 1237;
         if ( args.length >= 6 )
+            RMIHost = args[5];
+        else
+            RMIHost="localhost";
+        if ( args.length >= 7 )
             primary = false;
         else
             primary = true;
@@ -167,7 +171,7 @@ public class Server {
 
         Socket clientSocket = null;
 
-        connection = new RMIConnection();
+        connection = new RMIConnection(RMIHost);
         connection.connect(); //FIXME: Handle this failing
         connection.start();
 

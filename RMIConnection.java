@@ -13,9 +13,14 @@ public class RMIConnection extends Thread {
     private static final int RMILongReconnectSleepTime = 5000;
     boolean isDown = false;
     private final Object isDownLock = new Object();
+    private String RMIHost;
+
+    public RMIConnection(String RMIHost) {
+        this.RMIHost = RMIHost;
+    }
 
     public void waitUntilRMIIsUp() {
-        System.out.println("Waiting for RMI to be back up...");
+        System.out.println("Waiting for RMI to be up...");
         synchronized (isDownLock) {
             while ( isDown )
                 try { isDownLock.wait(); } catch (InterruptedException e) {}
@@ -46,7 +51,7 @@ public class RMIConnection extends Thread {
 
     synchronized boolean establishConnectionToRegistry() {
         try {
-            RMIregistry = LocateRegistry.getRegistry(7000);
+            RMIregistry = LocateRegistry.getRegistry(RMIHost, 7000);
             RMIInterface = (RMI_Interface) RMIregistry.lookup("academica");
         } catch (RemoteException e) {
             System.err.println("Remote Exception no RMIConnection!");
