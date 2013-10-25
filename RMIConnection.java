@@ -84,4 +84,8 @@ public class RMIConnection extends Thread {
 
         return val;
     }
+
+    public void onRMIFailed() {
+        connect();
+    }
 }

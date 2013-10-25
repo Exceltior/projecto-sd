@@ -38,6 +38,9 @@ public class ServerClient implements Runnable {
 
     private boolean initRMIConnection() {
 
+        connection.waitUntilRMIIsUp();
+
+        // Should never return false!
         return connection.getRMIInterface() != null;
     }
 
@@ -54,13 +57,15 @@ public class ServerClient implements Runnable {
             Common.sendMessage(Common.Message.ERR_NOT_PRIMARY,outStream);
             try {
                 socket.close();
-            } catch (IOException e)
-            {} //FIXME: Should we not ignore this?
+            } catch (IOException ignored)
+            {} // We don't care if the uer didn't get the ERR_NOT_PRIMARY message
+            server.removeSocket(socket);
             return ;
         }
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream)) {
             System.out.println("Connection to a client dropped while starting!");
+            server.removeSocket(socket);
             return;
         }
 
@@ -77,7 +82,10 @@ public class ServerClient implements Runnable {
                 try {
                     connection.getRMIInterface().updateUserTime(uid);
                 } catch (RemoteException e) {
+                    connection.onRMIFailed();
+                    server.removeSocket(socket);
                     System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism?
+                    break;
                 }
             }
 
@@ -227,6 +235,7 @@ public class ServerClient implements Runnable {
             System.out.println("Connection to UID "+uid+" dropped!");
         else
             System.out.println("Connection to a client dropped!");
+        server.removeSocket(socket);
     }
 
     private boolean handleRegistration(){
@@ -276,7 +285,7 @@ public class ServerClient implements Runnable {
     ////
     private boolean handleCreateTopicRequest(){
         String nome, descricao;
-        boolean result = false;
+        boolean result;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -288,7 +297,7 @@ public class ServerClient implements Runnable {
         if ( (descricao = Common.recvString(inStream)) == null)
             return false;
 
-        Request createTopicsRequest = null;
+        Request createTopicsRequest;
         if ( (createTopicsRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.CREATE_TOPIC))
                 == null) {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(nome); objects.add(descricao); objects
@@ -315,7 +324,7 @@ public class ServerClient implements Runnable {
     //  Get the list of topics where a given idea is
     ////
     private boolean handleGetTopicsOfIdea(){
-        int iid = -1;
+        int iid;
         ServerTopic[] list_topics;
 
         if ( !isLoggedIn() ) {
@@ -332,15 +341,16 @@ public class ServerClient implements Runnable {
             list_topics = connection.getRMIInterface().getIdeaTopics(iid);
         }catch(RemoteException r){
             System.err.println("Error while getting ideas from topic");
-            //FIXME: Handle this
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
         if (!Common.sendInt(list_topics.length,outStream))
             return false;
 
-        for (int i=0;i<list_topics.length;i++){
-            if (!list_topics[i].writeToDataStream(outStream))
+        for (ServerTopic list_topic : list_topics) {
+            if (! list_topic.writeToDataStream(outStream))
                 return false;
         }
 
@@ -354,8 +364,8 @@ public class ServerClient implements Runnable {
     // Get the list of ideas in a given topic
     ////
     private boolean handleGetTopicsIdea(){
-        int topicid = -1;
-        Idea[] ideaslist = null;
+        int topicid;
+        Idea[] ideaslist;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -393,7 +403,8 @@ public class ServerClient implements Runnable {
 
         }catch (RemoteException r){
             System.err.println("Error while getting ideas from topic");
-            //FIXME: Handle this
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -479,6 +490,8 @@ public class ServerClient implements Runnable {
                      minNumberShares);
         }catch(RemoteException r){
             System.err.println("Error in the handle buy shares!");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -539,6 +552,8 @@ public class ServerClient implements Runnable {
              ideasUserCanBuy = connection.getRMIInterface().getIdeasCanBuy(uid);
         }catch(RemoteException r){
             System.err.println("Error while getting ideas the user can buy");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -591,6 +606,8 @@ public class ServerClient implements Runnable {
              ideasList = connection.getRMIInterface().getIdeaRelations(iid,type);
         }catch(RemoteException r){
             System.err.println("RemoteException in the handleGetIdeasRelation method");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -631,6 +648,8 @@ public class ServerClient implements Runnable {
              userIdeas = connection.getRMIInterface().getIdeasFromUser(uid);
         }catch (RemoteException r){
             System.err.println("Error while getting user's ideas");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -892,28 +911,14 @@ public class ServerClient implements Runnable {
             iid = -1; //To avoid "Because they're trying to hack us" <- To Maxi
         ////
         //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
-        ////
 
         try {
             ideas = connection.getRMIInterface().getIdeaByIID(iid,title);
         } catch (RemoteException e) {
             System.err.println("RMI exception while fetching an idea by its IID");
-            return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
+            connection.onRMIFailed();
+            server.removeSocket(socket);
+            return false;
         }
 
         if ( ideas == null) {
@@ -961,10 +966,12 @@ public class ServerClient implements Runnable {
             idea = connection.getRMIInterface().getIdeaByIID(iid);
         } catch (RemoteException e) {
             System.err.println("RMI exception while fetching an idea by its IID");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
         }
 
-        if ( idea == null) {
+        if ( idea == null ) {
             // There is no idea with this ID
             if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
                 return false;
@@ -1000,8 +1007,8 @@ public class ServerClient implements Runnable {
             topics = connection.getRMIInterface().getTopics();
             System.out.println("Existem " + topics.length + " topicos");
         } catch (RemoteException e) {
-            //FIXME: Handle this
-            e.printStackTrace();
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1035,7 +1042,8 @@ public class ServerClient implements Runnable {
         try{
             shares = connection.getRMIInterface().getSharesNotSell(iid,uid);
         }catch (RemoteException r){
-            r.printStackTrace();
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1076,7 +1084,8 @@ public class ServerClient implements Runnable {
         try{
             check = connection.getRMIInterface().setSharesNotSell(iid, uid, numberShares);
         }catch(RemoteException r){
-            r.printStackTrace();
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1114,6 +1123,8 @@ public class ServerClient implements Runnable {
             ficheiro = connection.getRMIInterface().getFile(iid);
         }catch(RemoteException r){
             System.out.println("RemoteException in the handle get File method");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1155,6 +1166,8 @@ public class ServerClient implements Runnable {
             file = connection.getRMIInterface().getFile(iid);
         }catch(RemoteException r){
             System.err.println("RemoteException in the handle get idea file method!");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1197,6 +1210,8 @@ public class ServerClient implements Runnable {
             ideasFiles = connection.getRMIInterface().getFilesIdeas();
         }catch(RemoteException r){
             System.out.println("RemoteException in the handle get ideas files method");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1246,6 +1261,8 @@ public class ServerClient implements Runnable {
            check = connection.getRMIInterface().setPricesShares(iid,uid,price);
         }catch(RemoteException r){
             System.out.println("RemoteException in the handle set prices shares method");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1287,6 +1304,8 @@ public class ServerClient implements Runnable {
             ideaShares = connection.getRMIInterface().getIdeaShares(iid,uid);
         }catch(RemoteException r){
             System.err.println("RemoteException in the handle get idea shares method!!");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1346,8 +1365,9 @@ public class ServerClient implements Runnable {
             try {
                 idea = connection.getRMIInterface().getIdeaByIID(iid);
             }catch(RemoteException r){
-                //FIXME: Handle this
                 System.err.println("Existiu uma remoteException! " + r.getMessage());
+                connection.onRMIFailed();
+                server.removeSocket(socket);
             }
 
             // At this point we will only send ONE message:
@@ -1420,6 +1440,8 @@ public class ServerClient implements Runnable {
         try{
             topic = connection.getRMIInterface().getTopic(tid,name);
         }catch(RemoteException r){
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1460,9 +1482,9 @@ public class ServerClient implements Runnable {
         try{
             history = connection.getRMIInterface().getHistory(uid);
         }catch(RemoteException r){
-            //FIXME: Handle this
-            //e.printStackTrace();
             System.err.println("Existiu uma remoteException! " + r.getMessage());
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1513,6 +1535,8 @@ public class ServerClient implements Runnable {
             devolve = connection.getRMIInterface().setIdeasRelations(iidFather,iidSoon,type);
         }catch(RemoteException r){
             System.out.println("Remote exception in the handle set idea relationship");
+            connection.onRMIFailed();
+            server.removeSocket(socket);
             return false;
         }
 
@@ -1559,8 +1583,9 @@ public class ServerClient implements Runnable {
             try {
                 connection.getRMIInterface().updateUserTime(uid);
             } catch (RemoteException e) {
-                System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism? ALSO,
-                // should this really be here
+                System.err.println("RMI exception here!");
+                connection.onRMIFailed();
+                server.removeSocket(socket);
             }
         } else {
             if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) ){

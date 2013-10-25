@@ -3,6 +3,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Server {
     static ServerSocket acceptSocket;
@@ -12,6 +13,47 @@ public class Server {
 
     private RMIConnection connection;
     private Thread requestThread;
+    private final ArrayList<Socket> sockets  = new ArrayList<Socket>();
+    private ArrayList<Socket> notificationSockets  = new ArrayList<Socket>();
+
+    public void addNotificationSocket(Socket s) {
+        synchronized (notificationSockets) {
+            notificationSockets.add(s);
+        }
+    }
+    public void removeNotificationSocket(Socket s) {
+        synchronized (notificationSockets) {
+            if (notificationSockets.contains(s))
+                notificationSockets.remove(s);
+        }
+    }
+
+    public void removeSocket(Socket s) {
+        synchronized (sockets) {
+            if (sockets.contains(s))
+               sockets.remove(s);
+        }
+    }
+
+    public void killSockets() {
+        synchronized (sockets) {
+            for (Socket s : sockets)
+                try {
+                    s.close();
+                } catch (IOException e) {
+                    System.err.println("Couldn't force close a socket!");
+                }
+        }
+
+        synchronized (notificationSockets) {
+            for (Socket s : notificationSockets)
+                try {
+                    s.close();
+                } catch (IOException e) {
+                    System.err.println("Couldn't force close a notification socket!");
+                }
+        }
+    }
 
     public RMIConnection getConnection() {
         return connection;
@@ -148,6 +190,9 @@ public class Server {
         for(;;) {
             try {
                 clientSocket = acceptSocket.accept();
+                synchronized (sockets) {
+                    sockets.add(clientSocket);
+                }
                 new Thread(new ServerClient(clientSocket, connection, this)).start();
             }
             catch (IOException e) {
