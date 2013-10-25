@@ -3,17 +3,17 @@ import java.util.ArrayList;
 
 
 public class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
-    private RMI_Interface RMI;
+    private RMIConnection RMI;
 
     /**
      * Builds a request queue. If there was any data on the RMI server, then it is loaded
      * @param RMI
      */
-    RequestQueue(RMI_Interface RMI) {
+    RequestQueue(RMIConnection RMI) {
         ArrayList<Request> r = null;
         this.RMI = RMI;
         try {
-            r = RMI.readRequestsFromQueueFile();
+            r = RMI.getRMIInterface().readRequestsFromQueueFile();
         } catch (RemoteException e) {
             //FIXME: Retry 3 times here!
         }
@@ -32,7 +32,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
             super.enqueue(request);
 
             try {
-                RMI.writeRequestQueueFile(queue);
+                RMI.getRMIInterface().writeRequestQueueFile(queue);
             } catch (RemoteException e) {
                 //FIXME: Retry 3 times here!
             }
@@ -90,7 +90,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
         synchronized (queue) {
             super.dequeue(r);
             try {
-                RMI.writeRequestQueueFile(queue);
+                RMI.getRMIInterface().writeRequestQueueFile(queue);
             } catch (RemoteException e) {
                 //FIXME: Talvez fazer isto 3 vezes!
             }
@@ -128,51 +128,51 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                     if ( r.dispatched ) continue;
                     try {
                         if ( r.requestType == Request.RequestType.LOGIN ) {
-                                int ans = RMI.login((String)r.requestArguments.get(0), (String)r.requestArguments.get(1));
+                                int ans = RMI.getRMIInterface().login((String)r.requestArguments.get(0), (String)r.requestArguments.get(1));
                                 r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.HISTORY ) {
-                                String[] ans = RMI.getHistory((Integer) r.requestArguments.get(0));
+                                String[] ans = RMI.getRMIInterface().getHistory((Integer) r.requestArguments.get(0));
                                 r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.DELETE_IDEA ) {
-                            int ans = RMI.removeIdea((Idea) r.requestArguments.get(0),
+                            int ans = RMI.getRMIInterface().removeIdea((Idea) r.requestArguments.get(0),
                                     (Integer) r.requestArguments.get(1));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.CREATE_IDEA ) {
-                            int ans = RMI.createIdea((String)r.requestArguments.get(0),
+                            int ans = RMI.getRMIInterface().createIdea((String)r.requestArguments.get(0),
                                     (String)r.requestArguments.get(1),
                                     (Integer)r.requestArguments.get(2));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.SET_SHARES_IDEA ) {
-                            boolean ans = RMI.setSharesIdea((Integer) r.requestArguments.get(0),
+                            boolean ans = RMI.getRMIInterface().setSharesIdea((Integer) r.requestArguments.get(0),
                                     (Integer) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2),
                                     (Integer) r.requestArguments.get(3),
                                     (Integer) r.requestArguments.get(4));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.SET_TOPICS_IDEA ) {
-                            boolean ans = RMI.setTopicsIdea((Integer) r.requestArguments.get(0),
+                            boolean ans = RMI.getRMIInterface().setTopicsIdea((Integer) r.requestArguments.get(0),
                                     (String) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.SET_IDEAS_RELATIONS ) {
-                            boolean ans = RMI.setIdeasRelations((Integer) r.requestArguments.get(0),
+                            boolean ans = RMI.getRMIInterface().setIdeasRelations((Integer) r.requestArguments.get(0),
                                     (Integer) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.CREATE_TOPIC ) {
-                            boolean ans = RMI.createTopic((String) r.requestArguments.get(0),
+                            boolean ans = RMI.getRMIInterface().createTopic((String) r.requestArguments.get(0),
                                     (String) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.REGISTER_USER ) {
-                            boolean ans = RMI.register((String) r.requestArguments.get(0),
+                            boolean ans = RMI.getRMIInterface().register((String) r.requestArguments.get(0),
                                     (String) r.requestArguments.get(1),
                                     (String) r.requestArguments.get(2),
                                     (String) r.requestArguments.get(3));
                             r.requestResult.add(ans);
                             autoDequeue = true; // We instantly remove it as soon as we process it
                         }  else if (r.requestType == Request.RequestType.ADD_FILE){
-                            boolean ans = RMI.addFile((Integer) r.requestArguments.get(0),
+                            boolean ans = RMI.getRMIInterface().addFile((Integer) r.requestArguments.get(0),
                                     (NetworkingFile) r.requestArguments.get(1));
                             r.requestResult.add(ans);
                             autoDequeue = true; // We instantly remove it as soon as we process it
@@ -196,7 +196,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                    }
 
                     try {
-                        RMI.writeRequestQueueFile(queue);
+                        RMI.getRMIInterface().writeRequestQueueFile(queue);
                     } catch (RemoteException e) {
                         //FIXME: Talvez fazer isto 3 vezes!
                     }

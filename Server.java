@@ -134,7 +134,7 @@ public class Server {
         //FIXME: 'localhost' should be the IP of the other server. Also fix port
         new UDPTransmitter("localhost", udpTransmitterPort, 1000).start();
 
-        queue = new RequestQueue(connection.getRMIInterface());
+        queue = new RequestQueue(connection);
         requestThread = new Thread(queue);
 
         if ( primary )

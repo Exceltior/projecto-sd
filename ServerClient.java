@@ -13,7 +13,6 @@ public class ServerClient implements Runnable {
     private DataInputStream inStream = null;
 
     private RMIConnection connection;
-    private RMI_Interface RMIInterface = null;
     private Server server;
 
     // The client's uid. -1 means not logged in.
@@ -39,9 +38,7 @@ public class ServerClient implements Runnable {
 
     private boolean initRMIConnection() {
 
-        RMIInterface = connection.getRMIInterface();
-
-        return RMIInterface != null;
+        return connection.getRMIInterface() != null;
     }
 
     private boolean isLoggedIn() {
@@ -78,7 +75,7 @@ public class ServerClient implements Runnable {
 
             if ( isLoggedIn() ) {
                 try {
-                    RMIInterface.updateUserTime(uid);
+                    connection.getRMIInterface().updateUserTime(uid);
                 } catch (RemoteException e) {
                     System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism?
                 }
@@ -332,7 +329,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            list_topics = RMIInterface.getIdeaTopics(iid);
+            list_topics = connection.getRMIInterface().getIdeaTopics(iid);
         }catch(RemoteException r){
             System.err.println("Error while getting ideas from topic");
             //FIXME: Handle this
@@ -373,7 +370,7 @@ public class ServerClient implements Runnable {
         //Now we go to the database and get the ideas
 
         try{
-            ideaslist = RMIInterface.getIdeasFromTopic(topicid);
+            ideaslist = connection.getRMIInterface().getIdeasFromTopic(topicid);
 
             if (ideaslist == null){
                 if(!Common.sendInt(0,outStream))
@@ -470,7 +467,7 @@ public class ServerClient implements Runnable {
 
         try{
             //1º - Obter numero de shares que o user ja tem para ver com quantas e que ele vai ficar;
-            Share currentShares = RMIInterface.getSharesIdeaForUid(iid,uid);
+            Share currentShares = connection.getRMIInterface().getSharesIdeaForUid(iid,uid);
             if ( currentShares != null ) {
                 numSharesAlreadyHas = currentShares.getNum();
             } else {
@@ -478,7 +475,7 @@ public class ServerClient implements Runnable {
             }
             System.out.println(uid+", "+iid+", "+numSharesAlreadyHas +", "+price+", " +
                     ""+minNumberShares);
-             check = RMIInterface.registerGetSharesRequest(uid,iid,(numberSharesToBuy+numSharesAlreadyHas),price,
+             check = connection.getRMIInterface().registerGetSharesRequest(uid,iid,(numberSharesToBuy+numSharesAlreadyHas),price,
                      minNumberShares);
         }catch(RemoteException r){
             System.err.println("Error in the handle buy shares!");
@@ -539,7 +536,7 @@ public class ServerClient implements Runnable {
         }
 
         try{
-             ideasUserCanBuy = RMIInterface.getIdeasCanBuy(uid);
+             ideasUserCanBuy = connection.getRMIInterface().getIdeasCanBuy(uid);
         }catch(RemoteException r){
             System.err.println("Error while getting ideas the user can buy");
             return false;
@@ -591,7 +588,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-             ideasList = RMIInterface.getIdeaRelations(iid,type);
+             ideasList = connection.getRMIInterface().getIdeaRelations(iid,type);
         }catch(RemoteException r){
             System.err.println("RemoteException in the handleGetIdeasRelation method");
             return false;
@@ -631,7 +628,7 @@ public class ServerClient implements Runnable {
         }
 
         try{
-             userIdeas = RMIInterface.getIdeasFromUser(uid);
+             userIdeas = connection.getRMIInterface().getIdeasFromUser(uid);
         }catch (RemoteException r){
             System.err.println("Error while getting user's ideas");
             return false;
@@ -913,7 +910,7 @@ public class ServerClient implements Runnable {
         ////
 
         try {
-            ideas = RMIInterface.getIdeaByIID(iid,title);
+            ideas = connection.getRMIInterface().getIdeaByIID(iid,title);
         } catch (RemoteException e) {
             System.err.println("RMI exception while fetching an idea by its IID");
             return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
@@ -961,7 +958,7 @@ public class ServerClient implements Runnable {
         Idea idea = null;
 
         try {
-            idea = RMIInterface.getIdeaByIID(iid);
+            idea = connection.getRMIInterface().getIdeaByIID(iid);
         } catch (RemoteException e) {
             System.err.println("RMI exception while fetching an idea by its IID");
             return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
@@ -1000,7 +997,7 @@ public class ServerClient implements Runnable {
 
         ServerTopic[] topics = null;
         try {
-            topics = RMIInterface.getTopics();
+            topics = connection.getRMIInterface().getTopics();
             System.out.println("Existem " + topics.length + " topicos");
         } catch (RemoteException e) {
             //FIXME: Handle this
@@ -1036,7 +1033,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            shares = RMIInterface.getSharesNotSell(iid,uid);
+            shares = connection.getRMIInterface().getSharesNotSell(iid,uid);
         }catch (RemoteException r){
             r.printStackTrace();
             return false;
@@ -1077,7 +1074,7 @@ public class ServerClient implements Runnable {
         }
 
         try{
-            check = RMIInterface.setSharesNotSell(iid, uid, numberShares);
+            check = connection.getRMIInterface().setSharesNotSell(iid, uid, numberShares);
         }catch(RemoteException r){
             r.printStackTrace();
             return false;
@@ -1114,7 +1111,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            ficheiro = RMIInterface.getFile(iid);
+            ficheiro = connection.getRMIInterface().getFile(iid);
         }catch(RemoteException r){
             System.out.println("RemoteException in the handle get File method");
             return false;
@@ -1155,7 +1152,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            file = RMIInterface.getFile(iid);
+            file = connection.getRMIInterface().getFile(iid);
         }catch(RemoteException r){
             System.err.println("RemoteException in the handle get idea file method!");
             return false;
@@ -1197,7 +1194,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            ideasFiles = RMIInterface.getFilesIdeas();
+            ideasFiles = connection.getRMIInterface().getFilesIdeas();
         }catch(RemoteException r){
             System.out.println("RemoteException in the handle get ideas files method");
             return false;
@@ -1246,7 +1243,7 @@ public class ServerClient implements Runnable {
         }
 
         try{
-           check = RMIInterface.setPricesShares(iid,uid,price);
+           check = connection.getRMIInterface().setPricesShares(iid,uid,price);
         }catch(RemoteException r){
             System.out.println("RemoteException in the handle set prices shares method");
             return false;
@@ -1287,7 +1284,7 @@ public class ServerClient implements Runnable {
         }
 
         try{
-            ideaShares = RMIInterface.getIdeaShares(iid,uid);
+            ideaShares = connection.getRMIInterface().getIdeaShares(iid,uid);
         }catch(RemoteException r){
             System.err.println("RemoteException in the handle get idea shares method!!");
             return false;
@@ -1347,7 +1344,7 @@ public class ServerClient implements Runnable {
                 return false;
 
             try {
-                idea = RMIInterface.getIdeaByIID(iid);
+                idea = connection.getRMIInterface().getIdeaByIID(iid);
             }catch(RemoteException r){
                 //FIXME: Handle this
                 System.err.println("Existiu uma remoteException! " + r.getMessage());
@@ -1421,7 +1418,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            topic = RMIInterface.getTopic(tid,name);
+            topic = connection.getRMIInterface().getTopic(tid,name);
         }catch(RemoteException r){
             return false;
         }
@@ -1461,7 +1458,7 @@ public class ServerClient implements Runnable {
             return false;
 
         try{
-            history = RMIInterface.getHistory(uid);
+            history = connection.getRMIInterface().getHistory(uid);
         }catch(RemoteException r){
             //FIXME: Handle this
             //e.printStackTrace();
@@ -1513,7 +1510,7 @@ public class ServerClient implements Runnable {
             type = -1;
 
         try{
-            devolve = RMIInterface.setIdeasRelations(iidFather,iidSoon,type);
+            devolve = connection.getRMIInterface().setIdeasRelations(iidFather,iidSoon,type);
         }catch(RemoteException r){
             System.out.println("Remote exception in the handle set idea relationship");
             return false;
@@ -1560,7 +1557,7 @@ public class ServerClient implements Runnable {
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
                 return false;
             try {
-                RMIInterface.updateUserTime(uid);
+                connection.getRMIInterface().updateUserTime(uid);
             } catch (RemoteException e) {
                 System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism? ALSO,
                 // should this really be here
