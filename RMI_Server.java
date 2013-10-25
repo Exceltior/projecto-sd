@@ -522,6 +522,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return false;
         }
 
+        //FIXME: Check if we have ownership of the idea here, and change the return type and then change the server
+        // and THEN the client
+
         if ( ideaHasFiles(idea.id) ) {
             deleteIdeaFiles(idea.id);
         }
