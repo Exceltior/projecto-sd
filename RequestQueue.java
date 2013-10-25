@@ -13,10 +13,13 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
     RequestQueue(RMIConnection RMI) {
         ArrayList<Request> r = null;
         this.RMI = RMI;
+        RMI.waitUntilRMIIsUp();
         try {
             r = RMI.getRMIInterface().readRequestsFromQueueFile();
         } catch (RemoteException e) {
             //FIXME: Retry 3 times here!
+        } catch (NullPointerException e) {
+            System.err.println("RMI Down while creating the queue!");
         }
 
         if ( r != null ) {

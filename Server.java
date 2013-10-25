@@ -32,12 +32,12 @@ public class Server {
     void goPrimary() {
         System.out.println("Becoming PRIMARY server...");
         primary = true;
-        if ( !requestThread.isAlive()) {
+        if ( requestThread == null ) {
+            startQueueThread();
+        } else if ( !requestThread.isAlive()) {
             queue.notifyStartingAgain();
             requestThread.start();
         }
-
-
     }
 
     // For a client to know if we're primary or not
@@ -45,7 +45,7 @@ public class Server {
         return primary;
     }
 
-    void notifyConnectionToOtherServerDead() {
+    synchronized void notifyConnectionToOtherServerDead() {
         otherIsDown = true;
         //FIXME
         System.out.println("Lost connection to remote server...pinging RMI");
@@ -76,7 +76,7 @@ public class Server {
         }
     }
 
-    void notifyConnectionToOtherServerBack() {
+    synchronized void notifyConnectionToOtherServerBack() {
         System.out.println("Server is back!");
     }
 
@@ -127,6 +127,7 @@ public class Server {
 
         connection = new RMIConnection();
         connection.connect(); //FIXME: Handle this failing
+        connection.start();
 
         // Start the notification server
         new NotificationServer(this, notificationPort).start();
@@ -139,8 +140,7 @@ public class Server {
         //FIXME: 'localhost' should be the IP of the other server. Also fix port
         new UDPTransmitter("localhost", udpTransmitterPort, 1000).start();
 
-        queue = new RequestQueue(connection);
-        requestThread = new Thread(queue);
+        startQueueThread();
 
         if ( primary )
             requestThread.start();
@@ -155,6 +155,11 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    synchronized private void startQueueThread() {
+        queue = new RequestQueue(connection);
+        requestThread = new Thread(queue);
     }
 
     static public void main(String[] args) throws IOException {
