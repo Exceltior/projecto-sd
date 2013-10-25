@@ -248,7 +248,7 @@ public class ServerClient implements Runnable {
         ArrayList<Object> objects = new ArrayList<Object>(); objects.add(user); objects.add(pass); objects
                 .add(email); objects.add(date);
         Request registerUserRequest = new Request(-1, Request.RequestType.REGISTER_USER,objects);
-        server.queue.enqueueRequest(registerUserRequest);
+        server.queue.enqueue(registerUserRequest);
         registerUserRequest.waitUntilDispatched();
         registration = (Boolean)registerUserRequest.requestResult.get(0);
         // We don't need to dequeue it, because since it's a registration request it's done automagically!
@@ -294,7 +294,7 @@ public class ServerClient implements Runnable {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(nome); objects.add(descricao); objects
                     .add(this.uid);
             createTopicsRequest = new Request(uid, Request.RequestType.CREATE_TOPIC,objects);
-            server.queue.enqueueRequest(createTopicsRequest);
+            server.queue.enqueue(createTopicsRequest);
         }
         createTopicsRequest.waitUntilDispatched();
         result = (Boolean)createTopicsRequest.requestResult.get(0);
@@ -506,7 +506,7 @@ public class ServerClient implements Runnable {
                 ArrayList<Object> objects = new ArrayList<Object>(); objects.add(iid); objects.add(ideas.get(i)); objects
                         .add(relationType);
                 setIdeasRelationsRequest = new Request(uid, Request.RequestType.SET_IDEAS_RELATIONS,objects);
-                server.queue.enqueueRequest(setIdeasRelationsRequest);
+                server.queue.enqueue(setIdeasRelationsRequest);
             }
 
             requests.add(setIdeasRelationsRequest);
@@ -723,7 +723,7 @@ public class ServerClient implements Runnable {
                 null) {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(title); objects.add(description); objects.add(this.uid);
             createIdeaRequest = new Request(uid, Request.RequestType.CREATE_IDEA,objects);
-            server.queue.enqueueRequest(createIdeaRequest);
+            server.queue.enqueue(createIdeaRequest);
         }
         createIdeaRequest.waitUntilDispatched();
         result = (Integer)createIdeaRequest.requestResult.get(0);
@@ -743,7 +743,7 @@ public class ServerClient implements Runnable {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(this.uid); objects.add(result);
             objects.add(nshares);objects.add(price);objects.add(numMinShares);
             setSharesIdeaRequest = new Request(uid, Request.RequestType.SET_SHARES_IDEA,objects);
-            server.queue.enqueueRequest(setSharesIdeaRequest);
+            server.queue.enqueue(setSharesIdeaRequest);
         }
         setSharesIdeaRequest.waitUntilDispatched();
         result_shares = (Boolean)setSharesIdeaRequest.requestResult.get(0);
@@ -787,7 +787,7 @@ public class ServerClient implements Runnable {
                 objects.add(topic);
                 objects.add(uid);
                 setTopicsIdeaRequest = new Request(uid, Request.RequestType.SET_TOPICS_IDEA, objects);
-                server.queue.enqueueRequest(setTopicsIdeaRequest);
+                server.queue.enqueue(setTopicsIdeaRequest);
                 requests1.add(setTopicsIdeaRequest);
             }
             setTopicsIdeaRequest.waitUntilDispatched();
@@ -836,7 +836,7 @@ public class ServerClient implements Runnable {
                     ArrayList<Object> objects = new ArrayList<Object>(); objects.add(result); objects.add
                             (ficheiro);
                     addFileRequest = new Request(uid, Request.RequestType.ADD_FILE,objects);
-                    server.queue.enqueueRequest(addFileRequest);
+                    server.queue.enqueue(addFileRequest);
                 }
                 addFileRequest.waitUntilDispatched();
                 fileResult = (Boolean)addFileRequest.requestResult.get(0);
@@ -1364,7 +1364,7 @@ public class ServerClient implements Runnable {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea); objects.add(uid);
             removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
             //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
-            server.queue.enqueueRequest(removeIdeaRequest);
+            server.queue.enqueue(removeIdeaRequest);
         } else {
             // There is already a request, we only need to receive messages and ignore them
             if ( Common.recvInt(inStream) == -1)
@@ -1545,7 +1545,7 @@ public class ServerClient implements Runnable {
         objects.add(pwd);
         Request loginRequest = new Request(uid,Request.RequestType.LOGIN,objects);
         //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
-        server.queue.enqueueRequest(loginRequest);
+        server.queue.enqueue(loginRequest);
 
         // Wait until it's dispatched
         loginRequest.waitUntilDispatched();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
     private RMIConnection RMI;
+    private boolean needsToDie = false;
 
     /**
      * Builds a request queue. If there was any data on the RMI server, then it is loaded
@@ -24,7 +25,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
         }
     }
 
-    synchronized void enqueueRequest(Request request) {
+    synchronized void enqueue(Request request) {
         int i;
 
         /* Look for the right place to put it */
@@ -97,6 +98,23 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
         }
     }
 
+    boolean requestsPending() {
+        synchronized (queue) {
+            for (Request r : queue)
+                if ( !r.dispatched )
+                    return true;
+
+            return false;
+        }
+    }
+
+    synchronized void killThread() {
+        synchronized (queue) {
+            needsToDie = true;
+            queue.notify();
+        }
+    }
+
     /**
      * This function just continuously loops the request list.
      * * FIXME: We can only do something for a user if that user is NOT in the NEED_NOTIFY state. If it is in that
@@ -113,7 +131,9 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
 
             // Wait until there's at least one request
             synchronized (queue) {
-                while ( queue.isEmpty() ) {
+                if (needsToDie)
+                    break;
+                while ( !requestsPending() ) {
                     try {
                         queue.wait();
                     } catch (InterruptedException e){}
@@ -206,4 +226,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
         }
     }
 
+    public void notifyStartingAgain() {
+        needsToDie = false;
+    }
 }

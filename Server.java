@@ -24,15 +24,20 @@ public class Server {
     void goSecondary() {
         System.out.println("Becoming SECONDARY server...");
         primary = false;
-        if ( !requestThread.isAlive())
-            requestThread.stop();
+
+        if ( queue != null )
+            queue.killThread();
     }
 
     void goPrimary() {
         System.out.println("Becoming PRIMARY server...");
         primary = true;
-        if ( !requestThread.isAlive())
+        if ( !requestThread.isAlive()) {
+            queue.notifyStartingAgain();
             requestThread.start();
+        }
+
+
     }
 
     // For a client to know if we're primary or not
@@ -121,7 +126,7 @@ public class Server {
         Socket clientSocket = null;
 
         connection = new RMIConnection();
-        connection.establishConnectionToRegistry();
+        connection.connect(); //FIXME: Handle this failing
 
         // Start the notification server
         new NotificationServer(this, notificationPort).start();
