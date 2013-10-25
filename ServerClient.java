@@ -375,13 +375,20 @@ public class ServerClient implements Runnable {
         try{
             ideaslist = RMIInterface.getIdeasFromTopic(topicid);
 
-            if (!Common.sendInt(ideaslist.length,outStream))
-                return false;
-
-            //Send ideas
-            for (int i=0;i<ideaslist.length;i++){
-                if(!ideaslist[i].writeToDataStream(outStream))
+            if (ideaslist == null){
+                if(!Common.sendInt(0,outStream))
                     return false;
+            }
+
+            else{
+                if (!Common.sendInt(ideaslist.length,outStream))
+                    return false;
+
+                //Send ideas
+                for (int i=0;i<ideaslist.length;i++){
+                    if(!ideaslist[i].writeToDataStream(outStream))
+                        return false;
+                }
             }
 
             if (!Common.sendMessage(Common.Message.MSG_OK,outStream))

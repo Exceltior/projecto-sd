@@ -995,19 +995,21 @@ public class ClientConnection {
                  reconnect();continue;
              }
 
-             //Receive ideas
-             devolve = new Idea[ideaslen];
+             if (ideaslen > 0){
+                 //Receive ideas
+                 devolve = new Idea[ideaslen];
 
-             for (int i=0;i<ideaslen;i++){
-                 devolve[i] = new Idea();
-                 if ( !devolve[i].readFromDataStream(inStream) ){
-                     needReconnect = true;
-                     break;
+                 for (int i=0;i<ideaslen;i++){
+                     devolve[i] = new Idea();
+                     if ( !devolve[i].readFromDataStream(inStream) ){
+                         needReconnect = true;
+                         break;
+                     }
                  }
-             }
 
-             if ( needReconnect ) {
-                 reconnect(); continue;
+                 if ( needReconnect ) {
+                     reconnect(); continue;
+                 }
              }
 
              if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
@@ -1462,15 +1464,21 @@ public class ClientConnection {
 
             if ( reply == Common.Message.ERR_NO_SUCH_IID ) {
                 //Shouldn't happen, FIXME!
-                System.out.println("No idea with that IID"); //FIXME: See what we have to print here
+                System.out.println("Error while deleting the idea! No idea with that IID"); //FIXME: See what we have to print here
                 return false;
             } else if ( reply == Common.Message.ERR_IDEA_HAS_CHILDREN ) {
                 //Shouldn't happen, FIXME!
-                System.err.println("Idea has children"); //FIXME: See what we have to print here
+                System.err.println("Error deleting the idea! Idea has children"); //FIXME: See what we have to print here
                 return false;
+            } else if (reply == Common.Message.ERR_NOT_FULL_OWNER){
+                System.out.println("Error deleting the idea! Idea not fully owned by the user");
+                return false;
+            }else if (reply == Common.Message.MSG_OK){
+                System.out.println("Idea deleted with succes!");
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

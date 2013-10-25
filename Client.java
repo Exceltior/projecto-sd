@@ -1138,7 +1138,7 @@ public class Client {
         mainLoop();
     }
 
-    private boolean deleteIdea(){
+    private void deleteIdea(){
         int iid = -2;
         String line;
         boolean repeat = false;
@@ -1154,7 +1154,7 @@ public class Client {
             }
         }while (repeat);
 
-        return conn.deleteIdea(iid);
+        conn.deleteIdea(iid);
     }
 
     private void downloadFile(ArrayList<Integer> ideasListIds){
@@ -1191,6 +1191,12 @@ public class Client {
         ArrayList<Integer> ideasFilesListIds = new ArrayList<Integer>();
         String sentence;
         int iid = -1;
+
+        if(ideasList == null){
+            System.out.println("There are no ideas in the topic!\nPress any key to continue");
+            sc.nextLine();
+            return ;
+        }
 
         System.out.println("\nList of Ideas for the given topic:\n");
         for (Idea anIdeasList : ideasList){
@@ -1436,10 +1442,7 @@ public class Client {
 
                 //Delete an idea
                 case 4:{
-                    if (!deleteIdea())
-                        System.out.println("Error while deleting the idea!");
-                    else
-                        System.out.println("Idea deleted with success");
+                    deleteIdea();
                     break;
                 }
 
