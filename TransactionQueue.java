@@ -95,7 +95,7 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> impleme
 
                 // Execute transaction t
                 // FIXME: Need an RMI function for this
-                int result = 0;
+                boolean result;
                 try {
                     result = RMI.tryGetSharesIdea(t.uid, t.iid, t.numTargetShares, t.targetPrice, t.minTargetShares);
                 } catch (RemoteException e) {
@@ -103,7 +103,7 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> impleme
                     continue;
                 }
 
-                if ( result == 1 )
+                if ( result )
                     queue.remove(0);
             }
         }

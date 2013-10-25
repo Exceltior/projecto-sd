@@ -166,12 +166,11 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                                     (Integer)r.requestArguments.get(2));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.SET_SHARES_IDEA ) {
-                            boolean ans = RMI.getRMIInterface().setSharesIdea((Integer) r.requestArguments.get(0),
+                            RMI.getRMIInterface().setSharesIdea((Integer) r.requestArguments.get(0),
                                     (Integer) r.requestArguments.get(1),
                                     (Integer) r.requestArguments.get(2),
                                     (Integer) r.requestArguments.get(3),
                                     (Integer) r.requestArguments.get(4));
-                            r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.SET_TOPICS_IDEA ) {
                             boolean ans = RMI.getRMIInterface().setTopicsIdea((Integer) r.requestArguments.get(0),
                                     (String) r.requestArguments.get(1),

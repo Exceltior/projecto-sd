@@ -21,7 +21,6 @@ public interface RMI_Interface extends Remote {
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid) throws RemoteException;
-    public boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares)throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
     public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
@@ -29,15 +28,12 @@ public interface RMI_Interface extends Remote {
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException;
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException;
-    public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice, int minTargetShares) throws
-            RemoteException;
-    public int getUserMoney(int uid) throws RemoteException;
-    public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException;
-    public boolean updateUserTime(int uid) throws RemoteException;
-    public boolean isUserIn(int uid) throws RemoteException;
+    public void updateUserTime(int uid) throws RemoteException;
     public boolean addFile(int iid, NetworkingFile file) throws RemoteException;
     public NetworkingFile getFile(int iid) throws RemoteException;
-
+    public void setSharesIdea(int uid, int iid, int nshares, int price, int numMinShares)throws RemoteException;
+    boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice,
+                             int minTargetShares) throws RemoteException;
     public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException;
     public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
             RemoteException;

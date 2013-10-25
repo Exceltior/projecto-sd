@@ -25,10 +25,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private int num_topics;
     private int num_ideas;
     private int num_transactions;
-    private int starting_money = 10000;
-    private int limit_time_active = 300;//5 minutes
+    private final int starting_money = 10000;
+    private final int limit_time_active = 300;//5 minutes
     private ConnectionPool connectionPool;
-    private int lastFile = 0; //FIXME: Update this dynamically
+    private int lastFile = 0;
 
     private static final long serialVersionUID = 1L;
     private final Object notificationsLock = new Object();
@@ -46,8 +46,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try {
             m = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("Cannot find hashing algorithm:\n" + e);
-            System.exit(-1); //FIXME?
+            System.out.println("Cannot find hashing algorithm: " + e);
+            System.exit(-1);
         }
         if(m == null)
         {
@@ -71,7 +71,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Class constructor. Creates a new instance of the class RMI_Server
     ////
-    public RMI_Server(String servidor, String porto, String sid) throws RemoteException {
+    private RMI_Server(String servidor, String porto, String sid) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
         readLastFile();
@@ -94,7 +94,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         System.out.println("Query: " + query + " has " + result.size() + " results");
 
-        if ( result.size() > 0 )//Return the user's id
+        if ( !result.isEmpty() )//Return the user's id
             return Integer.valueOf(result.get(0)[0]);
         else
             return -1;
@@ -118,7 +118,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         System.out.println("Query: " + query + " has " + result.size() + " results");
 
-        if ( result.size() > 0 )//Return the user's id
+        if ( !result.isEmpty() )//Return the user's id
             return Integer.valueOf(result.get(0)[0]);
         else
             return -1;
@@ -130,17 +130,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public ServerTopic[] getTopics() throws RemoteException{
         String query = "select * from Topicos";
 
-        ArrayList<String[]> result = null;
-
-        try{
-            result = receiveData(query);
-        } catch(RemoteException e){
-            System.err.println("DEU MERDA");
-        }
-
-
-        if ( result == null )
-            return null; //FIXME: We should do something about a query failing or something like that...
+        ArrayList<String[]> result = receiveData(query);
 
         if ( result.size() == 0 )
             return null;
@@ -160,16 +150,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Idea[] ideas;
         String query = "Select i.iid,i.titulo,i.descricao,i.userid from Ideias i, Shares s where i.activa = 1 and s.iid = i.iid" +
                 " and s.userid = " + uid;
-        ArrayList<String[]> queryResult = null;
-
-        try{
-            queryResult = receiveData(query);
-        }catch(RemoteException r){
-            System.err.println("Error accessing the database");
-        }
-
-        if (queryResult == null)
-            return null; //FIXME: We should do something about a query failing or something like that...
+        ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult.size() == 0)
             return null;
@@ -188,23 +169,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     // This returns an array of ideas which belong to this Topic.
     //
-    // FIXME: We should decide if we pass the topic ID in here or the topic itself. It might be better to pass ideas
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideias e, " +
                 "TopicosIdeias t where t.iid = e.iid and t" +
                 ".tid = "+tid+" and e.activa = 1";
 
-        ArrayList<String[]> result = null;
-        String[] temp;
-
-        try{
-            result = receiveData(query);
-        } catch(RemoteException e){
-            System.err.println("DEU MERDA");
-        }
-
-        if ( result == null )
-            return null; //FIXME: We should do something about a query failing or something like that...
+        ArrayList<String[]> result = receiveData(query);
 
         if ( result.size() == 0 )
             return null;
@@ -225,16 +195,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // Method responsible for checking if there aren't any topics already created with the same name as the one we want
     //  to create
     ////
-    public boolean validateTopic(String nome){
+    boolean validateTopic(String nome){
         String query = "Select * from Topicos t where t.nome = '" + nome + "'";
-        ArrayList<String[]> topics = null;
-
-        try{
-            topics = receiveData(query);
-        }catch(RemoteException r){
-            System.err.println("Remote Exception on the validateData method");
-            //FIXME: Deal with this
-        }
+        ArrayList<String[]> topics = receiveData(query);
 
         // NOTE: topics will only be null if the query failed. And we should assume that never happens...
         return topics == null || topics.size() == 0;
@@ -243,16 +206,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsible for validating a user's username, before adding it to the database
     ///
-    public boolean validateData(String username){
+    boolean validateData(String username){
         String query = "Select * from Utilizadores u where u.username = '" + username + "'";
-        ArrayList<String[]> users = null;
-
-        try{
-            users = receiveData(query);
-        }catch(RemoteException r){
-            System.err.println("Remote Exception on the validateData method");
-            //FIXME: Deal with this
-        }
+        ArrayList<String[]> users = receiveData(query);
 
         // NOTE: users will only be null if the query failed. And we should assume that never happens...
         return users == null || users.size() == 0;
@@ -262,9 +218,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Method responsile for insering a new user in the database
     ////
-    synchronized public boolean register(String user, String pass, String email, String date) throws RemoteException{
-        boolean check;
-
+    synchronized public boolean register(String user, String pass, String email, String date) throws RemoteException {
         if (! validateData(user)){
             System.err.println("O validate data devolveu false");
             return false;
@@ -275,11 +229,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 "'" + pass +
                 "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'), null)";
 
-        //check = insertData(query); FIXME
         insertData(query);
 
-        //if ( check )
-            num_users++;
+        num_users++;
 
         return true;
     }
@@ -305,7 +257,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         String query = "Insert into IdeiasFicheiros values (" + iid + ",'" + path + "','"+file.getName()+"')";
 
-        insertData(query); //IGNORE if it fails... FIXME: if it fails we should retry...it may be a DB transient                                                                                                    // failure
+        insertData(query);
 
         updateLastFile();
         return true;
@@ -314,9 +266,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     synchronized private void updateLastFile() {
         String path="./lastFile_counter.bin";
         lastFile++;
-        RandomAccessFile f = null;
+        RandomAccessFile f;
         try {
-            f = new RandomAccessFile(path, "rw");//FIXME: O JOCA MUDOU O "w" PARA "rw" PORQUE ISTO DAVA EXCEPÇÃO A DIZER QUE O ARGUMENTO ESTAVA MAL!!!!!!!!!!
+            f = new RandomAccessFile(path, "rw");
         } catch (FileNotFoundException e) {
             return ; //FIXME: Should never happen
         }
@@ -326,17 +278,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         } catch (IOException e) {
             System.err.println("IO Exception while writing lastFile filefile!");
         } finally {
-            try {
-                f.close();
-            } catch (IOException e) {
-                System.err.println("Woohoo, more exceptions!"); //FIXME
-            }
+            try { f.close(); } catch (IOException ignored) {}
         }
     }
 
     synchronized private void readLastFile() {
         String path="./lastFile_counter.bin";
-        RandomAccessFile f = null;
+        RandomAccessFile f;
 
         try {
             f = new RandomAccessFile(path, "r");
@@ -350,11 +298,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         } catch (IOException e) {
             System.err.println("IO Exception while reading lastFile filefile!");
         } finally {
-            try {
-                f.close();
-            } catch (IOException e) {
-                System.err.println("Woohoo, more exceptions!"); //FIXME
-            }
+            try { f.close(); } catch (IOException ignored) {}
         }
     }
 
@@ -365,10 +309,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public NetworkingFile getFile(int iid) throws RemoteException {
+        // FIXME: Joca, are we sure that iid is valid? Where is this being guaranteed?
         String query = "select path, OriginalFile from IdeiasFicheiros where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
-        if ( queryResult == null || queryResult.size() == 0) //FIXME: Deal with this!
-        return null;
+        if ( queryResult.isEmpty() )
+            return null;
 
         try {
             return new NetworkingFile(queryResult.get(0)[0],queryResult.get(0)[1]);
@@ -420,10 +365,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "Select * from Ideias i, RelacaoIdeias r where r.iidfilho = i.iid and r.iidpai = " + iid +
                 " and r.tipo_relacao = " + relationshipType;
         ArrayList<String[]> queryResult = receiveData(query);
-        Idea[] devolve = null;
+        Idea[] devolve;
 
-        if (queryResult == null || queryResult.size()==0)
-            return null;//FIXME Deal with this!
+        if (queryResult.isEmpty())
+            return null;
 
         devolve = new Idea[queryResult.size()];
 
@@ -468,32 +413,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     private boolean ideaHasFiles(int iid) {
         String query = "select * from IdeiasFicheiros i where i.iid = " + iid;
-        ArrayList<String[]> queryResult = null;
-        try {
-            queryResult = receiveData(query);
-        } catch (RemoteException e) {
-            System.err.println("should never happen!!!!!");
-            return false;
-        }
-
-        if (queryResult == null)
-            return false; //FIXME: We should handle the query getting all fucked up (NULL case)
+        ArrayList<String[]> queryResult = receiveData(query);
 
         return !queryResult.isEmpty();
     }
 
     private void deleteIdeaFiles(int iid) {
-        String query = "select path from IdeiasFicheiros i where i.iid = " + iid;ArrayList<String[]> queryResult =
-                null;
-        try {
-            queryResult = receiveData(query);
-        } catch (RemoteException e) {
-            System.err.println("should never happen!!!!!");
-            return;
-        }
-
-        if (queryResult == null)
-            return; //FIXME: We should handle the query getting all fucked up (NULL case)
+        String query = "select path from IdeiasFicheiros i where i.iid = " + iid;
+        ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult.size() > 0) {
             for (String[] row : queryResult ) {
@@ -505,12 +432,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     }
 
-    public boolean ideaHasChildren(int iid) throws RemoteException {
+    boolean ideaHasChildren(int iid) throws RemoteException {
         String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult == null)
-            return false; //FIXME: We should handle the query getting all fucked up (NULL case)
 
         return !queryResult.isEmpty();
     }
@@ -585,8 +509,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         ArrayList<String[]> queryResult = receiveData(query);
         Idea devolve;
 
-        //FIXME: Maybe we should handle the case where the query fails in a different way
-        if (queryResult == null || queryResult.isEmpty())
+        if (queryResult.isEmpty())
             return null;
 
         devolve = new Idea(queryResult.get(0));
@@ -622,10 +545,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             return null;
 
         else{
-            for (int i=0;i<queryResult.size();i++){
-                if (!hasElement(devolve,queryResult.get(i))){
-                    temp = new Idea(queryResult.get(i));
-                    temp.setSharesBuy( Integer.parseInt(queryResult.get(i)[4]) - (Integer.parseInt(queryResult.get(i)[5])) );
+            for (String[] row : queryResult) {
+                if (! hasElement(devolve, row)) {
+                    temp = new Idea(row);
+                    temp.setSharesBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
                     devolve.add(temp);
                 }
             }
@@ -693,9 +616,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if (queryResult.size() == 0)
             return null;
 
-        ServerTopic topics = new ServerTopic(queryResult.get(0));
-
-        return topics;
+        return new ServerTopic(queryResult.get(0));
     }
 
     ////
@@ -758,7 +679,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public String[] getHistory(int uid) throws RemoteException{
-        String[] history = null;
+        String[] history;
         String query = "Select t.comprador, t.vendedor, t.valor, i.titulo from Transacoes t, Ideias i " +
                 "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid";
 
@@ -783,12 +704,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
+        // FIXME: Are we sure we have valid ideas when we get here?
         ArrayList<Share> shares = new ArrayList<Share>();
         String query = "select * from Shares where iid="+iid;
 
         ArrayList<String[]> result = receiveData(query);
-
-        if ( result == null ) return null; //FIXME: Wh're not dealing with this!
 
         for ( String[] row : result)
             shares.add(new Share(row));
@@ -804,18 +724,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
-        ArrayList<Share> shares = new ArrayList<Share>();
+        // FIXME: Are we sure we have valid ideas when we get here?
         String query = "select * from Shares where iid="+iid+" and userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
 
-        if ( result == null ) return null; //FIXME: We're not dealing with this! ANd have to!
-
-        if ( result.size() == 0 ) {
+        if ( result.isEmpty() ) {
             return null;
         }
-
-        System.out.println("SSSSS");
 
         return new Share(result.get(0));
     }
@@ -834,19 +750,22 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return
      * @throws RemoteException
      */
-    public int getUserMoney(int uid) throws RemoteException {
+    int getUserMoney(int uid) throws RemoteException {
         String query = "select dinheiro from Utilizadores where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
 
-        if ( result == null || result.size() == 0) /* FIXME: Should NEVER NEVER happen! */
+        if ( result.isEmpty() ) {
+            System.err.println("DB consistency has gone crazy!");
             return 0;
+        }
 
         return Integer.valueOf(result.get(0)[0]);
     }
 
     /**
      * Sets the money for UID. UID must exist
+     *
      * @param uid
      * @param money
      * @param conn The connection to use, for instance, for transactional operations. null if don't care which
@@ -854,15 +773,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return
      * @throws RemoteException
      */
-    public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException {
+    private void setUserMoney(int uid, int money, Connection conn) {
         String query = "update Utilizadores set dinheiro="+money+" where userid="+uid;
 
         if ( conn == null )
             insertData(query);
         else
             insertData(query, conn);
-
-        return true; //FIXME: Change return type?
     }
 
     /**
@@ -885,17 +802,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                                                     int minTargetShares)  throws RemoteException {
         System.out.println("registerGetSharesRequest called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
                 ", targetPrice="+targetPrice+", minTargetShares="+minTargetShares);
-        int ret = tryGetSharesIdea(uid, iid, numShares, targetPrice, minTargetShares);
+        boolean ret = tryGetSharesIdea(uid, iid, numShares, targetPrice, minTargetShares);
 
-        if ( ret == 0 )
+        if ( !ret )
             transactionQueue.enqueue(new Transaction(uid, iid, numShares, targetPrice, minTargetShares));
 
-        return ret == 1;
+        return ret;
     }
 
     /**
      * This tries to GET numShare shares. Notice that it doesn't try to BUY. If the user already has them,
      * it just quits and errors out.
+     *
      * @param uid
      * @param iid
      * @param numShares
@@ -906,8 +824,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return 1 on success, 0 on error (can't buy because there aren't any appropriate sellers....)
      * @throws RemoteException
      */
-    synchronized public int tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice,
-                                              int minTargetShares) throws
+    synchronized public boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice,
+                                                 int minTargetShares) throws
             RemoteException {
         System.out.println("tryGetSharesIdea called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
                 ", targetPrice="+targetPrice+", minTargetShares="+minTargetShares);
@@ -924,15 +842,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             numShares -= currentShares.getNum();
 
             if ( numShares <= 0) {
-                //FIXME: Should we update the shares' targetPrice and min target shares here?!?!?! JOCA!
-
-                ////
-                //  Super Answer by Joca:
-                //  Dude, if he already has them why do we need to update? Isn't that already in the database?
-                //  Just tell them "Dude, I can't buy something you already have..."
-                ////
-                System.out.println("User tried to get X shares, but already has them!"); //FIXME?
-                return 1; //Got them!
+                System.out.println("User tried to get X shares, but already has them!");
+                return true; //Got them!
             }
         }
 
@@ -943,15 +854,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         sortByPrice(shares);
 
         // We have sorted them by price per share, so the best options are first
-
-        /**
-         * This is a version of the Knapsack problem, and it seems a little bit too farfetched for us to be solving
-         * it here when we're worrying about distributed systems.
-         *
-         * Our solution is not the optimal solution. It is a greedy approximation algorithm which we later found out
-         * to be George Dantzig's greedy algorithm. It does the job.
-         * FIXME: This sounds wrong now x)
-         */
+        // FIXME CHECK THIS
 
         for (Share s : shares) {
             System.out.println("processing share: "+s);
@@ -1012,7 +915,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         if ( numShares > 0 ) {
             //Can't buy shares!!!
             System.out.println("Failed to buy shares!!");
-            return 0;
+            return false;
         }
 
         //Okay, move on and let's buy them. this must be transactional
@@ -1044,16 +947,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             new NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
                     s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
         }
-        return 1;
+        return true;
     }
 
     ////
     //  Set up the number of shares for a given idea, and the price of each share for that idea
     ////
-    synchronized public boolean setSharesIdea(int uid, int iid,int nshares, int price,
-                                       int numMinShares)throws RemoteException{
+    synchronized public void setSharesIdea(int uid, int iid, int nshares, int price,
+                                            int numMinShares)throws RemoteException{
         /* null here means no transactional connection */
-        return setSharesIdea(uid, iid, nshares,price,numMinShares,null);
+        setSharesIdea(uid, iid, nshares,price,numMinShares,null);
     }
 
     /**
@@ -1067,19 +970,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
      */
-    private synchronized boolean setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares,
+    private synchronized void setSharesIdea(int uid, int iid,int nshares, int price, int numMinShares,
                                   Connection conn)throws RemoteException{
-        String query = "select * from Shares where uid="+uid+" and "+"iid="+iid;
+        String query = "select * from Shares where userid="+uid+" and "+"iid="+iid;
         ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));
 
-        if (result.size() > 0) {
+        if ( !result.isEmpty() ) {
             // This already exists, we should just update it
 
             if ( nshares == 0 ) {
-                // Set to 0!! We should delete it! FIXME: is this right?
-                query = "delete from shares where uid="+uid+" and iid="+iid;
+                // Set to 0!! We should delete it!
+                query = "delete from shares where userid="+uid+" and iid="+iid;
             } else {
-                query = "update shares set nshares="+nshares+" where iid="+iid+" and uid="+uid;
+                query = "update shares set nshares="+nshares+" where iid="+iid+" and userid="+uid;
             }
         } else
             query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
@@ -1089,12 +992,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         else
             insertData(query,conn);
 
-        return true; //FIXME: Maybe not return anything
     }
 
 
-    synchronized private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares,int price, Connection conn,
-                                         int iid) {
+    synchronized private void insertIntoHistory(int uidBuyer, int uidSeller, int nshares, int price, Connection conn,
+                                                int iid) {
 
         //  First we are going to extract the system date, and them we are going to add it to the query. It appears to have
         //  to be like this, ORACLE SQL is a very good one, and does not allow us to select sysdate inside a query...
@@ -1102,62 +1004,44 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "insert into Transacoes values(" + (num_transactions+1) + "," + uidBuyer + "," + uidSeller + "," + price
                 + "," + nshares + "," + iid ;
         ArrayList<String[]> queryDataResult;
-        boolean res = false;
-        try {
-            queryDataResult = receiveData(queryData, conn);
-            query = query + ", to_date('" + queryDataResult.get(0)[0] + "','yyyy:mm:dd:hh:mi:ss'))";
-            if ( conn == null )
-                insertData(query);
-            else
-                insertData(query,conn);
-            num_transactions++;
-        } catch (RemoteException e) {
-            System.err.println("Remote exception, wtf!"); //FIXME
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        return res;
+        queryDataResult = receiveData(queryData, conn);
+        query = query + ", to_date('" + queryDataResult.get(0)[0] + "','yyyy:mm:dd:hh:mi:ss'))";
+        if ( conn == null )
+            insertData(query);
+        else
+            insertData(query,conn);
+        num_transactions++;
     }
 
     /**
      * Mehtod responsible for updating the time when the user was logged in
+     *
      * @param uid The id of the user
      * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
      */
-    public boolean updateUserTime(int uid) throws RemoteException{
+    public void updateUserTime(int uid) throws RemoteException{
         String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
         ArrayList<String[]> queryDataResult;
 
-        try{
-            queryDataResult = receiveData(queryData);
-            queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] +
-                    "','yyyy:mm:dd:hh:mi:ss') where userid = " + uid;
-            insertData(queryData);
-        }catch(RemoteException r){
-            System.err.println("RemoteException!");
-            r.printStackTrace();//FIXME: Deal with this!
-        }
-        return true; //FIXME: Maybe doesn't make sense?
+        queryDataResult = receiveData(queryData);
+        queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] +
+                "','yyyy:mm:dd:hh:mi:ss') where userid = " + uid;
+        insertData(queryData);
     }
 
     ////
     //  Method that returns true if the user has been actived in the last 5 minutes
     ////
-    public boolean isUserIn(int uid) throws RemoteException{
+    public boolean isUserIn(int uid) {
         String query = "Select u.dataUltimoLogin from Utilizadores u where u.userid = " + uid;
-        ArrayList<String[]> resultQuery = null;
+        ArrayList<String[]> resultQuery;
         Date actualDate = new Date(),userDate;
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
         String[] user_date;
         String finalUserDate = "";
 
-        try{
             resultQuery = receiveData(query);
-        }catch (RemoteException r){
-            System.err.println("RemoteException!");
-            r.printStackTrace();//FIXME: Deal with this!
-        }
 
         if (resultQuery == null)
             return false;
@@ -1181,9 +1065,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         long difference = actualDate.getTime() - userDate.getTime();
         long diffMinutes = difference / (60 * 1000) % 60;
 
-        if (diffMinutes > limit_time_active)//Has been active in less than 5 minutes
-            return true;
-        return false;
+        return diffMinutes > limit_time_active;
     }
 
     ////
@@ -1191,52 +1073,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     synchronized public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
 
-        //String query = "Select i.iid from Ideias i where i.iid = '" + iid + "' and i.activa = 1";
-        String query = null;
-        ArrayList<String[]> topics = null;
-        //ArrayList<String[]> ideias;
-        int idea_id, topic_id;
-        boolean check;
+        String query ;
+        ArrayList<String[]> topics;
+        int topic_id;
 
-        try{
-            //ideas = receiveData(query);
+        //ideas = receiveData(query);
+        query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
+        topics = receiveData(query);
+
+        ////
+        //  There is no topic with the given title, so let's create it
+        ////
+        if (topics.isEmpty()){
+            createTopic(topicTitle,("Topic created by user " + uid),uid);
+
+            //Add the number of the topic to the ArrayList
             query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
             topics = receiveData(query);
-
-            ////
-            //  There is no topic with the given title, so let's create it
-            ////
-            if (topics.size() == 0){
-
-                ////
-                //  FIXME: Decide which description to put in the topic when creating it
-                ////
-
-                check = createTopic(topicTitle,("Topic created by user " + uid),uid);
-                if(!check){
-                    System.err.println("Error creating topic " + topicTitle + " in the setTopicsIdea method!");
-                    //FIXME: What to do in this situation???
-                } else{
-                    //Add the number of the topic to the ArrayList
-                    query = "Select t.tid from Topicos t where t.nome='" + topicTitle + "'";
-                    topics = receiveData(query);
-                }
-            }
-
-            if ( (topics.size() > 0) ){
-                topic_id = Integer.valueOf(topics.get(0)[0]);//Get topic id
-
-                query = "INSERT INTO TopicosIdeias VALUES (" + topic_id + "," + iid + ")";
-
-                insertData(query);
-                return true;
-            } //else FIXME: Shouldn't happen because there should always be a topic
-        }catch(RemoteException r){
-            System.err.println("Remote Exception on the setTopicsIdea method");
-            //FIXME: Deal with this
         }
 
-        return false;
+        topic_id = Integer.valueOf(topics.get(0)[0]);//Get topic id
+
+        query = "INSERT INTO TopicosIdeias VALUES (" + topic_id + "," + iid + ")";
+
+        insertData(query);
+        return true; //Change this to return....nothing?
     }
 
     ////
@@ -1315,9 +1176,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * specify a connection in another overloaded method
      * @param query
      * @return
-     * @throws RemoteException
      */
-    private ArrayList<String[]> receiveData(String query) throws RemoteException{
+    private ArrayList<String[]> receiveData(String query) {
 
         Connection conn = null;
 
@@ -1343,7 +1203,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // produces an empty table.
     //
     ////
-    private ArrayList<String[]> receiveData(String query, Connection conn) throws RemoteException{
+    private ArrayList<String[]> receiveData(String query, Connection conn) {
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement = null;
@@ -1388,8 +1248,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     private Connection getTransactionalConnection() {
-        //FIXME: Implement this well
-        Connection connection = null;
+        Connection connection;
         try {
             connection = connectionPool.checkOutConnection();
         } catch (SQLException e) {
@@ -1421,9 +1280,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * version which can operate on a given connection (for things such as transactions...)
      * @param query
      * @return
-     * @throws RemoteException
      */
-    private void insertData(String query) throws RemoteException{
+    private void insertData(String query) {
         Connection conn = null;
         try {
             conn = connectionPool.checkOutConnection();
@@ -1439,20 +1297,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
     //  database's tables
     //
-    // FIXME: We are going to have to do more than just print a pretty message to stderr. In fact, we should never let
-    // execution go through or we may have unpredicteable results
     ////
-    private void insertData(String query, Connection conn) throws RemoteException{
-        Statement statement;
-        int update = -1;
-
+    private void insertData(String query, Connection conn) {
         System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
 
         boolean cont = false;
         do {
             try{
-                statement = conn.createStatement();
-                update = statement.executeUpdate(query);
+                conn.createStatement().executeUpdate(query);
             }catch(SQLException s){
                 System.err.println("SQLException in the insertData method");
                 cont = true;
@@ -1475,7 +1327,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
 
             //connect to database
-            //FIXME: Should this still be here? Should it be moved inside ConnectionPool?
+            //FIXME: Should this still be here? Should it be moved inside ConnectionPool? JOCA!
             Class.forName("oracle.jdbc.driver.OracleDriver");
 
             if (connectionPool == null) {
@@ -1484,32 +1336,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             }
 
             //Get current number of users
-            try{
-                ArrayList<String[]> teste= receiveData("Select count(*) from Utilizadores");
-                num_users = Integer.parseInt(teste.get(0)[0]);
+            ArrayList<String[]> teste= receiveData("Select count(*) from Utilizadores");
+            num_users = Integer.parseInt(teste.get(0)[0]);
 
-                teste = receiveData("Select count(*) from Topicos");
-                num_topics = Integer.parseInt(teste.get(0)[0]);
+            teste = receiveData("Select count(*) from Topicos");
+            num_topics = Integer.parseInt(teste.get(0)[0]);
 
-                teste = receiveData("Select count(*) from Ideias");
-                num_ideas = Integer.parseInt(teste.get(0)[0]);
+            teste = receiveData("Select count(*) from Ideias");
+            num_ideas = Integer.parseInt(teste.get(0)[0]);
 
-                teste = receiveData("Select count(*) from Transacoes");
-                num_transactions = Integer.parseInt(teste.get(0)[0]);
-            }catch(RemoteException r){
-                System.err.println("Remote Exception while trying to get the number of users....");
-                //FIXME: HOW TO DEAL WITH THIS EXCEPTION????
-            }
+            teste = receiveData("Select count(*) from Transacoes");
+            num_transactions = Integer.parseInt(teste.get(0)[0]);
 
             System.out.println("You made it, take control your database now!");
 
             //Start RMIRegistry programmatically
             Registry r = LocateRegistry.createRegistry(7000);
             r.rebind("academica", this);
-
-            ////
-            //  FIXME: Is it worth to store the RMI Registry's port in some sort of a file or variable?
-            ////
 
             System.out.println("Server ready :)");
 
@@ -1520,14 +1363,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         } catch(ClassNotFoundException c){
             c.printStackTrace();
         }
-
-        ////
-        //
-        //
-        //  FIXME: WHAT TO DO WITH THESE EXCEPTIONS???
-        //
-        //
-        ////
     }
 
     public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException {
@@ -1547,11 +1382,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             System.err.println("Error writing Queue to file!!");
         }
 
-        try {
-            out.close();
-        } catch (IOException e) {
-            //FIXME: What damn exception can we get here?
-        }
+        try { out.close(); } catch (IOException ignored) {}
     }
 
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException {
@@ -1564,7 +1395,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
 
         ArrayList<Request> requests = new ArrayList<Request>();
-        int size = 0;
+        int size;
         try {
             size = in.readInt();
         } catch (IOException e) {
@@ -1589,7 +1420,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             }
 
             ArrayList<Notification> notifications = new ArrayList<Notification>();
-            int size = 0;
+            int size;
             try {
                 size = in.readInt();
             } catch (IOException e) {
@@ -1608,7 +1439,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 }
 
 
-            if ( notifications != null && notifications.size()>0 ) {
+            if ( notifications.size()>0 ) {
                 System.out.println("Just found notifications!");
                 for (Notification n : notifications)
                     System.out.println("SUch as: "+n);
@@ -1639,11 +1470,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 return false;
             }
 
-            try {
-                out.close();
-            } catch (IOException e) {
-                //FIXME: What damn exception can we get here?
-            }
+            try { out.close(); } catch (IOException ignored) { }
 
             return true;
         }

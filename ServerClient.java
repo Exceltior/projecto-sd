@@ -754,16 +754,6 @@ public class ServerClient implements Runnable {
             server.queue.enqueue(setSharesIdeaRequest);
         }
         setSharesIdeaRequest.waitUntilDispatched();
-        result_shares = (Boolean)setSharesIdeaRequest.requestResult.get(0);
-
-        if (!result_shares){
-            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
-                return false;
-
-            server.queue.dequeue(createIdeaRequest);
-            server.queue.dequeue(setSharesIdeaRequest);
-            return true;
-        }
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream) )
             return false;
