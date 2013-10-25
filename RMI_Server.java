@@ -275,12 +275,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 "'" + pass +
                 "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'), null)";
 
-        check = insertData(query);
+        //check = insertData(query); FIXME
+        insertData(query);
 
-        if ( check )
+        //if ( check )
             num_users++;
 
-        return check;
+        return true;
     }
 
     /**
@@ -444,11 +445,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "INSERT INTO Topicos VALUES (" + (num_topics+1) + ",'" + nome + "','" + descricao + "'," +
                 "" + uid + ")";
 
-        if(insertData(query)) {
-            ++num_topics; return true;
-        }
-        else
-            return false;
+        insertData(query);
+        ++num_topics;
+        return true;
     }
 
     ////
@@ -462,10 +461,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 "" + uid + "," +
                 "" + "1)";
 
-        if(insertData(query))
-            return ++num_ideas;
-        else
-            return -1;
+        insertData(query);
+        return ++num_ideas;
+        // FIXME: We were returning -1, do we still have a reson to do that, Joca?
     }
 
     private boolean ideaHasFiles(int iid) {
@@ -524,7 +522,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return We have 4 possible return values:
      * -1 -> Idea has no children
      * -2 -> User is not the owner of the idea
-     * -3 -> Error removing the idea
      * 1 > Everything went well
      * @throws RemoteException
      */
@@ -551,10 +548,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
 
         query = "update Ideias set activa = 0 where iid="+idea.id;
-        boolean queryResult2 = insertData(query);
-
-        if (!queryResult2)
-            return -3; //FIXME: We should handle the query getting all fucked up (false case)
+        insertData(query);
 
         return 1;//Everything ok
 
@@ -726,14 +720,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
+        // FIXME: Need to check if the user has shares or not here
         String query = "Update Shares set valor = " + price + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
-        boolean check = insertData(query,conn);
+        insertData(query,conn);
         returnTransactionalConnection(conn);
 
         transactionQueue.checkQueue();
 
-        return check;
+        return true;
     }
 
     /**
@@ -745,14 +740,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
+        // FIXME: Need to check if the user has shares or not here
         String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
-        boolean check = insertData(query,conn);
+        insertData(query,conn);
         returnTransactionalConnection(conn);
 
         transactionQueue.checkQueue();
 
-        return check;
+        return true;
     }
 
     /**
@@ -861,7 +857,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public boolean setUserMoney(int uid, int money, Connection conn) throws RemoteException {
         String query = "update Utilizadores set dinheiro="+money+" where userid="+uid;
 
-        return ((conn == null) ? insertData(query) : insertData(query, conn));
+        if ( conn == null )
+            insertData(query);
+        else
+            insertData(query, conn);
+
+        return true; //FIXME: Change return type?
     }
 
     /**
@@ -1083,7 +1084,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         } else
             query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
 
-        return conn ==null ? insertData(query) : insertData(query, conn);
+        if ( conn == null )
+            insertData(query);
+        else
+            insertData(query,conn);
+
+        return true; //FIXME: Maybe not return anything
     }
 
 
@@ -1100,9 +1106,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try {
             queryDataResult = receiveData(queryData, conn);
             query = query + ", to_date('" + queryDataResult.get(0)[0] + "','yyyy:mm:dd:hh:mi:ss'))";
-            res = insertData(query, conn);
-            if (res)//It went well
-                num_transactions++;
+            if ( conn == null )
+                insertData(query);
+            else
+                insertData(query,conn);
+            num_transactions++;
         } catch (RemoteException e) {
             System.err.println("Remote exception, wtf!"); //FIXME
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -1120,18 +1128,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public boolean updateUserTime(int uid) throws RemoteException{
         String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
         ArrayList<String[]> queryDataResult;
-        boolean result = false;
 
         try{
             queryDataResult = receiveData(queryData);
             queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] +
                     "','yyyy:mm:dd:hh:mi:ss') where userid = " + uid;
-            result = insertData(queryData);
+            insertData(queryData);
         }catch(RemoteException r){
             System.err.println("RemoteException!");
             r.printStackTrace();//FIXME: Deal with this!
         }
-        return result;
+        return true; //FIXME: Maybe doesn't make sense?
     }
 
     ////
@@ -1221,7 +1228,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
                 query = "INSERT INTO TopicosIdeias VALUES (" + topic_id + "," + iid + ")";
 
-                return insertData(query);
+                insertData(query);
+                return true;
             } //else FIXME: Shouldn't happen because there should always be a topic
         }catch(RemoteException r){
             System.err.println("Remote Exception on the setTopicsIdea method");
@@ -1297,7 +1305,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         query = "INSERT INTO RelacaoIdeias Values(" + iidpai + ", " + iidfilho + ", " + tipo + ")";
 
-        return insertData(query);
+        insertData(query);
+        return true;
     }
 
 
@@ -1311,11 +1320,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private ArrayList<String[]> receiveData(String query) throws RemoteException{
 
         Connection conn = null;
-        try {
-            conn = connectionPool.checkOutConnection();
-        } catch (SQLException e) {
-            System.err.println("Error checking out connection for receiveData");
-        }
+
+        boolean cont;
+        do {
+            cont = false;
+            try {
+                conn = connectionPool.checkOutConnection();
+            } catch (SQLException e) {
+                System.err.println("Error checking out connection for receiveData");
+                cont = true;
+            }
+        } while ( cont );
         ArrayList<String[]> ret = receiveData(query, conn);
         if ( conn != null )
             connectionPool.returnConnection(conn);
@@ -1331,36 +1346,43 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private ArrayList<String[]> receiveData(String query, Connection conn) throws RemoteException{
         int columnsNumber, pos = 0;
         ArrayList<String[]> result = new ArrayList<String[]>();
-        Statement statement;
+        Statement statement = null;
 
         System.out.println("\n-------------------------------\nRunning query: "+query);
 
-        try {
-            statement = conn.createStatement();
-        } catch (SQLException e) {
-            System.err.println("Error creating SQL statement '" + query + "'!");
-            return null;
-        }
+        boolean cont;
+        do {
+            cont = false;
+            try {
+                statement = conn.createStatement();
+            } catch (SQLException e) {
+                System.err.println("Error creating SQL statement '" + query + "'!");
+                cont = true;
+            }
+        } while ( cont );
 
         ResultSet rs;
         ResultSetMetaData rsmd;
-        try {
-            rs = statement.executeQuery(query);
-            rsmd = rs.getMetaData();
-            columnsNumber = rsmd.getColumnCount();//Get number of columns
-            //System.out.println("Query's result has " + columnsNumber + " columns");
-            while (rs.next()){
-                result.add(new String[columnsNumber]);
-                for (int i=1;i<=columnsNumber;++i){
-                    result.get(pos)[i-1] = rs.getString(i);
+        do {
+            cont = false;
+            try {
+                rs = statement.executeQuery(query);
+                rsmd = rs.getMetaData();
+                columnsNumber = rsmd.getColumnCount();//Get number of columns
+                //System.out.println("Query's result has " + columnsNumber + " columns");
+                while (rs.next()){
+                    result.add(new String[columnsNumber]);
+                    for (int i=1;i<=columnsNumber;++i){
+                        result.get(pos)[i-1] = rs.getString(i);
+                    }
+                    pos++;
                 }
-                pos++;
+                statement.close();
+            } catch (SQLException e) {
+                System.err.println("Error executing SQL query '" + query + "'!");
+                cont = true;
             }
-            statement.close();
-        } catch (SQLException e) {
-            System.err.println("Error executing SQL query '" + query + "'!");
-            return null;
-        }
+        } while ( cont );
 
         return result;
     }
@@ -1401,17 +1423,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return
      * @throws RemoteException
      */
-    private boolean insertData(String query) throws RemoteException{
+    private void insertData(String query) throws RemoteException{
         Connection conn = null;
         try {
             conn = connectionPool.checkOutConnection();
         } catch (SQLException e) {
             System.err.println("Error checking out connection for insertData");
         }
-        boolean ret = insertData(query, conn);
+        insertData(query, conn);
         if ( conn != null )
             connectionPool.returnConnection(conn);
-        return ret;
     }
 
     ////
@@ -1421,24 +1442,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     // FIXME: We are going to have to do more than just print a pretty message to stderr. In fact, we should never let
     // execution go through or we may have unpredicteable results
     ////
-    private boolean insertData(String query, Connection conn) throws RemoteException{
+    private void insertData(String query, Connection conn) throws RemoteException{
         Statement statement;
         int update = -1;
 
         System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
 
-        try{
-            statement = conn.createStatement();
-            update = statement.executeUpdate(query);
-        }catch(SQLException s){
-            System.err.println("SQLException in the insertData method");
+        boolean cont = false;
+        do {
+            try{
+                statement = conn.createStatement();
+                update = statement.executeUpdate(query);
+            }catch(SQLException s){
+                System.err.println("SQLException in the insertData method");
+                cont = true;
 
-            return false;
-
-        }
-
-        //System.out.println("O resultado foi " + (update!=0));
-        return update != 0;
+            }
+        } while ( cont );
     }
 
     private void execute(){
