@@ -144,7 +144,7 @@ public class ServerClient implements Runnable {
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEA){
-                if (!handleGet_Idea()){
+                if (! handleGetIdea()){
                     System.err.println("Error in the handle get idea method!!!!!!");
                     break;
                 }
@@ -354,10 +354,8 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
-        if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
-            return false;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-        return true;
     }
 
     ////
@@ -430,7 +428,6 @@ public class ServerClient implements Runnable {
     }
 
     private boolean receiveInt(ArrayList<Integer> ideias){
-        int[] data;
         int numIdeas, temp;
 
         if ( (numIdeas = Common.recvInt(inStream)) == -1) {
@@ -447,7 +444,7 @@ public class ServerClient implements Runnable {
     }
 
     private boolean handleBuyShares(){
-        int iid, price, numberSharesToBuy, minNumberShares, numSharesAlreadyHas, numMinSharesAlreadyHas;
+        int iid, price, numberSharesToBuy, minNumberShares, numSharesAlreadyHas;
         boolean check;
 
         if ( !isLoggedIn() ) {
@@ -526,8 +523,6 @@ public class ServerClient implements Runnable {
             setIdeasRelationsRequest.waitUntilDispatched();
 
             result = (Boolean)setIdeasRelationsRequest.requestResult.get(0);
-            System.out.println("IID +"+iid+" ideas[i]: "+ideas.get(i)+" relationType: "+relationType+" i: "+i+
-            " oldI:" +  oldI + "result: "+ result); //FIXME
             if (!result) {
                 //Alert the client that the idea is not valid
                 if (!Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
@@ -558,9 +553,7 @@ public class ServerClient implements Runnable {
         }
 
         if (ideasUserCanBuy == null){
-            if(!Common.sendMessage(Common.Message.MSG_ERR,outStream))
-                return false;
-            return true;
+            return Common.sendMessage(Common.Message.MSG_ERR, outStream);
         }
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
@@ -576,10 +569,8 @@ public class ServerClient implements Runnable {
         }
 
         //Final confirmation
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-        return true;
     }
 
     ////
@@ -639,7 +630,6 @@ public class ServerClient implements Runnable {
     ////
     private boolean handleGetUserIdeas(){
         Idea[] userIdeas;
-        int numUserIdeas;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -673,10 +663,8 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-        return true;
     }
 
 
@@ -843,14 +831,13 @@ public class ServerClient implements Runnable {
         if(!setRelations(result,ideasNeutralArray,0, requests1, iState))
             return false;
 
-        if ( (reply=Common.recvMessage(inStream)) == Common.Message.MSG_IDEA_HAS_FILE){
+        if ( Common.recvMessage(inStream) == Common.Message.MSG_IDEA_HAS_FILE){
             //Receive File
             ObjectInputStream objectStream;
             try{
                 objectStream = new ObjectInputStream(inStream);
                 ficheiro = (NetworkingFile)objectStream.readObject();
 
-                boolean fileResult = false;
                 if ( (addFileRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.ADD_FILE)) ==
                         null) {
                     ArrayList<Object> objects = new ArrayList<Object>(); objects.add(result); objects.add
@@ -860,16 +847,21 @@ public class ServerClient implements Runnable {
                 }
                 addFileRequest.waitUntilDispatched();
                 // We don't care about the result of the request, because it will never fail...
-                fileResult = (Boolean)addFileRequest.requestResult.get(0);
 
 
             }catch(IOException i){
                 System.out.println("IO Exception"); //FIXME Can't just return (remember to dequeue!!)
-                i.printStackTrace();
+                server.queue.dequeue(createIdeaRequest);
+                server.queue.dequeue(setSharesIdeaRequest);
+                for (Request r : requests1)
+                    server.queue.dequeue(r);
                 return false;
             }catch(ClassNotFoundException c){
                 System.out.println("Class not found");//FIXME Can't just return (remember to dequeue!!)
-                c.printStackTrace();
+                server.queue.dequeue(createIdeaRequest);
+                server.queue.dequeue(setSharesIdeaRequest);
+                for (Request r : requests1)
+                    server.queue.dequeue(r);
                 return false;
             }
         }
@@ -891,7 +883,7 @@ public class ServerClient implements Runnable {
     ////
     //  Searches ideas from its id and title
     ////
-    private boolean handleGet_Idea(){
+    private boolean handleGetIdea(){
         int iid;
         String title;
         Idea[] ideas;
@@ -969,7 +961,7 @@ public class ServerClient implements Runnable {
             System.err.println("RMI exception while fetching an idea by its IID");
             connection.onRMIFailed();
             server.removeSocket(socket);
-            return false; //FIXME: Do we really want to return this? WHAT TO DO WHEN RMI IS DEAD?!
+            return false;
         }
 
         if ( idea == null ) {
@@ -995,7 +987,6 @@ public class ServerClient implements Runnable {
     //  Sends the list of the topics to the user
     ////
     private boolean handleListTopicsRequest() {
-        ServerTopic temp;
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
         }
@@ -1021,10 +1012,8 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-        return true;
     }
 
     private boolean handleGetSharesNotSell(){
@@ -1189,15 +1178,12 @@ public class ServerClient implements Runnable {
             }
 
             //Send final confirmation
-            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-                return false;
+            return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-            return true;
         }
     }
 
     private boolean handleGetIdeasFiles(){
-        int iid = -1;
         Idea[] ideasFiles;
 
         if ( !isLoggedIn() ) {
@@ -1311,9 +1297,7 @@ public class ServerClient implements Runnable {
         }
 
         if (ideaShares == null){
-            if (!Common.sendMessage(Common.Message.MSG_ERR,outStream))
-                return false;
-            return true;
+            return Common.sendMessage(Common.Message.MSG_ERR, outStream);
         }else{
             //Send data confirmation
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
@@ -1330,10 +1314,8 @@ public class ServerClient implements Runnable {
         }
 
         //Send final confirmation
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
 
-        return true;
     }
 
     private boolean handleDeleteIdea() {
@@ -1378,14 +1360,11 @@ public class ServerClient implements Runnable {
             // --> MSG_OK: In case everything's fine
 
             if ( idea == null ) {
-                if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
-                    return false;
-                return true;
+                return Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream);
             }
 
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea); objects.add(uid);
             removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
-            //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
             server.queue.enqueue(removeIdeaRequest);
         } else {
             // There is already a request, we only need to receive messages and ignore them
@@ -1397,14 +1376,12 @@ public class ServerClient implements Runnable {
 
         // Wait until it's dispatched
         removeIdeaRequest.waitUntilDispatched();
-        //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
         result = (Integer)removeIdeaRequest.requestResult.get(0);
 
         if ( result == 1) {
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
                 return false;
         } else if (result == -1){
-
             if ( !Common.sendMessage(Common.Message.ERR_IDEA_HAS_CHILDREN, outStream))
                 return false;
         } else {
@@ -1412,7 +1389,6 @@ public class ServerClient implements Runnable {
                 return false;
         }
 
-        //FIXME: Right before we dequeue, this is where we'd set the user's state to OK (clearing notify)
         server.queue.dequeue(removeIdeaRequest);
         return true;
 
@@ -1542,10 +1518,8 @@ public class ServerClient implements Runnable {
             return false;
         }
 
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream) && devolve;
 
-        return devolve;
     }
 
     ////
@@ -1570,13 +1544,11 @@ public class ServerClient implements Runnable {
         objects.add(user);
         objects.add(pwd);
         Request loginRequest = new Request(uid,Request.RequestType.LOGIN,objects);
-        //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
         server.queue.enqueue(loginRequest);
 
         // Wait until it's dispatched
         loginRequest.waitUntilDispatched();
 
-        //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
         uid = (Integer)loginRequest.requestResult.get(0);
 
         if (uid != -1){
@@ -1595,7 +1567,6 @@ public class ServerClient implements Runnable {
             }
         }
 
-        //FIXME: Right before we dequeue, this is where we'd set the user's state to OK (clearing notify)
         server.queue.dequeue(loginRequest);
 
         if ( uid == -1 )
