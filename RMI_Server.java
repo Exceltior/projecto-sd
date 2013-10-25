@@ -517,25 +517,46 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return !queryResult.isEmpty();
     }
 
-    public boolean removeIdea(Idea idea) throws  RemoteException {
+    /**
+     * Removes an idea
+     * @param idea Object "Idea" with the idea to be removed
+     * @param uid  User that wants to remove the idea
+     * @return We have 4 possible return values:
+     * -1 -> Idea has no children
+     * -2 -> User is not the owner of the idea
+     * -3 -> Error removing the idea
+     * 1 > Everything went well
+     * @throws RemoteException
+     */
+    public int removeIdea(Idea idea, int uid) throws  RemoteException {
         if ( ideaHasChildren(idea.id) ) {
-            return false;
+            return -1;//Idea has children
         }
 
-        //FIXME: Check if we have ownership of the idea here, and change the return type and then change the server
-        // and THEN the client
+        //Check if user is owner of the idea
+        String query = "Select s.userid from Shares s where s.iid = " + idea.id;
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.size() != 1)
+            return -2;//User is not owner of the idea
+
+        //Only has one owner
+        else if (Integer.parseInt(queryResult.get(0)[0]) != uid )
+                return -2;//User is not owner of the idea
+
+        //Here we know that the user is the owner of the idea
 
         if ( ideaHasFiles(idea.id) ) {
             deleteIdeaFiles(idea.id);
         }
 
-        String query = "update Ideias set activa = 0 where iid="+idea.id;
-        boolean queryResult = insertData(query);
+        query = "update Ideias set activa = 0 where iid="+idea.id;
+        boolean queryResult2 = insertData(query);
 
-        if (!queryResult)
-            return false; //FIXME: We should handle the query getting all fucked up (false case)
+        if (!queryResult2)
+            return -3; //FIXME: We should handle the query getting all fucked up (false case)
 
-        return true;
+        return 1;//Everything ok
 
     }
 
