@@ -12,13 +12,13 @@ public class ServerClient implements Runnable {
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
 
-    private RMIConnection connection;
-    private Server server;
+    private final RMIConnection connection;
+    private final Server server;
 
     // The client's uid. -1 means not logged in.
     private int uid = -1;
 
-    static int limit_characters_topic = 20;//Number of characters for the topic's name
+    private static final int limit_characters_topic = 20;//Number of characters for the topic's name
 
     public ServerClient(Socket currentSocket, RMIConnection connection, Server server) {
         this.socket = currentSocket;
@@ -392,8 +392,8 @@ public class ServerClient implements Runnable {
                     return false;
 
                 //Send ideas
-                for (int i=0;i<ideaslist.length;i++){
-                    if(!ideaslist[i].writeToDataStream(outStream))
+                for (Idea anIdeaslist : ideaslist) {
+                    if (! anIdeaslist.writeToDataStream(outStream))
                         return false;
                 }
             }
@@ -448,7 +448,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleBuyShares(){
         int iid, price, numberSharesToBuy, minNumberShares, numSharesAlreadyHas, numMinSharesAlreadyHas;
-        boolean check = false;
+        boolean check;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -510,7 +510,7 @@ public class ServerClient implements Runnable {
                                  int oldI){
         for (int i=0;i<ideas.size();i++) {
             boolean result;
-            Request setIdeasRelationsRequest = null;
+            Request setIdeasRelationsRequest;
 
             if ( (setIdeasRelationsRequest = server.queue.getNthRequestByUIDAndType(uid,
                     Request.RequestType.SET_IDEAS_RELATIONS, oldI+i+1)) ==
@@ -542,7 +542,7 @@ public class ServerClient implements Runnable {
     }
 
     private boolean handleGetIdeasCanBuy(){
-        ArrayList<Idea> ideasUserCanBuy = null;
+        ArrayList<Idea> ideasUserCanBuy;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -558,8 +558,9 @@ public class ServerClient implements Runnable {
         }
 
         if (ideasUserCanBuy == null){
-            Common.sendMessage(Common.Message.MSG_ERR,outStream);
-            return false;
+            if(!Common.sendMessage(Common.Message.MSG_ERR,outStream))
+                return false;
+            return true;
         }
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
@@ -569,8 +570,8 @@ public class ServerClient implements Runnable {
         if (!Common.sendInt(ideasUserCanBuy.size(),outStream))
             return false;
 
-        for (int i=0;i<ideasUserCanBuy.size();i++){
-            if (!ideasUserCanBuy.get(i).writeToDataStream(outStream))
+        for (Idea anIdeasUserCanBuy : ideasUserCanBuy) {
+            if (! anIdeasUserCanBuy.writeToDataStream(outStream))
                 return false;
         }
 
@@ -585,7 +586,7 @@ public class ServerClient implements Runnable {
     //  Gets the ideas' relation where iidpai is given and the type is a parameter
     ////
     private boolean handleGetIdeasRelation(int type){
-        int iid = -1;
+        int iid;
         Idea[] ideasList;
 
         if ( !isLoggedIn() ) {
@@ -621,8 +622,8 @@ public class ServerClient implements Runnable {
             if (!Common.sendInt(ideasList.length,outStream))
                 return false;
 
-            for (int i=0;i<ideasList.length;i++){
-                if (!ideasList[i].writeToDataStream(outStream))
+            for (Idea anIdeasList : ideasList) {
+                if (! anIdeasList.writeToDataStream(outStream))
                     return false;
             }
 
@@ -667,8 +668,8 @@ public class ServerClient implements Runnable {
         if (!Common.sendInt(userIdeas.length,outStream))
             return false;
 
-        for (int i=0;i<userIdeas.length;i++){
-            if(!userIdeas[i].writeToDataStream(outStream))
+        for (Idea userIdea : userIdeas) {
+            if (! userIdea.writeToDataStream(outStream))
                 return false;
         }
 
@@ -691,8 +692,8 @@ public class ServerClient implements Runnable {
                            ideasAgainstArray = new ArrayList<Integer>(),
                            ideasNeutralArray = new ArrayList<Integer>();
         int nshares, price, result, numMinShares;
-        boolean result_topics = false, result_shares;
-        NetworkingFile ficheiro = null;
+        boolean result_topics, result_shares;
+        NetworkingFile ficheiro;
         Request addFileRequest = null;
 
         if ( !isLoggedIn() ) {
@@ -737,7 +738,7 @@ public class ServerClient implements Runnable {
         if ( !receiveInt(ideasNeutralArray))
             return false;
 
-        Request createIdeaRequest = null;
+        Request createIdeaRequest;
         if ( (createIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.CREATE_IDEA)) ==
                 null) {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(title); objects.add(description); objects.add(this.uid);
@@ -756,7 +757,7 @@ public class ServerClient implements Runnable {
         }
 
 
-        Request setSharesIdeaRequest = null;
+        Request setSharesIdeaRequest;
         if ( (setSharesIdeaRequest = server.queue.getFirstRequestByUIDAndType(uid,Request.RequestType.SET_SHARES_IDEA)) ==
                 null) {
             ArrayList<Object> objects = new ArrayList<Object>(); objects.add(this.uid); objects.add(result);
@@ -797,7 +798,7 @@ public class ServerClient implements Runnable {
             //2nd - Actually bind them to the idea
 
 
-            Request setTopicsIdeaRequest = null;
+            Request setTopicsIdeaRequest;
             if ((setTopicsIdeaRequest = server.queue.getNthRequestByUIDAndType(uid,
                     Request.RequestType.SET_TOPICS_IDEA,i+1)) ==
                     null) {
@@ -844,7 +845,7 @@ public class ServerClient implements Runnable {
 
         if ( (reply=Common.recvMessage(inStream)) == Common.Message.MSG_IDEA_HAS_FILE){
             //Receive File
-            ObjectInputStream objectStream = null;
+            ObjectInputStream objectStream;
             try{
                 objectStream = new ObjectInputStream(inStream);
                 ficheiro = (NetworkingFile)objectStream.readObject();
@@ -858,9 +859,9 @@ public class ServerClient implements Runnable {
                     server.queue.enqueue(addFileRequest);
                 }
                 addFileRequest.waitUntilDispatched();
+                // We don't care about the result of the request, because it will never fail...
                 fileResult = (Boolean)addFileRequest.requestResult.get(0);
 
-                //FIXME: Deal with fileResult
 
             }catch(IOException i){
                 System.out.println("IO Exception"); //FIXME Can't just return (remember to dequeue!!)
@@ -933,8 +934,8 @@ public class ServerClient implements Runnable {
             if (!Common.sendInt(ideas.length,outStream))
                 return false;
 
-            for (int i=0;i<ideas.length;i++){
-                if ( !ideas[i].writeToDataStream(outStream) )
+            for (Idea idea : ideas) {
+                if (! idea.writeToDataStream(outStream))
                     return false;
             }
 
@@ -960,7 +961,7 @@ public class ServerClient implements Runnable {
         if ( (iid = Common.recvInt(inStream)) == -1)
             return false;
 
-        Idea idea = null;
+        Idea idea;
 
         try {
             idea = connection.getRMIInterface().getIdeaByIID(iid);
@@ -1002,7 +1003,7 @@ public class ServerClient implements Runnable {
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
 
-        ServerTopic[] topics = null;
+        ServerTopic[] topics;
         try {
             topics = connection.getRMIInterface().getTopics();
             System.out.println("Existem " + topics.length + " topicos");
@@ -1015,8 +1016,8 @@ public class ServerClient implements Runnable {
         if ( !Common.sendInt(topics.length,outStream) )
             return false;
 
-        for (int i=0;i<topics.length;i++){
-            if (!topics[i].writeToDataStream(outStream))
+        for (ServerTopic topic : topics) {
+            if (! topic.writeToDataStream(outStream))
                 return false;
         }
 
@@ -1027,7 +1028,7 @@ public class ServerClient implements Runnable {
     }
 
     private boolean handleGetSharesNotSell(){
-        int iid, shares = -2;
+        int iid, shares;
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
         }
@@ -1062,7 +1063,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleSetSharesNotSell(){
         int iid, numberShares;
-        boolean check = false;
+        boolean check;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1106,7 +1107,7 @@ public class ServerClient implements Runnable {
     private boolean handleGetFile(){
         NetworkingFile ficheiro;
         int iid;
-        ObjectOutputStream objectStream = null;
+        ObjectOutputStream objectStream;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1149,7 +1150,7 @@ public class ServerClient implements Runnable {
     private boolean handleGetIdeaFile(){
         NetworkingFile file;
         int iid;
-        ObjectOutputStream objectstream = null;
+        ObjectOutputStream objectstream;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1228,8 +1229,8 @@ public class ServerClient implements Runnable {
         if(!Common.sendInt(ideasFiles.length,outStream))
             return false;
 
-        for (int i=0;i<ideasFiles.length;i++){
-            if (!ideasFiles[i].writeToDataStream(outStream))
+        for (Idea ideasFile : ideasFiles) {
+            if (! ideasFile.writeToDataStream(outStream))
                 return false;
         }
 
@@ -1238,8 +1239,8 @@ public class ServerClient implements Runnable {
     }
 
     private boolean handleSetPriceShares(){
-        int iid = -1, price = -1;
-        boolean check = false;
+        int iid, price;
+        boolean check;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1285,8 +1286,8 @@ public class ServerClient implements Runnable {
     }
 
     private boolean handleGetIdeaShares(){
-        int iid = -1;
-        String[] ideaShares = null;
+        int iid;
+        String[] ideaShares;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1312,6 +1313,7 @@ public class ServerClient implements Runnable {
         if (ideaShares == null){
             if (!Common.sendMessage(Common.Message.MSG_ERR,outStream))
                 return false;
+            return true;
         }else{
             //Send data confirmation
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
@@ -1322,8 +1324,8 @@ public class ServerClient implements Runnable {
         if (!Common.sendInt(ideaShares.length,outStream))
             return false;
 
-        for (int i=0;i<ideaShares.length;i++){
-            if (!Common.sendString(ideaShares[i],outStream))
+        for (String ideaShare : ideaShares) {
+            if (! Common.sendString(ideaShare, outStream))
                 return false;
         }
 
@@ -1350,8 +1352,8 @@ public class ServerClient implements Runnable {
          ignore receiving the Idea data and wait for that request to be dispatched. If not, then it means there was
          no enqueued request and the user should send us the data again.
          */
-        Request removeIdeaRequest = null;
-        int result = 0;
+        Request removeIdeaRequest;
+        int result;
 
         int iid;
         Idea idea = null;
@@ -1422,7 +1424,7 @@ public class ServerClient implements Runnable {
     private boolean handlegetTopic(){
         int tid;
         String name;
-        ServerTopic topic = null;
+        ServerTopic topic;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1470,7 +1472,7 @@ public class ServerClient implements Runnable {
     //  Sends the history of a given client to that client
     ////
     private boolean handleGetHistory(){
-        String[] history = null;
+        String[] history;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1509,8 +1511,8 @@ public class ServerClient implements Runnable {
     //  Set the relationship between two ideas
     ////
     private boolean handleSetIdeaRelationship(){
-        int iidFather = -2, iidSoon = -2, type = -2;
-        boolean devolve = false;
+        int iidFather, iidSoon, type;
+        boolean devolve;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -1600,7 +1602,7 @@ public class ServerClient implements Runnable {
             return true;
 
         /* Now that the user's logged in, check his queue! */
-        Request pendingRequest = null;
+        Request pendingRequest;
         if ( (pendingRequest = server.queue.getFirstRequestByUID(uid)) != null ) {
             if ( pendingRequest.dispatched ) {
                 if ( !Common.sendMessage(Common.Message.MSG_USER_NOT_NOTIFIED_REQUESTS, outStream) )
