@@ -134,7 +134,8 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                                 String[] ans = RMI.getHistory((Integer) r.requestArguments.get(0));
                                 r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.DELETE_IDEA ) {
-                            boolean ans = RMI.removeIdea((Idea) r.requestArguments.get(0));
+                            int ans = RMI.removeIdea((Idea) r.requestArguments.get(0),
+                                    (Integer) r.requestArguments.get(1));
                             r.requestResult.add(ans);
                         } else if ( r.requestType == Request.RequestType.CREATE_IDEA ) {
                             int ans = RMI.createIdea((String)r.requestArguments.get(0),

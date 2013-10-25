@@ -1328,7 +1328,7 @@ public class ServerClient implements Runnable {
          no enqueued request and the user should send us the data again.
          */
         Request removeIdeaRequest = null;
-        boolean result = false;
+        int result = 0;
 
         int iid;
         Idea idea = null;
@@ -1357,7 +1357,7 @@ public class ServerClient implements Runnable {
                 return true;
             }
 
-            ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea);
+            ArrayList<Object> objects = new ArrayList<Object>(); objects.add(idea); objects.add(uid);
             removeIdeaRequest = new Request(uid, Request.RequestType.DELETE_IDEA,objects);
             //FIXME: This is right where we'd set the user's state to NEED_DISPATCH (request made)
             server.queue.enqueueRequest(removeIdeaRequest);
@@ -1372,15 +1372,17 @@ public class ServerClient implements Runnable {
         // Wait until it's dispatched
         removeIdeaRequest.waitUntilDispatched();
         //FIXME: This is right where we'd set the user's state to NEED_NOTIFY (request handled)
-        result = (Boolean)removeIdeaRequest.requestResult.get(0);
+        result = (Integer)removeIdeaRequest.requestResult.get(0);
 
-        if ( result ) {
+        if ( result == 1) {
             if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
                 return false;
-        } else {
-            // FIXME: Currently we __KNOW__ that if removeIdea fails, this is why it happened. it may change in the
-            // future.
+        } else if (result == -1){
+
             if ( !Common.sendMessage(Common.Message.ERR_IDEA_HAS_CHILDREN, outStream))
+                return false;
+        } else {
+            if ( !Common.sendMessage(Common.Message.ERR_NOT_FULL_OWNER, outStream))
                 return false;
         }
 

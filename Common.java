@@ -50,6 +50,7 @@ public class Common {
         ERR_IDEAS_NOT_FOUND,        // No Ideas were found (FIXME: Joca, you sure this isn't the only type of error 
                                     // and, hence, we couldn't just use MSG_ERR?
         ERR_NO_FILE,                // Error while getting the file
+        ERR_NOT_FULL_OWNER,         // Error not the full owner of the idea
         
         TOPIC_OK,                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
 
