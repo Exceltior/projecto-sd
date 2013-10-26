@@ -554,7 +554,13 @@ public class ClientConnection {
             //Get Confirmation
             reply = Common.recvMessage(inStream);
 
-            return reply == Common.Message.MSG_OK;
+            if (reply == Common.Message.MSG_OK ) {
+                System.out.println("Bought shares!");
+                return true;
+            } else {
+                System.out.println("Couldn't buy shares (not enough money)! Waiting in queue...");
+                return false;
+            }
         }
     }
 
