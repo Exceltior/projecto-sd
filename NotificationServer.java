@@ -13,8 +13,8 @@ public class NotificationServer extends Thread {
     @Override
     public void run() {
 
-        Socket clientSocket = null;
-        ServerSocket acceptSocket = null;
+        Socket clientSocket;
+        ServerSocket acceptSocket;
         try {
             acceptSocket = new ServerSocket(port);
         } catch (IOException e) {

@@ -11,6 +11,7 @@ public class Server {
     RequestQueue queue;
     private boolean primary = true;
     private boolean otherIsDown = false;
+    private String RMIHost;
 
     private RMIConnection connection;
     private Thread requestThread;
@@ -92,14 +93,12 @@ public class Server {
 
     synchronized void notifyConnectionToOtherServerDead() {
         otherIsDown = true;
-        //FIXME
         System.out.println("Lost connection to remote server...pinging RMI");
 
 
-        InetAddress inet = null;
-        //FIXME: RMI IP right here! FIXME FIXME FIXME FIXME FIXME MUCHO
+        InetAddress inet;
         try {
-            inet = InetAddress.getByName("localhost");
+            inet = InetAddress.getByName(RMIHost);
         } catch (UnknownHostException e) {
             //We can't even resolve the server? It must be us!!!
             System.out.println("Can't resolve RMI IP. Assuming we've lost outer-world connection...");
@@ -127,7 +126,7 @@ public class Server {
 
     void execute(String[] args) throws IOException {
         int port, udpReceiverPort, udpTransmitterPort, notificationPort;
-        String otherHost, RMIHost;
+        String otherHost;
 
         if ( args.length >= 1 )
             port = Integer.valueOf(args[0]);
@@ -172,10 +171,10 @@ public class Server {
         System.out.println("Notification server running on port "+notificationPort);
         System.out.println("Starting as primary: "+primary);
 
-        Socket clientSocket = null;
+        Socket clientSocket;
 
         connection = new RMIConnection(RMIHost);
-        connection.connect(); //FIXME: Handle this failing
+        connection.connect();
         connection.start();
 
         // Start the notification server
@@ -186,8 +185,7 @@ public class Server {
         // it can't reach us...
         new UDPReceiver(udpReceiverPort, this, 2000).start();
 
-        //FIXME: 'localhost' should be the IP of the other server. Also fix port
-        new UDPTransmitter("localhost", udpTransmitterPort, 1000).start();
+        new UDPTransmitter(otherHost, udpTransmitterPort, 1000).start();
 
         startQueueThread();
 

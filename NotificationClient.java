@@ -60,7 +60,9 @@ public class NotificationClient implements Runnable {
         try {
             uid = RMIInterface.canLogin(user, pwd);
         } catch (RemoteException e) {
-            //FIXME: Try catch the merda
+            connection.onRMIFailed();
+            server.killSockets();
+            return;
         }
 
         if ( uid == -1 ) {
