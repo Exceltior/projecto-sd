@@ -1461,7 +1461,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     public static void main(String[] args) {
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");
