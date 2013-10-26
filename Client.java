@@ -59,9 +59,10 @@ public class Client {
     ////
     private boolean createTopic(){
         String nome, descricao;
-        boolean repeat = false;
+        boolean repeat;
 
         do{
+            repeat = false;
             System.out.println("Please enter the name of the topic:");
             nome = sc.nextLine();
             if (nome.equals("")){
@@ -123,9 +124,10 @@ public class Client {
         String[] temp;
         ArrayList<Integer> devolve = new ArrayList<Integer>();
         int pos = 0, temp_num;
-        boolean repeat = false;
+        boolean repeat;
 
         do{
+            repeat = false;
             System.out.println(sentence);
             ideas = sc.nextLine();
 
@@ -456,10 +458,11 @@ public class Client {
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
         int nshares = 1, price = 1, minNumShares = 1;
         NetworkingFile ficheiro = null;
-        boolean repeat = false;
+        boolean repeat;
         String line;
 
         do{
+            repeat = false;
             System.out.println("Please enter the title of the idea:");
             title = sc.nextLine();
             if (title.equals("")){
@@ -468,9 +471,8 @@ public class Client {
             }
         }while (repeat);
 
-        repeat = false;
-
         do{
+            repeat = false;
             System.out.println("Please enter the description of the idea:");
             description = sc.nextLine();
             if (description.equals("")){
@@ -539,8 +541,8 @@ public class Client {
                 System.out.println("\nInvalid selection of the ideas' relations!Please repeat the selection!\n");
         }while (!repeat);
 
-        repeat = false;
         do{
+            repeat = false;
             System.out.println("Do you want to attach a file?(Y/N)");
             file = sc.nextLine();
             if (file.equals("Y") || file.equals("y")){
@@ -571,10 +573,11 @@ public class Client {
         int commentType = -2, nshares = 1, price = 1, minNumShares = 1;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
-        boolean repeat = false;
+        boolean repeat;
         NetworkingFile ficheiro = null;
 
         do{
+            repeat = false;
             System.out.println("Please enter the title of the idea:");
             title = sc.nextLine();
             if (title.equals("")){
@@ -626,6 +629,7 @@ public class Client {
         }while(repeat);
 
         do{
+            repeat = false;
             System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
             line = sc.nextLine();
             try{
@@ -697,8 +701,8 @@ public class Client {
                 ideasNeutral.add(iid);
         }
 
-        repeat = false;
         do{
+            repeat = false;
             System.out.println("Do you want to attach a file?(Y/N)");
             file = sc.nextLine();
             if (file.equals("Y") || file.equals("y")){
@@ -898,7 +902,7 @@ public class Client {
         System.out.println("3 - Submit an idea");
         System.out.println("4 - Delete an idea");
         System.out.println("5 - Show Transaction History");
-        System.out.println("6 - Search Idea");
+        System.out.println("6 - View Idea");
         System.out.println("7 - Search Topic");
         System.out.println("8 - Manage User Ideas");
         System.out.println("9 - Add relation between two ideas");
@@ -1154,9 +1158,10 @@ public class Client {
     private void deleteIdea(){
         int iid = -2;
         String line;
-        boolean repeat = false;
+        boolean repeat;
 
         do{
+            repeat = false;
             System.out.println("Please insert the id of the idea you want to delete:");
             line = sc.nextLine();
             try{
