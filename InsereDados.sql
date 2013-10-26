@@ -1,6 +1,9 @@
 /*Criacao dos Utilizadores*/
 INSERT INTO Utilizadores VALUES (1,'hakuna@matata.com','Hakuna','91968f0580a96a8467addb44038a7154', 10000, to_date('2013.10.12', 'yyyy.mm.dd'), null);
 INSERT INTO Utilizadores VALUES (2,'joca@joca.com', 'Joca', 'aa1bf4646de67fd9086cf6c79007026c', 10000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
+INSERT INTO Utilizadores VALUES (3,'joca2@joca.com', 'Joca2', 'aa1bf4646de67fd9086cf6c79007026c', 10000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
+INSERT INTO Utilizadores VALUES (4,'joca3@joca.com', 'Joca3', 'aa1bf4646de67fd9086cf6c79007026c', 10000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
+INSERT INTO Utilizadores VALUES (5,'joca4@joca.com', 'Joca4', 'aa1bf4646de67fd9086cf6c79007026c', 10000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
 
 /*Criacao dos Topicos*/
 INSERT INTO Topicos VALUES (1,'Tenis','Joao Sousa fecha top50 ATP!',1);
@@ -38,7 +41,10 @@ INSERT INTO RelacaoIdeias VALUES (4,5,-1);
 INSERT INTO RelacaoIdeias VALUES (1,5,1);
 
 /*Inserir Shares*/
-INSERT INTO Shares VALUES (1,1,100,2,50);
+INSERT INTO Shares VALUES (1,1,50,2,10);/*Podes comprar aqui ate 40 shares*/
+INSERT INTO Shares VALUES (1,5,25,2,2);/*Podes comprar aqui ate 23 shares*/
+INSERT INTO Shares VALUES (1,3,20,2,1);/*Podes comprar aqui ate 19 shares*/
+INSERT INTO Shares VALUES (1,4,5,2,0);/*Podes comprar aqui ate 5 shares*/
 INSERT INTO Shares VALUES (2,1,100,3,50);
 INSERT INTO Shares VALUES (3,2,100,4,50);
 INSERT INTO Shares VALUES (4,1,100,6,50);
