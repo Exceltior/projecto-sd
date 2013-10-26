@@ -35,10 +35,10 @@ public class ClientConnection {
         }
 
         int c=0;
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < args.length-2; i+=3) {
             hosts[c] = args[i];
             ports[c] = Integer.valueOf(args[i+1]);
-            notificationPorts[c] = Integer.valueOf(args[i+1]);
+            notificationPorts[c] = Integer.valueOf(args[i+2]);
             c++;
         }
     }
