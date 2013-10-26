@@ -93,6 +93,10 @@ public class Idea implements Serializable {
         return this.shares_to_buy;
     }
 
+    public void addSharesToBuy(int n){
+        this.shares_to_buy = this.shares_to_buy + n;
+    }
+
     public String toString(){
         if (this.shares_to_buy == -2)
             return "Idea{" +

@@ -528,14 +528,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     //  Indica se o primeiro array list tem alguma ideia com o referido id
     ////
-    private boolean hasElement(ArrayList<Idea> listIdeas,String[] queryResult){
+    private int hasElement(ArrayList<Idea> listIdeas,String[] queryResult){
         int i;
 
         for (i=0;i<listIdeas.size();i++){
             if ( Integer.parseInt(queryResult[0]) == listIdeas.get(i).getId() )
-                return true;
+                return i;
         }
-        return false;
+        return -1;
 
     }
 
@@ -545,16 +545,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 "Ideias i where s.userid != " +  uid + " and s.nummin < s.numshares and s.iid = i.iid";
         ArrayList<String[]> queryResult = receiveData(query);
         Idea temp;
+        int index;
 
         if (queryResult== null || queryResult.size()==0)
             return null;
 
         else{
             for (String[] row : queryResult) {
-                if (! hasElement(devolve, row)) {
+                index = hasElement(devolve, row);
+                if (index == -1) {
                     temp = new Idea(row);
                     temp.setSharesBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
                     devolve.add(temp);
+                }
+                else{
+                   devolve.get(index).addSharesToBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
                 }
             }
         }
@@ -989,6 +994,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 + "," + nshares + "," + iid ;
         ArrayList<String[]> queryDataResult;
         queryDataResult = receiveData(queryData, conn);
+
+        System.out.println("AQUI " + queryDataResult);
+
         query = query + ", to_date('" + queryDataResult.get(0)[0] + "','yyyy:mm:dd:hh:mi:ss'))";
         if ( conn == null )
             insertData(query);
