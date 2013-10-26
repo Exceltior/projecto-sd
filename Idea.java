@@ -74,6 +74,7 @@ public class Idea implements Serializable {
         this.body = row[2];
         this.uid = Integer.valueOf(row[3]);
         this.file = "N";
+        this.shares_to_buy = -2;
     }
 
     public void setFile(String f){
