@@ -3,17 +3,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-class ConnectionPool {
+public class ConnectionPool {
 
     // Free connections
-    private final ArrayList<Connection> connections           = new ArrayList<Connection>();
+    private ArrayList<Connection> connections           = new ArrayList<Connection>();
 
     // We keep track of the checkedOut connections in case we want to eventually check on them to free them
-    private final ArrayList<Connection> checkedOutConnections = new ArrayList<Connection>();
+    private ArrayList<Connection> checkedOutConnections = new ArrayList<Connection>();
 
-    private final String url;
-    private final String uname;
-    private final String pwd;
+    private String url;
+    private String uname;
+    private String pwd;
 
 
     public ConnectionPool(String url,String uname, String pwd) throws SQLException {
@@ -34,7 +34,7 @@ class ConnectionPool {
 
 
     public synchronized Connection checkOutConnection() throws SQLException {
-        Connection newConnection;
+        Connection newConnection = null;
 
         if (connections.size() == 0) {
             newConnection = getConnection();

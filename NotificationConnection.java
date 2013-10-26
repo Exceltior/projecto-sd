@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
-class NotificationConnection extends Thread {
+public class NotificationConnection extends Thread {
+    private int port;
     private Socket socket;
     private DataOutputStream outStream;
     private DataInputStream inStream;
@@ -14,6 +15,7 @@ class NotificationConnection extends Thread {
     NotificationConnection(String host, String user, String pwd, int port) {
         try { socket = new Socket(host, port); } catch (IOException ignored) {}
         this.user = user; this.password = pwd;
+        this.port = port;
     }
 
     @Override

@@ -1,11 +1,11 @@
 import java.io.Serializable;
 
 public class Share  implements Comparable<Share>, Serializable {
-    private final int uid;
-    private final int iid;
-    private final int price;
-    private final int numMin;
-    private final int num;
+    private int uid;
+    private int iid;
+    private int price;
+    private int numMin;
+    private int num;
 
      private static final long serialVersionUID = 1L;
 
@@ -19,6 +19,13 @@ public class Share  implements Comparable<Share>, Serializable {
         this.num = Integer.valueOf(row[2]);
         this.price = Integer.valueOf(row[3]);
         this.numMin = Integer.valueOf(row[4]);
+    }
+
+    public double getPriceShareRatio() {
+        if ( num == 0 )
+            return 0;
+
+        return price/(double)(num);
     }
 
     public int getNum() {

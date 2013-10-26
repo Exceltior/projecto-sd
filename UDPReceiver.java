@@ -1,11 +1,11 @@
 import java.io.IOException;
 import java.net.*;
 
-class UDPReceiver extends Thread{
+public class UDPReceiver extends Thread{
 
-    private final int targetPort;
-    private final Server server;
-    private final int checkPeriod;
+    private int targetPort;
+    private Server server;
+    private int checkPeriod;
 
     public UDPReceiver(int targetPort, Server server, int checkPeriod) {
         this.targetPort = targetPort;

@@ -10,9 +10,10 @@ import java.rmi.registry.Registry;
 public class RMIConnection extends Thread {
     private Registry RMIregistry = null;
     private RMI_Interface RMIInterface = null;
-    private boolean isDown = false;
+    private static final int RMILongReconnectSleepTime = 5000;
+    boolean isDown = false;
     private final Object isDownLock = new Object();
-    private final String RMIHost;
+    private String RMIHost;
 
     void testRMINow() {
         try {
@@ -37,7 +38,7 @@ public class RMIConnection extends Thread {
         System.out.println("Waiting for RMI to be up...");
         if ( isDown )
             while (!connect())
-                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+                try { Thread.sleep(1000); } catch (InterruptedException interrupt) {}
         System.out.println("RMI up!!");
     }
 
@@ -68,7 +69,7 @@ public class RMIConnection extends Thread {
         do {
             val = establishConnectionToRegistry(); count++;
             System.out.println("Attempt "+count+"..."+(val ? "Success!" : "Failed!"));
-            try { Thread.sleep(count*1000); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(count*1000); } catch (InterruptedException e) {}
         } while ( !val && count < 3);
 
 

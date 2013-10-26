@@ -1,9 +1,9 @@
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-class NotificationQueue extends OrderedTimestampQueue<Notification> {
-    private final RMI_Interface RMI;
-    private final int uid;
+public class NotificationQueue extends OrderedTimestampQueue<Notification> {
+    private RMI_Interface RMI;
+    private int uid;
 
     /**
      * Builds a request queue. If there was any data on the RMI server, then it is loaded

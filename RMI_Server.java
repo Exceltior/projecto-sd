@@ -37,8 +37,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * Hashes the password using MD5 and returns it.
      * @param pass The plaintext password to be hashed.
      * @return The hashed password.
-     * Credit goes to João Nuno Oliveira for finding this.
      */
+    //TODO: maybe change this
     private String hashPassword(String pass)
     {
         MessageDigest m = null;
@@ -279,7 +279,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try {
             f = new RandomAccessFile(path, "rw");
         } catch (FileNotFoundException e) {
-            return ; //Should never happen
+            return ; //FIXME: Should never happen
         }
 
         try {
@@ -318,8 +318,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public NetworkingFile getFile(int iid) throws RemoteException {
-        if ( getIdeaByIID(iid) == null )
-            return null;
+        // FIXME: Joca, are we sure that iid is valid? Where is this being guaranteed?
         String query = "select path, OriginalFile from IdeiasFicheiros where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
         if ( queryResult.isEmpty() )
@@ -418,6 +417,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         insertData(query);
         return ++num_ideas;
+        // FIXME: We were returning -1, do we still have a reson to do that, Joca?
     }
 
     private boolean ideaHasFiles(int iid) {
@@ -641,8 +641,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
-        if ( getSharesIdeaForUid(iid, uid) == null)
-            return false;
+        // FIXME: Need to check if the user has shares or not here
         String query = "Update Shares set valor = " + price + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
@@ -662,8 +661,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
-        if ( getSharesIdeaForUid(iid, uid) == null)
-            return false;
+        // FIXME: Need to check if the user has shares or not here
         String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
@@ -711,12 +709,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return The shares associated with the idea
      * @throws RemoteException
      */
-    private ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
+    public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
+        // FIXME: Are we sure we have valid ideas when we get here?
         ArrayList<Share> shares = new ArrayList<Share>();
-
-        if ( getIdeaByIID(iid) == null )
-            return shares;
-
         String query = "select * from Shares where iid="+iid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -735,6 +730,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
+        // FIXME: Are we sure we have valid ideas when we get here?
         String query = "select * from Shares where iid="+iid+" and userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -798,7 +794,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return The username of the user specified by "uid"
      * @throws RemoteException
      */
-    private String getUsername(int uid) throws RemoteException {
+    public String getUsername(int uid) throws RemoteException {
         String query = "select username from  Utilizadores where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -865,6 +861,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         sortByPrice(shares);
 
         // We have sorted them by price per share, so the best options are first
+        // FIXME CHECK THIS
 
         for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
             Share s = shares.get(i1);
@@ -1273,11 +1270,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         //  Store the database ip, username and password in a file or store it in "the properties" stuff the teacher said???
         ////
 
-        final String username = "sd", password = "sd";
+        String username = "sd", password = "sd";
 
         try{
 
             connectionPool = new ConnectionPool(url, username, password);
+
+
+            //connect to database
+            //FIXME: Should this still be here? Should it be moved inside ConnectionPool? JOCA!
+            Class.forName("oracle.jdbc.driver.OracleDriver");
 
             if (connectionPool == null) {
                 System.out.println("Failed to make connection!");
@@ -1305,8 +1307,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
             System.out.println("Server ready :)");
 
-        } catch(RemoteException ignored){}
-          catch (SQLException ignored){}
+        } catch(RemoteException e){
+            e.printStackTrace();
+        } catch (SQLException s){
+            s.printStackTrace();
+        } catch(ClassNotFoundException c){
+            c.printStackTrace();
+        }
     }
 
     public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException {
@@ -1424,7 +1431,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");

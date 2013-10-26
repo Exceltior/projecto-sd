@@ -55,12 +55,10 @@ class ClientConnection {
                 currentSocket = new Socket(hosts[currentHost], ports[currentHost]);
                 outStream = new DataOutputStream(currentSocket.getOutputStream());
                 inStream = new DataInputStream(currentSocket.getInputStream());
-                if ( currentSocket == null )
-                    try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
             } catch (IOException e) {
                 //System.err.println("connect ERR"); e.printStackTrace();
             }
-
         } while ( currentSocket == null);
 
         Common.Message serverMsg;
@@ -93,6 +91,13 @@ class ClientConnection {
         Common.Message reply;
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy.MM.dd");
         String s_date = format1.format(date);//Now we have the date in the 'yyyy-mm-dd' format
+
+        ////
+        //  Ideia para o Maxi: Basicamente é mandar estes campos todos ao servidor de TCP que depois tem de invocar um metodo
+        //  remoto que lhe permite fazer o registo do novo utilizador. Depois temos que arranjar uma forma de atribuir os id's
+        //  aos utilizadores, nao sei se ha uma forma automatica de fazer isso na base de dados ou nao, mas depois ou hoje a
+        //  noite ou amanha de manha vou ver se consigo fazer isso. Well, cya ;)
+        ////
 
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_REG, outStream) ) {
@@ -129,18 +134,29 @@ class ClientConnection {
     // Reconnect after a connection time out
     //
     private int reconnect() {
-//        System.out.println(" Connection to " + currentHost + " - '" + hosts[currentHost] + "':" + ports[currentHost]
-//                + " dropped, initiating reconnecting process...");
+        System.out.println(" Connection to " + currentHost + " - '" + hosts[currentHost] + "':" + ports[currentHost]
+                + " dropped, initiating reconnecting process...");
 
         currentHost--; //We do currentHost-- so that we retry the current host ONCE.
+        // FIXME: We might as well sleep for a while here too...
         connect();
+
+        ////
+        //  FIXME O QUE FAZER QUANDO LASTUSERNAME E LASTPASSWORD SAO NULOS??????
+        //  MAXI AQUI
+        ////
+        System.out.println("AQUI " + lastUsername + " " + lastPassword + "\n\n\n");
 
         if(this.loggedIn) {
             notificationThread.stop(); //FIXME: proper way to kill!
-            //System.out.println("Estou logado");
+            System.out.println("Estou logado");
             this.loggedIn = false;
+            int loginReply;
+            if (( loginReply = this.login(lastUsername, lastPassword) ) == 3) {
+                System.err.println("Something's gone HORRIBLY WRONG!!!!"); //FIXME: SHIT!
+            }
 
-            return this.login(lastUsername, lastPassword);
+            return loginReply;
         }
         return 0;
     }
@@ -150,36 +166,36 @@ class ClientConnection {
     //
     // Returns: true on successful login; false otherwise.
     //
-    // We're using magic numbers, but oh well...
+    // FIXME: We're using magic numbers, but fuck it!
     // 0: ALL OKAY
     // 1: NEED_REPLY from server
     // 2: NEED_DISPATCH from server
     // 3: Problem logging in
     //
-    // Instead of reconnect() we call connect() here because we're not supposed to try to login....while trying to
-    // login!
+    // FIXME: All these reconnect()s here should probably be connect()s...since reconnect() will call login()!
     //
     int login(String user, String pass) {
         Common.Message reply;
 
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_LOGIN, outStream) ) {
-                connect(); continue;
+                reconnect(); continue;
             }
             if ( !Common.sendString(user, outStream) ) {
-                connect(); continue;
+                reconnect(); continue;
             }
 
             if ( !Common.sendString(pass, outStream) ) {
-                connect(); continue;
+                reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                connect(); continue;
+                reconnect(); continue;
             }
 
             if ( reply == Common.Message.MSG_OK ) {
 
+                //FIXME FIXME O JOCA ADICIONOU AS PROXIMAS DUAS LINHAS
                 this.lastUsername = user;
                 this.lastPassword = pass;
                 this.loggedIn = true;
@@ -188,7 +204,7 @@ class ClientConnection {
                 notificationThread.start();
 
                 if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                    connect(); continue;
+                    reconnect(); continue;
                 }
 
                 if ( reply == Common.Message.MSG_USER_HAS_PENDING_REQUESTS) {
@@ -223,10 +239,17 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.out.println("AQUI3");
                 reconnect(); continue;
             }
 
-            return reply != Common.Message.ERR_NOT_LOGGED_IN && reply == Common.Message.MSG_OK;
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("AQUI4");
+                return false;
+            }
+
+            return reply == Common.Message.MSG_OK;
 
         }
     }
@@ -288,10 +311,13 @@ class ClientConnection {
             }
 
             if ( reply == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -331,10 +357,13 @@ class ClientConnection {
             }
 
             if ( reply == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -378,6 +407,9 @@ class ClientConnection {
                 reconnect();continue;
             }
 
+            //Get Confirmations of data except topics and ideas relations
+            // OS DADOS QUE FORAM ENVIADOS, EXCEPTO AS IDEIAS E OS TÓPICOS, 'TÁ TUDO BEM, INCLUSIVE AS SHARES, TÁ TUDO
+            // MARADINHO, MANINHO, FIXME
             reply = Common.recvMessage(inStream);
 
             if (reply == Common.Message.ERR_NO_MSG_RECVD){
@@ -388,6 +420,7 @@ class ClientConnection {
             for (String topic : topics) {
                 reply = Common.recvMessage(inStream);
                 if (reply == Common.Message.ERR_NO_MSG_RECVD) {
+                    System.err.println("Error while merdas"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_TOPIC_NAME)
@@ -399,6 +432,7 @@ class ClientConnection {
             for (Integer anIdeasFor : ideasFor) {
                 reply = Common.recvMessage(inStream);
                 if (reply == Common.Message.ERR_NO_MSG_RECVD) {
+                    System.err.println("Error while merdas 1"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
@@ -409,6 +443,7 @@ class ClientConnection {
             for (Integer anIdeasAgainst : ideasAgainst) {
                 reply = Common.recvMessage(inStream);
                 if (reply == Common.Message.ERR_NO_MSG_RECVD) {
+                    System.err.println("Error while merdas 2"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
@@ -419,6 +454,7 @@ class ClientConnection {
             for (Integer anIdeasNeutral : ideasNeutral) {
                 reply = Common.recvMessage(inStream);
                 if (reply == Common.Message.ERR_NO_MSG_RECVD) {
+                    System.err.println("Error while merdas 3"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
@@ -437,6 +473,8 @@ class ClientConnection {
                     objectStream = new ObjectOutputStream(outStream);
                     objectStream.writeObject(ficheiro);
                 } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    System.err.println("FILHA DA PUTA");
                     return false;
                 }
 
@@ -449,7 +487,12 @@ class ClientConnection {
             //Get Final Confirmation
             reply = Common.recvMessage(inStream);
 
-            return reply != Common.Message.ERR_NO_MSG_RECVD && reply == Common.Message.MSG_OK;
+            if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                System.err.println("Error while merdas 4"); /* FIXME */
+                return false;
+            }
+
+            return reply == Common.Message.MSG_OK;
 
         }
     }
@@ -465,7 +508,7 @@ class ClientConnection {
     public boolean buyShares(int iid,int numberSharesToBuy,int price,int minNumberShares){
         Common.Message reply;
 
-        if (iid == -1) //Should never ever happen
+        if (iid == -1)//FIXME: THIS SHOULD NEVER HAPPEN?????
             return false;
 
         if (price == -1)//To avoid the "They're trying to hack us" message
@@ -480,10 +523,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -534,10 +580,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -590,10 +639,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -606,6 +658,7 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
+                System.err.println("Bodega2: "+reply);
                 return null;
             }
 
@@ -652,10 +705,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -695,10 +751,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -751,10 +810,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -780,6 +842,7 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
+                System.err.println("AQUI2");
                 return null;
             }
 
@@ -803,10 +866,13 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -859,10 +925,13 @@ class ClientConnection {
              }
 
              if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                 System.err.println("AQUI2");
                  reconnect(); continue;
              }
 
              if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                 //Shouldn't happen, FIXME!
+                 System.err.println("Bodega");
                  return null;
              }
 
@@ -910,26 +979,34 @@ class ClientConnection {
         Common.Message reply;
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_GETTOPICS,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
             if ( (numTopics = Common.recvInt(inStream)) == -1) {
+                System.err.println("AQUI3");
                 reconnect(); continue;
             }
 
             topics = new ClientTopic[numTopics];
 
+            System.out.println("O numero de topicos e " + numTopics);
+
             boolean needReconnect = false;
             for (int i = 0; i < numTopics; i++) {
                 if ( (topics[i] = ClientTopic.fromDataStream(inStream)) == null ) {
+                    System.out.println("DEU ASNEIRA");
                     needReconnect = true;
                     break;
                 }
@@ -959,18 +1036,23 @@ class ClientConnection {
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GET_HISTORY,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
             if ( (numTransactions = Common.recvInt(inStream)) == -1) {
+                System.err.println("AQUI3");
                 reconnect(); continue;
             }
 
@@ -1004,45 +1086,56 @@ class ClientConnection {
         for(;;){
             if (relationType == 1){
                 if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASFAVOUR,outStream) ) {
+                    System.err.println("AQUI");
                     reconnect(); continue;
                 }
             }
 
             else if(relationType == 0){
                 if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASNEUTRAL,outStream) ) {
+                    System.err.println("AQUI2");
                     reconnect(); continue;
                 }
             }
 
             else if(relationType == -1){
                 if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASAGAINST,outStream) ) {
+                    System.err.println("AQUI3");
                     reconnect(); continue;
                 }
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI4");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
             //Send data
             if (!Common.sendInt(iid,outStream)){
+                System.err.println("AQUI5");
                 reconnect();continue;
             }
 
             //Get data confirmation
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
             if ( (numIdeas = Common.recvInt(inStream)) == -1) {
+                System.err.println("AQUI6");
                 reconnect(); continue;
             }
 
@@ -1079,14 +1172,18 @@ class ClientConnection {
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GETSHARESNOTSELL,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return -1;
             }
 
@@ -1097,11 +1194,15 @@ class ClientConnection {
 
             //Receive Data confirmation
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN )
-                return - 1;
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
+                return -1;
+            }
 
             //Receive data
             if( (shares = Common.recvInt(inStream)) == -1){
@@ -1126,14 +1227,18 @@ class ClientConnection {
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_SETSHARESNOTSELL,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -1162,14 +1267,18 @@ class ClientConnection {
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_SETPRICESHARES,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -1185,10 +1294,13 @@ class ClientConnection {
 
             //Receive Data confirmation
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -1210,14 +1322,18 @@ class ClientConnection {
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GETIDEASHARES,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -1228,10 +1344,13 @@ class ClientConnection {
 
             //Get data confirmation
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return null;
             }
 
@@ -1266,14 +1385,18 @@ class ClientConnection {
         Common.Message reply;
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_DELETE_IDEA,outStream) ) {
+                System.err.println("AQUI");
                 reconnect(); continue;
             }
 
             if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                System.err.println("AQUI2");
                 reconnect(); continue;
             }
 
             if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                //Shouldn't happen, FIXME!
+                System.err.println("Bodega");
                 return false;
             }
 
@@ -1288,13 +1411,15 @@ class ClientConnection {
             }
 
             if ( reply == Common.Message.ERR_NO_SUCH_IID ) {
-                System.out.println("Error while deleting the idea! No idea with that IID!");
+                //Shouldn't happen, FIXME!
+                System.out.println("Error while deleting the idea! No idea with that IID"); //FIXME: See what we have to print here
                 return false;
             } else if ( reply == Common.Message.ERR_IDEA_HAS_CHILDREN ) {
-                System.err.println("Error deleting the idea! Idea has children!");
+                //Shouldn't happen, FIXME!
+                System.err.println("Error deleting the idea! Idea has children"); //FIXME: See what we have to print here
                 return false;
             } else if (reply == Common.Message.ERR_NOT_FULL_OWNER){
-                System.out.println("Error deleting the idea! Idea not fully owned by the user!");
+                System.out.println("Error deleting the idea! Idea not fully owned by the user");
                 return false;
             }else if (reply == Common.Message.MSG_OK){
                 System.out.println("Idea deleted with succes!");

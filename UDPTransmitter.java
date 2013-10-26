@@ -1,10 +1,10 @@
 import java.io.IOException;
 import java.net.*;
 
-class UDPTransmitter extends Thread {
-    private final String targetServer;
-    private final int targetPort;
-    private final int period;
+public class UDPTransmitter extends Thread {
+    private String targetServer;
+    private int targetPort;
+    private int period;
 
     public UDPTransmitter(String targetServer, int targetPort, int period) {
         this.targetServer = targetServer;
@@ -46,7 +46,7 @@ class UDPTransmitter extends Thread {
 
             try {
                 Thread.sleep(period);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException e) {}
         }
     }
 }

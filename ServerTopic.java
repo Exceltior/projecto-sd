@@ -2,14 +2,21 @@ import java.io.DataOutputStream;
 
 ////
 // Specialized class which handles writing a Topic through an outputstream, thus sending it.
+// FIXME: Since this is the servertopic, it might be useful to store the id of the creator in here
 //
 public class ServerTopic extends Topic {
 
     private static final long serialVersionUID = 1L;
 
     public boolean writeToDataStream(DataOutputStream out) {
-        return Common.sendInt(id, out) && Common.sendString(title, out) && Common.sendString(body, out);
+        if ( ! Common.sendInt(id, out) )
+            return false;
+        if ( ! Common.sendString(title, out) )
+            return false;
+        if ( ! Common.sendString(body, out) )
+            return false;
 
+        return true;
     }
 
     ////

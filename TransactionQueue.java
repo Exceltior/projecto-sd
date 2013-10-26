@@ -2,14 +2,42 @@ import java.io.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-class TransactionQueue extends OrderedTimestampQueue<Transaction> {
-    private final RMI_Interface RMI;
+public class TransactionQueue extends OrderedTimestampQueue<Transaction> {
+    private RMI_Interface RMI;
 
     TransactionQueue(RMI_Interface RMI) {
         this.RMI = RMI;
     }
+    public void readFile() {
+        String path = "transactions.bin";
+            ObjectInputStream in;
+            try {
+                in = new ObjectInputStream(new FileInputStream(path));
+            } catch (IOException e) {
+                //System.err.println("Error opening Queue file for reading!");
+                return;
+            }
 
-    boolean writeFile() {
+            int size = 0;
+            try {
+                size = in.readInt();
+            } catch (IOException e) {
+                System.err.println("Error reading size from transactionsFile!");
+                return;
+            }
+            for (int i = 0; i < size; i++)
+                try {
+                    queue.add((Transaction)in.readObject());
+                } catch (IOException e) {
+                    System.err.println("Error reading from transactions File!");
+                    return;
+                } catch (ClassNotFoundException e) {
+                    System.err.println("Error reading from transactions File! (Class not found)");
+                    return;
+                }
+    }
+
+    public boolean writeFile() {
             String path = "transactions.bin";
             ObjectOutputStream out;
             try {

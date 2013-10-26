@@ -2,9 +2,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class NotificationServer extends Thread {
-    private final Server server;
-    private final int port;
+public class NotificationServer extends Thread {
+    private Server server;
+    private int port;
 
     NotificationServer(Server server, int port) {
         this.server = server; this.port = port;

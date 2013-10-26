@@ -10,12 +10,11 @@ public class Request implements Serializable, TimestampClass {
         return timestamp;
     }
 
-    private void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 
-    public enum RequestType {
-        SET_TOPICS_IDEA, LOGIN, DELETE_IDEA, HISTORY, CREATE_IDEA,
+    public enum RequestType { SQL_INSERT, SQL_SELECT, SET_TOPICS_IDEA, LOGIN, DELETE_IDEA, HISTORY, CREATE_IDEA,
         SET_SHARES_IDEA, SET_IDEAS_RELATIONS, CREATE_TOPIC, REGISTER_USER /*Note that in this case uid=-1*/, ADD_FILE}
     int uid;
     RequestType requestType;
@@ -27,7 +26,7 @@ public class Request implements Serializable, TimestampClass {
     void waitUntilDispatched() {
         synchronized (this) {
             while ( !dispatched )
-                try { wait(); } catch (InterruptedException ignored) {}
+                try { wait(); } catch (InterruptedException e) {}
         }
     }
 

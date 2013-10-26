@@ -1,15 +1,16 @@
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-class OrderedTimestampQueue<E extends TimestampClass> {
-    final ArrayList<E> queue = new ArrayList<E>();
+public class OrderedTimestampQueue<E extends TimestampClass> {
+    protected final ArrayList<E> queue = new ArrayList<E>();
 
     synchronized E getNextElement() {
         synchronized (queue) {
             if ( queue.size() == 0 )
                 return null;
             else {
-                return queue.get(0);
+                E n = queue.get(0);
+                return n;
             }
         }
     }
