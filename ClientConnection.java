@@ -138,25 +138,14 @@ class ClientConnection {
                 + " dropped, initiating reconnecting process...");
 
         currentHost--; //We do currentHost-- so that we retry the current host ONCE.
-        // FIXME: We might as well sleep for a while here too...
         connect();
-
-        ////
-        //  FIXME O QUE FAZER QUANDO LASTUSERNAME E LASTPASSWORD SAO NULOS??????
-        //  MAXI AQUI
-        ////
-        System.out.println("AQUI " + lastUsername + " " + lastPassword + "\n\n\n");
 
         if(this.loggedIn) {
             notificationThread.stop(); //FIXME: proper way to kill!
-            System.out.println("Estou logado");
+            //System.out.println("Estou logado");
             this.loggedIn = false;
-            int loginReply;
-            if (( loginReply = this.login(lastUsername, lastPassword) ) == 3) {
-                System.err.println("Something's gone HORRIBLY WRONG!!!!"); //FIXME: SHIT!
-            }
 
-            return loginReply;
+            return this.login(lastUsername,lastPassword);
         }
         return 0;
     }
@@ -166,13 +155,13 @@ class ClientConnection {
     //
     // Returns: true on successful login; false otherwise.
     //
-    // FIXME: We're using magic numbers, but fuck it!
+    // We're using magic numbers, oh well...
     // 0: ALL OKAY
     // 1: NEED_REPLY from server
     // 2: NEED_DISPATCH from server
     // 3: Problem logging in
     //
-    // FIXME: All these reconnect()s here should probably be connect()s...since reconnect() will call login()!
+    // Instead of reconnect() we call connect() here because we're not supposed to try to login... while trying to login!
     //
     int login(String user, String pass) {
         Common.Message reply;
@@ -195,7 +184,6 @@ class ClientConnection {
 
             if ( reply == Common.Message.MSG_OK ) {
 
-                //FIXME FIXME O JOCA ADICIONOU AS PROXIMAS DUAS LINHAS
                 this.lastUsername = user;
                 this.lastPassword = pass;
                 this.loggedIn = true;
@@ -243,14 +231,7 @@ class ClientConnection {
                 reconnect(); continue;
             }
 
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                //Shouldn't happen, FIXME!
-                System.err.println("AQUI4");
-                return false;
-            }
-
-            return reply == Common.Message.MSG_OK;
-
+            return reply != Common.Message.ERR_NOT_LOGGED_IN && reply == Common.Message.MSG_OK;
         }
     }
 

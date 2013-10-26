@@ -764,7 +764,7 @@ public class Client {
         pricesShares = conn.showPricesShares(iid);
 
         if (pricesShares == null || pricesShares.length == 0)
-            System.out.println("The user doesnt have any share for this idea");//FIXME: This should never happen right?
+            System.out.println("The user doesnt have any share for this idea");
         else{
             //Print the shares' information
             System.out.println("Share{iid = " + pricesShares[0] + ",Number of Shares = " + pricesShares[1] +
@@ -896,10 +896,6 @@ public class Client {
         do{
             repeat = false;
             System.out.print("Your choice: ");
-
-        ////
-        //  FIXME: INCOMPLETE, THERE ARE OPTIONS MISSING!!!!!!!
-        ////
             try{
                 line = sc.nextLine();
                 choice = Integer.parseInt(line);
@@ -970,7 +966,6 @@ public class Client {
             }
 
             case 2:{
-                //FIXME FIXME FIXME VER COM O MAXI SISTEMA NOTIFICAÇOES
                 if(setPriceShares(listUserIdeasIDs))
                     System.out.println("Operation completed with success!");
                 else
@@ -987,13 +982,11 @@ public class Client {
             case 4:{
                 //Set idea's shares not to sell instantaneously
                 setSharesNotSell(listUserIdeasIDs);
-                //FIXME FIXME FIXME VER COM O MAXI SISTEMA NOTIFICAÇOES
                 break;
             }
 
             case 5:{
                 //Pedir ideia e depois listar todas as relacoes
-                //FIXME FIXME FIXME FAZER FUNCAO BONITINHA PARA ISTO
                 do{
                     System.out.println("Please insert the idea id whose relations you want to check:");
                     try{
@@ -1077,10 +1070,7 @@ public class Client {
                 System.out.println("Invalid Choice!");
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    System.err.println("Client thread was interrupted");
-                    //FIXME: WHAT TO DO WITH THIS EXCEPTION????
-                }
+                } catch (InterruptedException ignored) {}
             }
 
         }while (choice < 1 || choice > 2);
