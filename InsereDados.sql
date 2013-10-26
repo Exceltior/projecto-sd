@@ -21,7 +21,7 @@ INSERT INTO Ideias VALUES (7, 'Benfica', 'O Benfica este ano tem uma equipa muit
 INSERT INTO Ideias VALUES (8, 'Festa das Latas', 'O Cortejo da Festa das Latas este ano teve uma menor adesao do que o esperado devido a chuva',2,1);
 INSERT INTO Ideias VALUES (9, 'Gastao Elias', 'O Gastao Elias e bem capaz de ter muito mais potencial do que o Frederico Gil ou o Joao Sousa. Poderia perfeitamente ser o melhor tenista Portugues da actualidade e de sempre',3,1);
 INSERT INTO Ideias VALUES (10, 'Mario Jardel', 'Sempre gostei de ver jogadores como Mario Jardel a jogar a bola. Gostava que ele ainda jogasse, e de preferencia no Porto',2,1);
-INSERT INTO Ideias VALUES (11, 'Super Mario', 'O Mario Jardel foi de facto um jogador estupendo, quer no Porto, quer no Sporting',1,1)
+INSERT INTO Ideias VALUES (11, 'Super Mario', 'O Mario Jardel foi de facto um jogador estupendo, quer no Porto, quer no Sporting',1,1);
 INSERT INTO Ideias VALUES (12, 'Taca de Portugal', 'A Taca de Portugal este ano vai ser entregue ao Benfica, que perdeu o ano passado para o Guimaraes',2,1);
 INSERT INTO Ideias VALUES (13, 'Cartaz Latada','O Cartaz da Festa das Latas deste ano estava bem preenchido. Sempre com bons convidados em todos os dias',4,1);
 INSERT INTO Ideias VALUES (14, 'Latada Coimbra', 'Eu por acaso discordo dessa opinao de que o cartaz da Latada estava bom. Nao gostei dos artistas convidados este ano',1,1);
