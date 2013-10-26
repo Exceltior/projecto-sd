@@ -26,7 +26,7 @@ public class Request implements Serializable, TimestampClass {
     void waitUntilDispatched() {
         synchronized (this) {
             while ( !dispatched )
-                try { wait(); } catch (InterruptedException e) {}
+                try { wait(); } catch (InterruptedException ignored) {}
         }
     }
 

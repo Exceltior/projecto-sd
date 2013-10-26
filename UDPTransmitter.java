@@ -46,7 +46,7 @@ public class UDPTransmitter extends Thread {
 
             try {
                 Thread.sleep(period);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
         }
     }
 }

@@ -1086,7 +1086,7 @@ public class Client {
 
                 if (!conn.register(username,password,email,date)){
                     do{
-                        System.out.print("Registration unsucessfull :(\n1-Try login in with another username\n2-Try registration again\nYour choice: ");
+                        System.out.print("Registration unsucessful :(\n1-Try login in with another username\n2-Try registration again\nYour choice: ");
                         line = sc.nextLine();
                         try{
                             choice = Integer.parseInt(line);
@@ -1103,7 +1103,7 @@ public class Client {
                     continue;
                 }
                 else{ //Now that the registration is sucessfull is time to login
-                    System.out.println("Registration sucessfull");
+                    System.out.println("Registration sucessful");
                 }
             }
 

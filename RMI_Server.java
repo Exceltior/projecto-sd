@@ -31,6 +31,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     private static final long serialVersionUID = 1L;
     private final Object notificationsLock = new Object();
+    private final Object requestsLock = new Object();
     private TransactionQueue transactionQueue;
 
     /**
@@ -38,7 +39,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @param pass The plaintext password to be hashed.
      * @return The hashed password.
      */
-    //TODO: maybe change this
     private String hashPassword(String pass)
     {
         MessageDigest m = null;
@@ -155,7 +155,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 " and s.userid = " + uid;
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult.size() == 0)
+        if (queryResult.isEmpty())
             return null;
 
         ideas = new Idea[queryResult.size()];
@@ -272,25 +272,28 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return true;
     }
 
+    /**
+     * Updates the file where we store the lastFile counter.
+     */
     synchronized private void updateLastFile() {
         String path="./lastFile_counter.bin";
         lastFile++;
         RandomAccessFile f;
         try {
             f = new RandomAccessFile(path, "rw");
-        } catch (FileNotFoundException e) {
-            return ; //FIXME: Should never happen
-        }
+        } catch (FileNotFoundException ignored) {return;}
 
         try {
             f.writeInt(lastFile);
-        } catch (IOException e) {
-            System.err.println("IO Exception while writing lastFile filefile!");
-        } finally {
+        } catch (IOException ignored) {}
+        finally {
             try { f.close(); } catch (IOException ignored) {}
         }
     }
 
+    /**
+     * Reads lastFile from the stored file
+     */
     synchronized private void readLastFile() {
         String path="./lastFile_counter.bin";
         RandomAccessFile f;
@@ -318,7 +321,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public NetworkingFile getFile(int iid) throws RemoteException {
-        // FIXME: Joca, are we sure that iid is valid? Where is this being guaranteed?
         String query = "select path, OriginalFile from IdeiasFicheiros where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
         if ( queryResult.isEmpty() )
@@ -341,7 +343,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "Select i.iid, f.titulo, f.descricao, f.userid from IdeiasFicheiros i, Ideias f where i.iid = f.iid";
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult == null || queryResult.size() == 0)
+        if (queryResult == null || queryResult.isEmpty())
             return null;
 
         Idea[] listIdeasFiles = new Idea[queryResult.size()];
@@ -417,9 +419,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         insertData(query);
         return ++num_ideas;
-        // FIXME: We were returning -1, do we still have a reson to do that, Joca?
     }
 
+    /**
+     * Checks if an idea has files
+     * @param iid The idea IID
+     * @return true if it has files
+     */
     private boolean ideaHasFiles(int iid) {
         String query = "select * from IdeiasFicheiros i where i.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
@@ -427,11 +433,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return !queryResult.isEmpty();
     }
 
+    /**
+     * Delete all the files associated with this idea
+     * @param iid The idea IID
+     */
     private void deleteIdeaFiles(int iid) {
         String query = "select path from IdeiasFicheiros i where i.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult.size() > 0) {
+        if (!queryResult.isEmpty()) {
             for (String[] row : queryResult ) {
                 String filepath = row[0];
                 File f = new File(filepath);
@@ -441,6 +451,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     }
 
+    /**
+     * Check if an idea has children
+     * @param iid Idea IID
+     * @return true if it has children
+     * @throws RemoteException
+     */
     boolean ideaHasChildren(int iid) throws RemoteException {
         String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
@@ -586,7 +602,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult.size() == 0)
+        if (queryResult.isEmpty())
             return null;
 
         devolve = new Idea[queryResult.size()];
@@ -613,7 +629,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult.size() == 0)
+        if (queryResult.isEmpty())
             return null;
 
         return new ServerTopic(queryResult.get(0));
@@ -626,7 +642,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         String query = "Select s.numMin from Shares s where s.userid = " + uid + " and s.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
 
-        if (queryResult.size() == 0)
+        if (queryResult.isEmpty())
             return -2;
 
         return Integer.parseInt(queryResult.get(0)[0]);
@@ -641,7 +657,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
-        // FIXME: Need to check if the user has shares or not here
+        if ( getSharesIdeaForUid(iid,uid) == null)
+            return false; // You have no shares!
         String query = "Update Shares set valor = " + price + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
@@ -661,7 +678,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
-        // FIXME: Need to check if the user has shares or not here
+        if ( getSharesIdeaForUid(iid,uid) == null)
+            return false; // You have no shares!
         String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
@@ -710,8 +728,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
-        // FIXME: Are we sure we have valid ideas when we get here?
         ArrayList<Share> shares = new ArrayList<Share>();
+        if ( getIdeaByIID(iid) == null)
+            return shares;
         String query = "select * from Shares where iid="+iid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -730,7 +749,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
-        // FIXME: Are we sure we have valid ideas when we get here?
+        if ( getIdeaByIID(iid) == null)
+            return null;
         String query = "select * from Shares where iid="+iid+" and userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -861,7 +881,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         sortByPrice(shares);
 
         // We have sorted them by price per share, so the best options are first
-        // FIXME CHECK THIS
 
         for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
             Share s = shares.get(i1);
@@ -1198,6 +1217,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return result;
     }
 
+    /**
+     * Get a transactional connection from the pool, ready to use.
+     * @return The transactional connection
+     */
     private Connection getTransactionalConnection() {
         Connection connection;
         try {
@@ -1216,6 +1239,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return connection;
     }
 
+    /**
+     * Return and effectively commit the changes on a transactional connection
+     * @param c The connection
+     */
     private void returnTransactionalConnection(Connection c) {
         try {
             c.commit();
@@ -1276,11 +1303,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try{
 
             connectionPool = new ConnectionPool(url, username, password);
-
-
-            //connect to database
-            //FIXME: Should this still be here? Should it be moved inside ConnectionPool? JOCA!
-            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Class.forName("oracle.jdbc.driver.OracleDriver"); //This could be moved to the connectionPool but we had
+                                                              // some issues so right now we're just praying that it
+                                                              // works.
 
             if (connectionPool == null) {
                 System.out.println("Failed to make connection!");
@@ -1317,49 +1342,70 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
     }
 
+    /**
+     * Write the request queue file to disk. Synchronized access to the file is guaranteed by the implementation
+     * @param queue The queue which we are supposed to write to disk
+     * @throws RemoteException
+     */
     public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException {
-        ObjectOutputStream out;
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(requestsQueueFilePath));
-        } catch (IOException e) {
-            System.err.println("Error opening Queue file for writing!");
-            return;
-        }
+        synchronized (requestsLock) {
+            ObjectOutputStream out;
+            try {
+                out = new ObjectOutputStream(new FileOutputStream(requestsQueueFilePath));
+            } catch (IOException e) {
+                System.err.println("Error opening Queue file for writing!");
+                return;
+            }
 
-        try {
-            out.writeInt(queue.size());
-            for (Request r : queue)
-                r.writeToStream(out);
-        } catch (IOException e) {
-            System.err.println("Error writing Queue to file!!");
-        }
+            try {
+                out.writeInt(queue.size());
+                for (Request r : queue)
+                    r.writeToStream(out);
+            } catch (IOException e) {
+                System.err.println("Error writing Queue to file!!");
+            }
 
-        try { out.close(); } catch (IOException ignored) {}
+            try { out.close(); } catch (IOException ignored) {}
+        }
     }
 
+    /**
+     * Read the request queue file from disk. Synchronized access to the file is guaranteed by the implementation
+     * @return The request queue
+     * @throws RemoteException
+     */
     public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException {
-        ObjectInputStream in;
-        try {
-            in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
-        } catch (IOException e) {
-            System.err.println("Error opening Queue file for reading!");
-            return null;
-        }
+        synchronized (requestsLock) {
+            ObjectInputStream in;
+            try {
+                in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
+            } catch (IOException e) {
+                System.err.println("Error opening Queue file for reading!");
+                return null;
+            }
 
-        ArrayList<Request> requests = new ArrayList<Request>();
-        int size;
-        try {
-            size = in.readInt();
-        } catch (IOException e) {
-            System.err.println("Error reading size from Queue File!");
-            return null;
-        }
-        for (int i = 0; i < size; i++)
-            requests.add(new Request(in));
+            ArrayList<Request> requests = new ArrayList<Request>();
+            int size;
+            try {
+                size = in.readInt();
+            } catch (IOException e) {
+                System.err.println("Error reading size from Queue File!");
+                return null;
+            }
+            for (int i = 0; i < size; i++)
+                requests.add(new Request(in));
 
-        return requests;
+            return requests;
+        }
     }
 
+    /**
+     * Read the notifications for this user from its notifications file. Synchronized access is guaranteed by the
+     * server. In fact, too synchronized. Had we had the time, we would have implemented this lock on a per user basis.
+     * @param uid The user UID
+     * @return
+     * @throws RemoteException
+     */
     public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException {
         synchronized ( notificationsLock ) {
             ObjectInputStream in;
@@ -1401,6 +1447,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         }
     }
 
+    /**
+     * Write the notifications for this user in its notifications file. Synchronized access is guaranteed by the
+     * server. In fact, too synchronized. Had we had the time, we would have implemented this lock on a per user basis.
+     * @param notifications The queue with the notifications
+     * @param uid The user ID for which we want to save this queue
+     * @return
+     * @throws RemoteException
+     */
     public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
             RemoteException {
         synchronized ( notificationsLock ) {
@@ -1431,8 +1485,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
+        String db = "192.168.56.120";
+        if ( args.length == 1)
+            db = args[0];
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
+            RMI_Server servidor = new RMI_Server(db,"1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");

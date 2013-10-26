@@ -141,7 +141,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                 while ( !requestsPending() ) {
                     try {
                         queue.wait();
-                    } catch (InterruptedException e){}
+                    } catch (InterruptedException ignored){}
                 }
 
                 //There is at least one request, process them
