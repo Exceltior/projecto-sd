@@ -2,10 +2,10 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 
-public class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
-    private RMIConnection RMI;
+class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
+    private final RMIConnection RMI;
     private boolean needsToDie = false;
-    private Server server;
+    private final Server server;
 
     /**
      * Builds a request queue. If there was any data on the RMI server, then it is loaded
@@ -141,7 +141,7 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                 while ( !requestsPending() ) {
                     try {
                         queue.wait();
-                    } catch (InterruptedException e){}
+                    } catch (InterruptedException ignored){}
                 }
 
                 //There is at least one request, process them

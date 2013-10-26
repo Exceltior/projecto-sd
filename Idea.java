@@ -10,8 +10,12 @@ public class Idea implements Serializable {
         return id;
     }
 
-    protected int id, uid, shares_to_buy;
-    protected String body, title, file;
+    int id;
+    private int uid;
+    private int shares_to_buy;
+    private String body;
+    private String title;
+    private String file;
 
     ////
     // Class Constructor
@@ -35,12 +39,8 @@ public class Idea implements Serializable {
             return false;
         if ( ! Common.sendString(body, out) )
             return false;
-        if ( ! Common.sendString(file, out) )
-            return false;
-        if ( ! Common.sendInt(shares_to_buy, out) )
-            return false;
+        return Common.sendString(file, out) && Common.sendInt(shares_to_buy, out);
 
-        return true;
     }
 
     ////

@@ -2,7 +2,11 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class Transaction implements Serializable, TimestampClass {
-    int uid, iid, numTargetShares, targetPrice, minTargetShares;
+    final int uid;
+    final int iid;
+    final int numTargetShares;
+    final int targetPrice;
+    final int minTargetShares;
     private Timestamp timestamp;
     private static final long serialVersionUID = 1L;
 
@@ -16,7 +20,7 @@ public class Transaction implements Serializable, TimestampClass {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    private void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 }

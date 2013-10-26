@@ -4,9 +4,9 @@ import java.io.Serializable;
 // A Topic, meant to be extended by the Client and the Server.
 //
 public class Topic implements Serializable{
-    protected int   id;
-    protected String title;
-    protected String body;
+    int   id;
+    String title;
+    String body;
 
     private static final long serialVersionUID = 1L;
 
@@ -19,14 +19,9 @@ public class Topic implements Serializable{
                 '}';
     }
 
-    public Topic() {
+    Topic() {
         this.id = 0;
         this.title = this.body = null;
-    }
-    public Topic(int id, String title, String body) {
-        this.id = id;
-        this.title = title;
-        this.body = body;
     }
 
     public int getId(){

@@ -70,7 +70,4 @@ public class NetworkingFile implements Serializable {
         return this.name;
     }
 
-    public void setName(String n){
-        this.name = n;
-    }
 }

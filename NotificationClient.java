@@ -6,15 +6,15 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.rmi.RemoteException;
 
-public class NotificationClient implements Runnable {
+class NotificationClient implements Runnable {
     private Socket socket = null;
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
-    ObjectOutputStream objStream = null;
+    private ObjectOutputStream objStream = null;
 
-    private RMIConnection connection;
+    private final RMIConnection connection;
     private RMI_Interface RMIInterface = null;
-    private Server server;
+    private final Server server;
 
     // The client's uid. -1 means not logged in.
     private int uid = -1;
@@ -109,7 +109,7 @@ public class NotificationClient implements Runnable {
 
             try {
                 Thread.sleep(200);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
         }
 
     }

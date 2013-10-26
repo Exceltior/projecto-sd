@@ -6,32 +6,16 @@ import java.util.Scanner;
 
 public class Client {
 
-    private ClientConnection conn;
+    private final ClientConnection conn;
     private String username;
     private String password;
     private String email;
-    private Scanner sc;
+    private final Scanner sc;
 
-    Client(String[] args){
+    private Client(String[] args){
         super();
         conn = new ClientConnection(args);
         sc = new Scanner(System.in);
-    }
-
-    public String getUsername(){
-        return this.username;
-    }
-
-    public String getPassword(){
-        return this.password;
-    }
-
-    public void setUsername(String user){
-        this.username = user;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     private String askUsername(){
@@ -47,10 +31,6 @@ public class Client {
     private String askEmail(){
         System.out.print("Enter your email address: ");
         return sc.nextLine();
-    }
-
-    public ClientConnection getConnection(){
-        return this.conn;
     }
 
     ////
@@ -108,9 +88,9 @@ public class Client {
         }while (repeat);
 
         temp = response.split(";");
-        for (int i=0;i<temp.length;i++){
-            if (!devolve.contains(temp[i]))
-                devolve.add(temp[i]);
+        for (String aTemp : temp) {
+            if (! devolve.contains(aTemp))
+                devolve.add(aTemp);
         }
 
         return devolve;
@@ -144,7 +124,6 @@ public class Client {
                     temp_num = Integer.parseInt(aTemp);
                     if(temp_num == -1) {
                         System.out.println("Okay then, no ideas, fucker!"); //FIXME
-                        temp_num = -2;
                         return devolve;
                     }
 
@@ -169,8 +148,8 @@ public class Client {
     ////
     private int printRelationsIdea(ArrayList<Integer> listIdeasIDs, int relationType){
         String temp;
-        int iid = -2;
-        Idea[] ideasList = null;
+        int iid;
+        Idea[] ideasList;
 
         if (relationType == 1)
             System.out.println("Please insert the id of the idea you want to see the ideas in favour:");
@@ -261,8 +240,7 @@ public class Client {
                         //Going to get the idea's topic
                         listTopics = conn.getIdeaTopics(iid);
 
-                        for (int i=0;i< listTopics.length;i++)
-                            listTopicsNames.add(listTopics[i].getTitle());
+                        for (ClientTopic listTopic : listTopics) listTopicsNames.add(listTopic.getTitle());
 
                         commentIdea(listTopicsNames,iid);
 
@@ -367,11 +345,11 @@ public class Client {
         }
 
         System.out.println("\nIdeas found:");
-        for (int i=0;i<userSelectedIdea.length;i++){
-            listIdeasIDs.add(userSelectedIdea[i].getId());
-            System.out.println(userSelectedIdea[i]);
-            if (userSelectedIdea[i].getFile().equals("Y")){
-                 listIdeasFilesListIDs.add(userSelectedIdea[i].getId());
+        for (Idea anUserSelectedIdea : userSelectedIdea) {
+            listIdeasIDs.add(anUserSelectedIdea.getId());
+            System.out.println(anUserSelectedIdea);
+            if (anUserSelectedIdea.getFile().equals("Y")) {
+                listIdeasFilesListIDs.add(anUserSelectedIdea.getId());
             }
         }
 
@@ -550,7 +528,6 @@ public class Client {
                 filePath = sc.nextLine();
                 try {
                     ficheiro = new NetworkingFile(filePath);
-                    System.out.println("AQUI " + ficheiro == null);
                 } catch (FileNotFoundException e) {
                     System.out.println("Invalid file path!");
                     repeat = true;
@@ -647,9 +624,9 @@ public class Client {
         topics = askTopics("If you want to include this idea in other topics, please enter their titles (USAGE: topic1;topic2)\n" +
                 "If you just want to include the idea on the current topic just press 'Enter'",false);
 
-        for(int i=0;i<topicTitle.size();i++){
-            if (!topics.contains(topicTitle.get(i)))
-                topics.add(topicTitle.get(i));
+        for (String aTopicTitle : topicTitle) {
+            if (! topics.contains(aTopicTitle))
+                topics.add(aTopicTitle);
         }
 
         //Ask relation type
@@ -658,10 +635,7 @@ public class Client {
             try{
                 line = sc.nextLine();
                 commentType = Integer.parseInt(line);
-                if(commentType == 1 || commentType == -1 || commentType == 0)
-                    repeat = false;
-                else
-                    repeat = true;
+                repeat = ! (commentType == 1 || commentType == - 1 || commentType == 0);
             }catch(NumberFormatException n){
                 System.out.println("Invalid input!");
                 repeat = true;
@@ -728,7 +702,7 @@ public class Client {
     //  Sets the price per share of a given idea
     ////
     private boolean setPriceShares(ArrayList<Integer> listUserIdeasIDs){
-        int iid = -1, price = -1;
+        int iid, price = -1;
         String line, line2;
         boolean stay;
 
@@ -761,7 +735,7 @@ public class Client {
     //  Shows the user all its shares of every idea he/she has and its price
     ////
     private void showPriceShares(ArrayList<Integer> listUserIdeasIDs){
-        int iid = -2;
+        int iid;
         String line;
         String[] pricesShares;
 
@@ -792,7 +766,7 @@ public class Client {
     //  Method that shows the number of shares not to sell instantaneously of a given idea
     ////
     private void checkSharesNotSell(ArrayList<Integer> listUserIdeasIDs){
-        int iid = -2, shares = -1;
+        int iid, shares;
         String line;
 
         do{
@@ -819,7 +793,7 @@ public class Client {
     //  a given user
     ////
     private void setSharesNotSell(ArrayList<Integer> listUserIdeasIDs){
-        int numberShares, iid = -2, numberSharesIdea = -2;
+        int numberShares, iid, numberSharesIdea;
         boolean repeat;
         String line;
         String[] priceShares;
@@ -934,7 +908,7 @@ public class Client {
     //  Display the Account Settings Menu
     ////
     private void manageUserIdeas(){
-        int option = -1, choice = -2;
+        int option, choice;
         String line;
         Idea[] listIdeas;
         //List of ideas owned by the user (totally or partially)
@@ -952,11 +926,11 @@ public class Client {
         }
 
         System.out.println("\n\nUser Ideas List:");
-        for (int i=0;i<listIdeas.length;i++){
-            System.out.println(listIdeas[i]);
-            listUserIdeasIDs.add(listIdeas[i].getId());
-            if (listIdeas[i].getFile().equals("Y"))
-                ideasFilesListIds.add(listIdeas[i].getId());
+        for (Idea listIdea : listIdeas) {
+            System.out.println(listIdea);
+            listUserIdeasIDs.add(listIdea.getId());
+            if (listIdea.getFile().equals("Y"))
+                ideasFilesListIds.add(listIdea.getId());
         }
 
         do{
@@ -1072,7 +1046,7 @@ public class Client {
 
     private void execute(){
         int choice;
-        int  login_result = 3;
+        int  login_result;
         boolean stay = true;
         String line;
 
@@ -1130,7 +1104,6 @@ public class Client {
                 }
                 else{ //Now that the registration is sucessfull is time to login
                     System.out.println("Registration sucessfull");
-                    stay = false;
                 }
             }
 
@@ -1184,7 +1157,7 @@ public class Client {
         try{
             sentence = sc.nextLine();
             ideaFile = Integer.parseInt(sentence);
-        }catch(NumberFormatException n){}
+        }catch(NumberFormatException ignored){}
 
         if (ideasListIds.contains(ideaFile)){
             //Download file
@@ -1238,7 +1211,7 @@ public class Client {
         try{
             sentence = sc.nextLine();
             iid = Integer.parseInt(sentence);
-        }catch(NumberFormatException n){}//We don't need to handle this exception
+        }catch(NumberFormatException ignored){}//We don't need to handle this exception
 
         if (iid == -1)
             return ;
@@ -1311,10 +1284,7 @@ public class Client {
                 System.out.println("Invalid input!");
             }
 
-            if (type == 1 || type == 0 || type == -1)//Valid option
-                repeat = false;
-            else
-                repeat = true;
+            repeat = ! (type == 1 || type == 0 || type == - 1);
         }
 
         if (conn.setRelationBetweenIdeas(iidparent,iidchild,type))
@@ -1344,8 +1314,7 @@ public class Client {
         }
 
         System.out.println("List of ideas the user can buy:");
-        for (int i=0;i<canBuyIdeas.size();i++)
-            System.out.println(canBuyIdeas.get(i));
+        for (Idea canBuyIdea : canBuyIdeas) System.out.println(canBuyIdea);
 
         //Pedir ao user que ideias quer comprar
         do{
@@ -1422,7 +1391,7 @@ public class Client {
     }
 
     private void mainLoop(){
-        int choice, topic, idea;
+        int choice, topic;
         boolean stay = true;
 
         while(stay){

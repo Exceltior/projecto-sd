@@ -3,10 +3,15 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
 public class Notification implements Serializable, TimestampClass {
-    int uidbuyer, uidSeller, amount, pricePerShare, iid;
+    private final int uidbuyer;
+    private final int uidSeller;
+    private final int amount;
+    private final int pricePerShare;
+    private final int iid;
 
     // These are shared only because they are useful
-    String  usernameBuyer, usernameSeller;
+    private final String  usernameBuyer;
+    private final String usernameSeller;
 
     private Timestamp timestamp;
 
@@ -44,7 +49,7 @@ public class Notification implements Serializable, TimestampClass {
         return timestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
+    private void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 }

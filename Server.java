@@ -7,10 +7,9 @@ import java.rmi.RMISecurityManager;
 import java.util.ArrayList;
 
 public class Server {
-    static ServerSocket acceptSocket;
+    private static ServerSocket acceptSocket;
     RequestQueue queue;
     private boolean primary = true;
-    private boolean otherIsDown = false;
     private String RMIHost;
 
     private RMIConnection connection;
@@ -63,10 +62,6 @@ public class Server {
         return connection;
     }
 
-    boolean isOtherDown() {
-        return otherIsDown;
-    }
-
     void goSecondary() {
         System.out.println("Becoming SECONDARY server...");
         primary = false;
@@ -92,7 +87,6 @@ public class Server {
     }
 
     synchronized void notifyConnectionToOtherServerDead() {
-        otherIsDown = true;
         System.out.println("Lost connection to remote server...pinging RMI");
 
 
@@ -124,7 +118,7 @@ public class Server {
         System.out.println("Server is back!");
     }
 
-    void execute(String[] args) throws IOException {
+    void execute(String[] args) {
         int port, udpReceiverPort, udpTransmitterPort, notificationPort;
         String otherHost;
 
@@ -155,10 +149,7 @@ public class Server {
             RMIHost = args[5];
         else
             RMIHost="localhost";
-        if ( args.length >= 7 )
-            primary = false;
-        else
-            primary = true;
+        primary = args.length < 7;
         try {
             acceptSocket = new ServerSocket(port);
         } catch (IOException e) {

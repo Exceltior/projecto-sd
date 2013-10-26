@@ -11,12 +11,8 @@ public class ServerTopic extends Topic {
     public boolean writeToDataStream(DataOutputStream out) {
         if ( ! Common.sendInt(id, out) )
             return false;
-        if ( ! Common.sendString(title, out) )
-            return false;
-        if ( ! Common.sendString(body, out) )
-            return false;
+        return Common.sendString(title, out) && Common.sendString(body, out);
 
-        return true;
     }
 
     ////

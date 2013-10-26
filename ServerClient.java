@@ -7,7 +7,7 @@ import java.util.ArrayList;
 // This class, which implements an independent thread, is responsible for handling all requests from a given client
 // (given to us referenced by its socket)
 //
-public class ServerClient implements Runnable {
+class ServerClient implements Runnable {
     private Socket socket = null;
     private DataOutputStream outStream = null;
     private DataInputStream inStream = null;
@@ -639,9 +639,7 @@ public class ServerClient implements Runnable {
         }
 
         if (userIdeas == null){
-            if(!Common.sendMessage(Common.Message.ERR_IDEAS_NOT_FOUND,outStream))
-                return false;
-            return true;
+            return Common.sendMessage(Common.Message.ERR_IDEAS_NOT_FOUND, outStream);
         }
 
         else{

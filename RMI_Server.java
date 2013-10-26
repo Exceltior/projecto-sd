@@ -8,7 +8,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +26,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     private int num_ideas;
     private int num_transactions;
     private final int starting_money = 10000;
-    private final int limit_time_active = 300;//5 minutes
     private ConnectionPool connectionPool;
     private int lastFile = 0;
 
@@ -601,21 +599,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return devolve;
     }
 
-    ////
-    // Build an idea from a title. Notice that this constructor does not give us parent topic and ideas, it only gathers
-    // the title (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
-    // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
-    ////
-    public Idea getIdeaByTitle(String title) throws RemoteException{
-        String query = "select * from Ideias t where t.titulo = " + title + " and t.activa = 1";
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult == null)
-            return null;
-
-        return new Idea(queryResult.get(0));
-    }
-
     public ServerTopic getTopic(int tid, String name) throws RemoteException{
         String query;
 
@@ -726,7 +709,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return The shares associated with the idea
      * @throws RemoteException
      */
-    public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
+    private ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
         // FIXME: Are we sure we have valid ideas when we get here?
         ArrayList<Share> shares = new ArrayList<Share>();
         String query = "select * from Shares where iid="+iid;
@@ -811,7 +794,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @return The username of the user specified by "uid"
      * @throws RemoteException
      */
-    public String getUsername(int uid) throws RemoteException {
+    private String getUsername(int uid) throws RemoteException {
         String query = "select username from  Utilizadores where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -1034,44 +1017,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + sDate +
                 "','yyyy:mm:dd:hh24:mi:ss') where userid = " + uid;
         insertData(queryData);
-    }
-
-    ////
-    //  Method that returns true if the user has been actived in the last 5 minutes
-    ////
-    public boolean isUserIn(int uid) {
-        String query = "Select u.dataUltimoLogin from Utilizadores u where u.userid = " + uid;
-        ArrayList<String[]> resultQuery;
-        Date actualDate = new Date(),userDate;
-        SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
-        String[] user_date;
-        String finalUserDate = "";
-
-            resultQuery = receiveData(query);
-
-        if (resultQuery == null)
-            return false;
-
-        user_date = resultQuery.get(0)[0].split(":");
-
-        for (int i=0;i<user_date.length;i++){
-             finalUserDate = finalUserDate + user_date[i];
-            if (i<user_date.length - 1)
-                finalUserDate = finalUserDate + ":";
-        }
-
-        try{
-            userDate = format1.parse(finalUserDate);
-        }catch(ParseException p){
-            System.err.println("Error while parsing the date");
-            p.printStackTrace();
-            return false;
-        }
-
-        long difference = actualDate.getTime() - userDate.getTime();
-        long diffMinutes = difference / (60 * 1000) % 60;
-
-        return diffMinutes > limit_time_active;
     }
 
     ////

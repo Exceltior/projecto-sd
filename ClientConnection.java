@@ -14,7 +14,7 @@ import java.util.Date;
 // if a command has not been correctly sent. Instead, Connection might loop forever until it manages to send the
 // message to any available server. This eases our error checking code when using this class.
 //
-public class ClientConnection {
+class ClientConnection {
     private static  String[] hosts = { "localhost", "localhost"};
     private static  int[] ports = { 1234, 4000 };
     private static  int[] notificationPorts = { 1237, 4001 };
@@ -75,7 +75,7 @@ public class ClientConnection {
             //Close the connection and keep trying until we find the primary server
             try {
                 currentSocket.close();
-            } catch (IOException e) {}
+            } catch (IOException ignored) {}
 
             //Try to connect again...I know this is recursive-based looping...but oh baby it feels so right.
             connect();
@@ -148,7 +148,7 @@ public class ClientConnection {
         System.out.println("AQUI " + lastUsername + " " + lastPassword + "\n\n\n");
 
         if(this.loggedIn) {
-            notificationThread.stop();
+            notificationThread.stop(); //FIXME: proper way to kill!
             System.out.println("Estou logado");
             this.loggedIn = false;
             int loginReply;
@@ -262,8 +262,8 @@ public class ClientConnection {
                 return false;
 
             //Send itens
-            for (int i=0;i<data.size();i++) {
-                if (!Common.sendString(data.get(i), outStream))
+            for (String aData : data) {
+                if (! Common.sendString(aData, outStream))
                     return false;
             }
         }else{
@@ -281,8 +281,8 @@ public class ClientConnection {
                 return false;
 
             //Send itens
-            for (int i=0;i<data.size();i++) {
-                if (!Common.sendInt(data.get(i), outStream))
+            for (Integer aData : data) {
+                if (! Common.sendInt(aData, outStream))
                     return false;
             }
         }else{
@@ -345,7 +345,6 @@ public class ClientConnection {
 
     boolean createIdea(String title, String description, int nshares, int price, ArrayList<String> topics, int minNumShares, ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral,NetworkingFile ficheiro){
         Common.Message reply;
-        int devolve = -1;
 
 
         for(;;) {
@@ -418,48 +417,48 @@ public class ClientConnection {
                 return false;
             }
 
-            for (int i = 0; i < topics.size(); i++) {
+            for (String topic : topics) {
                 reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                if (reply == Common.Message.ERR_NO_MSG_RECVD) {
                     System.err.println("Error while merdas"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_TOPIC_NAME)
-                    System.out.println("Error while associating topic "+topics.get(i)+": Invalid topic name");
+                    System.out.println("Error while associating topic " + topic + ": Invalid topic name");
                 else if (reply == Common.Message.MSG_ERR)
-                    System.out.println("Error while associating topic "+topics.get(i)+": RMI FODEU-SE");
+                    System.out.println("Error while associating topic " + topic + ": RMI FODEU-SE");
             }
 
-            for (int i = 0; i < ideasFor.size(); i++) {
+            for (Integer anIdeasFor : ideasFor) {
                 reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                if (reply == Common.Message.ERR_NO_MSG_RECVD) {
                     System.err.println("Error while merdas 1"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
-                    System.out.println("Error while associating idea "+ideasFor.get(i)+": Invalid idea name");
+                    System.out.println("Error while associating idea " + anIdeasFor + ": Invalid idea name");
                 /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
             }
 
-            for (int i = 0; i < ideasAgainst.size(); i++) {
+            for (Integer anIdeasAgainst : ideasAgainst) {
                 reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                if (reply == Common.Message.ERR_NO_MSG_RECVD) {
                     System.err.println("Error while merdas 2"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
-                    System.out.println("Error while associating idea "+ideasAgainst.get(i)+": Invalid idea name");
+                    System.out.println("Error while associating idea " + anIdeasAgainst + ": Invalid idea name");
                 /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
             }
 
-            for (int i = 0; i < ideasNeutral.size(); i++) {
+            for (Integer anIdeasNeutral : ideasNeutral) {
                 reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD){
+                if (reply == Common.Message.ERR_NO_MSG_RECVD) {
                     System.err.println("Error while merdas 3"); /* FIXME */
                     return false;
                 }
                 if (reply == Common.Message.ERR_NO_SUCH_IID)
-                    System.out.println("Error while associating idea "+ideasNeutral.get(i)+": Invalid idea name");
+                    System.out.println("Error while associating idea " + anIdeasNeutral + ": Invalid idea name");
                 /* Else, we got MSG_OK, everything's fine, move along, nothing to see here */
             }
 
@@ -469,7 +468,7 @@ public class ClientConnection {
                     reconnect();continue;
                 }
 
-                ObjectOutputStream objectStream = null;
+                ObjectOutputStream objectStream;
                 try {
                     objectStream = new ObjectOutputStream(outStream);
                     objectStream.writeObject(ficheiro);
@@ -677,7 +676,7 @@ public class ClientConnection {
                 }
             }
 
-            if (needReconnect == true){
+            if (needReconnect){
                 needReconnect = false;
                 reconnect();
                 continue;
@@ -697,7 +696,7 @@ public class ClientConnection {
     ////
     ClientTopic getTopic(int tid, String name){
         Common.Message reply;
-        ClientTopic topic = null;
+        ClientTopic topic;
         int len;
 
         for(;;){
@@ -744,7 +743,7 @@ public class ClientConnection {
     NetworkingFile getIdeaFile(int iid){
         Common.Message reply;
         NetworkingFile ficheiro;
-        ObjectInputStream objectStream = null;
+        ObjectInputStream objectStream;
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEA_FILE, outStream) ) {
@@ -794,79 +793,6 @@ public class ClientConnection {
             return ficheiro;
         }
     }
-
-    /**
-     * Returns an array of "Idea" objects containing all the ideas that have a file attached
-     * @return Array of "Idea" objects containing all the ideas that have a file attached
-     */
-    Idea[] getIdeasFiles(){
-        Idea[] ideaFiles;
-        Common.Message reply;
-        int len, read;
-        boolean needReconnect = false;
-        ObjectInputStream objectStream = null;
-
-
-        for(;;){
-            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEAS_FILES, outStream) ) {
-                reconnect(); continue;
-            }
-
-            //Receive first confirmation
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI2");
-                reconnect(); continue;
-            }
-
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                //Shouldn't happen, FIXME!
-                System.err.println("Bodega");
-                return null;
-            }
-
-            //Receive second confirmation
-            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                System.err.println("AQUI2");
-                reconnect(); continue;
-            }
-
-            if ( reply == Common.Message.ERR_NO_FILE ) {
-                //Shouldn't happen, FIXME!
-                System.err.println("Bodega2");
-                return null;
-            }
-
-            //Receive Data
-            if ( (len = Common.recvInt(inStream)) == -1){
-                reconnect();continue;
-            }
-
-            ideaFiles = new Idea[len];
-
-            for (int i=0;i<len;i++){
-                ideaFiles[i] = new Idea();
-                if ( !ideaFiles[i].readFromDataStream(inStream) ){
-                    needReconnect = true;
-                    break;
-                }
-            }
-
-            if (needReconnect){
-                needReconnect = false;
-                reconnect();
-                continue;
-            }
-
-            //Get Final Confirmation
-            if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
-                System.err.println("AQUI2");
-                return null;
-            }
-
-            return ideaFiles;
-        }
-    }
-
 
 
     ////
@@ -1105,7 +1031,7 @@ public class ClientConnection {
         String[] history;
         String temp;
         Common.Message reply;
-        int numTransactions = -1;
+        int numTransactions;
         boolean needReconnect = false;
 
         for(;;){
@@ -1242,7 +1168,7 @@ public class ClientConnection {
     ////
     int getSharesNotSell(int iid){
         Common.Message reply;
-        int shares = -1;
+        int shares;
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_GETSHARESNOTSELL,outStream) ) {
@@ -1390,7 +1316,7 @@ public class ClientConnection {
     ////
     String[] showPricesShares(int iid){
         Common.Message reply;
-        String[] ideaShares = null;
+        String[] ideaShares;
         int len;
         boolean needReconnect = false;
 
