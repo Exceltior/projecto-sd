@@ -553,7 +553,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Idea temp;
         int index;
 
-        if (queryResult== null || queryResult.size()==0)
+        if ( queryResult.isEmpty() )
             return null;
 
         else{
