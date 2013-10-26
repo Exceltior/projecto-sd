@@ -84,7 +84,6 @@ public class ServerClient implements Runnable {
                 } catch (RemoteException e) {
                     connection.onRMIFailed();
                     server.killSockets();
-                    System.err.println("RMI exception here!"); //FIXME: Do the retry mechanism?
                     break;
                 }
             }
@@ -226,11 +225,6 @@ public class ServerClient implements Runnable {
             }
         }
 
-        ////
-        //  FIXME: Quando não há topicos para mostrar (porque não há nada na base de dados) tu simplesmente assumes que
-        //  houve mega bode na ligação e assumes que o cliente se desligou, porque não dizer simplesmente ao utilizador
-        //  "Amigo, não há tópicos para mostrar queres adicionar algum??"
-        ////
         if ( !isLoggedIn() )
             System.out.println("Connection to UID "+uid+" dropped!");
         else
@@ -709,10 +703,10 @@ public class ServerClient implements Runnable {
         if ( (topicsArray = receiveData()) == null )
             return false;
 
-        //FIXME: prints
-        System.out.println("CÁ ESTÃO OS TÓPICOS: ");
-        for (String topico : topicsArray)
-                System.out.println("TOPIC: "+topico);
+
+        //System.out.println("CÁ ESTÃO OS TÓPICOS: ");
+        //for (String topico : topicsArray)
+        //        System.out.println("TOPIC: "+topico);
 
         //Receive Ideas For
         if ( !receiveInt(ideasForArray) )
@@ -795,8 +789,7 @@ public class ServerClient implements Runnable {
                 if (! Common.sendMessage(Common.Message.MSG_OK, outStream))
                     return false;
             } else {
-                if (! Common.sendMessage(Common.Message.MSG_ERR, outStream)) //ISTO SÓ DA MERDA SE O RMI DER MERDA,
-                // FIXME^
+                if (! Common.sendMessage(Common.Message.MSG_ERR, outStream)) //Only jappens if RMI fails
                     return false;
             }
         }
@@ -840,14 +833,14 @@ public class ServerClient implements Runnable {
 
 
             }catch(IOException i){
-                System.out.println("IO Exception"); //FIXME Can't just return (remember to dequeue!!)
+                System.err.println("IO Exception");
                 server.queue.dequeue(createIdeaRequest);
                 server.queue.dequeue(setSharesIdeaRequest);
                 for (Request r : requests1)
                     server.queue.dequeue(r);
                 return false;
             }catch(ClassNotFoundException c){
-                System.out.println("Class not found");//FIXME Can't just return (remember to dequeue!!)
+                System.err.println("Class not found");
                 server.queue.dequeue(createIdeaRequest);
                 server.queue.dequeue(setSharesIdeaRequest);
                 for (Request r : requests1)
@@ -892,8 +885,6 @@ public class ServerClient implements Runnable {
 
         if (iid == -2)
             iid = -1; //To avoid "Because they're trying to hack us" <- To Maxi
-        ////
-        //FIXME FIXME FIXME MAXI VE ISTO!!!
 
         try {
             ideas = connection.getRMIInterface().getIdeaByIID(iid,title);
@@ -1316,14 +1307,6 @@ public class ServerClient implements Runnable {
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return false;
 
-        /*
-          We have developed our system assuming that if there is a crash after the Request has been added to the queue,
-        then the user will know this when reconnecting (the server checks for pending requests). Since the user knows
-         it, it is responsible for skipping over the sending of all the data, and instead jump right to the part where
-         it waits for an answer. So we do it here as well: if the user has already marked a pending request, we just
-         ignore receiving the Idea data and wait for that request to be dispatched. If not, then it means there was
-         no enqueued request and the user should send us the data again.
-         */
         Request removeIdeaRequest;
         int result;
 

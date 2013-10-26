@@ -48,7 +48,6 @@ public class UDPReceiver extends Thread{
                     }
                     continue;
                 } catch (IOException e2) {
-                    //FIXME: What to do here? What exceptions can we get and why?
                     System.err.println("Error receiving packet!");
                     continue;
                 }
@@ -56,7 +55,6 @@ public class UDPReceiver extends Thread{
                 System.out.println("This time we got connection. Assuming it was a transient fault...");
 
             } catch (IOException e) {
-                //FIXME: What to do here? What exceptions can we get and why?
                 System.err.println("Error receiving packet!");
                 continue;
             }

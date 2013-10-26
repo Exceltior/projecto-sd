@@ -19,6 +19,9 @@ public class RMIConnection extends Thread {
         try {
             RMIInterface.sayTrue();
         } catch (RemoteException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
             onRMIFailed();
         }
     }
@@ -66,7 +69,6 @@ public class RMIConnection extends Thread {
         do {
             val = establishConnectionToRegistry(); count++;
             System.out.println("Attempt "+count+"..."+(val ? "Success!" : "Failed!"));
-            // sleep? FIXME
             try { Thread.sleep(count*1000); } catch (InterruptedException e) {}
         } while ( !val && count < 3);
 
