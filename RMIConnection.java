@@ -15,38 +15,28 @@ public class RMIConnection extends Thread {
     private final Object isDownLock = new Object();
     private String RMIHost;
 
+    void testRMINow() {
+        try {
+            RMIInterface.sayTrue();
+        } catch (RemoteException e) {
+            onRMIFailed();
+        }
+    }
+
+    synchronized boolean RMIIsDown() {
+        return isDown;
+    }
+
     public RMIConnection(String RMIHost) {
         this.RMIHost = RMIHost;
     }
 
     public void waitUntilRMIIsUp() {
         System.out.println("Waiting for RMI to be up...");
-        synchronized (isDownLock) {
-            while ( isDown )
-                try { isDownLock.wait(); } catch (InterruptedException e) {}
-        }System.out.println("RMI up!!");
-
-    }
-
-    public void run() {
-        for (;;) {
-            synchronized (isDownLock) {
-                while ( !isDown )
-                    try { isDownLock.wait(); } catch (InterruptedException e) {}
-
-                try { Thread.sleep(RMILongReconnectSleepTime); } catch (InterruptedException e) {}
-
-                //It's down, try to fix it
-                for(;;) {
-                    System.out.println("Long RMI reconnect thread...");
-                    if ( connect() )
-                        break;
-                    try { Thread.sleep(RMILongReconnectSleepTime); } catch (InterruptedException e) {}
-                }
-
-                System.out.println("RMI is back up!");
-            }
-        }
+        if ( isDown )
+            while (!connect())
+                try { Thread.sleep(1000); } catch (InterruptedException interrupt) {}
+        System.out.println("RMI up!!");
     }
 
     synchronized boolean establishConnectionToRegistry() {
@@ -65,12 +55,13 @@ public class RMIConnection extends Thread {
     }
 
     synchronized RMI_Interface getRMIInterface() {
+        waitUntilRMIIsUp();
         return this.RMIInterface;
     }
 
     synchronized boolean connect() {
         System.out.println("Trying connection to RMI...");
-        boolean val = false;
+        boolean val;
         int count=0;
         do {
             val = establishConnectionToRegistry(); count++;
@@ -85,7 +76,8 @@ public class RMIConnection extends Thread {
                 isDown = true;
                 isDownLock.notifyAll();
             }
-        }
+        } else
+            isDown = false;
 
         return val;
     }

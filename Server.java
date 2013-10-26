@@ -14,7 +14,7 @@ public class Server {
     private RMIConnection connection;
     private Thread requestThread;
     private final ArrayList<Socket> sockets  = new ArrayList<Socket>();
-    private ArrayList<Socket> notificationSockets  = new ArrayList<Socket>();
+    private final ArrayList<Socket> notificationSockets  = new ArrayList<Socket>();
 
     public void addNotificationSocket(Socket s) {
         synchronized (notificationSockets) {
@@ -43,6 +43,7 @@ public class Server {
                 } catch (IOException e) {
                     System.err.println("Couldn't force close a socket!");
                 }
+            sockets.clear();
         }
 
         synchronized (notificationSockets) {
@@ -52,6 +53,7 @@ public class Server {
                 } catch (IOException e) {
                     System.err.println("Couldn't force close a notification socket!");
                 }
+            notificationSockets.clear();
         }
     }
 
@@ -194,6 +196,11 @@ public class Server {
         for(;;) {
             try {
                 clientSocket = acceptSocket.accept();
+                connection.testRMINow();
+                if ( connection.RMIIsDown() ) {
+                    clientSocket.close();
+                    continue;
+                }
                 synchronized (sockets) {
                     sockets.add(clientSocket);
                 }
@@ -207,7 +214,7 @@ public class Server {
     }
 
     synchronized private void startQueueThread() {
-        queue = new RequestQueue(connection);
+        queue = new RequestQueue(connection, this);
         requestThread = new Thread(queue);
     }
 

@@ -5,14 +5,16 @@ import java.util.ArrayList;
 public class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
     private RMIConnection RMI;
     private boolean needsToDie = false;
+    private Server server;
 
     /**
      * Builds a request queue. If there was any data on the RMI server, then it is loaded
      * @param RMI
      */
-    RequestQueue(RMIConnection RMI) {
+    RequestQueue(RMIConnection RMI, Server server) {
         ArrayList<Request> r = null;
         this.RMI = RMI;
+        this.server = server;
         RMI.waitUntilRMIIsUp();
         try {
             r = RMI.getRMIInterface().readRequestsFromQueueFile();
@@ -200,7 +202,8 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                             autoDequeue = true; // We instantly remove it as soon as we process it
                         }
                     } catch (RemoteException e) {
-                     //FIXME: talvez fazer isto 3 vezes!
+                        server.killSockets();
+                        return; //RMI is dead. quit.
                     }
 
 
@@ -220,7 +223,8 @@ public class RequestQueue extends OrderedTimestampQueue<Request> implements Runn
                     try {
                         RMI.getRMIInterface().writeRequestQueueFile(queue);
                     } catch (RemoteException e) {
-                        //FIXME: Talvez fazer isto 3 vezes!
+                        server.killSockets();
+                        return; //RMI is dead. quit.
                     }
 
                 }

@@ -34,13 +34,13 @@ public class UDPReceiver extends Thread{
             try {
                 serverSocket.receive(receivePacket);
             } catch (SocketTimeoutException e) {
-                System.out.println("Timeout! Trying again to make sure it's not transient...");
+                //System.out.println("Timeout! Trying again to make sure it's not transient...");
 
                 // Try to get the package one more time (retry)
                 try {
                     serverSocket.receive(receivePacket);
                 } catch (SocketTimeoutException e2) {
-                    System.out.println("Timeout!");
+                    //System.out.println("Timeout!");
                     //Lost connection to client!
                     if ( !currentlyDead ) {
                         server.notifyConnectionToOtherServerDead();

@@ -68,6 +68,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         return hashText;
     }
 
+    public boolean sayTrue() throws RemoteException {
+        return true;
+    }
+
     ////
     //  Class constructor. Creates a new instance of the class RMI_Server
     ////
@@ -680,7 +684,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      */
     public String[] getHistory(int uid) throws RemoteException{
         String[] history;
-        String query = "Select t.comprador, t.vendedor, t.valor, i.titulo from Transacoes t, Ideias i " +
+        String query = "Select t.comprador, t.vendedor, t.valor*t.numShares, t.valor, " +
+                "t.numShares, i.titulo from Transacoes t, Ideias i " +
                 "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid";
 
         ArrayList<String[]> queryResult = receiveData(query);
@@ -690,9 +695,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         history = new String[queryResult.size()];
 
+
+
         for (int i=0;i<queryResult.size();i++)
-            history[i] = "Buyer id: " + queryResult.get(i)[0] + " Seller id: " +  queryResult.get(i)[1] + " Transaction Money: "
-                    + queryResult.get(i)[2] + " Idea: " + queryResult.get(i)[3];
+            history[i] = queryResult.get(i)[5] + ": ID " + queryResult.get(i)[0] + " bought "+ queryResult.get(i)[4] +
+                    " " +
+                "shares from " + "ID "
+                    + queryResult.get(i)[1] + " at " + queryResult.get(i)[3] + " DEI Coins per share, " +
+                    "for a total of " + queryResult.get(i)[2] + " DEI Coins";
 
         return  history;
     }
@@ -831,6 +841,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 ", targetPrice="+targetPrice+", minTargetShares="+minTargetShares);
         Share currentShares = getSharesIdeaForUid(iid, uid);
         int userMoney = getUserMoney(uid);
+        int sharesAlvo = numShares;
 
         if ( currentShares != null) {
             // User already has shares
@@ -856,59 +867,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         // We have sorted them by price per share, so the best options are first
         // FIXME CHECK THIS
 
-        for (Share s : shares) {
-            System.out.println("processing share: "+s);
+        for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
+            Share s = shares.get(i1);
+            System.out.println("processing share: " + s);
             int availShares = s.getAvailableShares();
-            if ( availShares > 0 ) {
-                System.out.println("ALready, available shares!: "+availShares);
-                if ( availShares >= numShares ) {
-                    System.out.println("ALready, good to finish! shares!: "+numShares+" was needed!");
-                    // There are enough for us to finish!
-                    int toBuy = numShares;
+            if (availShares > 0) { //Should always happen
+                System.out.println("ALready, available shares!: " + availShares);
 
-                    if ( s.getPriceForNum(toBuy) > userMoney ) {
-                        System.out.println("Not enough money...:"+userMoney+", "+s.getPriceForNum(toBuy));
-                        // Not enough money...
-                        int pricePerShare = s.getPrice();
+                int toBuy = Math.min(availShares, numShares);
 
-                        // See how many we can buy. Round down!
+                if (s.getPriceForNum(toBuy) > userMoney) {
+                    System.out.println("Not enough money...:" + userMoney + ", " + s.getPriceForNum(toBuy));
+                    // Not enough money...
+                    int pricePerShare = s.getPrice();
 
-                        toBuy = (int)(((double)userMoney) / pricePerShare);
-                        if ( toBuy == 0 )
-                            break;
-                        System.out.println("Will still try to buy "+toBuy);
-                    }
-                    sharesToBuy.add(s);
-                    sharesToBuyNum.add(toBuy);
-                    numShares = 0; //No shares remaining to buy
-                    userMoney -= s.getPriceForNum(toBuy);
-                    break;
-                } else {
-
-
-
-                    // COPY PASTE FIXME
-                    if ( s.getPriceForNum(availShares) > userMoney ) {
-                        System.out.println("Not enough money...:"+userMoney+", "+s.getPriceForNum(availShares));
-                        // Not enough money...
-                        int pricePerShare = s.getPrice();
-
-                        // See how many we can buy. Round down!
-
-                        availShares = (int)(((double)userMoney) / pricePerShare);
-                        if ( availShares == 0 )
-                            break;
-                        System.out.println("Will still try to buy "+availShares);
-                    }
-                    sharesToBuy.add(s);
-                    sharesToBuyNum.add(availShares);
-                    numShares -= availShares; //Still some left to buy...
-                    userMoney -= s.getPriceForNum(availShares);
-                    // FIXME
-
-
-                    System.out.println("Still "+numShares+" to go!");
+                    // See how many we can buy. Round down!
+                    toBuy = (int) (((double) userMoney) / pricePerShare);
+                    if (toBuy == 0)
+                        break;
+                    System.out.println("Will still try to buy " + toBuy);
                 }
+
+                sharesToBuy.add(s);
+                sharesToBuyNum.add(toBuy);
+                numShares -= toBuy;
+                userMoney -= s.getPriceForNum(toBuy);
             }
         }
 
@@ -925,14 +908,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
             int num = sharesToBuyNum.get(i);
             int resultingShares = s.getNum()-num;
             System.out.println("Buying "+num+"from "+s.getUid()+"!!");
-
+            System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
             setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),s.getNumMin(),conn);
-            insertIntoHistory(uid, iid, num,s.getPrice(),conn,iid);
+            insertIntoHistory(uid, s.getUid(), num,s.getPrice(),conn,iid);
             setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), conn);
         }
 
 
-        setSharesIdea(uid,iid,numShares,targetPrice,minTargetShares,conn);
+        setSharesIdea(uid,iid,sharesAlvo,targetPrice,minTargetShares,conn);
         setUserMoney(uid,userMoney, conn);
 
         // UNLEASH THE BEAST!

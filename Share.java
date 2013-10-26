@@ -40,7 +40,7 @@ public class Share  implements Comparable<Share>, Serializable {
     public int getPriceForNum(int n) {
         if ( n > getAvailableShares() )
             return 0; //Error: can't buy these many
-        return price*num;
+        return price*n;
     }
 
     public int getUid() {
