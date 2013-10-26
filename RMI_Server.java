@@ -1254,9 +1254,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     private void insertData(String query, Connection conn) {
         System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
+        boolean cont;
 
-        boolean cont = false;
         do {
+            cont = false;
             try{
                 conn.createStatement().executeUpdate(query);
             }catch(SQLException s){

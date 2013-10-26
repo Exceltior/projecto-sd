@@ -34,11 +34,11 @@ public class RMIConnection extends Thread {
     }
 
     public void waitUntilRMIIsUp() {
-        System.out.println("Waiting for RMI to be up...");
+        //System.out.println("Waiting for RMI to be up...");
         if ( isDown )
             while (!connect())
                 try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-        System.out.println("RMI up!!");
+        //System.out.println("RMI up!!");
     }
 
     synchronized boolean establishConnectionToRegistry() {

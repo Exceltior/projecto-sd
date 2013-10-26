@@ -1229,10 +1229,13 @@ public class Client {
         }
 
         do{
-            System.out.print("Which topic do you want to see? ");
+            System.out.print("Which topic do you want to see? (0 to go back to main menu)");
             try{
                 line = sc.nextLine();
                 selected = Integer.parseInt(line);
+
+                if (selected == 0)
+                    break;
             }catch(InputMismatchException m){
                 selected = -1;
             }catch(NumberFormatException n){
@@ -1398,7 +1401,8 @@ public class Client {
                 //Check a topic - List all the topics and ask the user which one he wants. While "inside" a topic list all ideas
                 case 1:{
                     topic = listTopics();
-                    commentTopic(topic);
+                    if (topic>0)
+                        commentTopic(topic);
 
                     break;
                 }
