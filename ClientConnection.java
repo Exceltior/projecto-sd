@@ -15,9 +15,9 @@ import java.util.Date;
 // message to any available server. This eases our error checking code when using this class.
 //
 public class ClientConnection {
-    private static final String[] hosts = { "localhost", "localhost"};
-    private static final int[] ports = { 1234, 4000 };
-    private static final int[] notificationPorts = { 1237, 4001 };
+    private static  String[] hosts = { "localhost", "localhost"};
+    private static  int[] ports = { 1234, 4000 };
+    private static  int[] notificationPorts = { 1237, 4001 };
     private int currentHost = -1;
     private Socket currentSocket = null;
     private DataOutputStream outStream = null;
@@ -26,6 +26,22 @@ public class ClientConnection {
     private String lastUsername, lastPassword;
     private NotificationConnection notificationThread = null;
 
+
+    ClientConnection(String[] args) {
+        if ( args.length > 0 && args.length % 3 == 0) {
+            hosts = new String[args.length / 3];
+            ports = new int[args.length / 3];
+            notificationPorts = new int[args.length / 3];
+        }
+
+        int c=0;
+        for (int i = 0; i < args.length; i++) {
+            hosts[c] = args[i];
+            ports[c] = Integer.valueOf(args[i+1]);
+            notificationPorts[c] = Integer.valueOf(args[i+1]);
+            c++;
+        }
+    }
 
     ////
     // Connect to any server, starting from the next one

@@ -12,9 +12,9 @@ public class Client {
     private String email;
     private Scanner sc;
 
-    Client(){
+    Client(String[] args){
         super();
-        conn = new ClientConnection();
+        conn = new ClientConnection(args);
         sc = new Scanner(System.in);
     }
 
@@ -1499,7 +1499,7 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        Client client = new Client();
+        Client client = new Client(args);
         client.execute();
     }
 }
