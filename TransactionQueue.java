@@ -15,7 +15,7 @@ class TransactionQueue extends OrderedTimestampQueue<Transaction> {
             try {
                 out = new ObjectOutputStream(new FileOutputStream(path));
             } catch (IOException e) {
-                System.err.println("Error opening transactions file for writing!");
+                //System.err.println("Error opening transactions file for writing!");
                 return false;
             }
 

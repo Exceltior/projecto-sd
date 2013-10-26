@@ -94,13 +94,6 @@ class ClientConnection {
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy.MM.dd");
         String s_date = format1.format(date);//Now we have the date in the 'yyyy-mm-dd' format
 
-        ////
-        //  Ideia para o Maxi: Basicamente é mandar estes campos todos ao servidor de TCP que depois tem de invocar um metodo
-        //  remoto que lhe permite fazer o registo do novo utilizador. Depois temos que arranjar uma forma de atribuir os id's
-        //  aos utilizadores, nao sei se ha uma forma automatica de fazer isso na base de dados ou nao, mas depois ou hoje a
-        //  noite ou amanha de manha vou ver se consigo fazer isso. Well, cya ;)
-        ////
-
         for(;;) {
             if ( !Common.sendMessage(Common.Message.REQUEST_REG, outStream) ) {
                 reconnect(); continue;
@@ -444,8 +437,6 @@ class ClientConnection {
                     objectStream = new ObjectOutputStream(outStream);
                     objectStream.writeObject(ficheiro);
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    System.err.println("FILHA DA PUTA");
                     return false;
                 }
 
@@ -615,7 +606,6 @@ class ClientConnection {
             }
 
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK) {
-                System.err.println("Bodega2: "+reply);
                 return null;
             }
 

@@ -874,7 +874,7 @@ class ServerClient implements Runnable {
             return false;
 
         if (iid == -2)
-            iid = -1; //To avoid "Because they're trying to hack us" <- To Maxi
+            iid = -1; //To avoid "Because they're trying to hack us"
 
         try {
             ideas = connection.getRMIInterface().getIdeaByIID(iid,title);

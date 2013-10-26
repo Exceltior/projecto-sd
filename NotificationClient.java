@@ -48,12 +48,12 @@ class NotificationClient implements Runnable {
 
         // Read the next Message/Request
         if ( ( user = Common.recvString(inStream)) == null){
-            System.out.println("Error No Message Received!!!");
+            System.err.println("Error No Message Received!!!");
             return ;
         }
 
         if ( ( pwd = Common.recvString(inStream)) == null){
-            System.out.println("Error No Message Received!!!");
+            System.err.println("Error No Message Received!!!");
             return ;
         }
 

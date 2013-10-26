@@ -31,12 +31,10 @@ class NotificationServer extends Thread {
                     continue;
                 }
                 server.addNotificationSocket(clientSocket);
-                System.err.println("New NOTIFICATION client!!");
                 new Thread(new NotificationClient(clientSocket, server.getConnection(), server)).start();
             }
             catch (IOException e) {
                 System.err.println("Accept notification failed!");
-                e.printStackTrace();
             }
         }
     }

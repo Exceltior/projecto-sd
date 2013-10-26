@@ -61,7 +61,7 @@ public class Common {
     }
 
     static public boolean sendMessage(Message msg, DataOutputStream outStream) {
-        System.out.println("SENDING: "+msg.name());
+        //System.out.println("SENDING: "+msg.name());
         return Common.sendInt(msg.ordinal(), outStream);
     }
     static public Message recvMessage(DataInputStream inStream) {
@@ -70,7 +70,7 @@ public class Common {
             return Message.ERR_NO_MSG_RECVD; //Connection dead!
         }
 
-        System.out.println("Got Message: "+Message.values()[intMsg].name());
+        //System.out.println("Got Message: "+Message.values()[intMsg].name());
         return Message.values()[intMsg];
     }
 
