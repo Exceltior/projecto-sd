@@ -982,7 +982,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                 // Set to 0!! We should delete it!
                 query = "delete from shares where userid="+uid+" and iid="+iid;
             } else {
-                query = "update shares set nshares="+nshares+" where iid="+iid+" and userid="+uid;
+                query = "update shares set numshares="+nshares+" where iid="+iid+" and userid="+uid;
             }
         } else
             query = "INSERT INTO Shares VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + numMinShares + ")";
@@ -1478,7 +1478,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     public static void main(String[] args) {
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");
