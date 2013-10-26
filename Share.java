@@ -30,7 +30,7 @@ public class Share  implements Comparable<Share>, Serializable {
     }
 
     public int getNum() {
-        return price;
+        return num;
     }
 
     public int getAvailableShares() {
