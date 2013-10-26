@@ -173,9 +173,8 @@ public class Server {
 
         Socket clientSocket;
 
-        connection = new RMIConnection(RMIHost);
-        connection.connect();
-        connection.start();
+        connection = new RMIConnection(RMIHost, this);
+        connection.waitUntilRMIIsUp();
 
         // Start the notification server
         new NotificationServer(this, notificationPort).start();

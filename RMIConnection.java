@@ -7,20 +7,25 @@ import java.rmi.registry.Registry;
  * We have this class so that there is a common interface (RMIConnection) that all clients and threads can use to
  * access the RMI. We can add reconnect stuff and the likes right here.
  */
-public class RMIConnection extends Thread {
+public class RMIConnection {
     private Registry RMIregistry = null;
     private RMI_Interface RMIInterface = null;
     private boolean isDown = false;
     private final Object isDownLock = new Object();
     private final String RMIHost;
+    private Server server;
 
-    void testRMINow() {
+    synchronized void testRMINow() {
+        if (RMIInterface == null) {
+            isDown = true;
+            return;
+        }
         try {
             RMIInterface.sayTrue();
         } catch (RemoteException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+//            e.printStackTrace();
+//            System.out.println(e.getMessage());
+//            System.out.println(e.getCause());
             onRMIFailed();
         }
     }
@@ -29,12 +34,14 @@ public class RMIConnection extends Thread {
         return isDown;
     }
 
-    public RMIConnection(String RMIHost) {
+    public RMIConnection(String RMIHost, Server server) {
         this.RMIHost = RMIHost;
+        this.server = server;
     }
 
-    public void waitUntilRMIIsUp() {
+    synchronized public void waitUntilRMIIsUp() {
         //System.out.println("Waiting for RMI to be up...");
+        testRMINow();
         if ( isDown )
             while (!connect())
                 try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
@@ -72,18 +79,18 @@ public class RMIConnection extends Thread {
         } while ( !val && count < 3);
 
 
-        if ( !val ) {
-            synchronized (isDownLock) {
-                isDown = true;
-                isDownLock.notifyAll();
-            }
-        } else
-            isDown = false;
+        isDown = !val;
+
+        if ( isDown ) {
+
+            // Kill the sockets, because it wasn't a transient failure
+            server.killSockets();
+        }
 
         return val;
     }
 
-    public void onRMIFailed() {
+    synchronized public void onRMIFailed() {
         connect();
     }
 }
