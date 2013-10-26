@@ -695,11 +695,6 @@ public class ServerClient implements Runnable {
         if ( (topicsArray = receiveData()) == null )
             return false;
 
-
-        //System.out.println("CÁ ESTÃO OS TÓPICOS: ");
-        //for (String topico : topicsArray)
-        //        System.out.println("TOPIC: "+topico);
-
         //Receive Ideas For
         if ( !receiveInt(ideasForArray) )
             return false;
@@ -760,8 +755,6 @@ public class ServerClient implements Runnable {
             }
 
             //2nd - Actually bind them to the idea
-
-
             Request setTopicsIdeaRequest;
             if ((setTopicsIdeaRequest = server.queue.getNthRequestByUIDAndType(uid,
                     Request.RequestType.SET_TOPICS_IDEA,i+1)) ==
@@ -781,12 +774,10 @@ public class ServerClient implements Runnable {
                 if (! Common.sendMessage(Common.Message.MSG_OK, outStream))
                     return false;
             } else {
-                if (! Common.sendMessage(Common.Message.MSG_ERR, outStream)) //Only jappens if RMI fails
+                if (! Common.sendMessage(Common.Message.MSG_ERR, outStream)) //Only happens if RMI fails
                     return false;
             }
         }
-
-
 
 
         int iState = 0;
