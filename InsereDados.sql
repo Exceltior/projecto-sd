@@ -46,7 +46,7 @@ INSERT INTO Shares VALUES (1,5,25,2,2);/*Podes comprar aqui ate 23 shares*/
 INSERT INTO Shares VALUES (1,3,20,2,1);/*Podes comprar aqui ate 19 shares*/
 INSERT INTO Shares VALUES (1,4,5,2,0);/*Podes comprar aqui ate 5 shares*/
 INSERT INTO Shares VALUES (2,1,100,3,50);
-INSERT INTO Shares VALUES (3,2,100,40000,50);/*Podes comprar 50*/
+INSERT INTO Shares VALUES (3,2,100,400000,50);/*Podes comprar 50*/
 INSERT INTO Shares VALUES (4,1,100,6,50);
 INSERT INTO Shares VALUES (5,1,50,1,25);
 INSERT INTO Shares VALUES (5,2,50,1,25);
