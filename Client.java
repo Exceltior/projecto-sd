@@ -122,10 +122,8 @@ public class Client {
             for (String aTemp : temp) {
                 try {
                     temp_num = Integer.parseInt(aTemp);
-                    if(temp_num == -1) {
-                        System.out.println("Okay then, no ideas, fucker!"); //FIXME
+                    if(temp_num == -1)
                         return devolve;
-                    }
 
                     else if(devolve.contains(temp_num)){
                         System.out.println("You have inserted the same idea twice, please enter again");
@@ -754,7 +752,7 @@ public class Client {
         pricesShares = conn.showPricesShares(iid);
 
         if (pricesShares == null || pricesShares.length == 0)
-            System.out.println("The user doesnt have any share for this idea");//FIXME: This should never happen right?
+            System.out.println("The user doesnt have any share for this idea");//This should never happen right?
         else{
             //Print the shares' information
             System.out.println("Share{iid = " + pricesShares[0] + ",Number of Shares = " + pricesShares[1] +
@@ -887,9 +885,6 @@ public class Client {
             repeat = false;
             System.out.print("Your choice: ");
 
-        ////
-        //  FIXME: INCOMPLETE, THERE ARE OPTIONS MISSING!!!!!!!
-        ////
             try{
                 line = sc.nextLine();
                 choice = Integer.parseInt(line);
@@ -960,7 +955,6 @@ public class Client {
             }
 
             case 2:{
-                //FIXME FIXME FIXME VER COM O MAXI SISTEMA NOTIFICAÇOES
                 if(setPriceShares(listUserIdeasIDs))
                     System.out.println("Operation completed with success!");
                 else
@@ -977,13 +971,13 @@ public class Client {
             case 4:{
                 //Set idea's shares not to sell instantaneously
                 setSharesNotSell(listUserIdeasIDs);
-                //FIXME FIXME FIXME VER COM O MAXI SISTEMA NOTIFICAÇOES
                 break;
             }
 
             case 5:{
                 //Pedir ideia e depois listar todas as relacoes
-                //FIXME FIXME FIXME FAZER FUNCAO BONITINHA PARA ISTO
+                // Back when we had time, we had decided to add a pretty function here.
+                // Legend says we got delluded, and no function was written.
                 do{
                     System.out.println("Please insert the idea id whose relations you want to check:");
                     try{
@@ -1065,12 +1059,7 @@ public class Client {
 
             if (choice < 1 || choice > 2){
                 System.out.println("Invalid Choice!");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    System.err.println("Client thread was interrupted");
-                    //FIXME: WHAT TO DO WITH THIS EXCEPTION????
-                }
+                try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
             }
 
         }while (choice < 1 || choice > 2);

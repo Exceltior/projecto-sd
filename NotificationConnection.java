@@ -12,19 +12,12 @@ class NotificationConnection extends Thread {
     private String user, password;
 
     NotificationConnection(String host, String user, String pwd, int port) {
-        //System.out.println("NotificationConnection!"); //FIXME
-        try {
-            socket = new Socket(host, port);
-        } catch (IOException e) {
-            System.err.println("Excepção bodega"); //FIXME
-            return;
-        }
+        try { socket = new Socket(host, port); } catch (IOException ignored) {}
         this.user = user; this.password = pwd;
     }
 
     @Override
     public void run() {
-        //System.out.println("Running!!"); //FIXME
         if ( this.socket == null )
             return;
         try {
@@ -32,7 +25,7 @@ class NotificationConnection extends Thread {
             this.inStream = new DataInputStream(socket.getInputStream());
             this.inObjStream = new ObjectInputStream(inStream);
         } catch (IOException e) {
-            System.err.println("Error constructing a new Notification connection (did the connection die?");
+            System.err.println("Error constructing a new Notification connection (did the connection die)?");
             return;
         }
 
@@ -47,22 +40,17 @@ class NotificationConnection extends Thread {
         Common.Message reply;
 
         if ( ( reply = Common.recvMessage(inStream)) == Common.Message.MSG_ERR) {
-            System.err.println("This was not expected!!!"); //FIXME
+            System.exit(-1);
             return;
         }
 
         for(;;) {
-            //System.out.println("Waiting...!"); //FIXME
             try {
                 Notification n = (Notification)inObjStream.readObject();
 
-                System.out.println("Notification: "+n);
-            } catch (IOException e) {
-                return;
-            } catch (ClassNotFoundException e) {
-                System.err.println("This was not expected!!!!!!!!"); //FIXME
-                return;
-            }
+                System.out.println("\n[Notification]: "+n);
+            } catch (IOException ignored) { return; }
+              catch (ClassNotFoundException ignored) { return; }
         }
     }
 }

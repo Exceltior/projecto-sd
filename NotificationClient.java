@@ -101,11 +101,11 @@ class NotificationClient implements Runnable {
                     server.removeNotificationSocket(socket);
                     return;
                 }
-                queue.dequeue(n);
+                queue.dequeue(n, server);
 
             }
 
-            queue.checkRMI();
+            queue.checkRMI(server);
 
             try {
                 Thread.sleep(200);

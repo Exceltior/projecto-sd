@@ -68,7 +68,6 @@ public class Idea implements Serializable {
     // Create an Idea from a SQL row (array of strings)
     //
     public Idea(String[] row) {
-        /* FIXME: Implement this */
         this.id = Integer.valueOf(row[0]);
         this.title = row[1]; //title comes before the body
         this.body = row[2];

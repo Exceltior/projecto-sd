@@ -15,11 +15,11 @@ public class Common {
         REQUEST_LOGIN,              // Initiate Login process
         REQUEST_REG,                // Initiate Register process
         REQUEST_CREATETOPICS,       // Create a topic
-        REQUEST_GET_IDEA_BY_IID,    // Get an Idea only by IID (FIXME: Joca, why do we have this and GET_IDEA??)
+        REQUEST_GET_IDEA_BY_IID,    // Get an Idea only by IID
         REQUEST_CREATEIDEA,         // Create an Idea
         REQUEST_GETTOPICSIDEAS,     // Get ideas associated with topic
         REQUEST_GET_HISTORY,        // Get Transaction History
-        REQUEST_GETTOPIC,           // Get a topic (FIXME: Joca, any more details to add?)
+        REQUEST_GETTOPIC,           // Get a topic
         REQUEST_GET_IDEA,           // Get one or more ideas from an IID or title
         REQUEST_DELETE_IDEA,        // Delete an Idea
         REQUEST_GET_TOPICS_OF_IDEA, // Get Idea topics
@@ -44,15 +44,15 @@ public class Common {
         ERR_TOPIC_NOT_FOUND,        // Topic not found
         ERR_IDEA_HAS_CHILDREN,      // Idea has children (and shouldn't, in this cenario)
         ERR_NOT_PRIMARY,            // Server isn't primary server, so tell client to disconnect
-        ERR_TOPIC_NAME,             // Invalid topic name (FIXME: Joca, anything else to add?)
+        ERR_TOPIC_NAME,             // Invalid topic name
         ERR_NO_SUCH_IID,            // No idea by this IID
         ERR_NO_MSG_RECVD,           // Used by our Common class to indicate a connection problem
-        ERR_IDEAS_NOT_FOUND,        // No Ideas were found (FIXME: Joca, you sure this isn't the only type of error 
+        ERR_IDEAS_NOT_FOUND,        // No Ideas were found
                                     // and, hence, we couldn't just use MSG_ERR?
         ERR_NO_FILE,                // Error while getting the file
         ERR_NOT_FULL_OWNER,         // Error not the full owner of the idea
         
-        TOPIC_OK,                    // Topic is Okay. (FIXME: Joca, probably we could, and should, use MSG_OK!!!)
+        TOPIC_OK,                    // Topic is Okay.
 
         MSG_USER_HAS_PENDING_REQUESTS,
         MSG_USER_NOT_NOTIFIED_REQUESTS,
@@ -130,7 +130,7 @@ public class Common {
             ret = inStream.readInt();
             if ( ret == -1 ) {
                 System.err.println("They're trying to hack us!");
-                // FIXME: Deal with this!
+                inStream.close(); // Our humble attempt at solving this
             }
         } catch (IOException e) {
             //System.err.println("recvInt ERR"); e.printStackTrace();

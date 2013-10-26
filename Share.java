@@ -14,7 +14,6 @@ public class Share  implements Comparable<Share>, Serializable {
      * @param row
      */
     public Share(String[] row) {
-        /* FIXME: Implement this */
         this.iid = Integer.valueOf(row[0]);
         this.uid = Integer.valueOf(row[1]);
         this.num = Integer.valueOf(row[2]);

@@ -28,11 +28,7 @@ class TransactionQueue extends OrderedTimestampQueue<Transaction> {
                 return false;
             }
 
-            try {
-                out.close();
-            } catch (IOException e) {
-                //FIXME: What damn exception can we get here?
-            }
+            try { out.close(); } catch (IOException ignored) {}
 
             return true;
     }
@@ -56,7 +52,8 @@ class TransactionQueue extends OrderedTimestampQueue<Transaction> {
                 Transaction t = queue.get(0);
 
                 // Execute transaction t
-                // FIXME: Need an RMI function for this
+                // An RMI function to do this might have been better, but right now I just want to push the changes
+                // out.
                 boolean result;
                 try {
                     result = RMI.tryGetSharesIdea(t.uid, t.iid, t.numTargetShares, t.targetPrice, t.minTargetShares);

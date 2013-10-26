@@ -41,7 +41,6 @@ class UDPTransmitter extends Thread {
             try {
                 clientSocket.send(sendPacket);
             } catch (IOException e) {
-                //FIXME: What to do here? What exceptions can we get and why?
                 System.err.println("Error sending packet!");
             }
 

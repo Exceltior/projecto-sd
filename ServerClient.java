@@ -90,136 +90,134 @@ class ServerClient implements Runnable {
 
 
             // Handle the request
-            // FIXME: All of these prints are mostly here just for debugging. In practice, they will mean that we've
-            // lost the connection to che client. We should drop them in production code
             if ( msg == Common.Message.REQUEST_LOGIN) {
                 if ( !handleLogin() ){
-                    System.err.println("Error in the handle login method!!!");
+                    //System.err.println("Error in the handle login method!!!");
                     break ;
                 }
             } else if (msg == Common.Message.REQUEST_REG){
                 if (!handleRegistration()){
-                    System.err.println("Error in the handle registration method!!!");
+                    //System.err.println("Error in the handle registration method!!!");
                     break ;
                 }
             } else if ( msg == Common.Message.REQUEST_GETTOPICS){
                 if ( !handleListTopicsRequest() ){
-                    System.err.println("Error in the handle list topics request method!!!");
+                    //System.err.println("Error in the handle list topics request method!!!");
                     break ;
                 }
             } else if (msg == Common.Message.REQUEST_CREATETOPICS){
                 if ( !handleCreateTopicRequest() ){
-                    System.err.println("Error in the handle create topics request method!!!");
+                    //System.err.println("Error in the handle create topics request method!!!");
                     break ;
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEA_BY_IID){
                 if ( !handleGetIdeaByIID() ){
-                    System.err.println("Error in the handle get idea by IID method!!!");
+                    //System.err.println("Error in the handle get idea by IID method!!!");
                     break ;
                 }
             }else if(msg == Common.Message.REQUEST_CREATEIDEA){
                 if ( !handleCreateIdea()){
-                    System.err.println("Error in the handle create idea method!!!");
+                    //System.err.println("Error in the handle create idea method!!!");
                     break ;
                 }
             }else if (msg == Common.Message.REQUEST_GETTOPICSIDEAS){
                 if (!handleGetTopicsIdea()){
-                    System.err.println("Error in the handle get topics idea method!!!");
+                    //System.err.println("Error in the handle get topics idea method!!!");
                     break;
                 }
             }else if( msg == Common.Message.REQUEST_GET_HISTORY){
                 if (!handleGetHistory()){
-                    System.err.println("Error in the handle get history method!!!!!");
+                    //System.err.println("Error in the handle get history method!!!!!");
                     break;
                 }
             } else if ( msg == Common.Message.REQUEST_DELETE_IDEA) {
                 if (!handleDeleteIdea()) {
-                    System.err.println("Error deleting idea");
+                    //System.err.println("Error deleting idea");
                     break;
                 }
             }else if( msg == Common.Message.REQUEST_GETTOPIC){
                 if (!handlegetTopic()){
-                    System.err.println("Error in the handle get topic method!!!!!");
+                    //System.err.println("Error in the handle get topic method!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEA){
                 if (! handleGetIdea()){
-                    System.err.println("Error in the handle get idea method!!!!!!");
+                    //System.err.println("Error in the handle get idea method!!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_TOPICS_OF_IDEA){
                 if (!handleGetTopicsOfIdea()){
-                    System.err.println("Error in the handle get topics of idea method!!!!!!");
+                    //System.err.println("Error in the handle get topics of idea method!!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GETUSERIDEAS){
                 if (!handleGetUserIdeas()){
-                    System.err.println("Error in the handle get user ideas method!!!!!!");
+                    //System.err.println("Error in the handle get user ideas method!!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_SETIDEARELATION){
                 if (!handleSetIdeaRelationship()){
-                    System.err.println("Error in the handle set idea relationship method!!!!!!");
+                    //System.err.println("Error in the handle set idea relationship method!!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GETIDEASFAVOUR){
                 if (!handleGetIdeasRelation(1)){
-                    System.err.println("Error in the handle get ideas relation 1 method!!!!!!");
+                    //System.err.println("Error in the handle get ideas relation 1 method!!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GETIDEASAGAINST){
                 if (!handleGetIdeasRelation(-1)){
-                    System.err.println("Error in the handle get ideas relation -1 method!!!!!!");
+                    //System.err.println("Error in the handle get ideas relation -1 method!!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GETIDEASNEUTRAL){
                 if (!handleGetIdeasRelation(0)){
-                    System.err.println("Error in the handle get ideas relation 0 method!!!!!!");
+                    //System.err.println("Error in the handle get ideas relation 0 method!!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GETIDEASHARES){
                 if (!handleGetIdeaShares()){
-                    System.err.println("Error in the handle get idea shares method!!!!!!!!");
+                    //System.err.println("Error in the handle get idea shares method!!!!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_SETPRICESHARES){
                 if (!handleSetPriceShares()){
-                    System.err.println("Error in the handle get idea shares method!!!!!!!!");
+                    //System.err.println("Error in the handle get idea shares method!!!!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GETSHARESNOTSELL){
                 if(!handleGetSharesNotSell()){
-                    System.err.println("Error in the handle get shares not sell method!!!!!");
+                    //System.err.println("Error in the handle get shares not sell method!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_SETSHARESNOTSELL){
                 if (!handleSetSharesNotSell()){
-                    System.err.println("Error in the handle set shares not sell method!!!!!");
+                    //System.err.println("Error in the handle set shares not sell method!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GETFILE){
                 if (!handleGetFile()){
-                    System.err.println("Error in the handle get file method!!!!!");
+                    //System.err.println("Error in the handle get file method!!!!!");
                     break;
                 }
             }else if(msg == Common.Message.REQUEST_GET_IDEAS_FILES){
                 if (!handleGetIdeasFiles()){
-                    System.err.println("Error in the handle get ideas files method!!!!!");
+                    //System.err.println("Error in the handle get ideas files method!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEA_FILE){
                 if (!handleGetIdeaFile()){
-                    System.err.println("Error in the handle get idea file method!!!!!");
+                    //System.err.println("Error in the handle get idea file method!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_GET_IDEAS_BUY){
                 if (!handleGetIdeasCanBuy()){
-                    System.err.println("Error in the handle get ideas can buy method!!!!!");
+                    //System.err.println("Error in the handle get ideas can buy method!!!!!");
                     break;
                 }
             }else if (msg == Common.Message.REQUEST_BUYSHARES){
                 if (!handleBuyShares()){
-                    System.err.println("Error in the handle buy shares method!!!!!");
+                    //System.err.println("Error in the handle buy shares method!!!!!");
                     break;
                 }
             }
@@ -245,7 +243,7 @@ class ServerClient implements Runnable {
         if ( (date = Common.recvString(inStream)) == null)
             return false;
 
-        System.out.println("Vou registar:" +  user + " " + pass + " " + email + " " + date);
+        //System.out.println("Vou registar:" +  user + " " + pass + " " + email + " " + date);
 
 
         ArrayList<Object> objects = new ArrayList<Object>(); objects.add(user); objects.add(pass); objects
@@ -262,13 +260,7 @@ class ServerClient implements Runnable {
         } else {
             if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream) )
                 return false;
-            else
-                System.out.println("Foi enviada mensagem de erro");
-            // Here we have to return true to keep the connection to the client alive
-            return true;
         }
-
-        System.out.println("O handle registration correu impecavelmente bem e o cliente foi registado com sucesso :)");
 
         return true;
     }

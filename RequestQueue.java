@@ -19,9 +19,8 @@ class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
         try {
             r = RMI.getRMIInterface().readRequestsFromQueueFile();
         } catch (RemoteException e) {
-            //FIXME: Retry 3 times here!
-        } catch (NullPointerException e) {
-            System.err.println("RMI Down while creating the queue!");
+            RMI.onRMIFailed();
+            server.killSockets();
         }
 
         if ( r != null ) {
@@ -36,13 +35,15 @@ class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
         /* Look for the right place to put it */
         synchronized (queue) {
             super.enqueue(request);
-
-            try {
-                RMI.getRMIInterface().writeRequestQueueFile(queue);
-            } catch (RemoteException e) {
-                //FIXME: Retry 3 times here!
+            for(;;) {
+                try {
+                    RMI.getRMIInterface().writeRequestQueueFile(queue);
+                    break;
+                } catch (RemoteException e) {
+                    RMI.onRMIFailed();
+                    server.killSockets();
+                }
             }
-
             queue.notify();
         }
     }
@@ -95,10 +96,14 @@ class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
     synchronized void dequeue(Request r) {
         synchronized (queue) {
             super.dequeue(r);
-            try {
-                RMI.getRMIInterface().writeRequestQueueFile(queue);
-            } catch (RemoteException e) {
-                //FIXME: Talvez fazer isto 3 vezes!
+            for(;;) {
+                try {
+                    RMI.getRMIInterface().writeRequestQueueFile(queue);
+                    break;
+                } catch (RemoteException e) {
+                    RMI.onRMIFailed();
+                    server.killSockets();
+                }
             }
         }
     }
@@ -122,11 +127,6 @@ class RequestQueue extends OrderedTimestampQueue<Request> implements Runnable {
 
     /**
      * This function just continuously loops the request list.
-     * * FIXME: We can only do something for a user if that user is NOT in the NEED_NOTIFY state. If it is in that
-     * state, then we need to wait until we notify the user. If we find something to do and it's the user is in
-     * NEED_NOTIFY, we will sleep for a while (like 3 seconds or so) to give the user time to reconnect and check one
-     * of the dispatched requests
-     * --> This means we need a function to explicitly remove requests
      */
     @Override
     public void run() {

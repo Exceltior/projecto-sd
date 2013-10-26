@@ -17,6 +17,7 @@ class ConnectionPool {
 
 
     public ConnectionPool(String url,String uname, String pwd) throws SQLException {
+        try { Class.forName("oracle.jdbc.driver.OracleDriver"); } catch (ClassNotFoundException ignored) {}
         this.url = url;
         this.uname = uname;
         this.pwd = pwd;
