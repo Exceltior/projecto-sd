@@ -639,9 +639,9 @@ public class ServerClient implements Runnable {
         }
 
         if (userIdeas == null){
-            Common.sendMessage(Common.Message.ERR_IDEAS_NOT_FOUND,outStream);
-            System.out.println("Error");
-            return false;
+            if(!Common.sendMessage(Common.Message.ERR_IDEAS_NOT_FOUND,outStream))
+                return false;
+            return true;
         }
 
         else{
