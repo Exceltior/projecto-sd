@@ -97,7 +97,7 @@ public class Server {
 
 
         InetAddress inet = null;
-        //FIXME: RMI IP right here!
+        //FIXME: RMI IP right here! FIXME FIXME FIXME FIXME FIXME MUCHO
         try {
             inet = InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
