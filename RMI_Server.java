@@ -1251,9 +1251,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     ////
     private void insertData(String query, Connection conn) {
         System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
+        boolean cont;
 
-        boolean cont = false;
         do {
+            cont = false;
             try{
                 conn.createStatement().executeUpdate(query);
             }catch(SQLException s){
@@ -1431,7 +1432,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.120","1521","XE");
+            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");
