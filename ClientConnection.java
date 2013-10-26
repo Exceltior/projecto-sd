@@ -138,7 +138,8 @@ class ClientConnection {
         connect();
 
         if(this.loggedIn) {
-            notificationThread.stop(); //FIXME: proper way to kill!
+            notificationThread.stop(); //It's okay if this doesn't stop the thread because it will eventually die on
+                                        // its own
             //System.out.println("Estou logado");
             this.loggedIn = false;
 

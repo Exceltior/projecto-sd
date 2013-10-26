@@ -38,7 +38,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @param pass The plaintext password to be hashed.
      * @return The hashed password.
      */
-    //TODO: maybe change this
     private String hashPassword(String pass)
     {
         MessageDigest m = null;
@@ -278,15 +277,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         RandomAccessFile f;
         try {
             f = new RandomAccessFile(path, "rw");
-        } catch (FileNotFoundException e) {
-            return ; //FIXME: Should never happen
-        }
+        } catch (FileNotFoundException ignored) {return;}
 
         try {
             f.writeInt(lastFile);
-        } catch (IOException e) {
-            System.err.println("IO Exception while writing lastFile filefile!");
-        } finally {
+        } catch (IOException ignored) {}
+        finally {
             try { f.close(); } catch (IOException ignored) {}
         }
     }
@@ -318,7 +314,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public NetworkingFile getFile(int iid) throws RemoteException {
-        // FIXME: Joca, are we sure that iid is valid? Where is this being guaranteed?
         String query = "select path, OriginalFile from IdeiasFicheiros where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
         if ( queryResult.isEmpty() )
@@ -417,7 +412,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
         insertData(query);
         return ++num_ideas;
-        // FIXME: We were returning -1, do we still have a reson to do that, Joca?
     }
 
     private boolean ideaHasFiles(int iid) {
@@ -641,7 +635,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
-        // FIXME: Need to check if the user has shares or not here
+        if ( getSharesIdeaForUid(iid,uid) == null)
+            return false; // You have no shares!
         String query = "Update Shares set valor = " + price + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
@@ -661,7 +656,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
-        // FIXME: Need to check if the user has shares or not here
+        if ( getSharesIdeaForUid(iid,uid) == null)
+            return false; // You have no shares!
         String query = "Update Shares set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
@@ -710,8 +706,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
-        // FIXME: Are we sure we have valid ideas when we get here?
         ArrayList<Share> shares = new ArrayList<Share>();
+        if ( getIdeaByIID(iid) == null)
+            return shares;
         String query = "select * from Shares where iid="+iid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -730,7 +727,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
      * @throws RemoteException
      */
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
-        // FIXME: Are we sure we have valid ideas when we get here?
+        if ( getIdeaByIID(iid) == null)
+            return null;
         String query = "select * from Shares where iid="+iid+" and userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -861,7 +859,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         sortByPrice(shares);
 
         // We have sorted them by price per share, so the best options are first
-        // FIXME CHECK THIS
 
         for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
             Share s = shares.get(i1);
@@ -1276,11 +1273,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         try{
 
             connectionPool = new ConnectionPool(url, username, password);
-
-
-            //connect to database
-            //FIXME: Should this still be here? Should it be moved inside ConnectionPool? JOCA!
-            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Class.forName("oracle.jdbc.driver.OracleDriver"); //This could be moved to the connectionPool but we had
+                                                              // some issues so right now we're just praying that it
+                                                              // works.
 
             if (connectionPool == null) {
                 System.out.println("Failed to make connection!");
@@ -1431,8 +1426,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
+        String db = "192.168.56.120";
+        if ( args.length == 1)
+            db = args[0];
         try{
-            RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
+            RMI_Server servidor = new RMI_Server(db,"1521","XE");
             servidor.execute();
         }catch(RemoteException r){
             System.out.println("RemoteException on the main method of the RMI Server");
