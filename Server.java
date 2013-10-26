@@ -3,6 +3,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.rmi.RMISecurityManager;
 import java.util.ArrayList;
 
 public class Server {
@@ -219,6 +220,8 @@ public class Server {
     }
 
     static public void main(String[] args) throws IOException {
+        System.getProperties().put("java.security.policy", "security.policy");
+        System.setSecurityManager(new RMISecurityManager());
         Server server = new Server();
         server.execute(args);
     }

@@ -1,5 +1,6 @@
 import java.io.*;
 import java.math.BigInteger;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -1460,6 +1461,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     public static void main(String[] args) {
+        System.getProperties().put("java.security.policy", "security.policy");
+        System.setSecurityManager(new RMISecurityManager());
         try{
             RMI_Server servidor = new RMI_Server("192.168.56.101","1521","XE");
             servidor.execute();
