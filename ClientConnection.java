@@ -50,8 +50,8 @@ class ClientConnection {
         do {
             try {
                 currentHost = (currentHost+1) % hosts.length;
-                System.out.println(" Trying host " + currentHost + " - '" + hosts[currentHost] + "':" +
-                        ports[currentHost]);
+                //System.out.println(" Trying host " + currentHost + " - '" + hosts[currentHost] + "':" +
+                //        ports[currentHost]);
                 currentSocket = new Socket(hosts[currentHost], ports[currentHost]);
                 outStream = new DataOutputStream(currentSocket.getOutputStream());
                 inStream = new DataInputStream(currentSocket.getInputStream());
@@ -131,8 +131,8 @@ class ClientConnection {
      *                 2 if there is a need to send a message to the server; 3 if there was a problem during the login
      */
     private int reconnect() {
-        System.out.println(" Connection to " + currentHost + " - '" + hosts[currentHost] + "':" + ports[currentHost]
-                + " dropped, initiating reconnecting process...");
+       /* System.out.println(" Connection to " + currentHost + " - '" + hosts[currentHost] + "':" + ports[currentHost]
+                + " dropped, initiating reconnecting process...");*/
 
         currentHost--; //We do currentHost-- so that we retry the current host ONCE.
         connect();
@@ -745,7 +745,6 @@ class ClientConnection {
 
             //Receive Data Confirmation
             if ( (reply = Common.recvMessage(inStream)) != Common.Message.MSG_OK ){
-                System.err.println("Couldnt receive the file!");
                 return null;
             }
 
@@ -754,10 +753,8 @@ class ClientConnection {
                 objectStream = new ObjectInputStream(inStream);
                 ficheiro = (NetworkingFile) objectStream.readObject();
             }catch(ClassNotFoundException c){
-                System.err.println("Error while receiving file: Class Not Found");
                 return null;
             }catch(IOException i){
-                System.err.println("Error while receiving file: IO Exception");
                 return null;
             }
 

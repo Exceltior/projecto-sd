@@ -1122,8 +1122,8 @@ public class Client {
                 stay = false;
         }
 
-        //  Login was successfull
-        System.out.println("Login Successfull!");
+        //  Login was successful
+        System.out.println("Login Successful!");
 
         mainLoop();
     }
@@ -1298,7 +1298,7 @@ public class Client {
         }
 
         if (conn.setRelationBetweenIdeas(iidparent,iidchild,type))
-            System.out.println("Relationship between ideas successfully!");
+            System.out.println("Relationship between ideas successfuly!");
         else
             System.out.println("Relationship between ideas was not added");
     }
