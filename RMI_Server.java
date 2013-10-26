@@ -81,7 +81,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
         readLastFile();
         transactionQueue = new TransactionQueue(this);
-        new Thread(transactionQueue).start();
+        //new Thread(transactionQueue).start();
     }
 
     ////
@@ -883,6 +883,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
             Share s = shares.get(i1);
             System.out.println("processing share: " + s);
+            if ( s.getUid() == uid ) {
+                System.out.println("Skipping, its mine");
+                continue;
+            }
             int availShares = s.getAvailableShares();
             if (availShares > 0) { //Should always happen
                 System.out.println("ALready, available shares!: " + availShares);
@@ -900,7 +904,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                         break;
                     System.out.println("Will still try to buy " + toBuy);
                 }
-
+                System.out.println("Buying " + toBuy +" shares.");
                 sharesToBuy.add(s);
                 sharesToBuyNum.add(toBuy);
                 numShares -= toBuy;

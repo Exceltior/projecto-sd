@@ -2,16 +2,8 @@ import java.io.*;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class TransactionQueue extends OrderedTimestampQueue<Transaction> implements Runnable {
+public class TransactionQueue extends OrderedTimestampQueue<Transaction> {
     private RMI_Interface RMI;
-
-    private Boolean needCheck = false;
-
-    public void notifyNeedsCheck() {
-        synchronized (needCheck) {
-            needCheck = true;
-        }
-    }
 
     TransactionQueue(RMI_Interface RMI) {
         this.RMI = RMI;
@@ -76,10 +68,8 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> impleme
     synchronized void enqueue(Transaction t) {
         synchronized (queue) {
             super.enqueue(t);
-
-            queue.notify();
         }
-        notifyNeedsCheck();
+        checkQueue();
     }
 
     synchronized void dequeue(Transaction t) {
@@ -103,22 +93,11 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> impleme
                     continue;
                 }
 
-                if ( result )
+                if ( result ) {
                     queue.remove(0);
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-        for(;;) {
-            synchronized(needCheck) {
-
-                while ( !needCheck )
-                    try { needCheck.wait(); } catch (InterruptedException e) {}
-
-                checkQueue();
-                needCheck = false;
+                    i = 0; //Other shares might be changed by this
+                    writeFile();
+                }
             }
         }
     }
