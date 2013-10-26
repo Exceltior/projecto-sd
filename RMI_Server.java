@@ -686,8 +686,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public String[] getHistory(int uid) throws RemoteException{
         String[] history;
         String query = "Select t.comprador, t.vendedor, t.valor*t.numShares, t.valor, " +
-                "t.numShares, i.titulo from Transacoes t, Ideias i " +
-                "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid";
+                "t.numShares, i.titulo, t.data from Transacoes t, Ideias i " +
+                "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid order by t.data";
 
         ArrayList<String[]> queryResult = receiveData(query);
 
@@ -703,7 +703,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                     " " +
                 "shares from " + "ID "
                     + queryResult.get(i)[1] + " at " + queryResult.get(i)[3] + " DEI Coins per share, " +
-                    "for a total of " + queryResult.get(i)[2] + " DEI Coins";
+                    "for a total of " + queryResult.get(i)[2] + " DEI Coins. Transaction date: " + queryResult.get(i)[6];
 
         return  history;
     }
