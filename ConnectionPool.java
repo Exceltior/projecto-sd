@@ -34,7 +34,7 @@ public class ConnectionPool {
 
 
     public synchronized Connection checkOutConnection() throws SQLException {
-        Connection newConnection = null;
+        Connection newConnection;
 
         if (connections.size() == 0) {
             newConnection = getConnection();

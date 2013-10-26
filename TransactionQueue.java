@@ -18,7 +18,7 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> {
                 return;
             }
 
-            int size = 0;
+            int size;
             try {
                 size = in.readInt();
             } catch (IOException e) {
