@@ -220,9 +220,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     }
 
-    ////
-    //  Method responsile for insering a new user in the database
-    ////
+    /**
+     *  Method responsible for insering a new user in the database
+     * @param user Username
+     * @param pass Password
+     * @param email User's email address
+     * @param date Date of the registration
+     * @return  Boolean value, indicating if the operation went well
+     * @throws RemoteException
+     */
     synchronized public boolean register(String user, String pass, String email, String date) throws RemoteException {
         if (! validateData(user)){
             System.err.println("O validate data devolveu false");
@@ -559,6 +565,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
                     devolve.add(temp);
                 }
                 else{
+                    System.out.println("AQUI " + index);
                    devolve.get(index).addSharesToBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
                 }
             }
@@ -983,21 +990,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
 
     }
 
-
+    /**
+     * Method responsible for registering a transaction in the database
+     * @param uidBuyer Id of the user who bought shares
+     * @param uidSeller Id of the user who sold shares
+     * @param nshares  Number of shares involved in the transaction
+     * @param price  Price of the shares bought
+     * @param conn  Connection to the RMI Server
+     * @param iid Id of the idea whose shares were involved in the transaction
+     */
     synchronized private void insertIntoHistory(int uidBuyer, int uidSeller, int nshares, int price, Connection conn,
                                                 int iid) {
-
-        //  First we are going to extract the system date, and them we are going to add it to the query. It appears to have
-        //  to be like this, ORACLE SQL is a very good one, and does not allow us to select sysdate inside a query...
-        String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
+        Date transactionDate = new Date();
         String query = "insert into Transacoes values(" + (num_transactions+1) + "," + uidBuyer + "," + uidSeller + "," + price
-                + "," + nshares + "," + iid ;
-        ArrayList<String[]> queryDataResult;
-        queryDataResult = receiveData(queryData, conn);
+                + "," + nshares + "," + iid,  sDate = format1.format(transactionDate);
 
-        System.out.println("AQUI " + queryDataResult);
-
-        query = query + ", to_date('" + queryDataResult.get(0)[0] + "','yyyy:mm:dd:hh:mi:ss'))";
+        query = query + ", to_date('" +  sDate + "','yyyy:mm:dd:hh24:mi:ss'))";
         if ( conn == null )
             insertData(query);
         else
@@ -1006,19 +1015,20 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     }
 
     /**
-     * Mehtod responsible for updating the time when the user was logged in
+     * Method responsible for updating the time when the user was logged in
      *
      * @param uid The id of the user
      * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
      */
     public void updateUserTime(int uid) throws RemoteException{
-        String queryData = "Select to_char(sysdate, 'yyyy:mm:dd:hh:mi:ss') from dual";
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
+        Date transactionDate = new Date();
+        String sDate= format1.format(transactionDate), queryData;
         ArrayList<String[]> queryDataResult;
 
-        queryDataResult = receiveData(queryData);
-        queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + queryDataResult.get(0)[0] +
-                "','yyyy:mm:dd:hh:mi:ss') where userid = " + uid;
+        queryData = "Update Utilizadores set dataUltimoLogin = to_date('" + sDate +
+                "','yyyy:mm:dd:hh24:mi:ss') where userid = " + uid;
         insertData(queryData);
     }
 

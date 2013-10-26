@@ -726,20 +726,28 @@ public class Client {
     private boolean setPriceShares(ArrayList<Integer> listUserIdeasIDs){
         int iid = -1, price = -1;
         String line, line2;
+        boolean stay;
 
         //Ask which idea we would like to set the shares' prices
         do{
             System.out.println("Please insert the id of the idea you would like to see the shares' prices:");
             line = sc.nextLine();
-            System.out.println("Please insert the new price per share you would like to set:");
-            line2 = sc.nextLine();
-            try{
-                iid = Integer.parseInt(line);
-                price = Integer.parseInt(line2);
-            }catch(NumberFormatException n){
-                System.out.println("Invalid input!");
-                iid = -1;
-            }
+            do{
+                stay = false;
+                System.out.println("Please insert the new price per share you would like to set:");
+                line2 = sc.nextLine();
+                try{
+                    iid = Integer.parseInt(line);
+                    price = Integer.parseInt(line2);
+                    if (price < 0){
+                        System.out.println("Invalid input! Price cannot be a negative number!");
+                        stay = true;
+                    }
+                }catch(NumberFormatException n){
+                    System.out.println("Invalid input!");
+                    iid = -1;
+                }
+            }while (stay);
         }while(!listUserIdeasIDs.contains(iid));
 
         return conn.setPriceShares(iid,price);
