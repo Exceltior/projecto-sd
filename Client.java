@@ -942,6 +942,11 @@ public class Client {
         //Display user ideas
         listIdeas = conn.getIdeasFromUser();
 
+        if ( listIdeas == null ) {
+            System.out.println("\n\nNo ideas!");
+            return ;
+        }
+
         System.out.println("\n\nUser Ideas List:");
         for (int i=0;i<listIdeas.length;i++){
             System.out.println(listIdeas[i]);
