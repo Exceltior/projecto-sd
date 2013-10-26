@@ -37,18 +37,19 @@ public class Client {
     //  Method responsible for collecting the information needed to create a new topic, and send a request to the TCP Server
     //  in order to create that new topic in the database
     ////
-    private boolean createTopic(){
+    private void createTopic(){
         String nome, descricao;
         boolean repeat;
 
         do{
             repeat = false;
-            System.out.println("Please enter the name of the topic:");
+            System.out.println("Please enter the name of the topic: (If you want to go back please enter -1)");
             nome = sc.nextLine();
             if (nome.equals("")){
                 System.out.println("Invalid input!");
                 repeat = true;
-            }
+            }else if (nome.equals("-1"))
+               return;
         }while (repeat);
 
         repeat = false;
@@ -61,7 +62,10 @@ public class Client {
             }
         }while (repeat);
 
-        return conn.createTopic(nome,descricao);
+        if (conn.createTopic(nome,descricao))
+            System.out.println("Topic created with success!");
+        else
+            System.out.println("Error while creating the topic! Topic already exists!");
     }
 
     ////
@@ -313,11 +317,15 @@ public class Client {
 
         do{
             repeat = false;
-            System.out.println("Please enter the id of the idea you want to search. If you don't know the idea id just press 'ENTER'");
+            System.out.println("Please enter the id of the idea you want to search." +
+                    "If you don't know the idea id just press 'ENTER'." +
+                    "If you want to go back please enter -1");
             temp = sc.nextLine();
 
-            //if the user pressed the enter key then we just ignore the topic id
-            if (!temp.equals("")){
+            if (temp.equals("-1"))
+                return ;
+
+            else if (!temp.equals("")){
                 try{
                     iid = Integer.parseInt(temp);
                 } catch(NumberFormatException n){
@@ -367,11 +375,14 @@ public class Client {
 
         do{
             repeat = false;
-            System.out.println("Please enter the id of the topic you want to search. If you don't know the topic id just press 'ENTER'");
+            System.out.println("Please enter the id of the topic you want to search." +
+                    "If you don't know the topic id just press 'ENTER'." +
+                    "If you want to go back please enter -1");
             temp = sc.nextLine();
 
-            //if the user pressed the enter key then we just ignore the topic id
-            if (!temp.equals("")){
+            if (temp.equals("-1"))
+                return;
+            else if (!temp.equals("")){
                 try{
                     tid = Integer.parseInt(temp);
                 } catch(NumberFormatException n){
@@ -439,12 +450,13 @@ public class Client {
 
         do{
             repeat = false;
-            System.out.println("Please enter the title of the idea:");
+            System.out.println("Please enter the title of the idea: (If you want to go back please enter -1)");
             title = sc.nextLine();
             if (title.equals("")){
                 System.out.println("Invalid input!");
                 repeat = true;
-            }
+            }else if (title.equals("-1"))
+                return false;
         }while (repeat);
 
         do{
@@ -687,7 +699,7 @@ public class Client {
                     repeat = true;
                 }
             }
-            else if(!file.equals("N") && file.equals("n")){
+            else if( !(file.equals("N") || file.equals("n")) ){
                 repeat = true;
                 System.out.println("Invalid input");
             }
@@ -1133,7 +1145,7 @@ public class Client {
 
         do{
             repeat = false;
-            System.out.println("Please insert the id of the idea you want to delete:");
+            System.out.println("Please insert the id of the idea you want to delete: (If you want to go back please enter -1)");
             line = sc.nextLine();
             try{
                 iid = Integer.parseInt(line);
@@ -1142,6 +1154,9 @@ public class Client {
                 repeat = true;
             }
         }while (repeat);
+
+        if (iid == -1)
+            return ;
 
         conn.deleteIdea(iid);
     }
@@ -1260,7 +1275,7 @@ public class Client {
         boolean repeat = true;
 
         while (repeat){
-            System.out.println("Please select the id for the first idea in the relationship:");
+            System.out.println("Please select the id for the first idea in the relationship: (If you want to go back enter -1)");
             try{
                 line = sc.nextLine();
                 iidparent = Integer.parseInt(line);
@@ -1268,6 +1283,10 @@ public class Client {
                 System.out.println("Invalid input!");
                 continue;
             }
+
+            if (iidparent == -1)
+                return;
+
             System.out.println("Please select the id for the second idea in the relationship:");
             try{
                 line = sc.nextLine();
@@ -1320,10 +1339,12 @@ public class Client {
         //Pedir ao user que ideias quer comprar
         do{
             repeat = false;
-            System.out.println("Please insert the id of the idea whose shares you want to buy:");
+            System.out.println("Please insert the id of the idea whose shares you want to buy: (If you want to go back please enter -1");
             line = sc.nextLine();
             try{
                 iid = Integer.parseInt(line);
+                if (iid == -1)
+                    return false;
                 index = hasElement(canBuyIdeas,iid);
                 if (iid < 1 || index == -1){
                     System.out.println("Invalid option!");
@@ -1418,8 +1439,7 @@ public class Client {
 
                 //Create a new topic
                 case 2:{
-                    if (!createTopic())
-                        System.out.println("Error while creating a topic! Topic already exists");
+                    createTopic();
                     break;
                 }
                 //Submit an idea
