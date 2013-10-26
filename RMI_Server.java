@@ -566,11 +566,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
         Idea[] devolve;
 
         if (iid != -1 && !title.equals(""))
-            query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid +" and i.titulo = '" + title + "'";
+            query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid +" and i.titulo LIKE '%" + title + "%'";
         else if(iid != -1)
             query = "Select * from Ideias i where i.activa = 1 and i.iid = " + iid;
         else if (!title.equals(""))
-            query = "Select * from Ideias i where i.activa = 1 and i.titulo = '" + title + "'";
+            query = "Select * from Ideias i where i.activa = 1 and i.titulo LIKE '%" + title + "%'";
         else
             return null;
 
@@ -607,12 +607,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface{
     public ServerTopic getTopic(int tid, String name) throws RemoteException{
         String query;
 
-        if (tid != -1 && !name.equals(""))
-            query = "Select * from Topicos t where t.nome = '" + name +"' and t.tid = " + tid;
-        else if(tid != -1)
+        if (tid != -2 && !name.equals(""))
+            query = "Select * from Topicos t where t.nome LIKE '%" + name +"%' and t.tid = " + tid;
+        else if(tid != -2)
             query = "Select * from Topicos t where t.tid = " + tid;
         else if (!name.equals(""))
-            query = "Select * from Topicos t where t.nome = '" + name;
+            query = "Select * from Topicos t where t.nome LIKE '%" + name + "%'";
         else
             return null;
 

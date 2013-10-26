@@ -1255,6 +1255,8 @@ public class Client {
                 selected = Integer.parseInt(line);
             }catch(InputMismatchException m){
                 selected = -1;
+            }catch(NumberFormatException n){
+                selected = -1;
             }
         }while (selected < min_id_topic || selected > max_id_topic);
         return selected;
