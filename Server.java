@@ -220,7 +220,7 @@ public class Server {
     }
 
     static public void main(String[] args) throws IOException {
-        System.getProperties().put("java.security.policy", "security.policy");
+        System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
         Server server = new Server();
         server.execute(args);
