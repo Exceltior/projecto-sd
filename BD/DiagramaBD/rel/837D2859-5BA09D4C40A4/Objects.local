@@ -1,20 +1,20 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <oracle.dbtools.crest.model.design.relational.RelationalDesign>
    <object objectType="SchemaObject" objectID="49FFD249-77E3-E2AB-8D93-5765A5AA0C29" name="SD" seqName="seg_0"/>
-   <object objectType="Table" objectID="AFECF2F0-3655-9983-2260-8FE386F9E8D0" name="TRANSACOES" seqName="seg_0"/>
-   <object objectType="Table" objectID="3C3418D4-2514-3215-9C61-C5C198150E91" name="SHARES" seqName="seg_0"/>
+   <object objectType="Table" objectID="38FD7BFE-0441-F11E-5D5E-12F9FE52B9B1" name="IDEIAS" seqName="seg_0"/>
    <object objectType="Table" objectID="48E1AC4B-90AB-6F11-1E19-18AAEBDDA044" name="IDEIASFICHEIROS" seqName="seg_0"/>
+   <object objectType="Table" objectID="3C3418D4-2514-3215-9C61-C5C198150E91" name="SHARES" seqName="seg_0"/>
    <object objectType="Table" objectID="2C755563-6BA6-E130-CB7E-4D83F08323D9" name="TOPICOS" seqName="seg_0"/>
    <object objectType="Table" objectID="F4517C4D-0649-6080-C276-F1EF5460C122" name="TOPICOSIDEIAS" seqName="seg_0"/>
-   <object objectType="Table" objectID="38FD7BFE-0441-F11E-5D5E-12F9FE52B9B1" name="IDEIAS" seqName="seg_0"/>
+   <object objectType="Table" objectID="AFECF2F0-3655-9983-2260-8FE386F9E8D0" name="TRANSACOES" seqName="seg_0"/>
    <object objectType="Table" objectID="33B773B1-D616-7D3A-6512-84200261722E" name="UTILIZADORES" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="F07BDEDE-54C2-CBC3-1B65-504D5D6CE044" name="TOPICOS_TOPICOS_FK" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="C9D86BC5-CE3B-9C56-BD34-79DE2D304B5D" name="TOPICOSIDEIAS_TOPICOS_FK" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="D6D7181B-5D9D-1487-A28B-1F7B12D25DED" name="TOPICOSIDEIAS_IDEIAS_FK" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="6CC98387-DF56-DF53-77EC-CC4B1A331827" name="TRANSACOES_UTILIZADORES_FK" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="BBB9C95B-5D08-37D2-DCD1-757D80ADDF53" name="USERID" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="D72A1E35-3E1D-0373-BC36-284707807F55" name="SHARES_UTILIZADORES_FK" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="002B0007-5A26-BA63-2A1C-CA599EAB8CA3" name="TRANSACOES_UTILIZADORES_FKV2" seqName="seg_0"/>
-   <object objectType="FKIndexAssociation" objectID="067EE5C0-E757-C87F-5277-11566D5D8898" name="SHARES_IDEIAS_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="D8004D6D-95D4-8D64-634C-3B2DE88E0E9C" name="IDEIASFICHEIROS_IDEIAS_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="067EE5C0-E757-C87F-5277-11566D5D8898" name="SHARES_IDEIAS_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="D72A1E35-3E1D-0373-BC36-284707807F55" name="SHARES_UTILIZADORES_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="D6D7181B-5D9D-1487-A28B-1F7B12D25DED" name="TOPICOSIDEIAS_IDEIAS_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="C9D86BC5-CE3B-9C56-BD34-79DE2D304B5D" name="TOPICOSIDEIAS_TOPICOS_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="F07BDEDE-54C2-CBC3-1B65-504D5D6CE044" name="TOPICOS_TOPICOS_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="6CC98387-DF56-DF53-77EC-CC4B1A331827" name="TRANSACOES_UTILIZADORES_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="002B0007-5A26-BA63-2A1C-CA599EAB8CA3" name="TRANSACOES_UTILIZADORES_FKV2" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="BBB9C95B-5D08-37D2-DCD1-757D80ADDF53" name="USERID" seqName="seg_0"/>
 </oracle.dbtools.crest.model.design.relational.RelationalDesign>
