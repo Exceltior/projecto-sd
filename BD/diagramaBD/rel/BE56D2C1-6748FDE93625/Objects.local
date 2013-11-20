@@ -1,0 +1,19 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<oracle.dbtools.crest.model.design.relational.RelationalDesign>
+   <object objectType="Table" objectID="B73AF495-753C-8405-26C3-0E9C773F32EA" name="Ideia" seqName="seg_0"/>
+   <object objectType="Table" objectID="EF322131-413D-AD7E-E303-D9D38C35FA93" name="IdeiaFicheiro" seqName="seg_0"/>
+   <object objectType="Table" objectID="1BB9B66C-E5E9-72D7-1574-B16103E6A96D" name="Share" seqName="seg_0"/>
+   <object objectType="Table" objectID="67339D9B-6D23-A9A6-2226-8431A09AD966" name="Topico" seqName="seg_0"/>
+   <object objectType="Table" objectID="D24492B5-E4CC-C027-FA1C-D22013DF7C27" name="TopicoIdeia" seqName="seg_0"/>
+   <object objectType="Table" objectID="63C814E4-6EDF-E6F3-BD77-03D60976F026" name="Transacao" seqName="seg_0"/>
+   <object objectType="Table" objectID="668C6582-522C-BE32-A03E-D96083C0417E" name="Utilizador" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="25939318-8DCC-E7B9-7E24-B789074F15B4" name="Transacao_Ideia_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="A91F546C-4D85-6D61-2B59-FA50807D7EA6" name="IdeiaFicheiro_Ideia_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="9F12C6A5-A4FD-66FB-FD51-9CBADB96426E" name="Share_Ideia_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="3A928FCB-125B-9735-4EFA-D2A5F5FC2A48" name="Share_Utilizador_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="37D9F2BF-6D69-9487-9663-C0A27AAF0DB4" name="TABLE_12_Utilizador_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="5C67DECA-6961-7D3F-C7FF-42C616165C56" name="TopicoIdeia_Ideia_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="570FB010-17F5-BC04-5550-DE51D076B3A1" name="TopicoIdeia_Topico_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="93EE3826-4C62-4D87-9863-0403DE834B19" name="Transacao_Utilizador_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="F57E9528-5767-2482-AD5F-F7C55E5C2B22" name="Transacao_Utilizador_FKv2" seqName="seg_0"/>
+</oracle.dbtools.crest.model.design.relational.RelationalDesign>

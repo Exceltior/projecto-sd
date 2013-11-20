@@ -1,7 +1,7 @@
-drop table Transacoes;
-drop table TopicosIdeias;
-drop table Shares;
-drop table IdeiasFicheiros;
-drop table Ideias;
-drop table Topicos;
-drop table Utilizadores;
+drop table Transacao;
+drop table TopicoIdeia;
+drop table Share;
+drop table IdeiaFicheiro;
+drop table Ideia;
+drop table Topico;
+drop table Utilizador;
