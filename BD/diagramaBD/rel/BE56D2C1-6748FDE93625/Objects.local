@@ -1,5 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <oracle.dbtools.crest.model.design.relational.RelationalDesign>
+   <object objectType="Table" objectID="9CA12B95-DDB7-C1A2-BD4F-A9D1FB3ECEE6" name="HallFame" seqName="seg_0"/>
    <object objectType="Table" objectID="B73AF495-753C-8405-26C3-0E9C773F32EA" name="Ideia" seqName="seg_0"/>
    <object objectType="Table" objectID="EF322131-413D-AD7E-E303-D9D38C35FA93" name="IdeiaFicheiro" seqName="seg_0"/>
    <object objectType="Table" objectID="1BB9B66C-E5E9-72D7-1574-B16103E6A96D" name="Share" seqName="seg_0"/>
@@ -7,6 +8,7 @@
    <object objectType="Table" objectID="D24492B5-E4CC-C027-FA1C-D22013DF7C27" name="TopicoIdeia" seqName="seg_0"/>
    <object objectType="Table" objectID="63C814E4-6EDF-E6F3-BD77-03D60976F026" name="Transacao" seqName="seg_0"/>
    <object objectType="Table" objectID="668C6582-522C-BE32-A03E-D96083C0417E" name="Utilizador" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="CD17FA72-EC44-BFEC-95B8-364CB760DEB4" name="TABLE_10_Ideia_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="A91F546C-4D85-6D61-2B59-FA50807D7EA6" name="IdeiaFicheiro_Ideia_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="9F12C6A5-A4FD-66FB-FD51-9CBADB96426E" name="Share_Ideia_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="3A928FCB-125B-9735-4EFA-D2A5F5FC2A48" name="Share_Utilizador_FK" seqName="seg_0"/>
