@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <html>
 <head>
     <title></title>
@@ -18,5 +19,10 @@
     &nbsp;</p>
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
+
+<h2>
+    <s:property value="email" />
+</h2>
+
 </body>
 </html>
