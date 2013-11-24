@@ -1,0 +1,74 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="BC66B273-95F8-C0E4-1FD9-FB34422E639F" name="IdeiaWatchList">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 15:17:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="userid" id="8885AE93-7C8F-CAB0-2C15-85F6A201C431">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 15:17:51 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="77788032-E203-6D9A-0E9C-2D61A49CFE7B" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</associations>
+</Column>
+<Column name="iid" id="66F54007-0222-EDCE-5B05-A373EDA719FE">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 15:17:51 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>19C0A9E5-DAF8-1971-58ED-D56AE461827D</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="BE919961-C269-B456-D31F-BEB5DF542BF1" referredColumn="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="7B48E5E0-8D31-2840-4CAB-FC65E3B684F7" name="IdeiaWatchList_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 15:17:51 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8885AE93-7C8F-CAB0-2C15-85F6A201C431"/>
+<colUsage columnID="66F54007-0222-EDCE-5B05-A373EDA719FE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="DF910DC5-6E4C-2533-9F33-F1DD5B39D648" name="IdeiaWatchList_Utilizador_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 15:18:07 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8885AE93-7C8F-CAB0-2C15-85F6A201C431"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3CC566A7-DBDE-F5CE-7C8E-70E366CF42BC" name="IdeiaWatchList_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 15:18:07 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="66F54007-0222-EDCE-5B05-A373EDA719FE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

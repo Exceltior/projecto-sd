@@ -1,0 +1,94 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="668C6582-522C-BE32-A03E-D96083C0417E" name="Utilizador">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:29:52 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="userid" id="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="email" id="90AC3722-D4F1-CCD6-DDC6-43F3E439B0D5">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="username" id="A0F67D27-B4B7-DACC-B5D2-9D438547793D">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="pass" id="320E3DC0-5C60-3563-C158-F1CB1CCEEEEE">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="dinheiro" id="E02F0E9C-FA50-9D50-A42F-1406EAC404A3">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="dataregisto" id="8E648EF5-E43D-A3A7-CC46-74F88211DE28">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="dataultimologin" id="E7B5095A-0ECD-0C31-E5BA-8E18F69B95F3">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="F762AB3C-5170-F46D-4D9D-50E46D240F3E" name="Utilizador_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:39 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

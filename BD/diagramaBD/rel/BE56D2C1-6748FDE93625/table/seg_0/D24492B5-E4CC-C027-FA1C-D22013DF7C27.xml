@@ -1,0 +1,74 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D24492B5-E4CC-C027-FA1C-D22013DF7C27" name="TopicoIdeia">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:29:12 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="tid" id="D630B2CA-9DB1-763A-B919-4013D8A7728C">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:29:44 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>658942E6-6E63-CE6F-7B06-55AB036690D0</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="570FB010-17F5-BC04-5550-DE51D076B3A1" referredColumn="658942E6-6E63-CE6F-7B06-55AB036690D0"/>
+</associations>
+</Column>
+<Column name="iid" id="891FEE73-E430-635F-E742-19EC2CEA480E">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:29:44 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>19C0A9E5-DAF8-1971-58ED-D56AE461827D</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5C67DECA-6961-7D3F-C7FF-42C616165C56" referredColumn="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="2CD178B6-D0F2-1F4B-4875-E7998AC9E920" name="TopicoIdeia_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:29:44 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D630B2CA-9DB1-763A-B919-4013D8A7728C"/>
+<colUsage columnID="891FEE73-E430-635F-E742-19EC2CEA480E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3E33BE6D-F036-E05B-8994-EEE9DA0121CB" name="TopicoIdeia_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:37:05 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="891FEE73-E430-635F-E742-19EC2CEA480E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="1787CE4F-60C0-DE65-8ADF-49D24BC0AA9C" name="TopicoIdeia_Topico_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:37:05 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D630B2CA-9DB1-763A-B919-4013D8A7728C"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

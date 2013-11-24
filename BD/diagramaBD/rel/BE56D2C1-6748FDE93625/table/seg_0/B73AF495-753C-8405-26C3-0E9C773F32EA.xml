@@ -1,0 +1,110 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="B73AF495-753C-8405-26C3-0E9C773F32EA" name="Ideia">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:12 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="iid" id="19C0A9E5-DAF8-1971-58ED-D56AE461827D">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:26:03 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="titulo" id="9DE096B0-33AC-C499-C5A0-57E1EC12EF0A">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:26:03 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>80</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="descricao" id="09738B24-11AA-4CC6-6306-CC1D80D9BB0A">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:26:03 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>10000</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="userid" id="BB29EAF7-B546-0E81-9B2F-E56EACD6E6B3">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:26:40 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="activa" id="8D201D36-E3D5-A780-1AFA-EF03C3281FF8">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:26:40 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>1</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="path" id="DE7DD566-B021-E4EF-AE15-E99F09A83DD4">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 16:37:38 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>70</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="originalfile" id="E03803A4-2B55-6C39-F65F-67359D80AF32">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 16:37:54 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ultimatransacao" id="E28820D6-4EA6-CC77-C8B1-21BA01BE1E2C">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 16:47:04 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="5541DFFC-870A-8B58-06BF-5D642D6C03FF" name="Ideia_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:26:03 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

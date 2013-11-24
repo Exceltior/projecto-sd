@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="CD17FA72-EC44-BFEC-95B8-364CB760DEB4" name="TABLE_10_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:29:14 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<containerWithKeyObject>9CA12B95-DDB7-C1A2-BD4F-A9D1FB3ECEE6</containerWithKeyObject>
+<deleteRule>NO ACTION</deleteRule>
+<localFKIndex>94802C00-ADED-4516-1418-33FCEFD2718C</localFKIndex>
+<keyObject>5541DFFC-870A-8B58-06BF-5D642D6C03FF</keyObject>
+<mandatory>true</mandatory>
+<transferable>true</transferable>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

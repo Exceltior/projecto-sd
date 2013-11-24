@@ -28,7 +28,7 @@
 </table>
 <div style="text-align: center;">
     <span  style="text-align: center;">
-        <img src="<s:url value="/images/poke.JPG"/>"  alt="POKEMON @ FIGUEIRA!" />
+        <img src="<s:url value="/images/minions.gif"/>"  alt="POKEMON @ FIGUEIRA!" />
     <s:form action="login">
 
         <s:textfield name="username" label="Username" />

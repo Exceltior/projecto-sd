@@ -1,0 +1,140 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="63C814E4-6EDF-E6F3-BD77-03D60976F026" name="Transacao">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:53 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="transactionid" id="7909D2E8-EFD3-138D-D8DF-F7AE809CD376">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="comprador" id="B29AC09E-1E53-14A8-5B8E-CCFF1772E4E5">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="93EE3826-4C62-4D87-9863-0403DE834B19" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</associations>
+</Column>
+<Column name="vendedor" id="DC77DA2E-97C2-B867-1516-BD0BB5E2F12F">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="F57E9528-5767-2482-AD5F-F7C55E5C2B22" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</associations>
+</Column>
+<Column name="valor" id="EFEFDCEA-7F04-0693-6011-C8CB1F154E66">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="numshares" id="40E1B1BC-14C8-B3EA-C58D-DFE11797951D">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="iid" id="6E2DA0E2-1547-0C79-BF8A-34528873EEAC">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>19C0A9E5-DAF8-1971-58ED-D56AE461827D</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="25939318-8DCC-E7B9-7E24-B789074F15B4" referredColumn="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</associations>
+</Column>
+<Column name="data" id="117E8F63-69C9-57C7-F4AF-678847835AF3">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="589190B3-4399-EF23-66AE-7F7D5E774C3D" name="Transacao_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:33:41 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7909D2E8-EFD3-138D-D8DF-F7AE809CD376"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C2BCC396-7388-47C8-696E-8BEF8685CCC3" name="Transacao_Utilizador_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:37:48 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B29AC09E-1E53-14A8-5B8E-CCFF1772E4E5"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AB6B6A4A-A4FB-7CDA-1ADF-167F395B6402" name="Transacao_Utilizador_FKv2">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:37:48 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DC77DA2E-97C2-B867-1516-BD0BB5E2F12F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="63F1762C-FD28-B4FA-0B8F-441745329B52" name="Transacao_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:37:48 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6E2DA0E2-1547-0C79-BF8A-34528873EEAC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

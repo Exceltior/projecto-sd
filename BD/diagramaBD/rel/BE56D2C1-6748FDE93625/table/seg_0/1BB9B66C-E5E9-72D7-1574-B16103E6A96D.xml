@@ -1,0 +1,110 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="1BB9B66C-E5E9-72D7-1574-B16103E6A96D" name="Share">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:23:01 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="iid" id="6FC32DEF-0003-63DB-A1A6-3AADC55CFB3E">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>19C0A9E5-DAF8-1971-58ED-D56AE461827D</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9F12C6A5-A4FD-66FB-FD51-9CBADB96426E" referredColumn="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</associations>
+</Column>
+<Column name="userid" id="E776FAF0-4BE2-8E9B-0351-08E3FB2789DA">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="3A928FCB-125B-9735-4EFA-D2A5F5FC2A48" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</associations>
+</Column>
+<Column name="numshares" id="906FB1A5-305C-D8DC-0D4D-0BB0F8C7FF94">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="valor" id="D51A2353-876B-6AF3-ABE2-5F081F2CCDD9">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="nummin" id="18D640A6-EB31-FFF9-37EC-34D3572CA35D">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="534C5910-FB0D-E82B-58D3-8A8D685465A7" name="Share_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:25:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6FC32DEF-0003-63DB-A1A6-3AADC55CFB3E"/>
+<colUsage columnID="E776FAF0-4BE2-8E9B-0351-08E3FB2789DA"/>
+<colUsage columnID="D51A2353-876B-6AF3-ABE2-5F081F2CCDD9"/>
+<colUsage columnID="906FB1A5-305C-D8DC-0D4D-0BB0F8C7FF94"/>
+<colUsage columnID="18D640A6-EB31-FFF9-37EC-34D3572CA35D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="66352984-F46B-D009-24FB-D9EE317DA7F8" name="Share_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:27:45 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="6FC32DEF-0003-63DB-A1A6-3AADC55CFB3E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7340D56B-BDED-47D1-EE91-68B5720DCC3D" name="Share_Utilizador_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:31:52 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E776FAF0-4BE2-8E9B-0351-08E3FB2789DA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

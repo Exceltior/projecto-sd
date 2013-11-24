@@ -9,14 +9,12 @@
 
     <package name="basicstruts2" extends="struts-default">
 
+        <!-- Quando acedem a /, isto é, aao root, redireccionar para o login FIXME: Isto vai mudar no futuro-->
         <action name="">
             <result type="redirect">login.jsp</result>
         </action>
 
-        <action name="index">
-            <result type="redirect">login</result>
-        </action>
-
+        <!-- A acção de login (de notar que é bem distinta de um acesso ao login.jsp -->
         <action name="login" class="org.apache.struts.action.controller.LoginAction" method="execute">
                 <result name="success">/home.jsp</result>
         </action>

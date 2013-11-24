@@ -19,7 +19,7 @@ public class LoginAction extends ActionSupport implements SessionAware {
     }
 
     public String execute() throws Exception {
-        // TODO: Login
+        // TODO: Login e guardar na sessão
         return SUCCESS;
     }
 

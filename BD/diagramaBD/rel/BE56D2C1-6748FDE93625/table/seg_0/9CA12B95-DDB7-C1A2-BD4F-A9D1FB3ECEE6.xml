@@ -1,0 +1,59 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="9CA12B95-DDB7-C1A2-BD4F-A9D1FB3ECEE6" name="HallFame">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:28:40 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="hfid" id="09A97581-437A-BA98-1233-F7713327C2F3">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:29:14 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="iid" id="D9B8C31A-8720-2FA9-1BF4-2DDBFC74EDD2">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:29:14 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>19C0A9E5-DAF8-1971-58ED-D56AE461827D</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="CD17FA72-EC44-BFEC-95B8-364CB760DEB4" referredColumn="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="2D6C3AC5-780C-3E2A-1A82-77191AB9DC4D" name="HallFame_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:29:14 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="09A97581-437A-BA98-1233-F7713327C2F3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="94802C00-ADED-4516-1418-33FCEFD2718C" name="TABLE_10_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:29:14 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D9B8C31A-8720-2FA9-1BF4-2DDBFC74EDD2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,90 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="67339D9B-6D23-A9A6-2226-8431A09AD966" name="Topico">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:35:22 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="tid" id="658942E6-6E63-CE6F-7B06-55AB036690D0">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:36:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="nome" id="0DB453C3-87CF-76DD-9475-D4160A2C0753">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:36:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="descricao" id="46777595-8402-6D0B-F864-53943135EE75">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:36:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="userid" id="71036471-1562-9E28-C2E0-CCDCE3310926">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:36:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="37D9F2BF-6D69-9487-9663-C0A27AAF0DB4" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</associations>
+</Column>
+<Column name="activo" id="8C90E154-BDB7-327F-FF84-11552C59B62B">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-22 00:26:16 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>1</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A7EFFEA9-BDD9-9B45-D8E5-28CD4185753B" name="Topico_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:36:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="658942E6-6E63-CE6F-7B06-55AB036690D0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="5D7725C0-46A9-E008-120F-4843BA91E40D" name="TABLE_12_Utilizador_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-11-20 22:36:21 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="71036471-1562-9E28-C2E0-CCDCE3310926"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
