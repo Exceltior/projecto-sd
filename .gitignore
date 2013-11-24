@@ -1,12 +1,8 @@
 
 *.class
 
-*.iml
+projecto-sd.iml
+.idea/*
 
-*.xml
-
-.idea/.name
-
-requests.bin
 
 *.bin
