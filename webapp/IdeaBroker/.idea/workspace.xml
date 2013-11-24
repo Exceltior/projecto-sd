@@ -12,7 +12,7 @@
     <file path="/HelloWorldAction.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385256528115" ignored="false" />
     <file path="/Client.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385256067360" ignored="false" />
     <file path="/LoginAction.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385262466030" ignored="false" />
-    <file path="/login.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385326015109" ignored="false" />
+    <file path="/login.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385328776956" ignored="false" />
     <file path="/struts.xml" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385262450824" ignored="false" />
     <file path="/home.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385260803228" ignored="false" />
     <file path="/web.xml" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385261152025" ignored="false" />
@@ -97,7 +97,7 @@
       <file leaf-file-name="LoginAction.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="42" selection-start="666" selection-end="666" vertical-scroll-proportion="0.0">
+            <state line="3" column="51" selection-start="143" selection-end="143" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -115,7 +115,7 @@
       <file leaf-file-name="login.jsp" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/login.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="51" selection-start="974" selection-end="974" vertical-scroll-proportion="0.22972973">
+            <state line="13" column="28" selection-start="413" selection-end="413" vertical-scroll-proportion="-0.2027027">
               <folding />
             </state>
           </provider>
@@ -172,8 +172,8 @@
         <option value="$PROJECT_DIR$/src/main/webapp/home.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/src/main/resources/struts.xml" />
-        <option value="$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java" />
         <option value="$PROJECT_DIR$/src/main/webapp/login.jsp" />
+        <option value="$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java" />
       </list>
     </option>
   </component>
@@ -847,13 +847,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/model/Client.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="18" selection-start="88" selection-end="88" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/images/bg_gradient_tiny.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -861,7 +854,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="42" selection-start="666" selection-end="666" vertical-scroll-proportion="0.0">
+        <state line="3" column="51" selection-start="143" selection-end="143" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -873,9 +866,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/model/Client.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="18" selection-start="88" selection-end="88" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/login.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="51" selection-start="974" selection-end="974" vertical-scroll-proportion="0.22972973">
+        <state line="13" column="28" selection-start="413" selection-end="413" vertical-scroll-proportion="-0.2027027">
           <folding />
         </state>
       </provider>
