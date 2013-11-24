@@ -12,10 +12,12 @@
     <file path="/HelloWorldAction.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385256528115" ignored="false" />
     <file path="/Client.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385256067360" ignored="false" />
     <file path="/LoginAction.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385262466030" ignored="false" />
-    <file path="/login.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385328776956" ignored="false" />
-    <file path="/struts.xml" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385262450824" ignored="false" />
+    <file path="/login.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385334771379" ignored="false" />
+    <file path="/struts.xml" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385334853545" ignored="false" />
     <file path="/home.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385260803228" ignored="false" />
     <file path="/web.xml" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385261152025" ignored="false" />
+    <file path="/RegisterAction.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385333040094" ignored="false" />
+    <file path="/register.jsp" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385333672727" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,19 +78,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="35" selection-start="777" selection-end="777" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="struts.xml" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="struts.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/resources/struts.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="88" selection-start="616" selection-end="616" vertical-scroll-proportion="-9.6">
+            <state line="24" column="45" selection-start="1010" selection-end="1010" vertical-scroll-proportion="0.6504065">
               <folding />
             </state>
           </provider>
@@ -97,8 +90,21 @@
       <file leaf-file-name="LoginAction.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="51" selection-start="143" selection-end="143" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="22" column="28" selection-start="695" selection-end="695" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RegisterAction.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/RegisterAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="50" column="40" selection-start="1160" selection-end="1160" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -112,37 +118,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="login.jsp" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="login.jsp" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/login.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="28" selection-start="413" selection-end="413" vertical-scroll-proportion="-0.2027027">
+            <state line="39" column="22" selection-start="1226" selection-end="1226" vertical-scroll-proportion="-9.375">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="web.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-          <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleGeneralEditorProvider">
-            <state />
-          </provider>
+      <file leaf-file-name="register.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/webapp/register.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="22" selection-start="468" selection-end="468" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-          <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorProvider">
-            <state />
-          </provider>
-          <provider editor-type-id="com.intellij.javaee.module.view.web.viewlets.WebModuleAssemblyDescriptorReferencesProvider">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="home.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/home.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="14" selection-start="450" selection-end="450" vertical-scroll-proportion="0.0">
+            <state line="30" column="28" selection-start="958" selection-end="958" vertical-scroll-proportion="-6.6666665">
               <folding />
             </state>
           </provider>
@@ -158,8 +146,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/MessageStore.java" />
         <option value="$PROJECT_DIR$/src/main/java/MessageStore.java" />
         <option value="$PROJECT_DIR$/src/main/java/HelloWorldAction.java" />
         <option value="$PROJECT_DIR$/src/main/resources/HelloWorldAction.java" />
@@ -171,9 +157,11 @@
         <option value="$PROJECT_DIR$/src/main/webapp/HelloWorld.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/home.jsp" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
-        <option value="$PROJECT_DIR$/src/main/resources/struts.xml" />
-        <option value="$PROJECT_DIR$/src/main/webapp/login.jsp" />
         <option value="$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/RegisterAction.java" />
+        <option value="$PROJECT_DIR$/src/main/webapp/register.jsp" />
+        <option value="$PROJECT_DIR$/src/main/webapp/login.jsp" />
+        <option value="$PROJECT_DIR$/src/main/resources/struts.xml" />
       </list>
     </option>
   </component>
@@ -289,58 +277,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="webapp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IdeaBroker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IdeaBroker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="webapp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="images" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IdeaBroker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IdeaBroker" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="resources" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -424,6 +360,7 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
+    <property name="OverrideImplement.combined" value="true" />
     <property name="Repository.Attach.JavaDocs" value="true" />
     <property name="Repository.Attach.Sources" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
@@ -754,20 +691,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/resources/struts.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="88" selection-start="616" selection-end="616" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="42" selection-start="666" selection-end="666" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/model/Client.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="5" column="21" selection-start="85" selection-end="85" vertical-scroll-proportion="0.0">
@@ -817,16 +740,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="35" selection-start="777" selection-end="777" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+    <entry file="file://$PROJECT_DIR$/src/main/webapp/images/bg_gradient_tiny.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/home.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="14" selection-start="450" selection-end="450" vertical-scroll-proportion="0.0">
+        <state line="17" column="14" selection-start="450" selection-end="450" vertical-scroll-proportion="0.5272206">
           <folding />
         </state>
       </provider>
@@ -836,7 +757,7 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="22" selection-start="468" selection-end="468" vertical-scroll-proportion="0.0">
+        <state line="13" column="22" selection-start="468" selection-end="468" vertical-scroll-proportion="0.5258621">
           <folding />
         </state>
       </provider>
@@ -847,21 +768,9 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/images/bg_gradient_tiny.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="51" selection-start="143" selection-end="143" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/struts.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="88" selection-start="616" selection-end="616" vertical-scroll-proportion="-9.6">
+        <state line="20" column="35" selection-start="777" selection-end="777" vertical-scroll-proportion="0.50507617">
           <folding />
         </state>
       </provider>
@@ -873,9 +782,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/LoginAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="28" selection-start="695" selection-end="695" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/org/apache/struts/action/controller/RegisterAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="40" selection-start="1160" selection-end="1160" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/webapp/register.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="28" selection-start="958" selection-end="958" vertical-scroll-proportion="-6.6666665">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/login.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="28" selection-start="413" selection-end="413" vertical-scroll-proportion="-0.2027027">
+        <state line="39" column="22" selection-start="1226" selection-end="1226" vertical-scroll-proportion="-9.375">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/struts.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="45" selection-start="1010" selection-end="1010" vertical-scroll-proportion="0.6504065">
           <folding />
         </state>
       </provider>

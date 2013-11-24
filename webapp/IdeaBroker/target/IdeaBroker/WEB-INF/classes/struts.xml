@@ -19,6 +19,17 @@
                 <result name="success">/home.jsp</result>
         </action>
 
+        <!-- Ir para o registo
+        FIXME Isto nao me parece muito bem, mas é a unica forma de eu o mandar para o register.jsp-->
+        <action name="goregister">
+            <result type="redirect">/register.jsp</result>
+        </action>
+
+        <!-- A acção de registo -->
+        <action name="register" class="org.apache.struts.action.controller.RegisterAction" method="execute">
+                <result name="success">/home.jsp</result>
+        </action>
+
     </package>
 
 </struts>
