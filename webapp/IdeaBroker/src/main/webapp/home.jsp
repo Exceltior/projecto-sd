@@ -5,7 +5,12 @@
   Time: 02:39
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!-- STRUTS -->
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+         pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<!--<jsp:useBean id="client" scope="session" class="actions.model.Client" />-->
+<!-- END STRUTS -->
 <html>
 <head>
     <title></title>
@@ -18,5 +23,6 @@
     &nbsp;</p>
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
+Welcome, user <s:property value="%{#session.client.uid}"/>!
 </body>
 </html>

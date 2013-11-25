@@ -15,7 +15,7 @@
         </action>
 
         <!-- A acção de login (de notar que é bem distinta de um acesso ao login.jsp -->
-        <action name="login" class="org.apache.struts.action.controller.LoginAction" method="execute">
+        <action name="login" class="actions.controller.LoginAction" method="execute">
                 <result name="success">/home.jsp</result>
         </action>
 
