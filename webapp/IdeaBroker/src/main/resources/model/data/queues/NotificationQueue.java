@@ -1,7 +1,6 @@
-package rmiserver;
+package model.data.queues;
 
 import model.RMI.RMI_Interface;
-import model.data.queues.Notification;
 
 public class NotificationQueue extends OrderedTimestampQueue<Notification> {
     private RMI_Interface RMI;
@@ -9,7 +8,7 @@ public class NotificationQueue extends OrderedTimestampQueue<Notification> {
 
 
 
-    synchronized void enqueue(Notification notification) {
+    public synchronized void enqueue(Notification notification) {
         int i;
 
         /* Look for the right place to put it */

@@ -1,6 +1,8 @@
-package rmiserver;
+package model.data.queues;
 
 import model.RMI.RMI_Interface;
+import model.data.Transaction;
+import rmiserver.RMI_Server;
 
 import java.io.*;
 import java.rmi.RemoteException;
@@ -8,7 +10,7 @@ import java.rmi.RemoteException;
 public class TransactionQueue extends OrderedTimestampQueue<Transaction> {
     private RMI_Interface RMI;
 
-    TransactionQueue(RMI_Server RMI) {
+    public TransactionQueue(RMI_Server RMI) {
         this.RMI = RMI;
     }
 
@@ -65,20 +67,20 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> {
             return true;
     }
 
-    synchronized void enqueue(Transaction t) {
+    public synchronized void enqueue(Transaction t) {
         synchronized (queue) {
             super.enqueue(t);
         }
         checkQueue();
     }
 
-    synchronized void dequeue(Transaction t) {
+    public synchronized void dequeue(Transaction t) {
         synchronized (queue) {
             super.dequeue(t);
         }
     }
 
-    void checkQueue() {
+    public void checkQueue() {
         synchronized (queue) {
             for (int i = 0; i < queue.size(); i++) {
                 Transaction t = queue.get(0);

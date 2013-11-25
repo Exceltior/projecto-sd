@@ -6,6 +6,8 @@ import model.data.NetworkingFile;
 import model.data.ServerTopic;
 import model.data.Share;
 import model.data.queues.Notification;
+import model.data.Transaction;
+import model.data.queues.TransactionQueue;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -723,7 +725,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                     " " +
                 "shares from " + "ID "
                     + queryResult.get(i)[1] + " at " + queryResult.get(i)[3] + " DEI Coins per share, " +
-                    "for a total of " + queryResult.get(i)[2] + " DEI Coins. rmiserver.Transaction date: " + queryResult.get(i)[6];
+                    "for a total of " + queryResult.get(i)[2] + " DEI Coins. model.data.Idea.Transaction date: " + queryResult.get(i)[6];
 
         return  history;
     }
@@ -951,9 +953,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             Share s = sharesToBuy.get(i);
             System.out.println("To buy: "+s);
             System.out.println("(Buying): "+sharesToBuyNum.get(i));
-            /*new rmiserver.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
+            /*new model.data.queues.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
                     s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
-            new rmiserver.NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
+            new model.data.queues.NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
                     s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));*/
         }
         return true;

@@ -1,4 +1,4 @@
-package rmiserver;
+package model.data.queues;
 
 import model.data.queues.TimestampClass;
 
@@ -19,13 +19,13 @@ public class OrderedTimestampQueue<E extends TimestampClass> {
         }
     }
 
-    synchronized void dequeue(E r) {
+    public synchronized void dequeue(E r) {
         synchronized (queue) {
             queue.remove(r);
         }
     }
 
-    synchronized void enqueue(E notification) {
+    public synchronized void enqueue(E notification) {
         int i;
 
         /* Look for the right place to put it */

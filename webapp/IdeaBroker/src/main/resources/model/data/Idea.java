@@ -1,10 +1,12 @@
 package model.data;
 
 import common.util.Common;
+import model.data.queues.TimestampClass;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class Idea implements Serializable {
 
@@ -119,5 +121,4 @@ public class Idea implements Serializable {
                 ", shares to buy = " + shares_to_buy +
                 '}';
     }
-
 }
