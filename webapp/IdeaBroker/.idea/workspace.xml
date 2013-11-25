@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="10f56ae5-7fac-45ee-966e-88cc981303e7" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IdeaBroker.iml" afterPath="$PROJECT_DIR$/IdeaBroker.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/home.jsp" afterPath="$PROJECT_DIR$/src/main/webapp/home.jsp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/struts.xml" afterPath="$PROJECT_DIR$/src/main/resources/struts.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="10f56ae5-7fac-45ee-966e-88cc981303e7" name="Default" comment="" />
     <ignored path="IdeaBroker.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="$PROJECT_DIR$/../../../inforestudante-mobile/Projecto/InforMobile/src/com/informasters/InforMobile/serviceHandling/Login.java" changelist="10f56ae5-7fac-45ee-966e-88cc981303e7" time="1385238658181" ignored="false" />
