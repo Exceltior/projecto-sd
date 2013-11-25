@@ -39,15 +39,37 @@ public class Client {
         return ret;
     }
 
+    private boolean doRMIRegister(String username, String password, String email){
+        boolean ret = false;
+        try{
+            ret = rmi.getRMIInterface().register(username,password,email);
+        } catch(RemoteException e){
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return ret;
+    }
+
     /**
-     * Public interface to try to login a client. If successful, current state will be updateed to indicate that this
+     * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
      * @param password User's password
-     * @return
+     * @return A boolean value, indicating the success or failure of the operation
      */
     public boolean doLogin(String username, String password) {
         return (this.uid = doRMILogin(username, password)) != -1;
+    }
+
+    /**
+     * Public interface to try to register a client. If successful, we automatically perform the login for the given
+     * client.
+     * @param username User's username
+     * @param password User's password
+     * @param email User's password
+     * @return A boolean value, indicating the success or failure of the operation
+     */
+    public boolean doRegister(String username, String password, String email){
+        return doRMIRegister(username, password, email) && doLogin(username, password);
     }
 
     public int getUid() {

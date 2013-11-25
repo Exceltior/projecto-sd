@@ -13,7 +13,7 @@ import model.data.*;
 public interface RMI_Interface extends Remote {
     public int login(String user, String pwd) throws  RemoteException;
     public int canLogin(String user, String pwd) throws  RemoteException;
-    public boolean register(String user, String pass, String email, String date) throws RemoteException;
+    public boolean register(String user, String pass, String email) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
     public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException;
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException;

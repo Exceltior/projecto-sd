@@ -233,11 +233,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param user Username
      * @param pass Password
      * @param email User's email address
-     * @param date Date of the registration
      * @return  Boolean value, indicating if the operation went well
      * @throws RemoteException
      */
-    synchronized public boolean register(String user, String pass, String email, String date) throws RemoteException {
+    synchronized public boolean register(String user, String pass, String email) throws RemoteException {
         if (! validateData(user)){
             System.err.println("O validate data devolveu false");
             return false;
@@ -246,7 +245,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         String query = "INSERT INTO Utilizadores VALUES (" + (num_users+1) + ",'" + email + "','" + user + "'," +
                 "'" + pass +
-                "'," + starting_money + ",to_date('" + date + "','yyyy.mm.dd'), null)";
+                "'," + starting_money + ",sysdate, null)";
 
         insertData(query);
 
