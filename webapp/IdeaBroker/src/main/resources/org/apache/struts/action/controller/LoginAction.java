@@ -2,6 +2,7 @@ package org.apache.struts.action.controller;
 
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.interceptor.SessionAware;
+
 import java.util.Map;
 
 /**
