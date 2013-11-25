@@ -6,3 +6,5 @@ projecto-sd.iml
 
 
 *.bin
+webapp/IdeaBroker/out/*
+webapp/IdeaBroker/target/*
