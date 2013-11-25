@@ -29,6 +29,7 @@
 <div style="text-align: center;">
     <span  style="text-align: center;">
         <img src="<s:url value="/images/minions.gif"/>"  alt="POKEMON @ FIGUEIRA!" />
+     <td>
     <s:form action="login">
 
         <s:textfield name="username" label="Username" />
@@ -36,12 +37,9 @@
 
         <s:submit value="Submit" />
     </s:form>
-
-    <s:form action="goregister">
-        <s:submit value="Register" />
-    </s:form>
         Deveria estar alinhado, mas o Struts é merda e não alinha. Cagai, irmãos, cagai.<br />
         </span>
+    </td>
 </div>
 </body>
 </html>

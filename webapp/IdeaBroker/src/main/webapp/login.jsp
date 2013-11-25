@@ -36,10 +36,6 @@
 
         <s:submit value="Submit" />
     </s:form>
-
-    <s:form action="goregister">
-        <s:submit value="Register" />
-    </s:form>
         Deveria estar alinhado, mas o Struts é merda e não alinha. Cagai, irmãos, cagai.<br />
         </span>
 </div>
