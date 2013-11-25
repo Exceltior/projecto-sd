@@ -37,7 +37,7 @@
         <s:submit value="Submit" />
     </s:form>
 
-    <a href="<s:url: value="register.jsp" />" >
+    <a href="<s:url value="register.jsp" />" >
         REGISTA CARALHÃAAO <font color="red">EOOHOOOOOOOOOOO</font>
     </a>
         Deveria estar alinhado, mas o Struts é merda e não alinha. Cagai, irmãos, cagai.<br />

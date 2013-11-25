@@ -11,7 +11,7 @@
 
         <!-- Quando acedem a /, isto é, aao root, redireccionar para o login FIXME: Isto vai mudar no futuro-->
         <action name="">
-            <result type="redirect">login.jsp</result>
+            <result type="redirect">/login.jsp</result>
         </action>
 
         <!-- A acção de registo -->
