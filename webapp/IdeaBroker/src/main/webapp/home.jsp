@@ -24,5 +24,9 @@
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
 Welcome, user <s:property value="%{#session.client.uid}"/>!
+
+<!-- Display main menu -->
+
+<!-- FIXME: METER WALL COM IDEIAS? -->
 </body>
 </html>

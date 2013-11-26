@@ -28,17 +28,13 @@
 </table>
 <div style="text-align: center;">
     <span  style="text-align: center;">
-    <s:form action="register">
 
-        <s:textfield name="username" label="Username" />
-        <s:password  name="password" label="Password" />
-        <s:textfield name="email" label="Email" />
-
-        <s:submit value="Submit" />
-    </s:form>
-        Deveria estar alinhado, mas o Struts é merda e não alinha. Cagai, irmãos, cagai.<br />
+        <s:textfield name="username" label="Username" /><br/>
+        <s:password  name="password" label="Password" /><br/>
+        <s:textfield name="email" label="Email" /><br/>
+        <s:submit value="Submit" action="register" align="center"/><br/>
         <!-- FIXME: Estou a assumir que depois do registo fazemos login automaticamente, mas isso pode-se mudar -->
-        </span>
+    </span>
 </div>
 </body>
 </html>

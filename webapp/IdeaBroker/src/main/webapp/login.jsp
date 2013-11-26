@@ -28,20 +28,19 @@
 </table>
 <div style="text-align: center;">
     <span  style="text-align: center;">
-        <img src="<s:url value="/images/minions.gif"/>"  alt="POKEMON @ FIGUEIRA!" />
-    <s:form action="login">
+        <img src="<s:url value="/images/minions.gif"/>"  alt="Minions@Movies!" /><br/>
 
-        <s:textfield name="username" label="Username" />
-        <s:password  name="password" label="Password" />
+        <s:form action="login">
 
-        <s:submit value="Submit" />
-    </s:form>
+            <s:textfield name="username" label="Username" />
+            <s:password  name="password" label="Password" />
+            <s:submit value="Submit"/>
+        </s:form>
 
     <a href="<s:url value="register.jsp" />" >
-        REGISTA CARALHÃAAO <font color="red">EOOHOOOOOOOOOOO</font>
+        Sign up<font color="red"></font>
     </a>
-        Deveria estar alinhado, mas o Struts é merda e não alinha. Cagai, irmãos, cagai.<br />
-        </span>
+    </span>
 </div>
 </body>
 </html>

@@ -20,10 +20,14 @@ public class LoginAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        if ( client.doLogin(username, password) )
+        if ( client.doLogin(username, password) ){
+            System.out.println("Vou devolver sucesso no execute do LoginAction");
             return SUCCESS;
-        else
+        }
+        else{
+            System.out.println("Vou devolver erro no execute do LoginAction");
             return ERROR;
+        }
     }
 
     public String getPassword() {
