@@ -29,6 +29,10 @@
             <result name="success">teste.jsp</result>
         </action>
 
+        <action name="teste2" class="actions.controller.Temp2Action" method="execute">
+            <result name="success">login.jsp</result>
+        </action>
+
     </package>
 
 </struts>

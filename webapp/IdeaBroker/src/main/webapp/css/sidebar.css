@@ -1,0 +1,9 @@
+#nav {
+    width: 20%;
+    float: left;
+    background-color: gray;
+}
+
+#content {
+    width: 80%;
+}

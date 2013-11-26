@@ -1,5 +1,7 @@
 package actions.controller;
 
+import org.apache.struts2.ServletActionContext;
+
 import java.util.ArrayList;
 
 /**
@@ -12,12 +14,32 @@ import java.util.ArrayList;
 public class TempAction extends ClientAction {
     public ArrayList<Temp> banana = new ArrayList<Temp>();
 
+    public ArrayList<Integer> getVariavelLocal() {
+        return variavelLocal;
+    }
+
+    public void setVariavelLocal(ArrayList<Integer> variavelLocal) {
+        this.variavelLocal = variavelLocal;
+    }
+
+    ArrayList<Integer> variavelLocal = new ArrayList<Integer>();
+
+    public int getAha() {
+        return aha;
+    }
+
+    public int aha = 3;
+
     public String execute() throws Exception {
         super.execute();
 
-        banana.add(new Temp(0,1));
-        banana.add(new Temp(2,3));
-        banana.add(new Temp(4,5));
+        banana.add(new Temp(9, 10));
+        banana.add(new Temp(11, 12));
+        banana.add(new Temp(13, 14));
+
+        variavelLocal.add(77);
+        variavelLocal.add(78);
+        variavelLocal.add(79);
 
         return SUCCESS;
     }
