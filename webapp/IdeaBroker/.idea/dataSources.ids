@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source source="LOCAL" name="SD" product="Oracle" version="Oracle Database 11g Express Edition Release 11.2.0.2.0 - Production" jdbc-version="11.2" driver-name="Oracle JDBC driver" driver-version="11.2.0.3.0" uuid="3c9fef0c-5426-469b-8ee2-a27d1f41b0e3">
+    <extra-name-characters>$#</extra-name-characters>
+    <identifier-quote-string>&quot;</identifier-quote-string>
+    <synchronize>true</synchronize>
+    <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
+    <jdbc-url>jdbc:oracle:thin:@192.168.56.101:1521:XE</jdbc-url>
+    <user-name>sd</user-name>
+    <user-password>dfd9dfce</user-password>
+    <schema-pattern>*.SD</schema-pattern>
+    <default-dialect>Oracle</default-dialect>
+    <libraries>
+      <library>
+        <url>jar://$PROJECT_DIR$/ojdbc6-11.2.0.3.jar!/</url>
+      </library>
+      <library>
+        <url>file://$PROJECT_DIR$/oracle-driver-license.txt</url>
+      </library>
+    </libraries>
+    <schema name="SD" catalog=""/>
+    <table name="HALLFAME" schema="SD" catalog="" type="TABLE">
+      <column name="HFID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="IID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <primary-key name="HALLFAME_PK" columns="HFID"/>
+      <foreign-key name="TABLE_10_IDEIA_FK" columns="IID" ref-table="IDEIA" ref-schema="SD" ref-catalog="" ref-columns="IID" update-rule="0" delete-rule="1" deferrability="2"/>
+    </table>
+    <table name="IDEA_SEQ" schema="SD" catalog="" type="SEQUENCE"/>
+    <table name="IDEIA" schema="SD" catalog="" type="TABLE">
+      <column name="IID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="TITULO" sqlType="VARCHAR2" length="80" precision="0" nullable="false" jdbcType="12"/>
+      <column name="DESCRICAO" sqlType="VARCHAR2" length="1000" precision="0" nullable="false" jdbcType="12"/>
+      <column name="USERID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="ACTIVA" sqlType="NUMBER" length="1" precision="0" nullable="false" jdbcType="3"/>
+      <column name="PATH" sqlType="VARCHAR2" length="70" precision="0" nullable="true" jdbcType="12"/>
+      <column name="ORIGINALFILE" sqlType="VARCHAR2" length="100" precision="0" nullable="true" jdbcType="12"/>
+      <column name="ULTIMATRANSACAO" sqlType="NUMBER" length="10" precision="0" nullable="true" jdbcType="3"/>
+      <primary-key name="IDEIA_PK" columns="IID"/>
+      <exported-key name="TABLE_10_IDEIA_FK" table="HALLFAME" schema="SD" catalog="" columns="IID"/>
+      <exported-key name="IDEIAWATCHLIST_IDEIA_FK" table="IDEIAWATCHLIST" schema="SD" catalog="" columns="IID"/>
+      <exported-key name="SHARE_IDEIA_FK" table="Share" schema="SD" catalog="" columns="IID"/>
+      <exported-key name="TOPICOIDEIA_IDEIA_FK" table="TOPICOIDEIA" schema="SD" catalog="" columns="IID"/>
+      <exported-key name="TRANSACAO_IDEIA_FK" table="TRANSACAO" schema="SD" catalog="" columns="IID"/>
+    </table>
+    <table name="IDEIAWATCHLIST" schema="SD" catalog="" type="TABLE">
+      <column name="USERID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="IID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <primary-key name="IDEIAWATCHLIST_PK" columns="USERID,IID"/>
+      <foreign-key name="IDEIAWATCHLIST_IDEIA_FK" columns="IID" ref-table="IDEIA" ref-schema="SD" ref-catalog="" ref-columns="IID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <foreign-key name="IDEIAWATCHLIST_UTILIZADOR_FK" columns="USERID" ref-table="UTILIZADOR" ref-schema="SD" ref-catalog="" ref-columns="USERID" update-rule="0" delete-rule="1" deferrability="2"/>
+    </table>
+    <table name="Share" schema="SD" catalog="" type="TABLE">
+      <column name="IID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="USERID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="NUMSHARES" sqlType="NUMBER" length="5" precision="0" nullable="false" jdbcType="3"/>
+      <column name="VALOR" sqlType="NUMBER" length="10" precision="0" nullable="false" jdbcType="3"/>
+      <primary-key name="SHARE_PK" columns="IID,USERID,VALOR,NUMSHARES"/>
+      <foreign-key name="SHARE_IDEIA_FK" columns="IID" ref-table="IDEIA" ref-schema="SD" ref-catalog="" ref-columns="IID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <foreign-key name="SHARE_UTILIZADOR_FK" columns="USERID" ref-table="UTILIZADOR" ref-schema="SD" ref-catalog="" ref-columns="USERID" update-rule="0" delete-rule="1" deferrability="2"/>
+    </table>
+    <table name="TOPICO" schema="SD" catalog="" type="TABLE">
+      <column name="TID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="NOME" sqlType="VARCHAR2" length="20" precision="0" nullable="false" jdbcType="12"/>
+      <column name="DESCRICAO" sqlType="VARCHAR2" length="100" precision="0" nullable="false" jdbcType="12"/>
+      <column name="USERID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="ACTIVO" sqlType="NUMBER" length="1" precision="0" nullable="false" jdbcType="3"/>
+      <primary-key name="TOPICO_PK" columns="TID"/>
+      <foreign-key name="TABLE_12_UTILIZADOR_FK" columns="USERID" ref-table="UTILIZADOR" ref-schema="SD" ref-catalog="" ref-columns="USERID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <exported-key name="TOPICOIDEIA_TOPICO_FK" table="TOPICOIDEIA" schema="SD" catalog="" columns="TID"/>
+    </table>
+    <table name="TOPICOIDEIA" schema="SD" catalog="" type="TABLE">
+      <column name="TID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="IID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <primary-key name="TOPICOIDEIA_PK" columns="TID,IID"/>
+      <foreign-key name="TOPICOIDEIA_IDEIA_FK" columns="IID" ref-table="IDEIA" ref-schema="SD" ref-catalog="" ref-columns="IID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <foreign-key name="TOPICOIDEIA_TOPICO_FK" columns="TID" ref-table="TOPICO" ref-schema="SD" ref-catalog="" ref-columns="TID" update-rule="0" delete-rule="1" deferrability="2"/>
+    </table>
+    <table name="TOPIC_SEQ" schema="SD" catalog="" type="SEQUENCE"/>
+    <table name="TRANSACAO" schema="SD" catalog="" type="TABLE">
+      <column name="TRANSACTIONID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="COMPRADOR" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="VENDEDOR" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="VALOR" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="NUMSHARES" sqlType="NUMBER" length="5" precision="0" nullable="false" jdbcType="3"/>
+      <column name="IID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="DATA" sqlType="DATE" length="7" precision="0" nullable="false" jdbcType="93"/>
+      <primary-key name="TRANSACAO_PK" columns="TRANSACTIONID"/>
+      <foreign-key name="TRANSACAO_IDEIA_FK" columns="IID" ref-table="IDEIA" ref-schema="SD" ref-catalog="" ref-columns="IID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <foreign-key name="TRANSACAO_UTILIZADOR_FKV2" columns="VENDEDOR" ref-table="UTILIZADOR" ref-schema="SD" ref-catalog="" ref-columns="USERID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <foreign-key name="TRANSACAO_UTILIZADOR_FK" columns="COMPRADOR" ref-table="UTILIZADOR" ref-schema="SD" ref-catalog="" ref-columns="USERID" update-rule="0" delete-rule="1" deferrability="2"/>
+    </table>
+    <table name="TRANSACTION_SEQ" schema="SD" catalog="" type="SEQUENCE"/>
+    <table name="USER_SEQ" schema="SD" catalog="" type="SEQUENCE"/>
+    <table name="UTILIZADOR" schema="SD" catalog="" type="TABLE">
+      <column name="USERID" sqlType="NUMBER" length="7" precision="0" nullable="false" jdbcType="3"/>
+      <column name="EMAIL" sqlType="VARCHAR2" length="50" precision="0" nullable="false" jdbcType="12"/>
+      <column name="USERNAME" sqlType="VARCHAR2" length="20" precision="0" nullable="false" jdbcType="12"/>
+      <column name="PASS" sqlType="VARCHAR2" length="100" precision="0" nullable="false" jdbcType="12"/>
+      <column name="DINHEIRO" sqlType="NUMBER" length="10" precision="0" nullable="false" jdbcType="3"/>
+      <column name="DATAREGISTO" sqlType="DATE" length="7" precision="0" nullable="false" jdbcType="93"/>
+      <column name="DATAULTIMOLOGIN" sqlType="DATE" length="7" precision="0" nullable="true" jdbcType="93"/>
+      <primary-key name="UTILIZADOR_PK" columns="USERID"/>
+      <exported-key name="IDEIAWATCHLIST_UTILIZADOR_FK" table="IDEIAWATCHLIST" schema="SD" catalog="" columns="USERID"/>
+      <exported-key name="SHARE_UTILIZADOR_FK" table="Share" schema="SD" catalog="" columns="USERID"/>
+      <exported-key name="TABLE_12_UTILIZADOR_FK" table="TOPICO" schema="SD" catalog="" columns="USERID"/>
+      <exported-key name="TRANSACAO_UTILIZADOR_FK" table="TRANSACAO" schema="SD" catalog="" columns="COMPRADOR"/>
+      <exported-key name="TRANSACAO_UTILIZADOR_FKV2" table="TRANSACAO" schema="SD" catalog="" columns="VENDEDOR"/>
+    </table>
+  </data-source>
+</component>
