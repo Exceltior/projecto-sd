@@ -1,6 +1,6 @@
 drop table Transacao;
 drop table TopicoIdeia;
-drop table Share;
+drop table "Share";
 drop table IdeiaWatchList;
 drop table HallFame;
 drop table Ideia;

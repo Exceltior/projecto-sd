@@ -34,7 +34,7 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>10000</dataTypeSize>
+<dataTypeSize>1000</dataTypeSize>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="userid" id="BB29EAF7-B546-0E81-9B2F-E56EACD6E6B3">

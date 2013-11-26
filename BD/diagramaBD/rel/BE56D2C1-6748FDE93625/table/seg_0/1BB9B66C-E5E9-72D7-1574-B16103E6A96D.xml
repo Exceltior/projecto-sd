@@ -58,17 +58,6 @@
 <dataTypeScale>0</dataTypeScale>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
-<Column name="nummin" id="18D640A6-EB31-FFF9-37EC-34D3572CA35D">
-<createdBy>joaquim</createdBy>
-<createdTime>2013-11-20 22:25:06 UTC</createdTime>
-<ownerDesignName>diagramaBD</ownerDesignName>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>5</dataTypePrecision>
-<dataTypeScale>0</dataTypeScale>
-<autoIncrementCycle>false</autoIncrementCycle>
-</Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="534C5910-FB0D-E82B-58D3-8A8D685465A7" name="Share_PK">
@@ -83,7 +72,6 @@
 <colUsage columnID="E776FAF0-4BE2-8E9B-0351-08E3FB2789DA"/>
 <colUsage columnID="D51A2353-876B-6AF3-ABE2-5F081F2CCDD9"/>
 <colUsage columnID="906FB1A5-305C-D8DC-0D4D-0BB0F8C7FF94"/>
-<colUsage columnID="18D640A6-EB31-FFF9-37EC-34D3572CA35D"/>
 </indexColumnUsage>
 </ind_PK_UK>
 <ind_PK_UK id="66352984-F46B-D009-24FB-D9EE317DA7F8" name="Share_Ideia_FK">

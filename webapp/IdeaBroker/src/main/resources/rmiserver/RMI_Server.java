@@ -77,9 +77,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return true;
     }
 
-    ////
-    //  Class constructor. Creates a new instance of the class rmiserver.RMI_Server
-    ////
+    /**
+     * Class constructor. Creates a new instance of the class rmiserver.RMI_Server
+     * @param servidor  The ip address of the database
+     * @param porto The port of the database connection
+     * @param sid   SID of the database connection
+     * @throws RemoteException
+     */
     private RMI_Server(String servidor, String porto, String sid) throws RemoteException {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
@@ -88,10 +92,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         //new Thread(transactionQueue).start();
     }
 
-    ////
-    //  Method responsible for checking a given username and corresponding password, in order to check if the user is registered
-    //  and if that is the case, confirm his (or hers) login.
-    ////
+    /**
+     * Method responsible for checking a given username and corresponding password, in order to check if the user is
+     * registered and if that is the case, confirm his (or hers) login
+     * @param user  The User's username
+     * @param pwd   The User's password
+     * @return Returns the User's id, or in case of error, the Integer -1
+     * @throws RemoteException
+     */
     public int login(String user, String pwd) throws RemoteException {
 
         String query;
@@ -133,9 +141,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return -1;
     }
 
-    ////
-    //  Method responsible for getting all the topics stored in the database.
-    ////
+    /**
+     * Method responsible for getting all the topics stored in the database
+     * @return  An array of ServerTopic objects, containing all the topics stored in the database
+     * @throws RemoteException
+     */
     public ServerTopic[] getTopics() throws RemoteException{
         String query = "select * from Topico";
 
@@ -152,9 +162,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return topics;
     }
 
-    ////
-    //  Returns all the ideas associated with a given user
-    ////
+    /**
+     * Method responsible for getting all the ideas associated with a given user.
+     * @param uid   The User's id
+     * @return  An array of Idea objects, containing all the ideas associated with a given user
+     * @throws RemoteException
+     */
     public Idea[] getIdeasFromUser(int uid) throws RemoteException{
         Idea[] ideas;
         String query = "Select i.iid,i.titulo,i.descricao,i.userid from Ideia i, Share s where i.activa = 1 and s.iid = i.iid" +
@@ -175,9 +188,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return ideas;
     }
 
-    ////
-    // This returns an array of ideas which belong to this Topic.
-    //
+    /**
+     * Method responsible for getting all the ideas which belong to a given topic
+     * @param tid   The Topic's id
+     * @return  An array of Idea objects, containing all the ideas which belong to the given topic
+     * @throws RemoteException
+     */
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
         String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideia e, " +
                 "TopicoIdeia t where t.iid = e.iid and t" +
@@ -200,10 +216,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return ideas;
     }
 
-    ////
-    // Method responsible for checking if there aren't any topics already created with the same name as the one we want
-    //  to create
-    ////
+    /**
+     * Method responsible for checking if there aren't any topics already created with the same name as the one we want to
+     * create
+     * @param nome  The name of the topic
+     * @return  A boolean value, which tells us if there are any topics already created with the given name
+     */
     boolean validateTopic(String nome){
         String query = "Select * from Topico t where t.nome = '" + nome + "'";
         ArrayList<String[]> topics = receiveData(query);
@@ -212,9 +230,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return topics == null || topics.size() == 0;
     }
 
-    ////
-    //  Method responsible for validating a user's username, before adding it to the database
-    ///
+    /**
+     * Method responsible for validating a user's username, before adding it to the database
+     * @param username  The User's username
+     * @return A boolean value, indicating if the User's username is already stored in the database
+     */
     boolean validateData(String username){
         String query = "Select * from Utilizador u where u.username = '" + username + "'";
         ArrayList<String[]> users = receiveData(query);
@@ -361,18 +381,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return listIdeasFiles;
     }
 
-    ////
-    //  Method responsible for getting all the information about all the shares of a given idea
-    ////
-    synchronized public String[] getIdeaShares(int iid, int uid) throws RemoteException{
-        String query = "Select s.iid, s.numshares, s.valor from Share s where s.iid = " + iid +
+    /**
+     * Method responsible for getting all the information about all the shares of a given idea which belong to a specific
+     * user
+     * @param iid   The id of the given idea
+     * @param uid   The User's id
+     * @return  A Share object containing all the information mentioned.
+     * @throws RemoteException
+     */
+    synchronized public Share getIdeaShares(int iid, int uid) throws RemoteException{
+        String query = "Select s.iid, s.userid, s.valor, s.numshares from Share s where s.iid = " + iid +
                 " and s.userid = " + uid;
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null || queryResult.size()==0 )
             return null;
 
-        return queryResult.get(0);
+        return new Share(queryResult.get(0));
     }
 
     //FIXME: Are we going to need this?
@@ -396,28 +421,38 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return devolve;
     }
 
-    ////
-    //  Method responsible for creating a new topic in the database
-    ////
-    synchronized public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException{
-        if (! validateTopic(nome)){
+    /**
+     * Method responsible for creating a new topic in the database
+     * @param name  The name of the topic
+     * @param description The description of the topic
+     * @param uid   The id of the user who created the topic
+     * @return  A boolean value, indicating the success or failure of the operation
+     * @throws RemoteException
+     */
+    synchronized public boolean createTopic(String name, String description, int uid) throws  RemoteException{
+        if (! validateTopic(name)){
             System.err.println("Topico invalido");
             return false;
         }
 
-        String query = "INSERT INTO Topico VALUES (topic_seq.nextval,'" + nome + "','" + descricao + "'," +
+        String query = "INSERT INTO Topico VALUES (topic_seq.nextval,'" + name + "','" + description + "'," +
                 "" + uid + ")";
 
         insertData(query);
         return true;
     }
 
-    ////
-    //  Method responsible for creating a new idea in the database
-    ////
+    /**
+     * Method responsible for creating a new idea in the database
+     * @param title The title of the idea
+     * @param description   The description of the idea
+     * @param uid   The id of the user who created the idea
+     * @return  The id of the idea we just created
+     * @throws RemoteException
+     */
     synchronized public int createIdea(String title, String description, int uid) throws RemoteException{
         String query;
-        ArrayList<String[]> queryResult = new ArrayList<String[]>();
+        ArrayList<String[]> queryResult;
 
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
@@ -521,10 +556,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return 1;//Everything ok
 
     }
-
-    ////
-    //  Get the given idea's list of topics
-    ////
+    /**
+     * Method responsible for getting the list of topics for a given idea
+     * @param iid   The id of the idea
+     * @return  An array of ServerTopic objects, containing all the topics where the given idea is present
+     * @throws RemoteException
+     */
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException{
         String query = "Select * from TopicoIdeia t where t.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query), topic;
@@ -543,11 +580,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return listTopics;
     }
 
-    ////
-    // Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gathers
-    // IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
-    // addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
-    //
+    /**
+     * Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gathers
+     * IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
+     * addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
+     * @param iid   The id of the idea we want to build
+     * @return  An Idea object, with the idea we just built
+     * @throws RemoteException
+     */
     public Idea getIdeaByIID(int iid) throws RemoteException {
         String query = "select * from Ideia t where t.iid = " + iid + " and t.activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
@@ -567,6 +607,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     ////
     //  Indica se o primeiro array list tem alguma ideia com o referido id
     ////
+
+    /**
+     * Method which tells us if a given ArrayList contains any Idea with any of the given ids
+     * @param listIdeas The ArrayList
+     * @param queryResult  An array with the ids in question
+     * @return  An Integer object, with the position in the ArrayList where the matching occured, or -1 if there were
+     *          no matching
+     */
     private int hasElement(ArrayList<Idea> listIdeas,String[] queryResult){
         int i;
 
@@ -579,6 +627,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     //FIXME: Fix this query, we no longer have minimum number of shares a user can keep!!!!!
+    //FIXME: Add javadoc - MAXI MAXI MAXI
+    /**
+     *
+     * @param uid
+     * @return
+     * @throws RemoteException
+     */
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
         ArrayList<Idea> devolve = new ArrayList<Idea>();
         String query = "Select i.iid, i.titulo, i.descricao, i.userid, s.numShares, s.numMin from Share s, " +
@@ -606,6 +661,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return devolve;
     }
 
+    /**
+     * Gets all the ideas with the specified id and title
+     * @param iid   The id of the idea
+     * @param title The title of the idea
+     * @return An array of Idea objects, with all the ideas with the specified id and title
+     * @throws RemoteException
+     */
     public Idea[] getIdeaByIID(int iid, String title) throws RemoteException{
         String query;
         Idea[] devolve;
@@ -634,6 +696,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return devolve;
     }
 
+    /**
+     * Gets a topic, with a given id and name
+     * @param tid   The id of the topic
+     * @param name  The name of the topic
+     * @return  The topic with the specified id and name
+     * @throws RemoteException
+     */
     public ServerTopic getTopic(int tid, String name) throws RemoteException{
         String query;
 
@@ -654,9 +723,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return new ServerTopic(queryResult.get(0));
     }
 
-    ////
-    //  Get the number of shares that a user doesnt want to sel for a given idea
-    ////
+    //FIXME: Are we going to need this?
+    /**
+     * Gets the number of shares that a user doesnt want to sell for a given idea
+     * @param iid   The id of the idea
+     * @param uid   The id of the user
+     * @return  The number of shares the given user doesnt want to sell for the given idea
+     * @throws RemoteException
+     */
     public int getSharesNotSell(int iid,int uid) throws RemoteException{
         String query = "Select s.numMin from Share s where s.userid = " + uid + " and s.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
@@ -790,9 +864,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
-     * Gets the money for the given UID
-     * @param uid
-     * @return
+     * Gets the money for the a given user
+     * @param uid   The if of the user
+     * @return  The money of the specified user
      * @throws RemoteException
      */
     int getUserMoney(int uid) throws RemoteException {
@@ -809,14 +883,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
-     * Sets the money for UID. UID must exist
-     *
-     * @param uid
-     * @param money
+     * Sets the money for a given user. The user must exist
+     * @param uid   The id of the user
+     * @param money The money we are going to set for the user
      * @param conn The connection to use, for instance, for transactional operations. null if don't care which
      *             connection to use
-     * @return
-     * @throws RemoteException
      */
     private void setUserMoney(int uid, int money, Connection conn) {
         String query = "update Utilizador set dinheiro="+money+" where userid="+uid;
@@ -843,6 +914,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return result.get(0)[0];
     }
 
+    //FIXME: MAXI JAVADOC
+    /**
+     *
+     * @param uid
+     * @param iid
+     * @param numShares
+     * @param targetPrice
+     * @return
+     * @throws RemoteException
+     */
     public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice) throws RemoteException {
         System.out.println("registerGetSharesRequest called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
                 ", targetPrice="+targetPrice);
@@ -857,10 +938,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     /**
      * This tries to GET numShare shares. Notice that it doesn't try to BUY. If the user already has them,
      * it just quits and errors out.
-     *
-     * @param uid
-     * @param iid
-     * @param numShares
+     * @param uid   The id of the user performing the operation
+     * @param iid   The id of the idea involved in the transaction
+     * @param numShares The number of shares the user wants to buy
      * @param targetPrice  The desired target price of the shares of this user after buying. If the user already has
      *                     shares, then -2 means we should keep the price already set
      * @return 1 on success, 0 on error (can't buy because there aren't any appropriate sellers....)
@@ -965,9 +1045,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return true;
     }
 
-    ////
-    //  Set up the number of shares for a given idea, and the price of each share for that idea
-    ////
+    /**
+     * Set up the number of shares for a given idea, and the price of each share for that idea
+     * @param uid   The User's id
+     * @param iid   The id of the idea
+     * @param nshares   The number of shares to set for the given idea
+     * @param price The price of each share for the given idea
+     * @throws RemoteException
+     */
     synchronized public void setSharesIdea(int uid, int iid, int nshares, int price)throws RemoteException{
         /* null here means no transactional connection */
         setSharesIdea(uid, iid, nshares,price,null);
@@ -1048,9 +1133,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         insertData(queryData);
     }
 
-    ////
-    //  Method responsible for creating the connection between an idea and one or more topics
-    ////
+    /**
+     * Method responsible for creating the connection between an idea and one or more topics
+     * @param iid   The id of the idea
+     * @param topicTitle    The title of the topics
+     * @param uid   The id of the user
+     * @return A boolean value, indicating the success or failure of the operation
+     * @throws RemoteException
+     */
     synchronized public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
 
         String query ;
@@ -1154,12 +1244,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 */
 
-
     /**
      * This just picks any connection available from the pool and uses it. If you need transactional support you can
      * specify a connection in another overloaded method
-     * @param query
-     * @return
+     * @param query The query to execute
+     * @return  An ArrayList of String[] objects (Array of String objects) with the result obtained for the given query
      */
     private ArrayList<String[]> receiveData(String query) {
 
