@@ -9,3 +9,4 @@ projecto-sd.iml
 webapp/IdeaBroker/out/*
 webapp/IdeaBroker/target/*
 webapp/IdeaBroker/.idea/workspace.xml
+webapp/IdeaBroker/.idea/webContexts.xml
