@@ -15,7 +15,7 @@ public interface RMI_Interface extends Remote {
     public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
-    public boolean createTopic(String nome, String descricao, int uid) throws  RemoteException;
+    public boolean createTopic(String nome, int uid) throws  RemoteException;
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException;
     public Idea[] getIdeasFromUser(int uid) throws RemoteException;
     public int removeIdea(Idea idea, int uid) throws  RemoteException;

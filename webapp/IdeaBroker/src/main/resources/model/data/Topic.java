@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class Topic implements Serializable{
     protected int   id;
     protected String title;
-    protected String body;
 
     private static final long serialVersionUID = 1L;
 
@@ -17,18 +16,16 @@ public class Topic implements Serializable{
         return "Topic{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", body='" + body + '\'' +
                 '}';
     }
 
     public Topic() {
         this.id = 0;
-        this.title = this.body = null;
+        this.title = null;
     }
-    public Topic(int id, String title, String body) {
+    public Topic(int id, String title) {
         this.id = id;
         this.title = title;
-        this.body = body;
     }
 
     public int getId(){

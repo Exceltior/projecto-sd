@@ -1,7 +1,6 @@
 package model.data;
 
 import common.util.Common;
-
 import java.io.DataOutputStream;
 
 ////
@@ -16,8 +15,6 @@ public class ServerTopic extends Topic {
             return false;
         if ( ! Common.sendString(title, out) )
             return false;
-        if ( ! Common.sendString(body, out) )
-            return false;
 
         return true;
     }
@@ -28,6 +25,5 @@ public class ServerTopic extends Topic {
     public ServerTopic(String[] line) {
         this.id = Integer.valueOf(line[0]);
         this.title = line[1];
-        this.body = line[2];
     }
 }

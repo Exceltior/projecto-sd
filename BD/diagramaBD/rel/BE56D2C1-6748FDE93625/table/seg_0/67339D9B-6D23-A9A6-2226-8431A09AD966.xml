@@ -24,16 +24,6 @@
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
-<dataTypeSize>20</dataTypeSize>
-<autoIncrementCycle>false</autoIncrementCycle>
-</Column>
-<Column name="descricao" id="46777595-8402-6D0B-F864-53943135EE75">
-<createdBy>joaquim</createdBy>
-<createdTime>2013-11-20 22:36:21 UTC</createdTime>
-<ownerDesignName>diagramaBD</ownerDesignName>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT024</logicalDatatype>
 <dataTypeSize>100</dataTypeSize>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
@@ -51,17 +41,6 @@
 <associations>
 <colAssociation fkAssociation="37D9F2BF-6D69-9487-9663-C0A27AAF0DB4" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
 </associations>
-</Column>
-<Column name="activo" id="8C90E154-BDB7-327F-FF84-11552C59B62B">
-<createdBy>joaquim</createdBy>
-<createdTime>2013-11-22 00:26:16 UTC</createdTime>
-<ownerDesignName>diagramaBD</ownerDesignName>
-<useDomainConstraints>false</useDomainConstraints>
-<use>1</use>
-<logicalDatatype>LOGDT019</logicalDatatype>
-<dataTypePrecision>1</dataTypePrecision>
-<dataTypeScale>0</dataTypeScale>
-<autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">

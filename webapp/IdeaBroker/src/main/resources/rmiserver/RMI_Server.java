@@ -120,9 +120,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     /**
      * This is the same as login, except it doesn't do anything to say we're online. It's meant to be used by the
      * notification server.
-     * @param user
-     * @param pwd
-     * @return
+     * @param user  The User's username
+     * @param pwd   The User's password
+     * @return  Returns the User's id in case of success, or -1 if an error occurred.
      * @throws RemoteException
      */
     public int canLogin(String user, String pwd) throws  RemoteException {
@@ -424,19 +424,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     /**
      * Method responsible for creating a new topic in the database
      * @param name  The name of the topic
-     * @param description The description of the topic
      * @param uid   The id of the user who created the topic
      * @return  A boolean value, indicating the success or failure of the operation
      * @throws RemoteException
      */
-    synchronized public boolean createTopic(String name, String description, int uid) throws  RemoteException{
+    synchronized public boolean createTopic(String name, int uid) throws  RemoteException{
         if (! validateTopic(name)){
             System.err.println("Topico invalido");
             return false;
         }
 
-        String query = "INSERT INTO Topico VALUES (topic_seq.nextval,'" + name + "','" + description + "'," +
-                "" + uid + ")";
+        String query = "INSERT INTO Topico VALUES (topic_seq.nextval,'" + name + "'," + uid + ")";
 
         insertData(query);
         return true;
@@ -1155,7 +1153,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         //  There is no topic with the given title, so let's create it
         ////
         if (topics.isEmpty()){
-            createTopic(topicTitle,("Topic created by user " + uid),uid);
+            createTopic(topicTitle,uid);
 
             //Add the number of the topic to the ArrayList
             query = "Select t.tid from Topico t where t.nome='" + topicTitle + "'";
@@ -1374,11 +1372,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             connectionPool.returnConnection(conn);
     }
 
-    ////
-    //  This method will be responsible for executing a query like "Insert ...". With this method we can create new registries in the
-    //  database's tables
-    //
-    ////
+    /**
+     * This method will be responsible for executing a query like "Insert ...". With this method we can create new
+     * registries in the database's tables
+     * @param query The query we want to execute in the database
+     * @param conn  The connection to the database
+     */
     private void insertData(String query, Connection conn) {
         System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
         boolean cont;

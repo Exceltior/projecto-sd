@@ -30,12 +30,18 @@
     <span  style="text-align: center;">
         <img src="<s:url value="/images/minions.gif"/>"  alt="Minions@Movies!" /><br/>
 
-        <s:form action="login">
-
-            <s:textfield name="username" label="Username" />
-            <s:password  name="password" label="Password" />
-            <s:submit value="Submit"/>
-        </s:form>
+         <form method="post" action="login">
+             <p>
+                 <s:textfield name="username" label="Username"/>
+             </p>
+             <p>
+                 <s:password name="password" label="Password"/>
+             </p>
+             <p>
+                 <button type="submit">Submit</button>
+             </p>
+             <!-- FIXME: Estou a assumir que depois do registo fazemos login automaticamente, mas isso pode-se mudar -->
+         </form>
 
     <a href="<s:url value="register.jsp" />" >
         Sign up<font color="red"></font>

@@ -29,11 +29,22 @@
 <div style="text-align: center;">
     <span  style="text-align: center;">
 
-        <s:textfield name="username" label="Username" /><br/>
-        <s:password  name="password" label="Password" /><br/>
-        <s:textfield name="email" label="Email" /><br/>
-        <s:submit value="Submit" action="register" align="center"/><br/>
+    <form method="post" action="register">
+        <p>
+            <s:textfield name="username" label="Username"/>
+        </p>
+        <p>
+            <s:password name="password" label="Password"/>
+        </p>
+        <p>
+            <s:textfield name="email" label="Email" />
+        </p>
+        <p>
+            <button type="submit">Submit</button>
+        </p>
         <!-- FIXME: Estou a assumir que depois do registo fazemos login automaticamente, mas isso pode-se mudar -->
+    </form>
+
     </span>
 </div>
 </body>
