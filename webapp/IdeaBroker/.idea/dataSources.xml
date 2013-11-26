@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="2847716546">
+    <data-source source="LOCAL" name="SD" product="Oracle" version="Oracle Database 11g Express Edition Release 11.2.0.2.0 - Production" jdbc-version="11.2" driver-name="Oracle JDBC driver" driver-version="11.2.0.3.0" uuid="3c9fef0c-5426-469b-8ee2-a27d1f41b0e3">
+      <extra-name-characters>$#</extra-name-characters>
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
+      <jdbc-url>jdbc:oracle:thin:@192.168.56.101:1521:XE</jdbc-url>
+      <user-name>sd</user-name>
+      <user-password>dfd9dfce</user-password>
+      <schema-pattern>*.SD</schema-pattern>
+      <default-dialect>Oracle</default-dialect>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/ojdbc6-11.2.0.3.jar!/</url>
+        </library>
+        <library>
+          <url>file://$PROJECT_DIR$/oracle-driver-license.txt</url>
+        </library>
+      </libraries>
+    </data-source>
+  </component>
+</project>
+

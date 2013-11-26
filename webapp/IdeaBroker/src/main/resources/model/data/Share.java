@@ -6,7 +6,6 @@ public class Share  implements Comparable<Share>, Serializable {
     private int uid;
     private int iid;
     private int price;
-    private int numMin;
     private int num;
 
      private static final long serialVersionUID = 1L;
@@ -20,7 +19,6 @@ public class Share  implements Comparable<Share>, Serializable {
         this.uid = Integer.valueOf(row[1]);
         this.num = Integer.valueOf(row[2]);
         this.price = Integer.valueOf(row[3]);
-        this.numMin = Integer.valueOf(row[4]);
     }
 
     public double getPriceShareRatio() {
@@ -35,7 +33,7 @@ public class Share  implements Comparable<Share>, Serializable {
     }
 
     public int getAvailableShares() {
-        return num-numMin;
+        return getNum(); //FIXME: Change this
     }
 
     public int getPriceForNum(int n) {
@@ -67,10 +65,6 @@ public class Share  implements Comparable<Share>, Serializable {
         else return 0;
     }
 
-    public int getNumMin() {
-        return numMin;
-    }
-
     public int getPrice() {
         return price;
     }
@@ -81,7 +75,6 @@ public class Share  implements Comparable<Share>, Serializable {
                 "uid=" + uid +
                 ", iid=" + iid +
                 ", price=" + price +
-                ", numMin=" + numMin +
                 ", num=" + num +
                 '}';
     }

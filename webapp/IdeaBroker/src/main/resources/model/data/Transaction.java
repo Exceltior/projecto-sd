@@ -10,16 +10,14 @@ public class Transaction implements Serializable, TimestampClass {
     public  int       iid;
     public  int       numTargetShares;
     public  int       targetPrice;
-    public  int       minTargetShares;
     private Timestamp timestamp;
     private static final long serialVersionUID = 1L;
 
-    public Transaction(int uid, int iid, int numTargetShares, int targetPrice, int minTargetShares) {
+    public Transaction(int uid, int iid, int numTargetShares, int targetPrice) {
         this.uid = uid;
         this.iid = iid;
         this.numTargetShares = numTargetShares;
         this.targetPrice = targetPrice;
-        this.minTargetShares = minTargetShares;
         this.setTimestamp(new Timestamp(new java.util.Date().getTime()));
     }
 

@@ -90,7 +90,7 @@ public class TransactionQueue extends OrderedTimestampQueue<Transaction> {
                 // out.
                 boolean result;
                 try {
-                    result = RMI.tryGetSharesIdea(t.uid, t.iid, t.numTargetShares, t.targetPrice, t.minTargetShares);
+                    result = RMI.tryGetSharesIdea(t.uid, t.iid, t.numTargetShares, t.targetPrice);
                 } catch (RemoteException e) {
                     System.err.println("Should never happen!");
                     continue;

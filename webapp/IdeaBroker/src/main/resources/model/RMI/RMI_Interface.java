@@ -26,7 +26,7 @@ public interface RMI_Interface extends Remote {
     public int createIdea(String title, String description, int uid) throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
-    public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
+    //public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
     //public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException;
     //public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException;
@@ -34,9 +34,8 @@ public interface RMI_Interface extends Remote {
     public void updateUserTime(int uid) throws RemoteException;
     public boolean addFile(int iid, NetworkingFile file) throws RemoteException;
     public NetworkingFile getFile(int iid) throws RemoteException;
-    public void setSharesIdea(int uid, int iid, int nshares, int price, int numMinShares)throws RemoteException;
-    boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice,
-                             int minTargetShares) throws RemoteException;
+    public void setSharesIdea(int uid, int iid, int nshares, int price)throws RemoteException;
+    boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice) throws RemoteException;
     boolean sayTrue() throws RemoteException;
     //public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException;
     //public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
@@ -49,7 +48,6 @@ public interface RMI_Interface extends Remote {
     public Idea[] getFilesIdeas()throws RemoteException;
 
     public String getUsername(int uid) throws RemoteException;
-    public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice,
-                                         int minTargetShares)  throws RemoteException;
+    public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice) throws RemoteException;
     public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException;
 }
