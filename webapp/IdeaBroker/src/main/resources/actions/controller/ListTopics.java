@@ -2,8 +2,6 @@ package actions.controller;
 
 import model.data.Topic;
 
-import java.util.ArrayList;
-
 /**
  * Created with IntelliJ IDEA.
  * User: joaquim
@@ -25,10 +23,10 @@ public class ListTopics extends ClientAction{
 
     public String execute() throws Exception {
         super.execute();
-        //topic = client.doTopics();
-        topics = new Topic[3];
+        this.topics = client.doTopics();
+        /*topics = new Topic[3];
         for (int i=0; i < topics.length; i++)
-            topics[i] =  (new Topic(i+100, "TT"+(i)));
+            topics[i] =  (new Topic(i+100, "TT"+(i)));*/
 
         return SUCCESS;
     }
