@@ -138,7 +138,7 @@
                             <span  style="text-align: center;">
 
 
-                                OLA PUTAS!!!<br />
+                                HELLO WORLD!!!<br />
                                 <s:iterator var="i" step="1" value="banana">
                                     <s:url action="teste2" var="urlTag">
                                         <s:param name="umaVariavel2" value="top.a" />
