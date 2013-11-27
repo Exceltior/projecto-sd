@@ -1,0 +1,51 @@
+.top {
+    position:absolute;
+    left:0; top:0;right:0;
+    height: 100px;
+
+}
+
+.left_blank {
+    position:absolute;
+    left:0px; top:100px;
+    width: 20px;
+    overflow:visible;
+
+}
+
+.left {
+    width:180px;
+    top:0px;
+    margin-top:0px;
+    padding-top:5px;
+    float: left;
+    border: 5px solid black;
+    overflow:visible;
+    text-align:center;
+    border-radius: 5px;
+
+}
+
+.left a {
+    border:1px solid red;
+    background-color: #F5F5F5;
+}
+
+.left a:hover{
+    border:3px solid green;
+    background-color: #D5D5D5;
+}
+
+.main {
+    top:100px;
+    margin-top:100px;
+    margin-left:200px;
+    background-color: #F7F1E6;
+    border-left: 5px solid black;
+    padding-left: 15px;
+    border-radius: 5px;
+}
+
+body {
+    background-color: #E9F1F5;
+}

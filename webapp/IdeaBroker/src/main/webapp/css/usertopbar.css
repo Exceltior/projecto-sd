@@ -1,0 +1,17 @@
+/* Make bar Sticky */
+#user_top_container {
+    background:#eee;
+    border:1px solid #666;
+    height:60px;
+    left:0;
+    position:fixed;
+    width:100%;
+    top:0;
+}
+
+#user_top {
+    line-height:60px;
+    margin:0 auto;
+    width:940px;
+    text-align:center;
+}
