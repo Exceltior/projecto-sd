@@ -48,15 +48,16 @@
     <div style="text-align: center;">
         <span  style="text-align: center;">
 
-            <s:iterator var="i" step="1" value="topics">
-                <s:url action="viewtopic" var="urlTag">
-                    <s:param name="tid" value="top.id" />
-                </s:url>
+            <s:iterator var="i" step="1" value="ideas">
+                <%-- <s:url action="viewidea" var="urlTag">
+                    <s:param name="iid" value="top.id" />
+                </s:url> --%>
 
-                <s:a href="%{urlTag}">Topico <s:property value="id" /></s:a><br />
+                <s:a href="%{urlTag}">Ideia <s:property value="iid" /></s:a><br />
                 <s:property value="id" /><br />
                 <s:property value="title" /><br />
             </s:iterator>
+
         </span>
     </div>
 </div>

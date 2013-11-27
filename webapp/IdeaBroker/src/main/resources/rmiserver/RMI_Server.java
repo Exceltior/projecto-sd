@@ -341,6 +341,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Checks if an idea has a file attached
+     * @param queryResult   The result of the SQL query
+     * @return  A boolean value, indicating if the idea has a file attached to it or not.
+     */
+    private boolean ideaHasNoFile(ArrayList<String[]> queryResult){
+        return !(queryResult.isEmpty() || queryResult.get(0)[0] == null);
+    }
+
+    /**
      * Gets the file associated with a given idea
      * @param iid The id of the idea in the database
      * @return NetworkingFile, containing the file associated with the idea
@@ -349,7 +358,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public NetworkingFile getFile(int iid) throws RemoteException {
         String query = "select path, OriginalFile from Ideia where iid ="+iid;
         ArrayList<String[]> queryResult = receiveData(query);
-        if ( queryResult.isEmpty() )
+        if ( !ideaHasNoFile(queryResult) )
             return null;
 
         try {

@@ -2,7 +2,7 @@ package actions.model;
 
 import model.RMI.RMIConnection;
 import model.RMI.RMI_Interface;
-import model.data.ServerTopic;
+import model.data.Idea;
 import model.data.Topic;
 
 import java.rmi.RemoteException;
@@ -36,7 +36,7 @@ public class Client {
         try {
             ret = rmi.getRMIInterface().login(username, password);
         } catch (RemoteException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return ret;
     }
@@ -62,6 +62,25 @@ public class Client {
         try{
            devolve = rmi.getRMIInterface().getTopics();
         }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
+     * Gets all the ideas in a given topic safely, using RMI.
+     * @param tid   The id of the given topic
+     * @return  On success returns an Array of class Idea objects, containing all the ideas in the given topic.
+     *          On failure, returns null.
+     */
+    private Idea[] doRMIIdeasTopic(int tid){
+        Idea[] devolve = null;
+
+
+        try{
+            devolve=rmi.getRMIInterface().getIdeasFromTopic(tid);
+        }catch(RemoteException e){
             e.printStackTrace();
         }
 
@@ -97,6 +116,15 @@ public class Client {
      */
     public boolean doRegister(String username, String password, String email){
         return doRMIRegister(username, password, email) && doLogin(username, password);
+    }
+
+    /**
+     * Public interface to try to get all the ideas in a given topic.
+     * @param tid   The id of the topic in question.
+     * @return  An array of Idea objects, containing all the ideas in the given topic
+     */
+    public Idea[] doIdeasTopic(int tid){
+        return doRMIIdeasTopic(tid);
     }
 
     public int getUid() {

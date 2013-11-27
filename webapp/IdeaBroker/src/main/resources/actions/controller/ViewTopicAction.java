@@ -1,8 +1,6 @@
 package actions.controller;
 
-import model.data.Topic;
-
-import java.util.ArrayList;
+import model.data.Idea;
 
 /**
  * Given a topic ID, fetch its data (ideas, etc), store them in the current Action. In struts.xml,
@@ -10,6 +8,7 @@ import java.util.ArrayList;
  */
 public class ViewTopicAction extends ClientAction{
     private int tid;
+    private Idea[] ideas;
 
     public int getTid() {
         return tid;
@@ -19,11 +18,19 @@ public class ViewTopicAction extends ClientAction{
         this.tid = tid;
     }
 
+    public Idea[] getIdeas(){
+        return this.ideas;
+    }
+
+    public void setIdeas(Idea[] ideas1){
+        this.ideas = ideas1;
+    }
 
     public String execute() throws Exception {
         super.execute();
-        System.out.println("Got topic id: "+tid);
-        //System.out.println("Got topic: "+topic);
+
+        this.ideas = client.doIdeasTopic(tid);
+        System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
         return SUCCESS;
     }
