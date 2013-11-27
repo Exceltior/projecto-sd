@@ -13,6 +13,8 @@ import java.util.ArrayList;
  */
 public class TempAction extends ClientAction {
     public ArrayList<Temp> banana = new ArrayList<Temp>();
+    ArrayList<Integer> variavelLocal = new ArrayList<Integer>();
+    public int aha = 3;
 
     public ArrayList<Integer> getVariavelLocal() {
         return variavelLocal;
@@ -22,13 +24,9 @@ public class TempAction extends ClientAction {
         this.variavelLocal = variavelLocal;
     }
 
-    ArrayList<Integer> variavelLocal = new ArrayList<Integer>();
-
     public int getAha() {
         return aha;
     }
-
-    public int aha = 3;
 
     public String execute() throws Exception {
         super.execute();

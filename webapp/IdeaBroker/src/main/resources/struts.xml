@@ -37,6 +37,10 @@
             <result name="success">testelayout.jsp</result>
         </action>
 
+        <action name="teste3" class="actions.controller.Temp3Action" method="execute">
+            <result name="success">teste.jsp</result>
+        </action>
+
     </package>
 
 </struts>

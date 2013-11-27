@@ -1,4 +1,5 @@
-<!--<jsp:useBean id="banana" scope="request" type="java.util.ArrayList"/>-->
+<!-- <jsp:useBean id="banana" scope="request" type="java.util.ArrayList"/> -->
+<jsp:useBean id="topic" scope="request" />
 <!-- STRUTS -->
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1"%>
@@ -50,17 +51,29 @@
         <span  style="text-align: center;">
 
 
-            OLA PUTAS!!!<br />
-            <s:iterator var="i" step="1" value="banana">
-                <s:url action="teste2" var="urlTag">
-                    <s:param name="umaVariavel2" value="top.a" />
+            OLA GORDOS!!!<br />
+
+            <!-- <s:iterator var="i" step="1" value="banana"> -->
+                <!-- <s:url action="teste2" var="urlTag"> -->
+                    <!-- <s:param name="umaVariavel2" value="top.a" /> -->
+                <!-- </s:url> -->
+
+                <!-- <s:a href="%{urlTag}">clica-me</s:a><br /> -->
+                <!-- <s:property value="a" /><br /> -->
+                <!-- <s:property value="b" /><br /> -->
+            <!-- </s:iterator> -->
+            <!-- <s:property value="%{#request.aha}"/><br /> -->
+
+            <s:iterator var="topic" step="1" value="topic">
+                <s:url action="teste3" var="urlTag">
+                    <s:param name="currentTopic" value="top.id" />
                 </s:url>
 
-                <s:a href="%{urlTag}">clica-me</s:a><br />
-                <s:property value="a" /><br />
-                <s:property value="b" /><br />
+                <s:a href="%{urlTag}">Topico clica</s:a><br />
+                <s:property value="id" /><br />
+                <s:property value="title" /><br />
             </s:iterator>
-            <s:property value="%{#request.aha}"/><br />
+
 
 
         </span>
