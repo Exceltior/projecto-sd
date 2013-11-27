@@ -46,8 +46,8 @@ public interface RMI_Interface extends Remote {
     public int getSharesNotSell(int iid,int uid) throws RemoteException;
     public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException;
     public Idea[] getFilesIdeas()throws RemoteException;
-
     public String getUsername(int uid) throws RemoteException;
     public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice) throws RemoteException;
     public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException;
+    public Idea[] getIdeasFromWatchList(int uid) throws RemoteException;
 }

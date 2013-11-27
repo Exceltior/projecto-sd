@@ -84,3 +84,19 @@ INSERT INTO "Share" VALUES (18,1,43,5);
 INSERT INTO "Share" VALUES (19,2,96,63);
 INSERT INTO "Share" VALUES (19,4,102,65);
 INSERT INTO "Share" VALUES (20,4,50,1);
+
+/*Inserir ideias na watchlist*/
+INSERT INTO IdeiaWatchList VALUES (1,4);
+INSERT INTO IdeiaWatchList VALUES (1,20);
+INSERT INTO IdeiaWatchList VALUES (1,17);
+INSERT INTO IdeiaWatchList VALUES (2,17);
+INSERT INTO IdeiaWatchList VALUES (2,13);
+INSERT INTO IdeiaWatchList VALUES (2,5);
+INSERT INTO IdeiaWatchList VALUES (3,17);
+INSERT INTO IdeiaWatchList VALUES (3,6);
+INSERT INTO IdeiaWatchList VALUES (3,7);
+INSERT INTO IdeiaWatchList VALUES (4,18);
+INSERT INTO IdeiaWatchList VALUES (4,19);
+INSERT INTO IdeiaWatchList VALUES (5,16);
+INSERT INTO IdeiaWatchList VALUES (5,3);
+INSERT INTO IdeiaWatchList VALUES (5,12);

@@ -8,6 +8,10 @@ import model.data.Idea;
 public class ViewUserIdeasAction extends ClientAction{
     private Idea[] ideasList;
 
+    /**
+     * Gets the ideas owned by the user.
+     * @return  An array of Idea objects, containing all the ideas owned by the user.
+     */
     public Idea[] getIdeasList(){
         return this.ideasList;
     }
@@ -30,7 +34,7 @@ public class ViewUserIdeasAction extends ClientAction{
 
         this.ideasList = client.doGetUserIdeas();
 
-        System.out.println("O user tem " + ideasList.length + " ideias");
+        //System.out.println("O user tem " + ideasList.length + " ideias");
 
         return SUCCESS;
     }

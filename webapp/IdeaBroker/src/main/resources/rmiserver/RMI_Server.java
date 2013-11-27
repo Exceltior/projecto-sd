@@ -391,6 +391,29 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Method responsible for getting all the ideas stored in a specified user's wathclist.
+     * @param uid   The user's id.
+     * @return  An array of Idea objects, containing all the ideas stored in a user's watchlist.
+     * @throws RemoteException
+     */
+    public Idea[] getIdeasFromWatchList(int uid) throws RemoteException{
+        String query = "Select w.iid, i.titulo, i.descricao, w.userid from Ideia i, IdeiaWatchList w " +
+                "where w.iid = i.iid and w.userid = " + uid;
+        ArrayList<String[]> queryResut = receiveData(query);
+        Idea[] devolve;
+
+        if (queryResut == null || queryResut.size() == 0)
+            return null;
+
+        devolve = new Idea[queryResut.size()];
+
+        for (int i=0;i<devolve.length;i++)
+            devolve[i] = new Idea(queryResut.get(i));
+
+        return devolve;
+    }
+
+    /**
      * Method responsible for getting all the information about all the shares of a given idea which belong to a specific
      * user
      * @param iid   The id of the given idea

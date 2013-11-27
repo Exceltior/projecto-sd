@@ -11,7 +11,7 @@ import java.rmi.RemoteException;
  * current user session. It is responsible for all interaction with the RMI.
  */
 public class Client {
-    private final static String RMI_HOST="localhost";
+    private final static String RMI_HOST="localhost";//FIXME: MUDAR ISTO?? NAO SEI SE O PROF QUER VER LOCALHOST NO CODIGO
 
 
     private RMIConnection rmi;
@@ -105,6 +105,25 @@ public class Client {
     }
 
     /**
+     * Gets all the ideas stored in a user's watchlist, safely and using RMI.
+     * @return  An array of Idea objects, conatining all the ideas stored in the user's watchlist.
+     */
+    private Idea[] doRMIGetUserWatchList(){
+        Idea[] devolve = null;
+
+        uid = 1;
+        //FIXME: Eliminar isto!
+
+        try{
+            devolve=rmi.getRMIInterface().getIdeasFromWatchList(uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -141,6 +160,14 @@ public class Client {
      */
     public Idea[] doGetUserIdeas(){
         return doRMIGetUserIdeas();
+    }
+
+    /**
+     *Public interface to try to get all the ideas in the user's watchlist.
+     * @return An array of Idea objects, containing all the ideasin the user's watchlist.
+     */
+    public Idea[] doGetUserWatchList(){
+        return doRMIGetUserWatchList();
     }
 
     /**
