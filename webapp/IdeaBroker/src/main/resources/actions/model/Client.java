@@ -2,6 +2,8 @@ package actions.model;
 
 import model.RMI.RMIConnection;
 import model.RMI.RMI_Interface;
+import model.data.ServerTopic;
+import model.data.Topic;
 
 import java.rmi.RemoteException;
 
@@ -42,11 +44,28 @@ public class Client {
     private boolean doRMIRegister(String username, String password, String email){
         boolean ret = false;
         try{
-            ret = rmi.getRMIInterface().register(username,password,email);
+            ret = rmi.getRMIInterface().register(username, password, email);
         } catch(RemoteException e){
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return ret;
+    }
+
+    /**
+     * Calls RMITopics safely.
+     * @return  On success, returns an Array of class Topic objects, containing all the topics stored in the database.
+     *          On failure, returns null.
+     */
+    private Topic[] doRMITopics(){
+       Topic[] devolve = null;
+
+        try{
+           devolve = rmi.getRMIInterface().getTopics();
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
     }
 
     /**
@@ -58,6 +77,14 @@ public class Client {
      */
     public boolean doLogin(String username, String password) {
         return (this.uid = doRMILogin(username, password)) != -1;
+    }
+
+    /**
+     * Public interface to try to get all the topics stored in the database
+     * @return  An ArrayList of class Topic objects, containing all the topics in the database
+     */
+    public Topic[] doTopics(){
+        return doRMITopics();
     }
 
     /**
