@@ -30,18 +30,34 @@ public class LoginAction extends ClientAction{
         }
     }
 
+    /**
+     * Gets the password for the given user.
+     * @return  A String object, containing the password for the given user.
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Defines a new password for the given user.
+     * @param password  The new password for the user.
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * Gets the username of the given user.
+     * @return  A String object, containing the username of the given user.
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Sets a new username for the user.
+     * @param username  The new user's username.
+     */
     public void setUsername(String username) {
         this.username = username;
     }

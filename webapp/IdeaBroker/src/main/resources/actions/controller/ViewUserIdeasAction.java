@@ -12,10 +12,19 @@ public class ViewUserIdeasAction extends ClientAction{
         return this.ideasList;
     }
 
+    /**
+     * Sets a new list of ideas for the user.
+     * @param ideas_list    List of user's ideas
+     */
     public void setIdeasList(Idea[] ideas_list){
         this.ideasList = ideas_list;
     }
 
+    /**
+     * Action's execute method, called whenever the action is triggered.
+     * @return  A String object, informing the success or failure of the operation
+     * @throws Exception
+     */
     public String execute() throws Exception{
         super.execute();
 

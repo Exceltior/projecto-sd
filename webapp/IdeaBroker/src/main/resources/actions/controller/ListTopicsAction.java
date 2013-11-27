@@ -8,15 +8,27 @@ import model.data.Topic;
 public class ListTopicsAction extends ClientAction{
     private Topic[] topics;
 
+    /**
+     * Getter for the attribute topics. Gets all the topics stored in the database.
+     * @return  An array of Topic objects, containing all the topics stored in the database.
+     */
     public Topic[] getTopics(){
         return this.topics;
     }
 
+    /**
+     * Setter for the attribute topics.
+     * @param topics
+     */
     public void setTopics(Topic[] topics) {
         this.topics = topics;
     }
 
-
+    /**
+     * Action's execute method, called whenever the action is triggered.
+     * @return A String object, informing the success or failure of the operation
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
+     */
     public String execute() throws Exception {
         super.execute();
         this.topics = client.doTopics();

@@ -152,6 +152,10 @@ public class Client {
         return doRMIGetTopicIdeas(tid);
     }
 
+    /**
+     * Gets the id of the client.
+     * @return
+     */
     public int getUid() {
         return uid;
     }

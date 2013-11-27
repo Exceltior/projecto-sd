@@ -29,26 +29,50 @@ public class RegisterAction extends ClientAction {
 
     }
 
+    /**
+     * Gets the password for the given user.
+     * @return  A String object, containing the password for the given user.
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Defines a new password for the given user.
+     * @param password  The new password for the user.
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     * Gets the username of the given user.
+     * @return  A String object, containing the username of the given user.
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Sets a new username for the user.
+     * @param username  The new user's username.
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * Gets the email of the given user.
+     * @return  A String object, containing the email of the given user.
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Sets a new email for the user.
+     * @param email  The new user's email.
+     */
     public void setEmail(String email) {
         this.email = email;
     }
