@@ -1,7 +1,6 @@
 package actions.model;
 
 import model.RMI.RMIConnection;
-import model.RMI.RMI_Interface;
 import model.data.Idea;
 import model.data.Topic;
 
@@ -74,13 +73,31 @@ public class Client {
      * @return  On success returns an Array of class Idea objects, containing all the ideas in the given topic.
      *          On failure, returns null.
      */
-    private Idea[] doRMIIdeasTopic(int tid){
+    private Idea[] doRMIGetTopicIdeas(int tid){
         Idea[] devolve = null;
-
 
         try{
             devolve=rmi.getRMIInterface().getIdeasFromTopic(tid);
         }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
+     * Gets all the ideas owned by the user, safely and using RMI.
+     * @return  An array of Idea objects, containing all the ideas owned by the user.
+     */
+    private Idea[] doRMIGetUserIdeas(){
+        Idea[] devolve = null;
+
+        uid = 1;
+        //FIXME Eliminar isto!
+
+        try{
+            devolve=rmi.getRMIInterface().getIdeasFromUser(uid);
+        }catch (RemoteException e){
             e.printStackTrace();
         }
 
@@ -119,12 +136,20 @@ public class Client {
     }
 
     /**
+     * Public interface to try to get all the ideas owned by the user.
+     * @return  An array of Idea objects, containing all the ideas owned by the user.
+     */
+    public Idea[] doGetUserIdeas(){
+        return doRMIGetUserIdeas();
+    }
+
+    /**
      * Public interface to try to get all the ideas in a given topic.
      * @param tid   The id of the topic in question.
      * @return  An array of Idea objects, containing all the ideas in the given topic
      */
-    public Idea[] doIdeasTopic(int tid){
-        return doRMIIdeasTopic(tid);
+    public Idea[] doGetTopicIdeas(int tid){
+        return doRMIGetTopicIdeas(tid);
     }
 
     public int getUid() {

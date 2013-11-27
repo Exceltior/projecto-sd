@@ -3,13 +3,9 @@ package actions.controller;
 import model.data.Topic;
 
 /**
- * Created with IntelliJ IDEA.
- * User: joaquim
- * Date: 27/11/13
- * Time: 09:40
- * To change this template use File | Settings | File Templates.
+ * Lists all the topics stored in the database. In struts.xml, we redirect the user to a jsp which expects this.
  */
-public class ListTopics extends ClientAction{
+public class ListTopicsAction extends ClientAction{
     private Topic[] topics;
 
     public Topic[] getTopics(){

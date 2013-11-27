@@ -10,10 +10,6 @@ public class Idea implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public int getId() {
-        return id;
-    }
-
     public int id, uid, shares_to_buy;
     protected String body, title, file;
 
@@ -94,6 +90,10 @@ public class Idea implements Serializable {
 
     public String getTitle(){
         return this.title;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getSharesBuy(){

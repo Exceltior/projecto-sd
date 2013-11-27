@@ -37,12 +37,16 @@
             <result name="success">testelayout.jsp</result>
         </action>
 
-        <action name="listtopics" class="actions.controller.ListTopics" method="execute">
+        <action name="listtopics" class="actions.controller.ListTopicsAction" method="execute">
             <result name="success">listtopics.jsp</result>
         </action>
 
         <action name="viewtopic" class="actions.controller.ViewTopicAction" method="execute">
             <result name="success">viewtopic.jsp</result>
+        </action>
+
+        <action name="viewuserideas" class="actions.controller.ViewUserIdeasAction" method="execute">
+            <result name="success">viewuserideas.jsp</result>
         </action>
 
     </package>

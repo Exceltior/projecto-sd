@@ -170,7 +170,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     public Idea[] getIdeasFromUser(int uid) throws RemoteException{
         Idea[] ideas;
-        String query = "Select i.iid,i.titulo,i.descricao,i.userid from Ideia i, Share s where i.activa = 1 and s.iid = i.iid" +
+        String query = "Select i.iid,i.titulo,i.descricao,i.userid from Ideia i, \"Share\" s where i.activa = 1 and s.iid = i.iid" +
                 " and s.userid = " + uid;
         ArrayList<String[]> queryResult = receiveData(query);
 
@@ -399,7 +399,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     synchronized public Share getIdeaShares(int iid, int uid) throws RemoteException{
-        String query = "Select s.iid, s.userid, s.valor, s.numshares from Share s where s.iid = " + iid +
+        String query = "Select s.iid, s.userid, s.valor, s.numshares from \"Share\" s where s.iid = " + iid +
                 " and s.userid = " + uid;
         ArrayList<String[]> queryResult = receiveData(query);
 
@@ -541,7 +541,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
 
         //Check if user is owner of the idea
-        String query = "Select s.userid from Share s where s.iid = " + idea.id;
+        String query = "Select s.userid from \"Share\" s where s.iid = " + idea.id;
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult.size() != 1)
@@ -643,7 +643,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
         ArrayList<Idea> devolve = new ArrayList<Idea>();
-        String query = "Select i.iid, i.titulo, i.descricao, i.userid, s.numShares, s.numMin from Share s, " +
+        String query = "Select i.iid, i.titulo, i.descricao, i.userid, s.numShares, s.numMin from \"Share\" s, " +
                 "Ideia i where s.userid != " +  uid + " and s.nummin < s.numshares and s.iid = i.iid";
         ArrayList<String[]> queryResult = receiveData(query);
         Idea temp;
@@ -739,7 +739,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public int getSharesNotSell(int iid,int uid) throws RemoteException{
-        String query = "Select s.numMin from Share s where s.userid = " + uid + " and s.iid = " + iid;
+        String query = "Select s.numMin from \"Share\" s where s.userid = " + uid + " and s.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult.isEmpty())
@@ -759,7 +759,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
         if ( getSharesIdeaForUid(iid,uid) == null)
             return false; // You have no shares!
-        String query = "Update Share set valor = " + price + " where userid = " + uid + " and iid = " + iid;
+        String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
         returnTransactionalConnection(conn);
@@ -780,7 +780,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
         if ( getSharesIdeaForUid(iid,uid) == null)
             return false; // You have no shares!
-        String query = "Update Share set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
+        String query = "Update \"Share\" set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
         Connection conn = getTransactionalConnection();
         insertData(query,conn);
         returnTransactionalConnection(conn);
@@ -831,7 +831,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<Share> shares = new ArrayList<Share>();
         if ( getIdeaByIID(iid) == null)
             return shares;
-        String query = "select * from Share where iid="+iid;
+        String query = "select * from \"Share\" where iid="+iid;
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -851,7 +851,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
         if ( getIdeaByIID(iid) == null)
             return null;
-        String query = "select * from Share where iid="+iid+" and userid="+uid;
+        String query = "select * from \"Share\" where iid="+iid+" and userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -1077,7 +1077,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     private synchronized void setSharesIdea(int uid, int iid,int nshares, int price,
                                   Connection conn)throws RemoteException{
-        String query = "select * from Share where userid="+uid+" and "+"iid="+iid;
+        String query = "select * from \"Share\" where userid="+uid+" and "+"iid="+iid;
         ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));
 
         if ( !result.isEmpty() ) {
@@ -1085,12 +1085,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             if ( nshares == 0 ) {
                 // Set to 0!! We should delete it!
-                query = "delete from Share where userid="+uid+" and iid="+iid;
+                query = "delete from \"Share\" where userid="+uid+" and iid="+iid;
             } else {
-                query = "update Share set numshares="+nshares+" where iid="+iid+" and userid="+uid;
+                query = "update \"Share\" set numshares="+nshares+" where iid="+iid+" and userid="+uid;
             }
         } else
-            query = "INSERT INTO Share VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + ")";
+            query = "INSERT INTO \"Share\" VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + ")";
 
         if ( conn == null )
             insertData(query);

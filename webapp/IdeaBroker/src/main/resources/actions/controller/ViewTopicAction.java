@@ -29,8 +29,8 @@ public class ViewTopicAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        this.ideas = client.doIdeasTopic(tid);
-        System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
+        this.ideas = client.doGetTopicIdeas(tid);
+        //System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
         return SUCCESS;
     }
