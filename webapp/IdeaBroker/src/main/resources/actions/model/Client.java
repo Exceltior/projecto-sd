@@ -40,6 +40,13 @@ public class Client {
         return ret;
     }
 
+    /**
+     * Call's RMI register to safely register a new user in the database.
+     * @param username  The new user's username
+     * @param password  The new user's password
+     * @param email     The new user's email
+     * @return          A boolean value, indicating the success or failure of the operation
+     */
     private boolean doRMIRegister(String username, String password, String email){
         boolean ret = false;
         try{
@@ -123,12 +130,35 @@ public class Client {
         return devolve;
     }
 
+    /**
+     * Gets all the topics safely and using RMI, which titles contain the String specified in title.
+     * @param title The title (or part of it) of the topic we want to search.
+     * @return  An array of Topic objects, containing all the results for the search we performed.
+     */
     private Topic[] doRMISearchTopic(String title){
         Topic[] devolve = null;
 
         try{
             devolve = rmi.getRMIInterface().getTopics(title);
         }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
+     * Gets all the ideas with the specified id and which title contains
+     * @param id    The id of the idea we want to search
+     * @param title The title (or part of it) of the idea we want to search
+     * @return      An array of Idea objects, containing all the results for the search we performed.
+     */
+    private Idea[] doRMISearchIdea(int id, String title){
+        Idea[] devolve = null;
+
+        try{
+            devolve = rmi.getRMIInterface().getIdeaByIID(id,title);
+        }catch(RemoteException e){
             e.printStackTrace();
         }
 
@@ -154,8 +184,24 @@ public class Client {
         return doRMIGetTopics();
     }
 
+    /**
+     * Public interface to search a topic by its title, or part of it.
+     * @param title The title (or part of it) of the topic we want to search
+     * @return  An array of Topic objects, containing all the topics found containing in their titles the String specified
+     *          in title
+     */
     public Topic[] doSearchTopic(String title){
         return doRMISearchTopic(title);
+    }
+
+    /**
+     * Public interface to search an idea by its id and its title (or part of it).
+     * @param iid   The id of the idea we want to search
+     * @param title The title (or part of it) of the idea we want to search
+     * @return      An array of Idea objects, containing all the ideas founded, based on the search we performed
+     */
+    public Idea[] doSearchIdea(int iid, String title){
+        return doRMISearchIdea(iid,title);
     }
 
     /**

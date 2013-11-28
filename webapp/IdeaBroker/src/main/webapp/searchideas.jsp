@@ -48,15 +48,17 @@
     <div style="text-align: center;">
         <span  style="text-align: center;">
 
-            <s:iterator var="i" step="1" value="ideasList">
-                <%-- <s:url action="viewidea" var="urlTag">
-                    <s:param name="iid" value="top.id" />
-                </s:url> --%>
-
-                <s:a href="%{urlTag}">Ideia <s:property value="iid" /></s:a><br />
-                <s:property value="id" /><br />
-                <s:property value="title" /><br />
-            </s:iterator>
+             <form method="post" action="searchidea">
+                 <p>
+                     <s:textfield name="id" label="Idea Id"/>
+                 </p>
+                 <p>
+                     <s:textfield name="title" label="Idea Title"/>
+                 </p>
+                 <p>
+                     <button type="submit">Submit</button>
+                 </p>
+             </form>
 
         </span>
     </div>

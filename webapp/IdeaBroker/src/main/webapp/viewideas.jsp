@@ -40,7 +40,7 @@
         <tr>
             <td>
                 <h2 style="text-align: center;">
-                    <em>LOGIN</em></h2>
+                    <em>User Ideas</em></h2>
             </td>
         </tr>
         </tbody>

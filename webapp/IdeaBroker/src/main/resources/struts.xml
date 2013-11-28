@@ -46,11 +46,11 @@
         </action>
 
         <action name="viewuserideas" class="actions.controller.ViewUserIdeasAction" method="execute">
-            <result name="success">viewuserideas.jsp</result>
+            <result name="success">viewideas.jsp</result>
         </action>
 
         <action name="viewuserwatchlist" class="actions.controller.ViewUserWatchListAction" method="execute">
-            <result name="success">viewuserwatchlist.jsp</result>
+            <result name="success">viewideas.jsp</result>
         </action>
 
         <action name="gosearchtopic" class="actions.controller.GoSearchTopicAction" method="execute">
@@ -60,6 +60,14 @@
         <action name="searchtopic" class="actions.controller.SearchTopicAction" method="execute">
             <result name="success">listtopics.jsp</result>
             <result name="error">home.jsp</result> <!-- FIXME -->
+        </action>
+
+        <action name="gosearchidea" class="actions.controller.GoSearchIdeaAction" method="execute">
+            <result name="success">searchideas.jsp</result>
+        </action>
+
+        <action name="searchidea" class="actions.controller.SearchIdeaAction" method="execute">
+            <result name="success">viewideas.jsp</result>
         </action>
 
     </package>

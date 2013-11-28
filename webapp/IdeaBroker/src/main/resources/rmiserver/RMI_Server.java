@@ -637,15 +637,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
-     * Build an idea from an IID. Notice that this constructor does not give us parent topic and ideas, it only gathers
-     * IID (which we already had), title and body. If one wants parent topics, ideas or children ideas, one must call
+     * Build an idea from an IID. Notice that this constructor only gathers IID (which we already had), title and body.
+     * If one wants parent topics, ideas or children ideas, one must call
      * addChildrenIdeasToIdea(), addParentIdeasToIdea() and addParentTopicsToIdea()
      * @param iid   The id of the idea we want to build
      * @return  An Idea object, with the idea we just built
      * @throws RemoteException
      */
     public Idea getIdeaByIID(int iid) throws RemoteException {
-        String query = "select * from Ideia t where t.iid = " + iid + " and t.activa = 1";
+        String query = "Select * from Ideia t where t.iid = " + iid + " and t.activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
         Idea devolve;
 
@@ -659,10 +659,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         return devolve;
     }
-
-    ////
-    //  Indica se o primeiro array list tem alguma ideia com o referido id
-    ////
 
     /**
      * Method which tells us if a given ArrayList contains any Idea with any of the given ids
@@ -728,9 +724,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query;
         Idea[] devolve;
 
-        if (iid != -1 && !title.equals(""))
+        if (iid > 0 && !title.equals(""))
             query = "Select * from Ideia i where i.activa = 1 and i.iid = " + iid +" and i.titulo LIKE '%" + title + "%'";
-        else if(iid != -1)
+        else if(iid > 0)
             query = "Select * from Ideia i where i.activa = 1 and i.iid = " + iid;
         else if (!title.equals(""))
             query = "Select * from Ideia i where i.activa = 1 and i.titulo LIKE '%" + title + "%'";
