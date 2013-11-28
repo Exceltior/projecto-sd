@@ -142,6 +142,32 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Method responsible for getting all the topics stored in the database, containing the given title
+     * @param title The title of the topic we want to search, or part of it
+     * @return  An array of ServerTopic objects, containing all the topics found with the given title, or part of it
+     * @throws RemoteException
+     */
+    public ServerTopic[] getTopics(String title) throws RemoteException{
+
+        if (title==null)
+            return getTopics();//FIXME: MAXI SHOULD WE DO THIS???
+
+        String query = "Select * from Topico where nome LIKE '%" + title + "%'";
+
+        ArrayList<String[]> result = receiveData(query);
+
+        if ( result.size() == 0 )
+            return null;
+
+        ServerTopic[] topics = new ServerTopic[result.size()];
+
+        for (int i = 0; i < result.size(); i++)
+            topics[i] = new ServerTopic(result.get(i));
+
+        return topics;
+    }
+
+    /**
      * Method responsible for getting all the topics stored in the database
      * @return  An array of ServerTopic objects, containing all the topics stored in the database
      * @throws RemoteException

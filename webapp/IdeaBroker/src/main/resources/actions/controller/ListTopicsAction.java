@@ -31,7 +31,7 @@ public class ListTopicsAction extends ClientAction{
      */
     public String execute() throws Exception {
         super.execute();
-        this.topics = client.doTopics();
+        this.topics = client.doGetTopics();
         /*topics = new Topic[3];
         for (int i=0; i < topics.length; i++)
             topics[i] =  (new Topic(i+100, "TT"+(i)));*/

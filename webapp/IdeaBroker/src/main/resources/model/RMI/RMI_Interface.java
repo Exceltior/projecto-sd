@@ -15,12 +15,13 @@ public interface RMI_Interface extends Remote {
     public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
+    public ServerTopic[] getTopics(String title) throws RemoteException;
     public boolean createTopic(String nome, int uid) throws  RemoteException;
     public Idea[] getIdeasFromTopic(int tid) throws RemoteException;
     public Idea[] getIdeasFromUser(int uid) throws RemoteException;
     public int removeIdea(Idea idea, int uid) throws  RemoteException;
     public Idea getIdeaByIID(int iid) throws RemoteException;
-    public Idea[] getIdeaByIID(int iid, String title) throws RemoteException;;
+    public Idea[] getIdeaByIID(int iid, String title) throws RemoteException;
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid) throws RemoteException;

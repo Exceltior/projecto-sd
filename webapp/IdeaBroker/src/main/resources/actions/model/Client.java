@@ -55,7 +55,7 @@ public class Client {
      * @return  On success, returns an Array of class Topic objects, containing all the topics stored in the database.
      *          On failure, returns null.
      */
-    private Topic[] doRMITopics(){
+    private Topic[] doRMIGetTopics(){
        Topic[] devolve = null;
 
         try{
@@ -123,6 +123,18 @@ public class Client {
         return devolve;
     }
 
+    private Topic[] doRMISearchTopic(String title){
+        Topic[] devolve = null;
+
+        try{
+            devolve = rmi.getRMIInterface().getTopics(title);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
     /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
@@ -138,8 +150,12 @@ public class Client {
      * Public interface to try to get all the topics stored in the database
      * @return  An ArrayList of class Topic objects, containing all the topics in the database
      */
-    public Topic[] doTopics(){
-        return doRMITopics();
+    public Topic[] doGetTopics(){
+        return doRMIGetTopics();
+    }
+
+    public Topic[] doSearchTopic(String title){
+        return doRMISearchTopic(title);
     }
 
     /**
