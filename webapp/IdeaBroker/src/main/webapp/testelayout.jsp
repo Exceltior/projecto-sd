@@ -1,4 +1,4 @@
-<!--<jsp:useBean id="banana" scope="request" type="java.util.ArrayList"/>-->
+<jsp:useBean id="banana2" scope="session" class="actions.controller.TempAction" />
 <!-- STRUTS -->
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1"%>
@@ -109,8 +109,7 @@
 
 
                 <div class="idea-body"><p>
-                    IDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODY IDEA BODYIDEA BODY IDEA BODYIDEA
-                    BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODYIDEA BODY IDEA BODY IDEA BODY
+                    <s:property value="banana2" />
                 </p></div>
                 <div>
                     tags tags tags tags tags

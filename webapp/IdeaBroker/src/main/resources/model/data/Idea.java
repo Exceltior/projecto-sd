@@ -76,6 +76,14 @@ public class Idea implements Serializable {
         this.shares_to_buy = -2;
     }
 
+    public void setTitle(String title1){
+        this.title = title1;
+    }
+
+    public void setBody(String body1){
+        this.body = body1;
+    }
+
     public void setFile(String f){
         this.file = f;
     }
@@ -98,6 +106,10 @@ public class Idea implements Serializable {
 
     public int getSharesBuy(){
         return this.shares_to_buy;
+    }
+
+    public String getBody(){
+        return this.body;
     }
 
     public void addSharesToBuy(int n){

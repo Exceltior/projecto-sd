@@ -513,13 +513,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +
-                "" + "1)";
+                "" + "1,null,null,null)";
 
         insertData(query);
 
         //FIXME: Do we need to return the id of the idea we created?? If so, is there any better way to do this??
-        query = "Select i.iid from Ideia i where i.titulo = '" + title + "' , i.descricao = '" + description +
-                "', i.userid = " + uid + ", i.activa = 1";
+        query = "Select i.iid from Ideia i where i.titulo = '" + title + "' and i.descricao = '" + description +
+                "' and i.userid = " + uid + " and i.activa = 1";
 
         queryResult = receiveData(query);
 

@@ -26,9 +26,21 @@
 Welcome, user <s:property value="%{#session.client.uid}"/>!
 
 
-<a href="<s:url action="goCreateIdea" />" >
-    Create Idea<font color="red"></font>
-</a>
+<form method="post" action="createIdea">
+    <p>
+        <s:textfield name="title" label="Type the idea's title"/>
+    </p>
+
+    <p>
+        <s:textfield name="body" label="Type the idea's body"/>
+    </p>
+    <p>
+        <s:textfield name="topicsList" label="Type the idea's topics. Separate with \";\" "/>
+    </p>
+    <p>
+        <button type="submit">Submit</button>
+    </p>
+</form>
 
 <!-- Display main menu -->
 

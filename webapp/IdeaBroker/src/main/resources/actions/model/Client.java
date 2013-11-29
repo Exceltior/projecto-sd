@@ -166,6 +166,45 @@ public class Client {
     }
 
     /**
+     * Gets all the ideas with the specified id and which title contains
+     * @param id    The id of the idea we want to search
+     * @return      An Idea object, containing the result for the search we performed.
+     */
+    private Idea doRMISearchIdea(int id){
+        Idea devolve = null;
+
+        try{
+            devolve = rmi.getRMIInterface().getIdeaByIID(id);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    private boolean doRMISubmitIdea(Idea ideia,String[] topicos){
+        boolean devolve = false;
+        int result;
+
+        try{
+            result = rmi.getRMIInterface().createIdea(ideia.getTitle(),ideia.getBody(),getUid());
+
+            if (result > 0){
+                for (String topico : topicos) {
+                    rmi.getRMIInterface().setTopicsIdea(result,topico,getUid());
+                }
+
+                devolve=true;
+            }
+
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -201,7 +240,20 @@ public class Client {
      * @return      An array of Idea objects, containing all the ideas founded, based on the search we performed
      */
     public Idea[] doSearchIdea(int iid, String title){
-        return doRMISearchIdea(iid,title);
+        return doRMISearchIdea(iid, title);
+    }
+
+    /**
+     * Public interface to search an idea by its id and its title (or part of it).
+     * @param iid   The id of the idea we want to search
+     * @return      An Idea object, containing the idea founded, based on the search we performed
+     */
+    public Idea doSearchIdea(int iid){
+        return doRMISearchIdea(iid);
+    }
+
+    public boolean doSubmitIdea(Idea ideia,String[] topics){
+        return doRMISubmitIdea(ideia,topics);
     }
 
     /**

@@ -22,13 +22,8 @@
 <p>
     &nbsp;</p>
 <p style="text-align: center;">
-    AMAZING HOMEPAGE.</p>
-Welcome, user <s:property value="%{#session.client.uid}"/>!
-
-
-<a href="<s:url action="goCreateIdea" />" >
-    Create Idea<font color="red"></font>
-</a>
+    ERRO ERRO ERRO.</p>
+    ERRO ERRO ERRO
 
 <!-- Display main menu -->
 

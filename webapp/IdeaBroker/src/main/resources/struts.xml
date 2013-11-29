@@ -70,6 +70,15 @@
             <result name="success">viewideas.jsp</result>
         </action>
 
+        <action name="goCreateIdea" class="actions.controller.goSubmitIdeaAction" method="execute">
+            <result name="success">submitIdea.jsp</result>
+        </action>
+
+        <action name="createIdea" class="actions.controller.submitIdeaAction" method="execute">
+            <result name="success">home.jsp</result>
+            <result name="error">error.jsp</result>
+        </action>
+
     </package>
 
 </struts>
