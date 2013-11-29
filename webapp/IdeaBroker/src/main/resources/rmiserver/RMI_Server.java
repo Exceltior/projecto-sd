@@ -33,7 +33,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     private static final String requestsQueueFilePath = "requests.bin";
     private String url;
-    private final int starting_money = 10000;
+    private final int starting_money = 1000000;
+    private final int starting_shares = 100000;
     private ConnectionPool connectionPool;
     private int lastFile = 0;
 
@@ -506,27 +507,64 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The id of the idea we just created
      * @throws RemoteException
      */
-    synchronized public int createIdea(String title, String description, int uid) throws RemoteException{
+    synchronized public int createIdea(String title, String description, int uid, int moneyInvested) throws RemoteException{
         String query;
         ArrayList<String[]> queryResult;
+        int initialSell, iid;
+        Connection conn;
 
+        //FIXME FIXME MAXI MAXI VE SE ESTA MERDA ESTA BEM FEITA!!!!!!!
+
+        /**
+         * FXME OK, O QUE ISTO DEVERIA FAZER (ASSUMINDO QUE HA DINHEIRO PARA TUDO E ASSIM):
+         * - CRIAR ENTRADA NA TABELA DE IDEIAS PARA A IDEIA
+         * - CRIAR ENTRADA NA TABELA DE SHARES
+         * - CRIAR ENTRADAS NA TABELA DE TOPICOS
+         * - DEDUZIR DINHEIRO DA CONTA DO UTILIZADOR
+         *
+         * MAXI, ISTO DEVERA ESTAR TUDO BEM, MAS VE ISTO COM ATENCAO QUE PODE TER ESCAPADO ALGUMA COISA
+         */
+
+        try{
+            conn = connectionPool.checkOutConnection();
+        }catch(SQLException e){
+            System.err.println("Error in the createIdea method!!");
+            return -1;
+        }
+
+        if (getUserMoney(uid) < moneyInvested){//If the user doesn't have enough money
+            System.err.println("Error while creating the idea! the user doesn't have enought money!" +
+                    " " + getUserMoney(uid) + " " + moneyInvested);
+            return -1;
+        }
+
+        initialSell = moneyInvested/starting_shares;
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +
-                "" + "1,null,null,null)";
+                "" + "1,null,null,"+ initialSell +")";
 
-        insertData(query);
+        insertData(query);//Insert the idea
 
-        //FIXME: Do we need to return the id of the idea we created?? If so, is there any better way to do this??
         query = "Select i.iid from Ideia i where i.titulo = '" + title + "' and i.descricao = '" + description +
                 "' and i.userid = " + uid + " and i.activa = 1";
 
         queryResult = receiveData(query);
 
-        if (queryResult.size()>0)
-            return Integer.parseInt(queryResult.get(0)[0]);
+        if (queryResult.size()>0){
+            iid =  Integer.parseInt(queryResult.get(0)[0]);
 
-        return -1;
+            //Insert the shares
+            setSharesIdea(uid,iid,starting_shares,initialSell);
+
+            //Deduce the money from the user's account
+            setUserMoney(uid,starting_money-moneyInvested,conn);
+        }
+        else
+            iid = -1;
+
+        System.out.println("Vou retornar " + iid +" no createIdea");
+        return iid;
 
     }
 
@@ -1135,7 +1173,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 query = "update \"Share\" set numshares="+nshares+" where iid="+iid+" and userid="+uid;
             }
         } else
-            query = "INSERT INTO \"Share\" VALUES (" + iid + "," + uid + "," + nshares + "," + price + "," + ")";
+            query = "INSERT INTO \"Share\" VALUES (" + iid + "," + uid + "," + nshares + "," + price + ")";
 
         if ( conn == null )
             insertData(query);

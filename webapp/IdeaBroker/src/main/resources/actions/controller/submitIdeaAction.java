@@ -1,7 +1,6 @@
 package actions.controller;
 
 import model.data.Idea;
-import model.data.Topic;
 
 
 public class submitIdeaAction extends ClientAction{
@@ -9,7 +8,9 @@ public class submitIdeaAction extends ClientAction{
     String[] topics;
     String title;
     String body;
+    String filePath;
     String topicsList;
+    int moneyInvested;
 
     public String getTitle(){
         return this.title;
@@ -17,6 +18,14 @@ public class submitIdeaAction extends ClientAction{
 
     public void setTitle(String title1){
         this.title = title1;
+    }
+
+    public int getMoneyInvested(){
+        return this.moneyInvested;
+    }
+
+    public void setMoneyInvested(int money){
+        this.moneyInvested = money;
     }
 
     public String getTopicsList(){
@@ -51,6 +60,14 @@ public class submitIdeaAction extends ClientAction{
         return this.topics;
     }
 
+    public String getFilePath(){
+        return this.filePath;
+    }
+
+    public void setFilePath(String filePath1){
+        this.filePath = filePath1;
+    }
+
     public String execute() throws Exception {
         super.execute();
 
@@ -61,7 +78,7 @@ public class submitIdeaAction extends ClientAction{
 
         topics = topicsList.split(";");
 
-        if (client.doSubmitIdea(idea,topics)){
+        if (client.doSubmitIdea(idea,topics,moneyInvested)){
             System.out.println("Correu bem a submissao da ideia!!!!!!!!");
             return SUCCESS;
         }

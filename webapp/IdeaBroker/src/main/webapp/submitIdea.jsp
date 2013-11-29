@@ -23,7 +23,8 @@
     &nbsp;</p>
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
-Welcome, user <s:property value="%{#session.client.uid}"/>!
+Welcome, user <s:property value="%{#session.client.uid}" />!
+
 
 
 <form method="post" action="createIdea">
@@ -36,6 +37,12 @@ Welcome, user <s:property value="%{#session.client.uid}"/>!
     </p>
     <p>
         <s:textfield name="topicsList" label="Type the idea's topics. Separate with \";\" "/>
+    </p>
+    <p>
+        <s:textfield name="moneyInvested" label="Insert the amount of DEI Coins you want to invest"/>
+    </p>
+    <p>
+        <s:file name="filePath" label="Select the file you want to attach" accept="text/*" />
     </p>
     <p>
         <button type="submit">Submit</button>

@@ -182,14 +182,15 @@ public class Client {
         return devolve;
     }
 
-    private boolean doRMISubmitIdea(Idea ideia,String[] topicos){
+    private boolean doRMISubmitIdea(Idea ideia,String[] topicos,int moneyInvested){
         boolean devolve = false;
         int result;
 
         try{
-            result = rmi.getRMIInterface().createIdea(ideia.getTitle(),ideia.getBody(),getUid());
+            result = rmi.getRMIInterface().createIdea(ideia.getTitle(),ideia.getBody(),getUid(),moneyInvested);
 
             if (result > 0){
+                //Associar aos topicos
                 for (String topico : topicos) {
                     rmi.getRMIInterface().setTopicsIdea(result,topico,getUid());
                 }
@@ -252,8 +253,8 @@ public class Client {
         return doRMISearchIdea(iid);
     }
 
-    public boolean doSubmitIdea(Idea ideia,String[] topics){
-        return doRMISubmitIdea(ideia,topics);
+    public boolean doSubmitIdea(Idea ideia,String[] topics,int moneyInvested){
+        return doRMISubmitIdea(ideia,topics,moneyInvested);
     }
 
     /**
