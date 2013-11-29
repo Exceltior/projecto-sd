@@ -596,9 +596,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (queryResult.size() != 1)
             return -2;//User is not owner of the idea
 
-        //Only has one owner
+            //Only has one owner
         else if (Integer.parseInt(queryResult.get(0)[0]) != uid )
-                return -2;//User is not owner of the idea
+            return -2;//User is not owner of the idea
 
         //Here we know that the user is the owner of the idea
 
@@ -706,7 +706,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                     devolve.add(temp);
                 }
                 else{
-                   devolve.get(index).addSharesToBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
+                    devolve.get(index).addSharesToBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
                 }
             }
         }
@@ -859,7 +859,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         for (int i=0;i<queryResult.size();i++)
             history[i] = queryResult.get(i)[5] + ": ID " + queryResult.get(i)[0] + " bought "+ queryResult.get(i)[4] +
                     " " +
-                "shares from " + "ID "
+                    "shares from " + "ID "
                     + queryResult.get(i)[1] + " at " + queryResult.get(i)[3] + " DEI Coins per share, " +
                     "for a total of " + queryResult.get(i)[2] + " DEI Coins. model.data.Idea.Transaction date: " + queryResult.get(i)[6];
 
@@ -999,7 +999,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     synchronized public boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice)
-                                                 throws RemoteException {
+            throws RemoteException {
         System.out.println("tryGetSharesIdea called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
                 ", targetPrice="+targetPrice);
         Share currentShares = getSharesIdeaForUid(iid, uid);
@@ -1121,7 +1121,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     private synchronized void setSharesIdea(int uid, int iid,int nshares, int price,
-                                  Connection conn)throws RemoteException{
+                                            Connection conn)throws RemoteException{
         String query = "select * from \"Share\" where userid="+uid+" and "+"iid="+iid;
         ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));
 
@@ -1460,8 +1460,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             connectionPool = new ConnectionPool(url, username, password);
             Class.forName("oracle.jdbc.driver.OracleDriver"); //This could be moved to the connectionPool but we had
-                                                              // some issues so right now we're just praying that it
-                                                              // works.
+            // some issues so right now we're just praying that it
+            // works.
 
             if (connectionPool == null) {
                 System.out.println("Failed to make connection!");
