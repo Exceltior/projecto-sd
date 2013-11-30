@@ -23,26 +23,13 @@
     &nbsp;</p>
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
-Welcome, user <s:property value="%{#session.client.uid}" />!
+Set Share Price!!!
 
 
 
-<form method="post" action="createIdea">
+<form method="post" action="setSharePrice">
     <p>
-        <s:textfield name="title" label="Type the idea's title"/>
-    </p>
-
-    <p>
-        <s:textfield name="body" label="Type the idea's body"/>
-    </p>
-    <p>
-        <s:textfield name="topicsList" label="Type the idea's topics. Eg: #topic1#topic2 "/>
-    </p>
-    <p>
-        <s:textfield name="moneyInvested" label="Insert the amount of DEI Coins you want to invest"/>
-    </p>
-    <p>
-        <s:file name="filePath" label="Select the file you want to attach" accept="text/*" />
+        <s:textfield name="price" label="Type the current shares' selling price"/>
     </p>
     <p>
         <button type="submit">Submit</button>

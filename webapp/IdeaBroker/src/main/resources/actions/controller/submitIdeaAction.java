@@ -2,10 +2,12 @@ package actions.controller;
 
 import model.data.Idea;
 
+import java.util.ArrayList;
+
 
 public class submitIdeaAction extends ClientAction{
     Idea idea;
-    String[] topics;
+    ArrayList<String> topics;
     String title;
     String body;
     String filePath;
@@ -52,14 +54,6 @@ public class submitIdeaAction extends ClientAction{
         this.idea = idea2;
     }
 
-    public void setTopics(String[] topic1){
-        this.topics = topic1;
-    }
-
-    public String[] getTopics(){
-        return this.topics;
-    }
-
     public String getFilePath(){
         return this.filePath;
     }
@@ -68,15 +62,35 @@ public class submitIdeaAction extends ClientAction{
         this.filePath = filePath1;
     }
 
+    /**
+     * Method to filter the topics inserted by the user. With this method we can discard invalid topic names, like:
+     * #this is #topic . In this example we only consider the topics "this" and "topic", since it's impossible to use
+     * hashtags with spaces.
+     * @param list  An array of String objects, containing a list of the topics inserted by the user
+     * @return  An ArrayList of String objects, containing the final valid topics.
+     */
+    private ArrayList<String> getTopicsFromList(String[] list){
+        ArrayList<String> devolve = new ArrayList<String>();
+
+        for (String aList : list) {
+            if (!aList.contains(" ") && !aList.equals(""))//If the topic doesnt have a space
+                devolve.add(aList);
+        }
+
+        return devolve;
+    }
+
     public String execute() throws Exception {
         super.execute();
+
+        System.out.println("O cliente e " + client.getUid());
 
         //Criar ideia; FIXME CODIGO FEIO COMO TUDO!!!!
         idea = new Idea();
         idea.setBody(body);
         idea.setTitle(title);
 
-        topics = topicsList.split(";");
+        topics = getTopicsFromList(topicsList.split("#"));
 
         if (client.doSubmitIdea(idea,topics,moneyInvested)){
             System.out.println("Correu bem a submissao da ideia!!!!!!!!");

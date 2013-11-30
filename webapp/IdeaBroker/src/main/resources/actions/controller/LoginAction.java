@@ -19,6 +19,10 @@ public class LoginAction extends ClientAction{
      */
     public String execute() throws Exception {
         super.execute();
+
+        if (username.equals("") || password.equals(""))
+            return ERROR;
+
         System.out.println("Login: "+username+" "+password);
         if ( client.doLogin(username, password) ){
             System.out.println("Vou devolver sucesso no execute do LoginAction");

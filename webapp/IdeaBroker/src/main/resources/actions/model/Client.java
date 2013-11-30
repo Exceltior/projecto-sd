@@ -5,6 +5,7 @@ import model.data.Idea;
 import model.data.Topic;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 /**
  * Client Bean which acts as our Model. It stores the RMI, the uid and other useful variables associated with the
@@ -182,7 +183,7 @@ public class Client {
         return devolve;
     }
 
-    private boolean doRMISubmitIdea(Idea ideia,String[] topicos,int moneyInvested){
+    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested){
         boolean devolve = false;
         int result;
 
@@ -253,7 +254,7 @@ public class Client {
         return doRMISearchIdea(iid);
     }
 
-    public boolean doSubmitIdea(Idea ideia,String[] topics,int moneyInvested){
+    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested){
         return doRMISubmitIdea(ideia,topics,moneyInvested);
     }
 

@@ -7,6 +7,7 @@ import model.data.Idea;
  */
 public class ViewUserIdeasAction extends ClientAction{
     private Idea[] ideasList;
+    private boolean userIdeas = true;
 
     /**
      * Gets the ideas owned by the user.
@@ -14,6 +15,22 @@ public class ViewUserIdeasAction extends ClientAction{
      */
     public Idea[] getIdeasList(){
         return this.ideasList;
+    }
+
+    /**
+     * Gets a boolean value, telling us if the ideas we are going to see are owned (totally or partially) by the user
+     * @return  A boolean value, telling us if the ideas we are going to see are owned (totally or partially) by the user
+     */
+    public boolean getUserIdeas(){
+        return this.userIdeas;
+    }
+
+    /**
+     * Setter for the attribute userIdeas.
+     * @param type  The value we want to assign to userIdeas
+     */
+    public void setUserIdeas(boolean type){
+        this.userIdeas = type;
     }
 
     /**

@@ -33,7 +33,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     private static final String requestsQueueFilePath = "requests.bin";
     private String url;
-    private final int starting_money = 1000000;
+    private final float starting_money = 1000000;
     private final int starting_shares = 100000;
     private ConnectionPool connectionPool;
     private int lastFile = 0;
@@ -510,7 +510,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized public int createIdea(String title, String description, int uid, int moneyInvested) throws RemoteException{
         String query;
         ArrayList<String[]> queryResult;
-        int initialSell, iid;
+        float initialSell;
+        int iid;
         Connection conn;
 
         //FIXME FIXME MAXI MAXI VE SE ESTA MERDA ESTA BEM FEITA!!!!!!!
@@ -979,7 +980,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param conn The connection to use, for instance, for transactional operations. null if don't care which
      *             connection to use
      */
-    private void setUserMoney(int uid, int money, Connection conn) {
+    private void setUserMoney(int uid, float money, Connection conn) {
         String query = "update Utilizador set dinheiro="+money+" where userid="+uid;
 
         if ( conn == null )
@@ -1143,7 +1144,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param price The price of each share for the given idea
      * @throws RemoteException
      */
-    synchronized public void setSharesIdea(int uid, int iid, int nshares, int price)throws RemoteException{
+    synchronized public void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
         /* null here means no transactional connection */
         setSharesIdea(uid, iid, nshares,price,null);
     }
@@ -1158,7 +1159,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
      */
-    private synchronized void setSharesIdea(int uid, int iid,int nshares, int price,
+    private synchronized void setSharesIdea(int uid, int iid,int nshares, float price,
                                             Connection conn)throws RemoteException{
         String query = "select * from \"Share\" where userid="+uid+" and "+"iid="+iid;
         ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));

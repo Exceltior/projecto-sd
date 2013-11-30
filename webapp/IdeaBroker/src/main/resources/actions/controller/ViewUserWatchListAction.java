@@ -8,6 +8,7 @@ import model.data.Idea;
  */
 public class ViewUserWatchListAction extends ClientAction {
     private Idea[] ideasList;
+    private boolean userIdeas = false;
 
     /**
      * Setter for attribute ideasList. This method allow us to define a new set of ideas to define as the user's watchlist.
@@ -23,6 +24,22 @@ public class ViewUserWatchListAction extends ClientAction {
      */
     public Idea[] getIdeasList(){
         return this.ideasList;
+    }
+
+    /**
+     * Gets a boolean value, telling us if the ideas we are going to see are owned (totally or partially) by the user
+     * @return  A boolean value, telling us if the ideas we are going to see are owned (totally or partially) by the user
+     */
+    public boolean getUserIdeas(){
+        return this.userIdeas;
+    }
+
+    /**
+     * Setter for the attribute userIdeas.
+     * @param type  The value we want to assign to userIdeas
+     */
+    public void setUserIdeas(boolean type){
+        this.userIdeas = type;
     }
 
     /**

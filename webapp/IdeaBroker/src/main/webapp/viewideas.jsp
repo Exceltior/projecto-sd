@@ -56,6 +56,12 @@
                 <s:a href="%{urlTag}">Ideia <s:property value="iid" /></s:a><br />
                 <s:property value="id" /><br />
                 <s:property value="title" /><br />
+
+                <s:if test="userIdeas == true">
+                    <a href="<s:url action="goSetSharePrice" />" >
+                        Set Idea's Shares Selling Prices<font color="red"></font>
+                    </a><br />
+                </s:if>
             </s:iterator>
 
         </span>
