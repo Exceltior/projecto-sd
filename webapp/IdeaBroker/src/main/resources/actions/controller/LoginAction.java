@@ -19,7 +19,7 @@ public class LoginAction extends ClientAction{
      */
     public String execute() throws Exception {
         super.execute();
-
+        System.out.println("Login: "+username+" "+password);
         if ( client.doLogin(username, password) ){
             System.out.println("Vou devolver sucesso no execute do LoginAction");
             return SUCCESS;
