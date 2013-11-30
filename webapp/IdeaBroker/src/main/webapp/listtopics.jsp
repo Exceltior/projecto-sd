@@ -9,56 +9,69 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="css/sidebar.css">
+    <link href="bootstrap-3.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/login.css" rel="stylesheet">
+    <link href="css/clouds.css" rel="stylesheet">
+    <link href="css/simple-sidebar.css" rel="stylesheet">
     <title></title>
 </head>
 <body>
-<div id="header_container">
-    <div id="header">
-        <h1 style="color: blue; text-align: center;">
-            <span style="font-family:lucida sans unicode,lucida grande,sans-serif;"><strong>IdeaBroker</strong></span></h1>
-        <hr />
+<div style="position:relative">
+    <div id="clouds" style="position:relative">
+        <div class="cloud x1"></div>
+        <!-- Time for multiple clouds to dance around -->
+        <div class="cloud x2"></div>
+        <div class="cloud x3"></div>
+        <div class="cloud x4"></div>
+        <div class="cloud x5"></div>
+</div>
+        <div style="position:absolute; top:0; left:0">
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand"><a href="#">Start Bootstrap</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Shortcuts</a></li>
+            <li><a href="#">Overview</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
     </div>
-</div>
 
-<div id="nav">
-    <ul>
-        <li><a href="http://example.com/page2">A Link</a></li>
-        <li><a href="http://example.com/page3">Another Link</a></li>
-    </ul>
-</div>
-<div id="content_header">
-    <p> Here's some stuff </p>
+    <!-- Page content -->
+    <div id="page-content-wrapper">
+        <div class="content-header">
+            <h1>
+                <a id="menu-toggle" href="#" class="btn btn-default"><i class="icon-reorder"></i></a>
+                Simple Sidebar
+            </h1>
+        </div>
+        <!-- Keep all page content within the page-content inset div! -->
+        <div class="page-content inset">
+            <div class="row">
+                <div class="col-md-12">
+                    <s:iterator var="i" step="1" value="topics">
+                        <s:url action="viewtopic" var="urlTag">
+                            <s:param name="tid" value="top.id" />
+                        </s:url>
 
-
-
-    <p>
-        &nbsp;</p>
-    <table align="center" border="1" cellpadding="1" cellspacing="1" style="width: 500px; background: url('<s:url
-            value="images/bg_gradient_tiny.png"/>');">
-        <tbody>
-        <tr>
-            <td>
-                <h2 style="text-align: center;">
-                    <em>LOGIN</em></h2>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div style="text-align: center;">
-        <span  style="text-align: center;">
-
-            <s:iterator var="i" step="1" value="topics">
-                <s:url action="viewtopic" var="urlTag">
-                    <s:param name="tid" value="top.id" />
-                </s:url>
-
-                <s:a href="%{urlTag}">Topico <s:property value="id" /></s:a><br />
-                <s:property value="id" /><br />
-                <s:property value="title" /><br />
-            </s:iterator>
-        </span>
+                        <s:a href="%{urlTag}">Topico <s:property value="id" /></s:a><br />
+                        <s:property value="id" /><br />
+                        <s:property value="title" /><br />
+                    </s:iterator>
+                </div>
+            </div>
+        </div>
     </div>
+
 </div>
+            </div>
+    </div>
+<script src="jquery.js"></script>
+<script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
