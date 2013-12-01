@@ -1,7 +1,6 @@
 package actions.controller;
 
 import model.data.Idea;
-
 import java.util.ArrayList;
 
 

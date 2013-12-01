@@ -42,6 +42,11 @@
             <result name="success">viewideas.jsp</result>
         </action>
 
+        <action name="listtopics" class="actions.controller.ListTopicsAction" method="execute">
+            <result name="success">listtopics.jsp</result>
+            <result name="error">error.jsp</result>
+        </action>
+
         <action name="searchtopic" class="actions.controller.SearchTopicAction" method="execute">
             <result name="success">listtopics.jsp</result>
             <result name="error">error.jsp</result>
@@ -49,10 +54,6 @@
 
         <action name="searchidea" class="actions.controller.SearchIdeaAction" method="execute">
             <result name="success">viewideas.jsp</result>
-        </action>
-
-        <action name="goCreateIdea" class="actions.controller.GoSubmitIdeaAction" method="execute">
-            <result name="success">submitIdea.jsp</result>
         </action>
 
         <action name="createIdea" class="actions.controller.SubmitIdeaAction" method="execute">

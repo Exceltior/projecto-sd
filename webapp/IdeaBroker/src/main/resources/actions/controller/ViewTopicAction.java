@@ -10,7 +10,10 @@ public class ViewTopicAction extends ClientAction{
     private int tid;
     private Idea[] ideas;
 
-
+    /**
+     * Gets the id of the topic we are showing to the user.
+     * @return  The id of the topic we are showing to the user.
+     */
     public int getTid() {
         return tid;
     }

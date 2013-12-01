@@ -25,7 +25,7 @@
     AMAZING HOMEPAGE.</p>
 Welcome, user <s:property value="%{#session.client.uid}"/>!<br />
 
-<a href="<s:url action="GoCreateIdea" />" >
+<a href="<s:url value="submitIdea.jsp" />" >
     Create Idea
 </a><br />
 <a href="<s:url action="viewuserideas" />" >
@@ -34,7 +34,7 @@ Welcome, user <s:property value="%{#session.client.uid}"/>!<br />
 <a href="<s:url action="viewuserwatchlist" />" >
     View User Watchlist
 </a><br />
-<a href="<s:url value="listtopics.jsp" />" >
+<a href="<s:url action="listtopics" />" >
     Check Topics
 </a><br />
 <a href="<s:url value="searchtopic.jsp" />" >
