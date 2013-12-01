@@ -83,6 +83,22 @@ public class Client {
     }
 
     /**
+     * Calls RMI's getTopicTitle safely.
+     * @return  On success, The topic title. On failure, returns null
+     */
+    private String doRMIGetTopicTitle(int tid){
+        String ret = null;
+
+        try{
+            ret = rmi.getRMIInterface().getTopicTitle(tid);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    /**
      * Gets all the ideas in a given topic safely, using RMI.
      * @param tid   The id of the given topic
      * @return  On success returns an Array of class Idea objects, containing all the ideas in the given topic.
@@ -350,6 +366,15 @@ public class Client {
      */
     public boolean doSetSharePrice(int iid, int price){
         return doRMISetSharePrice(iid, uid, price);
+    }
+
+    /**
+     * Gets the title of the supplied topic id.
+     * @param tid The topic id
+     * @return The topic title, or null in case of failure
+     */
+    public String doGetTopicTitle(int tid) {
+        return doRMIGetTopicTitle(tid);
     }
 
     /**
