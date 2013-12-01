@@ -25,9 +25,9 @@ public class Client {
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
         this.uid = -1;
-        this.coins = 0; /* FIXME: On login, set this */
+        this.coins = 0;
         this.numNotifications = 0; /* FIXME: On login, set this */
-        this.adminStatus = true; /* FIXME: We're temporarily setting adminStatus to true */
+        this.adminStatus = true;
     }
 
     /**
