@@ -111,6 +111,26 @@ public class Common {
         return true;
     }
 
+    static public boolean sendFloat(float i, DataOutputStream outStream) {
+        if ( outStream == null ) {
+            //System.err.println("sendInt ERR");
+            return false;
+        }
+        try {
+            if (i==-1)
+                System.out.println("WE ARE SENDING THE FLOAT -1 -> THIS WILL NOT END WELL");
+            outStream.writeFloat(i);
+        } catch (IOException e) {
+            //System.err.println("sendInt ERR"); e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
     static public String recvString(DataInputStream inStream) {
         if ( inStream == null ) {
             //System.err.println("recvString ERR");
@@ -133,6 +153,25 @@ public class Common {
         int ret = -1;
         try {
             ret = inStream.readInt();
+            if ( ret == -1 ) {
+                System.err.println("They're trying to hack us!");
+                inStream.close(); // Our humble attempt at solving this
+            }
+        } catch (IOException e) {
+            //System.err.println("recvInt ERR"); e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    static public float recvFloat(DataInputStream inStream) {
+        if ( inStream == null ) {
+            //System.err.println("recvInt ERR");
+            return -1;
+        }
+        float ret = -1;
+        try {
+            ret = inStream.readFloat();
             if ( ret == -1 ) {
                 System.err.println("They're trying to hack us!");
                 inStream.close(); // Our humble attempt at solving this
