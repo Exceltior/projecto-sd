@@ -94,7 +94,7 @@
                     <div class="list-group text-center" >
                         <s:iterator var="i" step="1" value="topics">
                             <a href="viewtopic.action?tid=<s:property value="id" />" class="list-group-item">
-                                <h4 class="list-group-item-heading"><s:property value="title" /><span
+                                <h4 class="list-group-item-heading">#<s:property value="title" /><span
                                         class="badge" style="float:right"><s:property value="numIdeas" /></span></h4>
                             </a>
                         </s:iterator>
