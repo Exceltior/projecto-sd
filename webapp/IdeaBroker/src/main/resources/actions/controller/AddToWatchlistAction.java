@@ -1,9 +1,6 @@
 package actions.controller;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * AJAX action. This action is mapped in struts.xml to produce JSON. The JSON parser will iterate through the action
  * and append all getters to the JSON output. In particular, the .JSP is expecting a success boolean value which
@@ -21,7 +18,7 @@ public class AddToWatchlistAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
         System.out.println(" AddToWatchlistActioniid: " + iid);
-        this.success = client.doAddWatchList(iid);
+        this.success = client.doAddToWatchList(iid);
         return SUCCESS;
     }
 

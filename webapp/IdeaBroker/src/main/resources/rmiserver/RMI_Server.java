@@ -1065,10 +1065,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * Adds an idea to a user's watchlist.
      * @param iid   The id of the idea to be added to the user's watchlist.
      * @param uid   The user's id.
-     * @return      A boolean value, indicating the success or failure of the operation.
      * @throws RemoteException
      */
-    public void addIdeaWatchList(int iid, int uid) throws RemoteException{
+    public void addIdeaToWatchlist(int iid, int uid) throws RemoteException{
         String query = "Insert INTO IdeiaWatchList Values(" + uid + ", " + iid +")";
 
         insertData(query);

@@ -295,7 +295,7 @@ public class Client {
      */
     private boolean doRMIAddToWatchList(int iid){
         try{
-            rmi.getRMIInterface().addIdeaWatchList(iid,uid);
+            rmi.getRMIInterface().addIdeaToWatchlist(iid,uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
