@@ -49,11 +49,11 @@
         <span  style="text-align: center;">
 
             <s:iterator var="i" step="1" value="ideas">
-                <%-- <s:url action="viewidea" var="urlTag">
+                <s:url action="viewidea" var="urlTag">
                     <s:param name="iid" value="top.id" />
-                </s:url> --%>
-
+                </s:url>
                 <s:a href="%{urlTag}">Ideia <s:property value="iid" /></s:a><br />
+
                 <s:property value="id" /><br />
                 <s:property value="title" /><br />
             </s:iterator>

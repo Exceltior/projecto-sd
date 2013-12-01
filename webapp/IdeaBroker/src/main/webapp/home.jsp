@@ -23,8 +23,7 @@
     &nbsp;</p>
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
-Welcome, user <s:property value="%{#session.client.uid}"/>!
-
+Welcome, user <s:property value="%{#session.client.uid}"/>!<br />
 
 <a href="<s:url action="GoCreateIdea" />" >
     Create Idea
@@ -35,13 +34,13 @@ Welcome, user <s:property value="%{#session.client.uid}"/>!
 <a href="<s:url action="viewuserwatchlist" />" >
     View User Watchlist
 </a><br />
-<a href="<s:url action="listtopics" />" >
+<a href="<s:url value="listtopics.jsp" />" >
     Check Topics
 </a><br />
-<a href="<s:url action="searchtopic" />" >
+<a href="<s:url value="searchtopic.jsp" />" >
     Search Topic
 </a><br />
-<a href="<s:url action="gosearchidea" />" >
+<a href="<s:url value="searchideas.jsp" />" >
     Search Idea
 </a><br />
 

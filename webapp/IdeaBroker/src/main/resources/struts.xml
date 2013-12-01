@@ -30,10 +30,6 @@
             <result name="success">testelayout.jsp</result>
         </action>
 
-        <action name="listtopics" class="actions.controller.ListTopicsAction" method="execute">
-            <result name="success">listtopics.jsp</result>
-        </action>
-
         <action name="viewtopic" class="actions.controller.ViewTopicAction" method="execute">
             <result name="success">viewtopic.jsp</result>
         </action>
@@ -46,17 +42,9 @@
             <result name="success">viewideas.jsp</result>
         </action>
 
-        <action name="gosearchtopic" class="actions.controller.GoSearchTopicAction" method="execute">
-            <result name="success">searchtopic.jsp</result>
-        </action>
-
         <action name="searchtopic" class="actions.controller.SearchTopicAction" method="execute">
             <result name="success">listtopics.jsp</result>
-            <result name="error">home.jsp</result> <!-- FIXME -->
-        </action>
-
-        <action name="gosearchidea" class="actions.controller.GoSearchIdeaAction" method="execute">
-            <result name="success">searchideas.jsp</result>
+            <result name="error">error.jsp</result>
         </action>
 
         <action name="searchidea" class="actions.controller.SearchIdeaAction" method="execute">
