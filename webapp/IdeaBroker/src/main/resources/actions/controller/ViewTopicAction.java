@@ -7,8 +7,9 @@ import model.data.Idea;
  * we redirect the user to a jsp which expects this.
  */
 public class ViewTopicAction extends ClientAction{
-    private int tid;
+    private int    tid;
     private Idea[] ideas;
+    private String topicName;
 
     /**
      * Gets the id of the topic we are showing to the user.
@@ -50,9 +51,14 @@ public class ViewTopicAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        this.ideas = client.doGetTopicIdeas(tid);
+        this.ideas     = client.doGetTopicIdeas(tid);
+        this.topicName = client.doGetTopicTitle(tid);
         //System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
         return SUCCESS;
+    }
+
+    public String getTopicName() {
+        return topicName;
     }
 }
