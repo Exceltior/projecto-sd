@@ -45,9 +45,12 @@
                 Ideias</span><span
                     style="color:black">
                 _</span></a></li>
+            <c:if
+                    test="${ #session.client.adminStatus == 'true'">
             <li><a href="#"><span class="glyphicon glyphicon-wrench">&nbsp;Painel de Administrador</span><span
                     style="color:black">
                 _</span></a></li>
+            </c:if>
         </ul>
     </div>
 

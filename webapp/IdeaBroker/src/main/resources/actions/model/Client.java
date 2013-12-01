@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * current user session. It is responsible for all interaction with the RMI.
  */
 public class Client {
-    private final static String RMI_HOST="localhost";//FIXME: MUDAR ISTO?? NAO SEI SE O PROF QUER VER LOCALHOST NO CODIGO
+    private final static String RMI_HOST = "localhost";//FIXME: MUDAR ISTO?? NAO SEI SE O PROF QUER VER LOCALHOST NO CODIGO
 
 
     private RMIConnection rmi;
@@ -20,12 +20,14 @@ public class Client {
     private String        username;
     private float         coins;
     private int           numNotifications;
+    private boolean       adminStatus;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
         this.uid = -1;
         this.coins = 0; /* FIXME: On login, set this */
         this.numNotifications = 0; /* FIXME: On login, set this */
+        this.adminStatus = true; /* FIXME: We're temporarily setting adminStatus to true */
     }
 
     /**
@@ -368,5 +370,9 @@ public class Client {
 
     public int getNumNotifications() {
         return numNotifications;
+    }
+
+    public boolean getAdminStatus() {
+        return adminStatus;
     }
 }
