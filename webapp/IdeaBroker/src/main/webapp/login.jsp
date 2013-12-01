@@ -23,7 +23,7 @@
         <div class="cloud x2"></div>
         <div class="cloud x1"></div>
 
-        <div style="margin-top:-150px">
+        <div style="margin-top:-350px">
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 col-md-offset-4">
