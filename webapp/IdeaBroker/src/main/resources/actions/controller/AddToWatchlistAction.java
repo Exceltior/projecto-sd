@@ -21,7 +21,7 @@ public class AddToWatchlistAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
         System.out.println(" AddToWatchlistActioniid: " + iid);
-        this.success = true;
+        this.success = client.doAddWatchList(iid);
         return SUCCESS;
     }
 
