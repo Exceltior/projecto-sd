@@ -13,60 +13,90 @@
     <link href="css/login.css" rel="stylesheet">
     <link href="css/clouds.css" rel="stylesheet">
     <link href="css/simple-sidebar.css" rel="stylesheet">
+    <link href="css/banner.css" rel="stylesheet">
     <title></title>
 </head>
 <body>
-<div style="position:relative">
-    <div id="clouds" style="position:relative">
-        <div class="cloud x1"></div>
-        <!-- Time for multiple clouds to dance around -->
-        <div class="cloud x2"></div>
-        <div class="cloud x3"></div>
-        <div class="cloud x4"></div>
-        <div class="cloud x5"></div>
-</div>
-        <div style="position:absolute; top:0; left:0">
+
 <div id="wrapper">
 
     <!-- Sidebar -->
     <div id="sidebar-wrapper">
         <ul class="sidebar-nav">
-            <li class="sidebar-brand"><a href="#">Start Bootstrap</a></li>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Shortcuts</a></li>
-            <li><a href="#">Overview</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Contact</a></li>
+            <li class="sidebar-brand"><a href="#">Team TransformadaZ</a></li>
+            <li style="margin-top:100px;"><a
+                    href="#"><span class="glyphicon glyphicon-home">&nbsp;Home</span><span style="color:black">
+                _</span></a></li>
+            <li style="background-color: floralwhite"><a href="#"><span class="glyphicon glyphicon-list">&nbsp;Ver
+                Tópicos</span><span style="color:floralwhite">_</span></a></li>
+            <li><a
+                    href="#"><span class="glyphicon glyphicon-eye-open">&nbsp;Watchlist</span><span
+                    style="color:black">
+                _</span></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-cloud">&nbsp;As Minhas Ideias</span><span style="color:black">_</span></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-bell">&nbsp;Mensagens</span><span style="color:black">_</span></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-fire">&nbsp;Hall of Fame</span><span style="color:black">
+                _</span></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-search">&nbsp;Pesquisar Tópicos</span><span
+                    style="color:black">
+                _</span></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-search"  style="z-index:0"></span><span
+                    class="glyphicon glyphicon-cloud" style="margin-left:-5px; z-index:1">&nbsp;Pesquisar
+                Ideias</span><span
+                    style="color:black">
+                _</span></a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-wrench">&nbsp;Painel de Administrador</span><span
+                    style="color:black">
+                _</span></a></li>
         </ul>
     </div>
 
     <!-- Page content -->
     <div id="page-content-wrapper">
         <div class="content-header">
-            <h1>
-                <a id="menu-toggle" href="#" class="btn btn-default"><i class="icon-reorder"></i></a>
-                Simple Sidebar
-            </h1>
+            <div class="bs-header">
+                    <h1  style="margin-left: -10px;">Idea Broker</h1>
+                <p> Your ideas. Our market. </p>
+            </div>
         </div>
         <!-- Keep all page content within the page-content inset div! -->
-        <div class="page-content inset">
-            <div class="row">
-                <div class="col-md-12">
-                    <s:iterator var="i" step="1" value="topics">
-                        <s:url action="viewtopic" var="urlTag">
-                            <s:param name="tid" value="top.id" />
-                        </s:url>
+        <div class="page-content inset" style=" margin: -20px">
+            <nav class="navbar navbar-default navbar-static-top" role="navigation">
+                <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
+                    <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
+                        Hakuna</a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-euro"></span>&nbsp;500 DEICoins</a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-envelope"></span>&nbsp;3 Novas
+                        Mensagens</a></li>
+                </ul>
+            </nav>
+            <div style="position:relative">
+                <div id="clouds" style="position:relative; margin: -20px; margin-top: -40px; z-index: -20;">
+                    <div class="cloud x1"></div>
+                    <div class="cloud x2"></div>
+                    <div class="cloud x3"></div>
+                    <div class="cloud x4"></div>
+                    <div class="cloud x5"></div>
+                    <div class="cloud x2"></div>
+                    <div class="cloud x1"></div>
+                </div>
+                <div style="position:absolute; top:0; left:0; width:100%">
+            <div class="row" style="margin:10px; margin-top:30px">
 
-                        <s:a href="%{urlTag}">Topico <s:property value="id" /></s:a><br />
-                        <s:property value="id" /><br />
-                        <s:property value="title" /><br />
-                    </s:iterator>
+                <div class="col-md-8 col-md-offset-2">
+                    <h2 style="text-align:center">Tópicos</h2>
+                    <div class="list-group text-center" >
+                        <s:iterator var="i" step="1" value="topics">
+                            <a href="viewtopic.action?tid=<s:property value="id" />" class="list-group-item">
+                                <h4 class="list-group-item-heading"><s:property value="title" /><span
+                                        class="badge" style="float:right">14</span></h4>
+                            </a>
+                        </s:iterator>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+                </div>
 
 </div>
             </div>
