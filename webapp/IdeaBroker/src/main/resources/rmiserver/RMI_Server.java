@@ -1075,6 +1075,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Removes an idea from a user's watchlist.
+     * @param iid   The id of the idea to be removed from the user's watchlist.
+     * @param uid   The user's id.
+     * @throws RemoteException
+     */
+    public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException{
+        String query = "delete from IdeiaWatchList where userid = "+uid+" and iid="+iid;
+
+        insertData(query);
+    }
+
+    /**
      * Gets the administration role of a given user.
      * @param uid   The user's id.
      * @return      A boolean value, indicating if the user is as administrator (root) or just a simple user.
