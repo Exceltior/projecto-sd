@@ -64,9 +64,12 @@
             <nav class="navbar navbar-default navbar-static-top" role="navigation">
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
-                        Hakuna</a></li>
-                    <li><a href="#"><span class="glyphicon glyphicon-euro"></span>&nbsp;500 DEICoins</a></li>
-                    <li><a href="#"><span class="glyphicon glyphicon-envelope"></span>&nbsp;3 Novas
+                        <s:property value="%{#session.client.username}"/></a></li>
+                    <li><a href="#" name="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
+                            value="%{#session.client.coins}"/> DEICoins</a></li>
+                    <li><a href="#" name="notifications"><span class="glyphicon
+                     glyphicon-envelope"></span>&nbsp;<s:property
+                            value="%{#session.client.numNotifications}"/> Novas
                         Mensagens</a></li>
                 </ul>
             </nav>
@@ -89,7 +92,7 @@
                         <s:iterator var="i" step="1" value="topics">
                             <a href="viewtopic.action?tid=<s:property value="id" />" class="list-group-item">
                                 <h4 class="list-group-item-heading"><s:property value="title" /><span
-                                        class="badge" style="float:right">14</span></h4>
+                                        class="badge" style="float:right"><s:property value="numIdeas" /></span></h4>
                             </a>
                         </s:iterator>
                     </div>
