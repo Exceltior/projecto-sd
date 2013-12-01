@@ -1611,8 +1611,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             }catch(SQLException s){
                 System.err.println("SQLException in the insertData method");
                 cont = true;
-
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
             }
+
         } while ( cont );
     }
 
