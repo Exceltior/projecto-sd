@@ -37,6 +37,7 @@ public class ClientAction extends ActionSupport implements SessionAware {
     public void getClientSession() {
         if ( !session.containsKey("client") ) {
             this.client = new Client();
+            client.doLogin("Hakuna","Matata"); //FIXME: HACKED IN to make our lives easier
             session.put("client", client);
         } else
             this.client = (Client) session.get("client");
