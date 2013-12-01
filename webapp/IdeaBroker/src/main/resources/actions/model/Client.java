@@ -431,7 +431,7 @@ public class Client {
      * Adds an idea to the user's watchlist
      * @param iid   The id of the idea to add to the user's watchlist
      */
-    public boolean doAddWatchList(int iid){
+    public boolean doAddToWatchList(int iid){
         return doRMIAddToWatchList(iid);
     }
 
