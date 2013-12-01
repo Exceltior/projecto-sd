@@ -802,13 +802,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         if (tid != -2 && !name.equals(""))
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.nome LIKE '%" + name +"%' and t.tid = " + tid + " and i.tid = t.tid";
+                    "where t.nome LIKE '%" + name +"%' and t.tid = " + tid + " and i.tid = t.tid" +
+                    " group by t.tid, t.nome, t.userid";
         else if(tid != -2)
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.tid = " + tid + " and t.tid = i.tid";
+                    "where t.tid = " + tid + " and t.tid = i.tid group by t.tid, t.nome, t.userid";
         else if (!name.equals(""))
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid";
+                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid group by t.tid, t.nome, t.userid";
         else
             return null;
 
@@ -818,6 +819,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return null;
 
         return new ServerTopic(queryResult.get(0));
+    }
+
+    /**
+     * Given a topic id, return its title
+     * @param tid The topic id
+     * @return The name, or null if no such topic exists
+     * @throws RemoteException
+     */
+    public String getTopicTitle(int tid) throws RemoteException {
+        String query = "select nome from Topico where tid = "+tid;
+
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.isEmpty())
+            return null;
+
+        return queryResult.get(0)[0];
     }
 
     //FIXME: Are we going to need this?
@@ -1673,7 +1691,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{
