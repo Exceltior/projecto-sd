@@ -28,8 +28,8 @@
             <li style="margin-top:100px;"><a
                     href="#"><span class="glyphicon glyphicon-home">&nbsp;Home</span><span style="color:black">
                 _</span></a></li>
-            <li style="background-color: floralwhite"><a href="#"><span class="glyphicon glyphicon-list">&nbsp;Ver
-                Tópicos</span><span style="color:floralwhite">_</span></a></li>
+            <li style="background-color: black"><a href="#"><span class="glyphicon glyphicon-list">&nbsp;Ver
+                Tópicos</span><span style="color:black">_</span></a></li>
             <li><a
                     href="#"><span class="glyphicon glyphicon-eye-open">&nbsp;Watchlist</span><span
                     style="color:black">
