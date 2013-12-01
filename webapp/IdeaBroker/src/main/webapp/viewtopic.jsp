@@ -14,8 +14,28 @@
     <link href="css/clouds.css" rel="stylesheet">
     <link href="css/simple-sidebar.css" rel="stylesheet">
     <link href="css/banner.css" rel="stylesheet">
-    <link href="css/3dbtn.css" rel="stylesheet">
+    <!--<link href="css/3dbtn.css" rel="stylesheet">-->
     <title></title>
+    <script type="text/javascript">
+        function addToWatchlist(id){
+            btn = "addtowatchlistbtn"+id;
+            tags = "ideatags"+id;
+            var formData = {iid:id}; //Array
+            $.getJSON('addtowatchlist.action', formData,function(data) {
+
+                if ( data.success ) {
+                    $('[name='+btn+']').hide();
+                    $('[name='+tags+']').html($('[name='+tags+']').html()+'<span class="label label-success"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist</span>');
+                } else {
+                    alert("Server Internal Error...RMI is probably down!");
+                }
+                return true;
+            });
+
+
+
+        }
+    </script>
 </head>
 <body>
 
@@ -46,13 +66,14 @@
                     class="glyphicon glyphicon-cloud" style="margin-left:-5px; z-index:1">&nbsp;Pesquisar
                 Ideias</span><span
                     style="color:black">
-                _</span></a></li>
-            <c:if
+                _</span></a> </li>
+
+            <s:if
                     test="client.adminStatus == true">
                 <li><a href="#"><span class="glyphicon glyphicon-wrench">&nbsp;Painel de Administrador</span><span
                         style="color:black">
                 _</span></a></li>
-            </c:if>
+            </s:if>
         </ul>
     </div>
 
@@ -70,8 +91,7 @@
                     <li><a href="#" name="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
                             value="%{#session.client.coins}"/> DEICoins</a></li>
                     <li><a href="#" name="notifications"><span class="glyphicon
-                     glyphicon-envelope"></span>&nbsp;<s:property
-                            value="%{#session.client.numNotifications}"/> Novas
+                     glyphicon-envelope"></span>&nbsp; Novas
                         Mensagens</a></li>
                 </ul>
             </nav>
@@ -97,17 +117,26 @@
                                 <s:iterator var="i" step="1" value="ideas">
                                     <div class="list-group-item">
                                         <%-- href="viewidea.action?iid=<s:property value="iid" />" --%>
-                                        <h4 class="list-group-item-heading"><s:property value="title" /></h4>
+                                        <h4
+                                                class="list-group-item-heading"><s:property value="title" /><div
+                                                "></span></h4>
                                         <p class="list-group-item-text">
-                                            <div style="height: 75px">
+                                            <div style="height: 25px">
+                                            <div style="float:right" name="ideatags<s:property value="id" />">
+                                                <!-- Labels here -->
+                                            </div>
+                                        </div>
+                                            <div style="height: 45px">
                                                 <div style="float:right">
                                                     <a href="#" type="button"
-                                                       class="btn btn-success btn-sm btn3d">
+                                                       class="btn btn-success btn-sm" name="addtowatchlistbtn<s:property value="id" />"
+                                                       onclick="addToWatchlist(<s:property value="id" />);">
                                                         <span class="glyphicon glyphicon-eye-open"></span> Adicionar
                                                         à Watchlist
                                                     </a>
+                                                    <!--was btn3d-->
                                                     <a href="deleteidea.action?iid=<s:property value="id" />" type="button"
-                                                       class="btn btn-danger btn-sm btn3d">
+                                                       class="btn btn-danger btn-sm">
                                                         <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
                                                     </a>
                                                 </div>

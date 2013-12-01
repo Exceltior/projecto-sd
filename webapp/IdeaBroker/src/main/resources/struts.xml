@@ -68,4 +68,10 @@
 
     </package>
 
+    <package name="default" namespace="/" extends="json-default">
+        <action name="addtowatchlist" class="actions.controller.AddToWatchlistAction" method="execute">
+            <result type="json"></result>
+        </action>
+    </package>
+
 </struts>
