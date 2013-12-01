@@ -25,17 +25,33 @@
 
                 if ( data.success ) {
                     $('[name='+btn+']').hide();
-                    $('[name='+tags+']').html($('[name='+tags+']').html()+'<span class="label label-success"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist</span>');
+                    $('[name='+tags+']').html($('[name='+tags+']').html()+'<span class="label label-success" name="watchlistlabel'+id+'"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist <a href="#" type="button" onclick="removeFromWatchlist('+id+');"><span class="glyphicon glyphicon-remove"></span></a> </span>');
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
                 return true;
             });
+        }
 
+        function removeFromWatchlist(id) {
+            btns = "buttons"+id;
+            btn = "addtowatchlistbtn"+id;
+            tags = "ideatags"+id;
+            label = "watchlistlabel"+id;
+            var formData = {iid:id}; //Array
+            $.getJSON('removefromwatchlist.action', formData,function(data) {
 
-
+                if ( data.success ) {
+                    $('[name='+label+']').hide();
+                    $('[name='+btns+']').html($('[name='+btns+']').html()+'<a href="#" type="button" class="btn btn-success btn-sm" name="'+btn+'" onclick="addToWatchlist('+id+');"> <span class="glyphicon glyphicon-eye-open"></span> Adicionar à Watchlist </a>');
+                } else {
+                    alert("Server Internal Error...RMI is probably down!");
+                }
+                return true;
+            });
         }
     </script>
+
 </head>
 <body>
 
@@ -124,16 +140,33 @@
                                             <div style="height: 25px">
                                             <div style="float:right" name="ideatags<s:property value="id" />">
                                                 <!-- Labels here -->
+
+                                                <!-- Watchlist Label -->
+                                                <s:if test="top.inWatchList">
+
+                                                    <span class="label label-success" name="watchlistlabel<s:property
+                                                     value="id" />"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist
+                                                        <a href="#" type="button"
+                                                           onclick="removeFromWatchlist(<s:property
+                                                                value="id" />);"><span
+                                                                class="glyphicon glyphicon-remove"></span></a> </span>
+                                                </s:if>
+
                                             </div>
                                         </div>
                                             <div style="height: 45px">
-                                                <div style="float:right">
-                                                    <a href="#" type="button"
-                                                       class="btn btn-success btn-sm" name="addtowatchlistbtn<s:property value="id" />"
-                                                       onclick="addToWatchlist(<s:property value="id" />);">
-                                                        <span class="glyphicon glyphicon-eye-open"></span> Adicionar
-                                                        à Watchlist
-                                                    </a>
+                                                <div style="float:right" name="buttons<s:property
+                                                     value="id" />">
+                                                    <!-- Buttons here -->
+                                                    <s:if
+                                                            test="!top.inWatchList">
+                                                        <a href="#" type="button"
+                                                           class="btn btn-success btn-sm" name="addtowatchlistbtn<s:property value="id" />"
+                                                           onclick="addToWatchlist(<s:property value="id" />);">
+                                                            <span class="glyphicon glyphicon-eye-open"></span> Adicionar
+                                                            à Watchlist
+                                                        </a>
+                                                    </s:if>
                                                     <!--was btn3d-->
                                                     <a href="deleteidea.action?iid=<s:property value="id" />" type="button"
                                                        class="btn btn-danger btn-sm">
@@ -141,6 +174,9 @@
                                                     </a>
                                                 </div>
                                         </div>
+                                            Watchlist: <s:property value="inWatchList" />
+                                            Owned: <s:property value="numSharesOwned" />
+                                            Percent Owned: <s:property value="pecentOwned" />
                                                 <s:property value="body" /> </p>
                                     </div>
                                 </s:iterator>
