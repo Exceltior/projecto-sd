@@ -61,11 +61,6 @@
             <result name="error">error.jsp</result>
         </action>
 
-        <action name="setSharePrice" class="actions.controller.SetSharePriceAction" method="execute">
-            <result name="success">home.jsp</result>
-            <result name="error">error.jsp</result>
-        </action>
-
     </package>
 
     <package name="default" namespace="/" extends="json-default">
@@ -73,6 +68,10 @@
             <result type="json"></result>
         </action>
         <action name="removefromwatchlist" class="actions.controller.RemoveFromWatchlistAction" method="execute">
+            <result type="json"></result>
+        </action>
+
+        <action name="setshareprice" class="actions.controller.SetSharePriceAction" method="execute">
             <result type="json"></result>
         </action>
     </package>

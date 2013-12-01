@@ -1,21 +1,9 @@
 package actions.controller;
 
-public class SetSharePriceAction extends ClientAction{
+public class SetSharePriceAction extends AJAXAction{
 
-    private int price;//Price PER SHARE
-    private int iid;//Id of the idea
-
-    public int getPrice(){
-        return this.price;
-    }
-
-    public void setPrice(int price1){
-        this.price = price1;
-    }
-
-    public int getIid(){
-        return this.iid;
-    }
+    private float price; //Price PER SHARE
+    private int   iid;   //Id of the idea
 
     public void setIid(int iid) {
         this.iid = iid;
@@ -24,15 +12,23 @@ public class SetSharePriceAction extends ClientAction{
     public String execute() throws Exception{
         super.execute();
 
-        System.out.println("O execute do SetSharePriceAction esta a correr " + iid);
+        System.out.println("O execute do SetSharePriceAction esta a correr " + iid + " price: "+price);
 
         if (client.doSetSharePrice(this.iid,this.price)){
             System.out.println("Vou devolver sucesso");
-            return SUCCESS;
+            ajaxSuccess();
         }
-
-        System.out.println("Vou devolver erro");
-        return ERROR;
+        else {
+            System.out.println("Vou devolver erro");
+            ajaxFailure();
+        }
+        return SUCCESS;
+    }
+    public boolean isSuccess() {
+        return super.isSuccess();
     }
 
+    public void setPrice(float price) {
+        this.price = price;
+    }
 }
