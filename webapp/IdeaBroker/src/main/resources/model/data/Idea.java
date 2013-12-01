@@ -19,6 +19,7 @@ public class Idea implements Serializable {
     private int numSharesOwned;
     private float percentOwned;
     private boolean inWatchList;
+    private float sellingPrice; //The price at which this user is selling shares, if he owns any
 
 
     ////
@@ -36,6 +37,7 @@ public class Idea implements Serializable {
         this.numSharesOwned = 0;
         this.percentOwned = 0;
         this.inWatchList = false;
+        this.sellingPrice = 0;
     }
 
     ////
@@ -59,6 +61,8 @@ public class Idea implements Serializable {
         if ( ! Common.sendFloat(percentOwned, out) )
             return false;
         if ( ! Common.sendInt(inWatchList ? 1 : 0, out) )
+            return false;
+        if ( ! Common.sendFloat(sellingPrice, out) )
             return false;
 
         return true;
@@ -91,6 +95,9 @@ public class Idea implements Serializable {
             return false;
         this.inWatchList = tmp == 1;
 
+        if ( (this.sellingPrice = Common.recvFloat(in)) == -1)
+            return false;
+
         return true;
     }
 
@@ -111,6 +118,7 @@ public class Idea implements Serializable {
         this.numSharesOwned = 0;
         this.percentOwned = 0;
         this.inWatchList = false;
+        this.sellingPrice = 0;
 
     }
 
@@ -196,5 +204,13 @@ public class Idea implements Serializable {
 
     public void setInWatchList(boolean inWatchList) {
         this.inWatchList = inWatchList;
+    }
+
+    public float getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public void setSellingPrice(float sellingPrice) {
+        this.sellingPrice = sellingPrice;
     }
 }

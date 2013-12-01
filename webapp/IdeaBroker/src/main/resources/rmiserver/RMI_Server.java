@@ -207,15 +207,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         int iid         = idea.getId();
         int numOwned    = 0;
-
+        Share shares = null;
         try {
-            Share s = getSharesIdeaForUid(iid,uid);
-            if ( s != null )
-                numOwned = s.getNum();
+            shares = getSharesIdeaForUid(iid,uid);
         } catch (RemoteException e) { e.printStackTrace();  /*FIXME: Should never ever happen*/ }
+
+        if ( shares != null ) numOwned = shares.getNum();
         int totalShares = getNumIdeaShares(iid);
         idea.setNumSharesOwned(numOwned);
-        idea.setPercentOwned(((float)(numOwned))/totalShares);
+
+        if ( numOwned > 0) {
+            idea.setPercentOwned(((float)(numOwned))/totalShares);
+            idea.setSellingPrice(shares.getPrice());
+        }
+
+
 
         /**
          * Check if it's in the watchlist
