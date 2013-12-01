@@ -192,6 +192,38 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Fills the current idea with the info it has specifically for the given uid,
+     * such as the number of shares he owns, and if it is in their warchlist. If uid is -1, nothing happens,
+     * though this behaviour is not recommended
+     * @param idea The idea object to change. Must have a valid IID filled, of course
+     * @param uid The uid of the user
+     */
+    private void addUserSpecificInfoToIdea(Idea idea, int uid) {
+        if ( uid == -1 ) {
+            System.out.println("WARNING: While it may occasionally be okay to do this, " +
+                                       "you just invoked addUserSpecificInfoToIdea with uid=-1!");
+            return;
+        }
+
+        int iid         = idea.getId();
+        int numOwned    = 0;
+
+        try {
+            Share s = getSharesIdeaForUid(iid,uid);
+            if ( s != null )
+                numOwned = s.getNum();
+        } catch (RemoteException e) { e.printStackTrace();  /*FIXME: Should never ever happen*/ }
+        int totalShares = getNumIdeaShares(iid);
+        idea.setNumSharesOwned(numOwned);
+        idea.setPercentOwned(((float)(numOwned))/totalShares);
+
+        /**
+         * Check if it's in the watchlist
+         */
+        idea.setInWatchList(isInWatchlist(uid,iid));
+    }
+
+    /**
      * Method responsible for getting all the ideas associated with a given user.
      * @param uid   The User's id
      * @return  An array of Idea objects, containing all the ideas associated with a given user
@@ -218,12 +250,24 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Gets the number of shares that exist associated with a given idea
+     * Currently returns a fixed value, but encapsulating its behahaviour might be very useful in the future.
+     * @param iid ID of the idea whose shares we want to know the number of
+     * @return The number of shares that exist associated with the given id
+     */
+    private int getNumIdeaShares(int iid) {
+        return 100000;
+    }
+
+    /**
      * Method responsible for getting all the ideas which belong to a given topic
      * @param tid   The Topic's id
+     * @param uid   The ID of the user that wants to see them. This is used to set idea specific values (such as the
+     *              number of shares he/she owns, etc), for VIEW purposes.
      * @return  An array of Idea objects, containing all the ideas which belong to the given topic
      * @throws RemoteException
      */
-    public Idea[] getIdeasFromTopic(int tid) throws RemoteException{
+    public Idea[] getIdeasFromTopic(int uid, int tid) throws RemoteException{
         String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideia e, " +
                 "TopicoIdeia t where t.iid = e.iid and t" +
                 ".tid = "+tid+" and e.activa = 1";
@@ -240,6 +284,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             if(getFile(Integer.parseInt(result.get(i)[0])) != null)
                 ideas[i].setFile("Y");
+
+            addUserSpecificInfoToIdea(ideas[i], uid);
         }
 
         return ideas;
@@ -420,6 +466,20 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Check if the given idea is in the given user's watchlist
+     * @param uid UID to check
+     * @param iid IID to check
+     * @return true if the idea is in the user's watchlist. False otherwise.
+     */
+    private boolean isInWatchlist(int uid, int iid) {
+        String query = "Select w.iid from IdeiaWatchList w " +
+                "where w.iid = "+iid+" and w.userid = " + uid;
+        ArrayList<String[]> queryResut = receiveData(query);
+
+        return !(queryResut == null || queryResut.size() == 0);
+    }
+
+    /**
      * Method responsible for getting all the ideas stored in a specified user's wathclist.
      * @param uid   The user's id.
      * @return  An array of Idea objects, containing all the ideas stored in a user's watchlist.
@@ -436,8 +496,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         devolve = new Idea[queryResut.size()];
 
-        for (int i=0;i<devolve.length;i++)
+        for (int i=0;i<devolve.length;i++) {
             devolve[i] = new Idea(queryResut.get(i));
+
+            addUserSpecificInfoToIdea(devolve[i], uid);
+        }
 
         return devolve;
     }
@@ -672,7 +735,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  An Idea object, with the idea we just built
      * @throws RemoteException
      */
-    public Idea getIdeaByIID(int iid) throws RemoteException {
+    public Idea getIdeaByIID(int iid, int uid) throws RemoteException {
         String query = "Select * from Ideia t where t.iid = " + iid + " and t.activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
         Idea devolve;
@@ -685,6 +748,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (getFile(iid) != null)
             devolve.setFile("Y");
 
+        addUserSpecificInfoToIdea(devolve, uid); //Even if uid == -1, it's okay.
         return devolve;
     }
 
@@ -916,6 +980,20 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Private method to check if an idea with the given IID exists
+     * @param iid The ID of the idea whose existance we want to check
+     * @return True if the given idea exists. False otherwise
+     */
+    private boolean ideaExists(int iid) {
+        try {
+            return getIdeaByIID(iid,-1) != null;
+        } catch (RemoteException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return false; //FIXME: SHould never happen
+        }
+    }
+
+    /**
      * Get all the shares that are about this idea
      * @param iid The IID
      * @return The shares associated with the idea
@@ -923,7 +1001,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     public ArrayList<Share> getSharesIdea(int iid) throws RemoteException {
         ArrayList<Share> shares = new ArrayList<Share>();
-        if ( getIdeaByIID(iid) == null)
+        if ( !ideaExists(iid) )
             return shares;
         String query = "select * from \"Share\" where iid="+iid;
 
@@ -943,7 +1021,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException {
-        if ( getIdeaByIID(iid) == null)
+        if ( !ideaExists(iid) )
             return null;
         String query = "select * from \"Share\" where iid="+iid+" and userid="+uid;
 
@@ -1707,7 +1785,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120 ";
         if ( args.length == 1)
             db = args[0];
         try{

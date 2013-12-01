@@ -104,11 +104,11 @@ public class Client {
      * @return  On success returns an Array of class Idea objects, containing all the ideas in the given topic.
      *          On failure, returns null.
      */
-    private Idea[] doRMIGetTopicIdeas(int tid){
+    private Idea[] doRMIGetTopicIdeas(int uid, int tid){
         Idea[] devolve = null;
 
         try{
-            devolve=rmi.getRMIInterface().getIdeasFromTopic(tid);
+            devolve=rmi.getRMIInterface().getIdeasFromTopic(uid,tid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -190,7 +190,7 @@ public class Client {
     }
 
     /**
-     * Gets all the ideas with the specified id and which title contains
+     * Gets all the ideas with the specified id and whose title contains
      * @param id    The id of the idea we want to search
      * @return      An Idea object, containing the result for the search we performed.
      */
@@ -198,7 +198,7 @@ public class Client {
         Idea devolve = null;
 
         try{
-            devolve = rmi.getRMIInterface().getIdeaByIID(id);
+            devolve = rmi.getRMIInterface().getIdeaByIID(id, uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -405,7 +405,7 @@ public class Client {
      * @return  An array of Idea objects, containing all the ideas in the given topic
      */
     public Idea[] doGetTopicIdeas(int tid){
-        return doRMIGetTopicIdeas(tid);
+        return doRMIGetTopicIdeas(uid,tid);
     }
 
     /**
