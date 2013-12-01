@@ -16,11 +16,16 @@ public class Client {
 
 
     private RMIConnection rmi;
-    private int uid;
+    private int           uid;
+    private String        username;
+    private float         coins;
+    private int           numNotifications;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
         this.uid = -1;
+        this.coins = 0; /* FIXME: On login, set this */
+        this.numNotifications = 0; /* FIXME: On login, set this */
     }
 
     /**
@@ -158,7 +163,7 @@ public class Client {
         Idea[] devolve = null;
 
         try{
-            devolve = rmi.getRMIInterface().getIdeaByIID(id,title);
+            devolve = rmi.getRMIInterface().getIdeaByIID(id, title);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -196,7 +201,7 @@ public class Client {
         int result;
 
         try{
-            result = rmi.getRMIInterface().createIdea(ideia.getTitle(),ideia.getBody(),getUid(),moneyInvested);
+            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested);
 
             if (result > 0){
                 //Associar aos topicos
@@ -242,7 +247,12 @@ public class Client {
      * @return A boolean value, indicating the success or failure of the operation
      */
     public boolean doLogin(String username, String password) {
-        return (this.uid = doRMILogin(username, password)) != -1;
+        if ( (this.uid = doRMILogin(username, password)) != -1 ) {
+            this.username = username;
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -290,7 +300,7 @@ public class Client {
      * @return              A boolean value indicating the result of the operation (success/failure)
      */
     public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested){
-        return doRMISubmitIdea(ideia,topics,moneyInvested);
+        return doRMISubmitIdea(ideia, topics, moneyInvested);
     }
 
     /**
@@ -337,7 +347,7 @@ public class Client {
      * @return      A boolean value, indicating the result of the operation (success/failure)
      */
     public boolean doSetSharePrice(int iid, int price){
-        return doRMISetSharePrice(iid,uid,price);
+        return doRMISetSharePrice(iid, uid, price);
     }
 
     /**
@@ -346,5 +356,17 @@ public class Client {
      */
     public int getUid() {
         return uid;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public float getCoins() {
+        return coins;
+    }
+
+    public int getNumNotifications() {
+        return numNotifications;
     }
 }
