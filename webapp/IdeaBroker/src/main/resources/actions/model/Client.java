@@ -304,6 +304,21 @@ public class Client {
     }
 
     /**
+     * Safely remove an idea from the current user's watchlist.
+     * @param iid   The id of the idea to be removed from the user's watchlist.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
+    private boolean doRMIRemoveFromWatchList(int iid){
+        try{
+            rmi.getRMIInterface().removeIdeaFromWatchlist(iid,uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -476,4 +491,7 @@ public class Client {
         return adminStatus;
     }
 
+    public boolean doRemoveFromWatchList(int iid) {
+        return doRMIRemoveFromWatchList(iid);
+    }
 }
