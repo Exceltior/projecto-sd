@@ -72,6 +72,9 @@
         <action name="addtowatchlist" class="actions.controller.AddToWatchlistAction" method="execute">
             <result type="json"></result>
         </action>
+        <action name="removefromwatchlist" class="actions.controller.RemoveFromWatchlistAction" method="execute">
+            <result type="json"></result>
+        </action>
     </package>
 
 </struts>
