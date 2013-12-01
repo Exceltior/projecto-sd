@@ -272,6 +272,10 @@ public class Client {
         return devolve;
     }
 
+    /**
+     * Safely gets the administration role of the given user, accessing the database.
+     * @return  A boolean value, indicating if the user is an administrator (root) or just a simple user.
+     */
     private boolean doRMIGetAdminStatus(){
         boolean devolve = false;
 
@@ -282,6 +286,21 @@ public class Client {
         }
 
         return devolve;
+    }
+
+    /**
+     * Safely add an idea to the current user's watchlist.
+     * @param iid   The id of the idea to be added to the user's watchlist.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
+    private boolean doRMIAddToWatchList(int iid){
+        try{
+            rmi.getRMIInterface().addIdeaWatchList(iid,uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
     /**
@@ -406,6 +425,14 @@ public class Client {
      */
     public String doGetTopicTitle(int tid) {
         return doRMIGetTopicTitle(tid);
+    }
+
+    /**
+     * Adds an idea to the user's watchlist
+     * @param iid   The id of the idea to add to the user's watchlist
+     */
+    public void doAddWatchList(int iid){
+        doRMIAddToWatchList(iid);
     }
 
     /**
