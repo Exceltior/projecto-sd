@@ -183,6 +183,14 @@ public class Client {
         return devolve;
     }
 
+    /**
+     * Call's RMI createIdea safelly. Remote invocation of the createIdea method in the RMI server, which is going to
+     * create a new idea in the database.
+     * @param ideia         The idea we want to create
+     * @param topicos       A list of topics in which we want to include the idea.
+     * @param moneyInvested The money invested by the user in the idea
+     * @return              A boolean value, indicating the result of the operation (success/failure)
+     */
     private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested){
         boolean devolve = false;
         int result;
@@ -200,6 +208,26 @@ public class Client {
             }
 
         }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
+     * Safely set the selling price of each share of an idea owned by the user.
+     * @param iid   The id of the idea whose shares' selling price we want to update
+     * @param uid   The id of the user performing this operation
+     * @param price The new shares' selling price
+     * @return      A boolean value, indicating the result of the operation (success/failure)
+     */
+    private boolean doRMISetSharePrice(int iid, int uid, int price){
+        boolean devolve = false;
+
+        try{
+            devolve = rmi.getRMIInterface().setPricesShares(iid,uid,price);
+            System.out.println("Recebi " + devolve + " do rmi no set share price");
+        }catch(RemoteException e){
             e.printStackTrace();
         }
 
@@ -254,6 +282,13 @@ public class Client {
         return doRMISearchIdea(iid);
     }
 
+    /**
+     * Public interface to perform an idea creation in the database
+     * @param ideia         The idea we want to create
+     * @param topics        A list of topics in which we want to include the idea
+     * @param moneyInvested The money invested in the idea by the user
+     * @return              A boolean value indicating the result of the operation (success/failure)
+     */
     public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested){
         return doRMISubmitIdea(ideia,topics,moneyInvested);
     }
@@ -296,8 +331,18 @@ public class Client {
     }
 
     /**
+     * Public interface to try to set a given selling price to each share of a given idea.
+     * @param iid   The id of the idea whose shares' selling price we want to define
+     * @param price The target selling price for the user's shares of the given idea
+     * @return      A boolean value, indicating the result of the operation (success/failure)
+     */
+    public boolean doSetSharePrice(int iid, int price){
+        return doRMISetSharePrice(iid,uid,price);
+    }
+
+    /**
      * Gets the id of the client.
-     * @return
+     * @return  An Integer value, containing the ID of the client
      */
     public int getUid() {
         return uid;

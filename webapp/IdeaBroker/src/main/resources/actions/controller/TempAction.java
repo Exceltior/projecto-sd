@@ -13,7 +13,6 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class TempAction extends ClientAction {
-    public ArrayList<Temp> banana = new ArrayList<Temp>();
     ArrayList<Integer> variavelLocal = new ArrayList<Integer>();
     public int aha = 3;
     Idea banana2;
@@ -41,19 +40,11 @@ public class TempAction extends ClientAction {
     public String execute() throws Exception {
         super.execute();
 
-        banana.add(new Temp(9, 10));
-        banana.add(new Temp(11, 12));
-        banana.add(new Temp(13, 14));
-
         variavelLocal.add(77);
         variavelLocal.add(78);
         variavelLocal.add(79);
         banana2 = client.doSearchIdea(1);
 
         return SUCCESS;
-    }
-
-    public ArrayList<Temp> getBanana() {
-        return banana;
     }
 }

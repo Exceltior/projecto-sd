@@ -49,7 +49,7 @@
         <span  style="text-align: center;">
 
             <s:iterator var="i" step="1" value="ideasList">
-                <%-- <s:url action="viewidea" var="urlTag">
+                <%--<s:url action="viewidea" var="urlTag">
                     <s:param name="iid" value="top.id" />
                 </s:url> --%>
 
@@ -58,9 +58,11 @@
                 <s:property value="title" /><br />
 
                 <s:if test="userIdeas == true">
-                    <a href="<s:url action="goSetSharePrice" />" >
-                        Set Idea's Shares Selling Prices<font color="red"></font>
-                    </a><br />
+
+                    <s:url action="goSetSharePrice" var="urlTag">
+                        <s:param name="iid" value="top.id" />
+                    </s:url>
+                    <s:a href="%{urlTag}">Set Idea's Shares Selling Prices <s:property value="iid" /></s:a><br />
                 </s:if>
             </s:iterator>
 

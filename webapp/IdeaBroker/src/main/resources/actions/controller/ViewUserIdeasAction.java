@@ -51,7 +51,7 @@ public class ViewUserIdeasAction extends ClientAction{
 
         this.ideasList = client.doGetUserIdeas();
 
-        //System.out.println("O user tem " + ideasList.length + " ideias");
+        //FIXME: Se o user nao tiver ideias o que fazer???
 
         return SUCCESS;
     }

@@ -7,7 +7,7 @@ package actions.controller;
  * Time: 10:43
  * To change this template use File | Settings | File Templates.
  */
-public class goSubmitIdeaAction extends ClientAction {
+public class GoSubmitIdeaAction extends ClientAction {
 
     //FIXME: This cannot be done like this
 

@@ -1,4 +1,3 @@
-<jsp:useBean id="banana2" scope="session" class="actions.controller.TempAction" />
 <!-- STRUTS -->
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1"%>
@@ -109,7 +108,7 @@
 
 
                 <div class="idea-body"><p>
-                    <s:property value="banana2" />
+                    IdeaBody
                 </p></div>
                 <div>
                     tags tags tags tags tags

@@ -5,7 +5,7 @@ import model.data.Idea;
 import java.util.ArrayList;
 
 
-public class submitIdeaAction extends ClientAction{
+public class SubmitIdeaAction extends ClientAction{
     Idea idea;
     ArrayList<String> topics;
     String title;

@@ -26,14 +26,6 @@
         </action>
 
         <!-- Acção de teste -->
-        <action name="teste" class="actions.controller.TempAction" method="execute">
-            <result name="success">teste.jsp</result>
-        </action>
-
-        <action name="teste2" class="actions.controller.Temp2Action" method="execute">
-            <result name="success">login.jsp</result>
-        </action>
-
         <action name="testlayout" class="actions.controller.TempAction" method="execute">
             <result name="success">testelayout.jsp</result>
         </action>
@@ -71,11 +63,20 @@
             <result name="success">viewideas.jsp</result>
         </action>
 
-        <action name="goCreateIdea" class="actions.controller.goSubmitIdeaAction" method="execute">
+        <action name="goCreateIdea" class="actions.controller.GoSubmitIdeaAction" method="execute">
             <result name="success">submitIdea.jsp</result>
         </action>
 
-        <action name="createIdea" class="actions.controller.submitIdeaAction" method="execute">
+        <action name="createIdea" class="actions.controller.SubmitIdeaAction" method="execute">
+            <result name="success">home.jsp</result>
+            <result name="error">error.jsp</result>
+        </action>
+
+        <action name="goSetSharePrice" class="actions.controller.GoSetSharePriceAction" method="execute">
+            <result name="success">setSharePrice.jsp</result>
+        </action>
+
+        <action name="setSharePrice" class="actions.controller.SetSharePriceAction" method="execute">
             <result name="success">home.jsp</result>
             <result name="error">error.jsp</result>
         </action>

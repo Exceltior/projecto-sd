@@ -9,7 +9,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<jsp:useBean id="client" scope="session" class="actions.model.Client" />
 <!-- END STRUTS -->
 <html>
 <head>
@@ -26,18 +25,11 @@
 Set Share Price!!!
 
 
-
 <form method="post" action="setSharePrice">
-    <p>
-        <s:textfield name="price" label="Type the current shares' selling price"/>
-    </p>
-    <p>
-        <button type="submit">Submit</button>
-    </p>
+
+    <p><s:textfield name="price" label="Type the current shares' selling price"/></p>
+    <p><button type="submit">Submit</button></p>
 </form>
 
-<!-- Display main menu -->
-
-<!-- FIXME: METER WALL COM IDEIAS? -->
 </body>
 </html>

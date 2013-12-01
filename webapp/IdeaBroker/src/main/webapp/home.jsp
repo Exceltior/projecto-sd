@@ -26,9 +26,25 @@
 Welcome, user <s:property value="%{#session.client.uid}"/>!
 
 
-<a href="<s:url action="goCreateIdea" />" >
-    Create Idea<font color="red"></font>
-</a>
+<a href="<s:url action="GoCreateIdea" />" >
+    Create Idea
+</a><br />
+<a href="<s:url action="viewuserideas" />" >
+    View User Ideas
+</a><br />
+<a href="<s:url action="viewuserwatchlist" />" >
+    View User Watchlist
+</a><br />
+<a href="<s:url action="listtopics" />" >
+    Check Topics
+</a><br />
+<a href="<s:url action="searchtopic" />" >
+    Search Topic
+</a><br />
+<a href="<s:url action="gosearchidea" />" >
+    Search Idea
+</a><br />
+
 
 <!-- Display main menu -->
 
