@@ -1,9 +1,9 @@
 /*Criacao dos Utilizadores*/
-INSERT INTO Utilizador VALUES (user_seq.nextval,'hakuna@matata.com','Hakuna','91968f0580a96a8467addb44038a7154', 1000000, to_date('2013.10.12', 'yyyy.mm.dd'), null);
-INSERT INTO Utilizador VALUES (user_seq.nextval,'joca@joca.com', 'Joca', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
-INSERT INTO Utilizador VALUES (user_seq.nextval,'joca2@joca.com', 'Joca2', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
-INSERT INTO Utilizador VALUES (user_seq.nextval,'joca3@joca.com', 'Joca3', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
-INSERT INTO Utilizador VALUES (user_seq.nextval,'joca4@joca.com', 'Joca4', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null);
+INSERT INTO Utilizador VALUES (user_seq.nextval,'hakuna@matata.com','Hakuna','91968f0580a96a8467addb44038a7154', 1000000, to_date('2013.10.12', 'yyyy.mm.dd'), null,1);
+INSERT INTO Utilizador VALUES (user_seq.nextval,'joca@joca.com', 'Joca', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,0);
+INSERT INTO Utilizador VALUES (user_seq.nextval,'joca2@joca.com', 'Joca2', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,0);
+INSERT INTO Utilizador VALUES (user_seq.nextval,'joca3@joca.com', 'Joca3', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,0);
+INSERT INTO Utilizador VALUES (user_seq.nextval,'joca4@joca.com', 'Joca4', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,0);
 
 /*Criacao dos Topicos*/
 INSERT INTO Topico VALUES (topic_seq.nextval,'ATP!',1);

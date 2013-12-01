@@ -77,6 +77,17 @@
 <logicalDatatype>LOGDT007</logicalDatatype>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="funcao" id="0969F4CD-0EB1-22C4-7B7B-F91927BB13B7">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-01 16:33:58 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>1</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="F762AB3C-5170-F46D-4D9D-50E46D240F3E" name="Utilizador_PK">

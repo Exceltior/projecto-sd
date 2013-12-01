@@ -52,4 +52,6 @@ public interface RMI_Interface extends Remote {
     public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException;
     public Idea[] getIdeasFromWatchList(int uid) throws RemoteException;
     public String getTopicTitle(int tid) throws RemoteException;
+    public int getUserMoney(int uid) throws RemoteException;
+    public boolean getAdminStatus(int uid) throws RemoteException;
 }

@@ -258,6 +258,33 @@ public class Client {
     }
 
     /**
+     * Safely gets the money saved by the user, through a database connection.
+     * @return  The money saved by the user.
+     */
+    private float doRMIGetUserCoins(){
+        float devolve = -1;
+
+        try{
+            devolve = rmi.getRMIInterface().getUserMoney(uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+        return devolve;
+    }
+
+    private boolean doRMIGetAdminStatus(){
+        boolean devolve = false;
+
+        try{
+            devolve = rmi.getRMIInterface().getAdminStatus(uid);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -267,6 +294,10 @@ public class Client {
     public boolean doLogin(String username, String password) {
         if ( (this.uid = doRMILogin(username, password)) != -1 ) {
             this.username = username;
+
+            //Gets client's admin status
+            this.adminStatus = doRMIGetAdminStatus();
+
             return true;
         }
 
@@ -385,19 +416,37 @@ public class Client {
         return uid;
     }
 
+    /**
+     * Gets the user's username.
+     * @return  A String object, containing the user's username.
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Gets the money saved by the user.
+     * @return  The money saved by the user.
+     */
     public float getCoins() {
-        return coins;
+        this.coins = doRMIGetUserCoins();
+        return this.coins;
     }
 
+    /**
+     * Gets the number of pending notifications for the current user.
+     * @return  The number of pending notifications for the current user.
+     */
     public int getNumNotifications() {
         return numNotifications;
     }
 
+    /**
+     * Tells us if the current user is an administrator.
+     * @return  A boolean value, telling us if the current user is an administrator
+     */
     public boolean getAdminStatus() {
         return adminStatus;
     }
+
 }

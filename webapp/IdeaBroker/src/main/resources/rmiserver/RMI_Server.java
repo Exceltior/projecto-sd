@@ -970,7 +970,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The money of the specified user
      * @throws RemoteException
      */
-    int getUserMoney(int uid) throws RemoteException {
+    public int getUserMoney(int uid) throws RemoteException {
         String query = "select dinheiro from Utilizador where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query);
@@ -981,6 +981,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
 
         return Integer.valueOf(result.get(0)[0]);
+    }
+
+    public boolean getAdminStatus(int uid) throws RemoteException{
+        boolean devolve = false;
+        String query = "Select funcao from Utilizador where userid=" + uid;
+        ArrayList<String[]> result = receiveData(query);
+
+        if ( result.get(0)[0].equals("1") )
+            devolve = true;
+
+        return devolve;
     }
 
     /**
