@@ -27,8 +27,8 @@
             <li style="margin-top:100px;"><a
                     href="#"><span class="glyphicon glyphicon-home">&nbsp;Home</span><span style="color:black">
                 _</span></a></li>
-            <li style="background-color: floralwhite"><a href="#"><span class="glyphicon glyphicon-list">&nbsp;Ver
-                Tópicos</span><span style="color:floralwhite">_</span></a></li>
+            <li style="background-color: #eaeaea"><a href="#"><span class="glyphicon glyphicon-list">&nbsp;Ver
+                Tópicos</span><span style="color:#eaeaea">_</span></a></li>
             <li><a
                     href="#"><span class="glyphicon glyphicon-eye-open">&nbsp;Watchlist</span><span
                     style="color:black">
@@ -46,7 +46,7 @@
                     style="color:black">
                 _</span></a></li>
             <c:if
-                    test="${ #session.client.adminStatus == 'true'">
+                    test="client.adminStatus == true">
             <li><a href="#"><span class="glyphicon glyphicon-wrench">&nbsp;Painel de Administrador</span><span
                     style="color:black">
                 _</span></a></li>
@@ -61,9 +61,6 @@
                     <h1  style="margin-left: -10px;">Idea Broker</h1>
                 <p> Your ideas. Our market. </p>
             </div>
-        </div>
-        <!-- Keep all page content within the page-content inset div! -->
-        <div class="page-content inset" style=" margin: -20px">
             <nav class="navbar navbar-default navbar-static-top" role="navigation">
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
@@ -76,6 +73,9 @@
                         Mensagens</a></li>
                 </ul>
             </nav>
+        </div>
+        <!-- Keep all page content within the page-content inset div! -->
+        <div class="page-content inset" style=" margin: -20px">
             <div style="position:relative">
                 <div id="clouds" style="position:relative; margin: -20px; margin-top: -40px; z-index: -20;">
                     <div class="cloud x1"></div>
