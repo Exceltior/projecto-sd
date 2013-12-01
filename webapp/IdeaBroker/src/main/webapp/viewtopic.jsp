@@ -84,8 +84,7 @@
                     style="color:black">
                 _</span></a> </li>
 
-            <s:if
-                    test="client.adminStatus == true">
+            <s:if test="client.adminStatus">
                 <li><a href="#"><span class="glyphicon glyphicon-wrench">&nbsp;Painel de Administrador</span><span
                         style="color:black">
                 _</span></a></li>
@@ -138,9 +137,17 @@
                                                 "></span></h4>
                                         <p class="list-group-item-text">
                                             <div style="height: 25px">
-                                            <div style="float:right" name="ideatags<s:property value="id" />">
+                                            <div style="float:right; white-space:nowrap;" name="ideatags<s:property
+                                             value="id" />">
                                                 <!-- Labels here -->
-
+                                                <s:if test="top.percentOwned > 0.0">
+                                                    <span class="label label-info" name="ownidea<s:property
+                                                     value="id" />"><span
+                                                            class="glyphicon glyphicon-ok"></span><s:property
+                                                            value="numSharesOwned" /> shares (<s:property
+                                                            value="percentOwned" />%)
+                                                    </span>
+                                                </s:if>
                                                 <!-- Watchlist Label -->
                                                 <s:if test="top.inWatchList">
 
@@ -158,6 +165,15 @@
                                                 <div style="float:right" name="buttons<s:property
                                                      value="id" />">
                                                     <!-- Buttons here -->
+
+                                                    <!-- Delete idea -->
+                                                    <s:if test="top.percentOwned == 100.0">
+                                                        <a href="deleteidea.action?iid=<s:property value="id" />" type="button"
+                                                           class="btn btn-danger btn-sm">
+                                                            <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
+                                                        </a>
+                                                    </s:if>
+
                                                     <s:if
                                                             test="!top.inWatchList">
                                                         <a href="#" type="button"
@@ -168,15 +184,12 @@
                                                         </a>
                                                     </s:if>
                                                     <!--was btn3d-->
-                                                    <a href="deleteidea.action?iid=<s:property value="id" />" type="button"
-                                                       class="btn btn-danger btn-sm">
-                                                        <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
-                                                    </a>
+
                                                 </div>
                                         </div>
-                                            Watchlist: <s:property value="inWatchList" />
+                                            <%--Watchlist: <s:property value="inWatchList" />
                                             Owned: <s:property value="numSharesOwned" />
-                                            Percent Owned: <s:property value="pecentOwned" />
+                                            Percent Owned: <s:property value="percentOwned" />--%>
                                                 <s:property value="body" /> </p>
                                     </div>
                                 </s:iterator>
