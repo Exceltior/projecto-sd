@@ -6,25 +6,21 @@ package actions.controller;
  * and append all getters to the JSON output. In particular, the .JSP is expecting a success boolean value which
  * indicates the success or failure of the operation. Note that if we removed the getter (isSuccess()),
  * our .jsp would have problems.
- *
- * AJAX IN: iid: The idea iid to add to the watchlist of the current user (user is determined by session)
- * AJAX OUT: JSON:
- *              success: Boolean indicating success or failure of the operation.
+ * FIXME: This documentation has to be improved
  */
-public class AddToWatchlistAction extends AJAXAction{
-    private int     iid;
+public class AJAXAction extends ClientAction{
+    private boolean success;
 
     public String execute() throws Exception {
         super.execute();
-        System.out.println(" AddToWatchlistActioniid: " + iid);
-        setAjaxStatus(client.doAddToWatchList(iid));
         return SUCCESS;
     }
+
     public boolean isSuccess() {
-        return super.isSuccess();
+        return success;
     }
 
-    public void setIid(int iid) {
-        this.iid = iid;
-    }
+    protected void ajaxSuccess() { this.success = true; }
+    protected void ajaxFailure() { this.success = false; }
+    protected void setAjaxStatus(boolean s) { this.success = s; }
 }

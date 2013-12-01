@@ -14,19 +14,17 @@ import java.util.Map;
  * AJAX OUT: JSON:
  *              success: Boolean indicating success or failure of the operation.
  */
-public class RemoveFromWatchlistAction extends ClientAction{
-    private boolean success;
+public class RemoveFromWatchlistAction extends AJAXAction{
     private int     iid;
 
     public String execute() throws Exception {
         super.execute();
         System.out.println(" RemoveFromWatchlistAction: " + iid);
-        this.success = client.doRemoveFromWatchList(iid);
+        setAjaxStatus(client.doRemoveFromWatchList(iid));
         return SUCCESS;
     }
-
     public boolean isSuccess() {
-        return success;
+        return super.isSuccess();
     }
 
     public void setIid(int iid) {
