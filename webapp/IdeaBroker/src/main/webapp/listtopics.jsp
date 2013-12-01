@@ -65,9 +65,9 @@
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
                         <s:property value="%{#session.client.username}"/></a></li>
-                    <li><a href="#" name="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
+                    <li><a href="#" id="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
                             value="%{#session.client.coins}"/> DEICoins</a></li>
-                    <li><a href="#" name="numNotifications"><span class="glyphicon
+                    <li><a href="#" id="numNotifications"><span class="glyphicon
                      glyphicon-envelope"></span>&nbsp;<s:property
                             value="%{#session.client.numNotifications}"/> Novas
                         Mensagens</a></li>
