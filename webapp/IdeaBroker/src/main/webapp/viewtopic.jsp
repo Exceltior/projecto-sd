@@ -62,9 +62,6 @@
                 <h1  style="margin-left: -10px;">Idea Broker</h1>
                 <p> Your ideas. Our market. </p>
             </div>
-        </div>
-        <!-- Keep all page content within the page-content inset div! -->
-        <div class="page-content inset" style=" margin: -20px">
             <nav class="navbar navbar-default navbar-static-top" role="navigation">
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
@@ -77,6 +74,9 @@
                         Mensagens</a></li>
                 </ul>
             </nav>
+        </div>
+        <!-- Keep all page content within the page-content inset div! -->
+        <div class="page-content inset" style=" margin: -20px">
             <div style="position:relative">
                 <div id="clouds" style="position:relative; margin: -20px; margin-top: -40px; z-index: -20;">
                     <div class="cloud x1"></div>

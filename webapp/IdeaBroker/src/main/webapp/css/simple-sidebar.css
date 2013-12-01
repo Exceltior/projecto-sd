@@ -82,6 +82,7 @@
 }
 
 .inset {
+    overflow:scroll;
     padding: 20px;
 }
 
