@@ -175,7 +175,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public ServerTopic[] getTopics() throws RemoteException{
-        String query = "select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i where i.tid = t.tid";
+        String query = "select t.tid, t.nome, t.userid, count(*) from Topico t, TopicoIdeia i where i.tid = t.tid " +
+                "group by t.tid, t.nome, t.userid";
 
         ArrayList<String[]> result = receiveData(query);
 
