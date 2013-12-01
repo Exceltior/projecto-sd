@@ -13,6 +13,14 @@ public class Idea implements Serializable {
     public int id, uid, shares_to_buy;
     protected String body, title, file;
 
+    /**
+     * Specific for the user which makes the request
+     */
+    private int numSharesOwned;
+    private float percentOwned;
+    private boolean inWatchList;
+
+
     ////
     // Class Constructor
     ////
@@ -21,6 +29,13 @@ public class Idea implements Serializable {
         this.body = this.title = null;
         this.file = "N";
         this.shares_to_buy = -2;
+
+        /**
+         * User specific, might be null at start (changed later with setters)
+         */
+        this.numSharesOwned = 0;
+        this.percentOwned = 0;
+        this.inWatchList = false;
     }
 
     ////
@@ -38,6 +53,12 @@ public class Idea implements Serializable {
         if ( ! Common.sendString(file, out) )
             return false;
         if ( ! Common.sendInt(shares_to_buy, out) )
+            return false;
+        if ( ! Common.sendInt(numSharesOwned, out) )
+            return false;
+        if ( ! Common.sendFloat(percentOwned, out) )
+            return false;
+        if ( ! Common.sendInt(inWatchList ? 1 : 0, out) )
             return false;
 
         return true;
@@ -60,6 +81,15 @@ public class Idea implements Serializable {
             return false;
         if ( (this.shares_to_buy = Common.recvInt(in)) == -1)
             return false;
+        if ( (this.numSharesOwned = Common.recvInt(in)) == -1)
+            return false;
+        if ( (this.percentOwned = Common.recvFloat(in)) == -1)
+            return false;
+
+        int tmp;
+        if ( (tmp = Common.recvInt(in)) == -1)
+            return false;
+        this.inWatchList = tmp == 1;
 
         return true;
     }
@@ -74,6 +104,14 @@ public class Idea implements Serializable {
         this.uid = Integer.valueOf(row[3]);
         this.file = "N";
         this.shares_to_buy = -2;
+
+        /**
+         * User specific, might be null at start (changed later with setters)
+         */
+        this.numSharesOwned = 0;
+        this.percentOwned = 0;
+        this.inWatchList = false;
+
     }
 
     public void setTitle(String title1){
@@ -134,5 +172,29 @@ public class Idea implements Serializable {
                 ", file = " + file + '\'' +
                 ", shares to buy = " + shares_to_buy +
                 '}';
+    }
+
+    public int getNumSharesOwned() {
+        return numSharesOwned;
+    }
+
+    public void setNumSharesOwned(int numSharesOwned) {
+        this.numSharesOwned = numSharesOwned;
+    }
+
+    public float getPercentOwned() {
+        return percentOwned;
+    }
+
+    public void setPercentOwned(float percentOwned) {
+        this.percentOwned = percentOwned;
+    }
+
+    public boolean isInWatchList() {
+        return inWatchList;
+    }
+
+    public void setInWatchList(boolean inWatchList) {
+        this.inWatchList = inWatchList;
     }
 }
