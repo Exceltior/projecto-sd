@@ -44,6 +44,9 @@ Welcome, user <s:property value="%{#session.client.uid}"/>!<br />
     Search Idea
 </a><br />
 
+<a href="setSharePrice.action?iid=1&price=9" >
+    Set Shares Price
+</a><br />
 
 <!-- Display main menu -->
 

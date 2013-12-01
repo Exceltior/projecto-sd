@@ -61,10 +61,6 @@
             <result name="error">error.jsp</result>
         </action>
 
-        <action name="goSetSharePrice" class="actions.controller.GoSetSharePriceAction" method="execute">
-            <result name="success">setSharePrice.jsp</result>
-        </action>
-
         <action name="setSharePrice" class="actions.controller.SetSharePriceAction" method="execute">
             <result name="success">home.jsp</result>
             <result name="error">error.jsp</result>

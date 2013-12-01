@@ -518,22 +518,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         //FIXME FIXME MAXI MAXI VE SE ESTA MERDA ESTA BEM FEITA!!!!!!!
 
-        /**
-         * FXME OK, O QUE ISTO DEVERIA FAZER (ASSUMINDO QUE HA DINHEIRO PARA TUDO E ASSIM):
-         * - CRIAR ENTRADA NA TABELA DE IDEIAS PARA A IDEIA
-         * - CRIAR ENTRADA NA TABELA DE SHARES
-         * - CRIAR ENTRADAS NA TABELA DE TOPICOS
-         * - DEDUZIR DINHEIRO DA CONTA DO UTILIZADOR
-         *
-         * MAXI, ISTO DEVERA ESTAR TUDO BEM, MAS VE ISTO COM ATENCAO QUE PODE TER ESCAPADO ALGUMA COISA
-         */
-
-        try{
-            conn = connectionPool.checkOutConnection();
-        }catch(SQLException e){
-            System.err.println("Error in the createIdea method!!");
-            return -1;
-        }
+        conn = getTransactionalConnection();
 
         if (getUserMoney(uid) < moneyInvested){//If the user doesn't have enough money
             System.err.println("Error while creating the idea! the user doesn't have enought money!" +
@@ -547,18 +532,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 "" + uid + "," +
                 "" + "1,null,null,"+ initialSell +")";
 
-        insertData(query);//Insert the idea
+        insertData(query,conn);//Insert the idea
 
         query = "Select i.iid from Ideia i where i.titulo = '" + title + "' and i.descricao = '" + description +
                 "' and i.userid = " + uid + " and i.activa = 1";
 
-        queryResult = receiveData(query);
+        queryResult = receiveData(query,conn);
 
         if (queryResult.size()>0){
             iid =  Integer.parseInt(queryResult.get(0)[0]);
 
             //Insert the shares
-            setSharesIdea(uid,iid,starting_shares,initialSell);
+            setSharesIdea(uid,iid,starting_shares,initialSell,conn);
 
             //Deduce the money from the user's account
             setUserMoney(uid,starting_money-moneyInvested,conn);
@@ -566,6 +551,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         else
             iid = -1;
 
+        returnTransactionalConnection(conn);
         System.out.println("Vou retornar " + iid +" no createIdea");
         return iid;
 
@@ -577,7 +563,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return true if it has files
      */
     private boolean ideaHasFiles(int iid) {
-        String query = "select * from Ideia i where i.iid = " + iid + " and i.path is not null";
+        String query = "Select * from Ideia i where i.iid = " + iid + " and i.path is not null";
         ArrayList<String[]> queryResult = receiveData(query);
 
         return !queryResult.isEmpty();
@@ -1691,7 +1677,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{

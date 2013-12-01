@@ -24,7 +24,6 @@ public class SetSharePriceAction extends ClientAction{
     public String execute() throws Exception{
         super.execute();
 
-        this.iid = GoSetSharePriceAction.ideaId;
         System.out.println("O execute do SetSharePriceAction esta a correr " + iid);
 
         if (client.doSetSharePrice(this.iid,this.price)){
