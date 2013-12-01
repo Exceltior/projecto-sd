@@ -105,7 +105,7 @@
                                                         <span class="glyphicon glyphicon-eye-open"></span> Adicionar
                                                         à Watchlist
                                                     </a>
-                                                    <a href="deleteidea.action?iid=<s:property value="iid" />" type="button"
+                                                    <a href="deleteidea.action?iid=<s:property value="id" />" type="button"
                                                        class="btn btn-danger btn-sm btn3d">
                                                         <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
                                                     </a>
