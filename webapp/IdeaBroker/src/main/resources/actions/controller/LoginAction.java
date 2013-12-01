@@ -20,7 +20,7 @@ public class LoginAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        if (username.equals("") || password.equals(""))
+        if (username.isEmpty() || password.isEmpty())
             return ERROR;
 
         System.out.println("Login: "+username+" "+password);
