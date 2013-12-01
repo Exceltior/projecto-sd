@@ -153,7 +153,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (title==null)
             return getTopics();//FIXME: MAXI SHOULD WE DO THIS???
 
-        String query = "Select * from Topico where nome LIKE '%" + title + "%'";
+        String query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
+                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid";
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -174,7 +175,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public ServerTopic[] getTopics() throws RemoteException{
-        String query = "select * from Topico";
+        String query = "select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i where i.tid = t.tid";
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -667,7 +668,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         listTopics = new ServerTopic[queryResult.size()];
         for (int i=0;i<queryResult.size();i++){
-            query = "Select * from Topico t where t.tid = " + queryResult.get(i)[0];
+            query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
+                    "where i.tid = t.tid and t.tid = " + queryResult.get(i)[0];
             topic = receiveData(query);
             listTopics[i] = new ServerTopic(topic.get(0));
         }
@@ -798,11 +800,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query;
 
         if (tid != -2 && !name.equals(""))
-            query = "Select * from Topico t where t.nome LIKE '%" + name +"%' and t.tid = " + tid;
+            query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
+                    "where t.nome LIKE '%" + name +"%' and t.tid = " + tid + " and i.tid = t.tid";
         else if(tid != -2)
-            query = "Select * from Topico t where t.tid = " + tid;
+            query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
+                    "where t.tid = " + tid + " and t.tid = i.tid";
         else if (!name.equals(""))
-            query = "Select * from Topico t where t.nome LIKE '%" + name + "%'";
+            query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
+                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid";
         else
             return null;
 

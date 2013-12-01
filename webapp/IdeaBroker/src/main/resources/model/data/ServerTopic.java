@@ -25,5 +25,7 @@ public class ServerTopic extends Topic {
     public ServerTopic(String[] line) {
         this.id = Integer.valueOf(line[0]);
         this.title = line[1];
+        this.userid = Integer.valueOf(line[2]);
+        this.numIdeas = Integer.valueOf(line[3]);
     }
 }
