@@ -36,14 +36,14 @@ public interface RMI_Interface extends Remote {
     public boolean addFile(int iid, NetworkingFile file) throws RemoteException;
     public NetworkingFile getFile(int iid) throws RemoteException;
     public void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException;
-    boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice) throws RemoteException;
+    boolean tryGetSharesIdea(int uid, int iid, int numShares, float targetPrice) throws RemoteException;
     boolean sayTrue() throws RemoteException;
     //public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException;
     //public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
     //        RemoteException;
     public Idea[] getIdeaRelations(int iid, int relationshipType) throws RemoteException;
     public Share getIdeaShares(int iid,int uid) throws RemoteException;
-    public boolean setPricesShares(int iid, int uid, int price) throws RemoteException;
+    public boolean setPricesShares(int iid, int uid, float price) throws RemoteException;
     //public int getSharesNotSell(int iid,int uid) throws RemoteException;
     //public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException;
     public Idea[] getFilesIdeas()throws RemoteException;

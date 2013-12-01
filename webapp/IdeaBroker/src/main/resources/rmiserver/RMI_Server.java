@@ -920,7 +920,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return a boolean value indicating if the operation went well or not
      * @throws RemoteException
      */
-    synchronized public boolean setPricesShares(int iid, int uid, int price) throws RemoteException{
+    synchronized public boolean setPricesShares(int iid, int uid, float price) throws RemoteException{
         if ( getSharesIdeaForUid(iid,uid) == null)
             return false; // You have no shares!
         String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
@@ -1172,7 +1172,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return 1 on success, 0 on error (can't buy because there aren't any appropriate sellers....)
      * @throws RemoteException
      */
-    synchronized public boolean tryGetSharesIdea(int uid, int iid, int numShares, int targetPrice)
+    synchronized public boolean tryGetSharesIdea(int uid, int iid, int numShares, float targetPrice)
             throws RemoteException {
         System.out.println("tryGetSharesIdea called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
                 ", targetPrice="+targetPrice);
@@ -1217,7 +1217,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 if (s.getPriceForNum(toBuy) > userMoney) {
                     System.out.println("Not enough money...:" + userMoney + ", " + s.getPriceForNum(toBuy));
                     // Not enough money...
-                    int pricePerShare = s.getPrice();
+                    float pricePerShare = s.getPrice();
 
                     // See how many we can buy. Round down!
                     toBuy = (int) (((double) userMoney) / pricePerShare);
@@ -1327,7 +1327,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param conn  Connection to the RMI Server
      * @param iid Id of the idea whose shares were involved in the transaction
      */
-    synchronized private void insertIntoHistory(int uidBuyer, int uidSeller, int nshares, int price, Connection conn,
+    synchronized private void insertIntoHistory(int uidBuyer, int uidSeller, int nshares, float price, Connection conn,
                                                 int iid) {
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
         Date transactionDate = new Date();

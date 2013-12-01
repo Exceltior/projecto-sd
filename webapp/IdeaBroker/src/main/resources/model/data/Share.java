@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Share  implements Comparable<Share>, Serializable {
     private int uid;
     private int iid;
-    private int price;
+    private float price;
     private int num;
 
      private static final long serialVersionUID = 1L;
@@ -18,7 +18,7 @@ public class Share  implements Comparable<Share>, Serializable {
         this.iid = Integer.valueOf(row[0]);
         this.uid = Integer.valueOf(row[1]);
         this.num = Integer.valueOf(row[2]);
-        this.price = Integer.valueOf(row[3]);
+        this.price = Float.valueOf(row[3]);
     }
 
     public double getPriceShareRatio() {
@@ -36,7 +36,7 @@ public class Share  implements Comparable<Share>, Serializable {
         return getNum(); //FIXME: Change this
     }
 
-    public int getPriceForNum(int n) {
+    public float getPriceForNum(int n) {
         if ( n > getAvailableShares() )
             return 0; //Error: can't buy these many
         return price*n;
@@ -65,7 +65,7 @@ public class Share  implements Comparable<Share>, Serializable {
         else return 0;
     }
 
-    public int getPrice() {
+    public float getPrice() {
         return price;
     }
 

@@ -244,7 +244,7 @@ public class Client {
      * @param price The new shares' selling price
      * @return      A boolean value, indicating the result of the operation (success/failure)
      */
-    private boolean doRMISetSharePrice(int iid, int uid, int price){
+    private boolean doRMISetSharePrice(int iid, int uid, float price){
         boolean devolve = false;
 
         try{
@@ -295,7 +295,7 @@ public class Client {
      */
     private boolean doRMIAddToWatchList(int iid){
         try{
-            rmi.getRMIInterface().addIdeaToWatchlist(iid,uid);
+            rmi.getRMIInterface().addIdeaToWatchlist(iid, uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -310,7 +310,7 @@ public class Client {
      */
     private boolean doRMIRemoveFromWatchList(int iid){
         try{
-            rmi.getRMIInterface().removeIdeaFromWatchlist(iid,uid);
+            rmi.getRMIInterface().removeIdeaFromWatchlist(iid, uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -429,7 +429,7 @@ public class Client {
      * @param price The target selling price for the user's shares of the given idea
      * @return      A boolean value, indicating the result of the operation (success/failure)
      */
-    public boolean doSetSharePrice(int iid, int price){
+    public boolean doSetSharePrice(int iid, float price){
         return doRMISetSharePrice(iid, uid, price);
     }
 
