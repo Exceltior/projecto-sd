@@ -24,8 +24,8 @@
             $.getJSON('addtowatchlist.action', formData,function(data) {
 
                 if ( data.success ) {
-                    $('[name='+btn+']').hide();
-                    $('[name='+tags+']').html($('[name='+tags+']').html()+'<span class="label label-success" name="watchlistlabel'+id+'"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist <a href="#" type="button" onclick="removeFromWatchlist('+id+');"><span class="glyphicon glyphicon-remove"></span></a> </span>');
+                    $('#'+btn).remove();
+                    $('#'+tags).html($('#'+tags).html()+'<span class="label label-success" id="watchlistlabel'+id+'"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist <a href="#" type="button" onclick="removeFromWatchlist('+id+');"><span class="glyphicon glyphicon-remove"></span></a> </span>');
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
@@ -42,8 +42,53 @@
             $.getJSON('removefromwatchlist.action', formData,function(data) {
 
                 if ( data.success ) {
-                    $('[name='+label+']').hide();
-                    $('[name='+btns+']').html($('[name='+btns+']').html()+'<a href="#" type="button" class="btn btn-success btn-sm" name="'+btn+'" onclick="addToWatchlist('+id+');"> <span class="glyphicon glyphicon-eye-open"></span> Adicionar à Watchlist </a>');
+                    $('#'+label).remove();
+                    $('#'+btns).html($('#'+btns).html()+'<a href="#" type="button" class="btn btn-success btn-sm" id="'+btn+'" onclick="addToWatchlist('+id+');"> <span class="glyphicon glyphicon-eye-open"></span> Adicionar à Watchlist </a>');
+                } else {
+                    alert("Server Internal Error...RMI is probably down!");
+                }
+                return true;
+            });
+        }
+
+        function isValidSharePrice(input) {
+            return !isNaN(input) && input > 0;
+        }
+
+        function sharePriceChanged(id) {
+            btn="btnsellingprice"+id;
+            textarea="sellingprice"+id;
+            text = $('#'+textarea);
+            button = $('#'+btn);
+            //$('#'+btn).addClass('btn-success').removeClass('btn-info');
+
+            if ( isValidSharePrice(text.val()) ) {
+                text.removeAttr('title');
+                button.addClass('btn-info').removeClass('btn-success').removeClass('btn-error');
+                button.html('<span class="glyphicon glyphicon-share-alt"></span>');
+                button.attr('title', 'Confirmar Alteração de Preço');
+                button.off('click').on('click',{id:id},setSharePrice);
+            } else {
+                text.attr('title', 'Preço inválido!');
+                button.addClass('btn-danger').removeClass('btn-success').removeClass('btn-info');
+                button.html('<span class="glyphicon glyphicon-remove"></span>');
+            }
+        }
+
+        function setSharePrice(event) {
+            id = event.data.id;
+            btn="btnsellingprice"+id;
+            textarea="sellingprice"+id;
+            button = $('#'+btn);
+            text = $('#'+textarea);
+
+            var formData = {iid:id,price:text.val()}; //Array
+            $.getJSON('setshareprice.action', formData,function(data) {
+                if ( data.success ) {
+                    button.addClass('btn-success').removeClass('btn-info').removeClass('btn-error');;
+                    button.html('<span class="glyphicon glyphicon-ok-sign"></span>');
+                    button.removeAttr('title');
+                    button.off('click');
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
@@ -103,9 +148,9 @@
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
                         <s:property value="%{#session.client.username}"/></a></li>
-                    <li><a href="#" name="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
+                    <li><a href="#" id="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
                             value="%{#session.client.coins}"/> DEICoins</a></li>
-                    <li><a href="#" name="numNotifications"><span class="glyphicon
+                    <li><a href="#" id="numNotifications"><span class="glyphicon
                      glyphicon-envelope"></span>&nbsp; Novas
                         Mensagens</a></li>
                 </ul>
@@ -137,11 +182,11 @@
                                                 "></span></h4>
                                         <p class="list-group-item-text">
                                             <div style="height: 25px">
-                                            <div style="float:right; white-space:nowrap;" name="ideatags<s:property
+                                            <div style="float:right; white-space:nowrap;" id="ideatags<s:property
                                              value="id" />">
                                                 <!-- Labels here -->
                                                 <s:if test="top.percentOwned > 0.0">
-                                                    <span class="label label-info" name="ownidea<s:property
+                                                    <span class="label label-info" id="ownidea<s:property
                                                      value="id" />"><span
                                                             class="glyphicon glyphicon-ok"></span><s:property
                                                             value="numSharesOwned" /> shares (<s:property
@@ -151,7 +196,7 @@
                                                 <!-- Watchlist Label -->
                                                 <s:if test="top.inWatchList">
 
-                                                    <span class="label label-success" name="watchlistlabel<s:property
+                                                    <span class="label label-success" id="watchlistlabel<s:property
                                                      value="id" />"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist
                                                         <a href="#" type="button"
                                                            onclick="removeFromWatchlist(<s:property
@@ -160,9 +205,32 @@
                                                 </s:if>
 
                                             </div>
+                                            <div style="float:left; white-space:nowrap;" id="idealeftarea<s:property
+                                             value="id" />">
+                                                <!-- Left buttons -->
+                                                <s:if test="top.percentOwned > 0.0">
+                                                    <!-- Set share price -->
+                                                    <div class="input-append">
+                                                        <span
+                                                                class="glyphicon glyphicon-euro"></span>
+                                                        Vender a
+                                                        <input name="text" id="sellingprice<s:property value="id" />"
+                                                               value="<s:property value="sellingPrice" />"
+                                                               style="width:50px;"
+                                                               onkeyup="sharePriceChanged(<s:property
+                                                                       value="id" />);"/>
+                                                         DEICoins/share <button
+                                                            id="btnsellingprice<s:property value="id" />"
+                                                            class="btn btn-success btn-sm"
+                                                            ><span
+                                                                class="glyphicon glyphicon-ok-sign"></span></button>
+                                                    </div>
+
+                                                </s:if>
+                                            </div>
                                         </div>
                                             <div style="height: 45px">
-                                                <div style="float:right" name="buttons<s:property
+                                                <div style="float:right" id="buttons<s:property
                                                      value="id" />">
                                                     <!-- Buttons here -->
 
@@ -177,7 +245,8 @@
                                                     <s:if
                                                             test="!top.inWatchList">
                                                         <a href="#" type="button"
-                                                           class="btn btn-success btn-sm" name="addtowatchlistbtn<s:property value="id" />"
+                                                           class="btn btn-success btn-sm"
+                                                           id="addtowatchlistbtn<s:property value="id" />"
                                                            onclick="addToWatchlist(<s:property value="id" />);">
                                                             <span class="glyphicon glyphicon-eye-open"></span> Adicionar
                                                             à Watchlist
