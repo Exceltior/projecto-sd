@@ -82,7 +82,7 @@ public class SubmitIdeaAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        System.out.println("O cliente e " + client.getUid());
+        System.out.println("Ideia submetida e tem " + filePath + " como caminho para o ficheiro");
 
         //Criar ideia; FIXME CODIGO FEIO COMO TUDO!!!!
         idea = new Idea();

@@ -1803,7 +1803,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120 ";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{
