@@ -327,6 +327,22 @@ public class Client {
     }
 
     /**
+     * Safely gets all the transactions performed by the user.
+     * @return      An array of String objects, containing all the transactions performed by the user.
+     */
+    private String[] doRMIGetHistory(){
+        String[] devolve = null;
+
+        try{
+           devolve = rmi.getRMIInterface().getHistory(uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -443,6 +459,14 @@ public class Client {
     }
 
     /**
+     * Public interface to try to get the user's transaction history.
+     * @return      An array of String objects, containing all the transactions performed by the user.
+     */
+    public String[] doGetHistory(){
+        return doRMIGetHistory();
+    }
+
+    /**
      * Gets the title of the supplied topic id.
      * @param tid The topic id
      * @return The topic title, or null in case of failure
@@ -500,6 +524,11 @@ public class Client {
         return adminStatus;
     }
 
+    /**
+     * Public interface to remove an idea from the user's watchlist.
+     * @param iid   The id of the idea.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
     public boolean doRemoveFromWatchList(int iid) {
         return doRMIRemoveFromWatchList(iid);
     }
