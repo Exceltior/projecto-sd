@@ -52,8 +52,12 @@
             });
         }
 
-        function isValidSharePrice(input) {
-            return !isNaN(input) && input > 0;
+        function isValidPositiveNum(input) {
+            return !isNaN(input) && parseFloat(input) > 0;
+        }
+
+        function isValidPositiveInt(input) {
+            return !isNaN(input) && parseInt(input) > 0;
         }
 
         function sharePriceChanged(id) {
@@ -63,7 +67,8 @@
             button = $('#'+btn);
             //$('#'+btn).addClass('btn-success').removeClass('btn-info');
 
-            if ( isValidSharePrice(text.val()) ) {
+            if ( isValidPositiveNum(text.val()) ) {
+                text.removeAttr('title');
                 text.removeAttr('title');
                 button.addClass('btn-info').removeClass('btn-success').removeClass('btn-error');
                 button.html('<span class="glyphicon glyphicon-share-alt"></span>');
@@ -73,6 +78,7 @@
                 text.css('color','black');
             } else {
                 text.attr('title', 'Preço inválido!');
+                button.attr('title', 'Preço inválido!');
                 button.addClass('btn-danger').removeClass('btn-success').removeClass('btn-info');
                 button.html('<span class="glyphicon glyphicon-remove"></span>');
                 text.css('background-color','#d2322d');
@@ -93,6 +99,7 @@
                     button.addClass('btn-success').removeClass('btn-info').removeClass('btn-error');;
                     button.html('<span class="glyphicon glyphicon-ok-sign"></span>');
                     button.removeAttr('title');
+                    text.removeAttr('title');
                     button.off('click');
                     text.css('background-color','white');
                     text.css('color','black');
@@ -103,24 +110,114 @@
             });
         }
 
-        gClosedialog = null;
-        function buyShares(id) {
-            var currentnumshares = 0;
-            var numshareslabel = $('#numshares'+id);
+        function getUserMoney() {
+            return parseFloat($('#currmoney').text());
+        }
 
+        function getMaxSharesForIdea(id) {
+            return 100000;
+        }
+
+        function getNumSharesForIdea(id) {
+            var numshareslabel = $('#numshares'+id);
             if ( numshareslabel.length != 0)
-                currentnumshares = numshareslabel.text();
+                return numshareslabel.text();
+            else
+                return 0;
+        }
+
+        gClosedialog = null;
+
+        function onMaxWillingToBuyChanged() {
+            var m = $('#maxpershareinput');
+            var modalsubmitbutton = $('#modalsubmitbutton');
+            if (m.val() == '' || m.val() == 0.0 || !isValidPositiveNum(m.val())) {
+                modalsubmitbutton.prop('disabled', true);
+                return;
+            }
+
+            var maxwillingtobuy = parseFloat(m.val());
+            var currentmoney = getUserMoney();
+            //console.log('max: '+maxwillingtobuy+', money: '+currentmoney);
+
+
+
+            if ( maxwillingtobuy > currentmoney ) {
+                //Can't sell
+                m.val(currentmoney);
+                modalsubmitbutton.prop('disabled', true);
+            } else {
+                //Can sell
+                modalsubmitbutton.prop('disabled', false);
+            }
+        }
+
+        function onNumSharesWantChanged(id) {
+            var maxSharesAvail=getMaxSharesForIdea(id);
+            var m = $('#numshareswant');
+            var modalsubmitbutton = $('#modalsubmitbutton');
+            if (m.val() == '' || m.val() == 0 || !isValidPositiveInt(m.val())) {
+                modalsubmitbutton.prop('disabled', true);
+                return;
+            }
+
+            var currentSharesWant = parseInt(m.val());
+
+
+            if ( maxSharesAvail < currentSharesWant ) {
+                //Can't sell
+                m.val(maxSharesAvail);
+                modalsubmitbutton.prop('disabled', true);
+            } else {
+                //Can sell
+                modalsubmitbutton.prop('disabled', false);
+            }
+        }
+
+        function doBuyShares(id) {
+            var maxPerShare   = $('#maxpershareinput').val();
+            var numSharesWant = $('#numshareswant').val();
+            var wantToQueue   = $('#addtoqueue').prop('checked');
+
+            var formData = {iid:id,
+                            maxPricePerShare:maxPerShare,
+                            targetNumShares:numSharesWant,
+                            addToQueueOnFailure:wantToQueue};
+            /*
+            $.getJSON('buyshares.action', formData,function(data) {
+                if ( data.success ) {
+                    if ( data.result == 'OK' ) {
+                        // Went fine
+                    } else if ( data.result == 'QUEUED.NOMOREMONEY' ) {
+                        // Request got queued because we ran out of money
+                    } else if ( data.result == 'QUEUED.NOMORESHARES' ) {
+                        // Request got queued because there are no more shares
+                    }
+                } else {
+                    alert("Server Internal Error...RMI is probably down!");
+                }
+                return true;
+            });*/
+        }
+
+        function buyShares(id) {
+            var currentnumshares = getNumSharesForIdea(id);
+            if ( currentnumshares == 0) currentnumshares = 1;
+            var currentmoney = getUserMoney();
+
+
             var numsharesarea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares desejadas:&nbsp;<input name="text" id="buysharesinputmodal" value="'+currentnumshares+'" style="width:50px;" /></div>';
-            var maxwillingtosellarea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Máximo de DEICoins a gastar:&nbsp;<input name="text" id="maxwillingtosellinput" value="'+currentnumshares+'" style="width:50px;" /></div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares desejadas:&nbsp;<input name="text" id="numshareswant" value="'+currentnumshares+'" style="width:125px;" onkeyup="onNumSharesWantChanged(id);" /></div>';
+            var maxpersharearea =
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Máximo por share:&nbsp;<input name="text" id="maxpershareinput" value="'+currentmoney+'" style="width:125px;" onkeyup="onMaxWillingToBuyChanged();" /> DEICoins</div>';
+
+            var modalcheckbox =
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;<input type="checkbox" id="addtoqueue" value="true" > Colocar pedido na fila se não for possível satisfazer</input></div>';
 
             var message = function(dialogRef){
                 var $message =
                         $("<div style='font-size:16pt'>Começou com <span style='color: #6fc65d'>"+currentnumshares+"</span> shares</div>");
-                $message.append(numsharesarea);
-                $message.append($('<div>&nbsp;</div>'));
-                $message.append($(maxwillingtosellarea))
+                $message.append(numsharesarea).append($('<div>&nbsp;</div>')).append($(maxpersharearea)).append($(modalcheckbox));
 
                 return $message;
             }
@@ -132,7 +229,7 @@
             gClosedialog = dialog;
 
             var button =
-                    '<button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-cloud"></span><span style="margin:-9px; color: #dbd02b" class="glyphicon glyphicon-euro"></span> &nbsp; &nbsp;Comprar Shares</button>';
+                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doBuyShares(id);"><span class="glyphicon glyphicon-cloud"></span><span style="margin:-9px; color: #dbd02b" class="glyphicon glyphicon-euro"></span> &nbsp; &nbsp;Comprar Shares</button>';
             var closebutton
                     = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
 
@@ -204,8 +301,9 @@
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
                         <s:property value="%{#session.client.username}"/></a></li>
-                    <li><a href="#" id="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
-                            value="%{#session.client.coins}"/> DEICoins</a></li>
+                    <li><a href="#" id="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<span
+                            id="currmoney"><s:property
+                            value="%{#session.client.coins}"/></span> DEICoins</a></li>
                     <li><a href="#" id="numNotifications"><span class="glyphicon
                      glyphicon-envelope"></span>&nbsp;<s:property value="%{#session.client.numNotifictions}"/> Novas
                         Mensagens</a></li>
