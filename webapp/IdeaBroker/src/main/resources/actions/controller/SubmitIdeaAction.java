@@ -1,6 +1,8 @@
 package actions.controller;
 
 import model.data.Idea;
+import model.data.NetworkingFile;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -13,14 +15,8 @@ public class SubmitIdeaAction extends ClientAction{
     String topicsList;
     int moneyInvested;
     File file;
-
-    public String getTitle(){
-        return this.title;
-    }
-
-    public void setTitle(String title1){
-        this.title = title1;
-    }
+    String contentType;
+    String filename;
 
     public File getFile(){
         return this.file;
@@ -28,6 +24,26 @@ public class SubmitIdeaAction extends ClientAction{
 
     public void setFile(File file1){
         this.file = file1;
+    }
+
+    public void setFileContentType(String temp){
+        this.contentType =  temp;
+    }
+
+    public String getFileContentType(){
+        return this.contentType;
+    }
+
+    public void setfileFileName(String temp){
+        this.filename = temp;
+    }
+
+    public String getTitle(){
+        return this.title;
+    }
+
+    public void setTitle(String title1){
+        this.title = title1;
     }
 
     public int getMoneyInvested(){
@@ -83,7 +99,12 @@ public class SubmitIdeaAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        System.out.println("Ideia submetida e tem " + file.getPath() + " como caminho para o ficheiro");
+        NetworkingFile userFile = null;
+
+        if (file != null){
+            System.out.println("Ideia submetida e tem " + file.getPath() + " como caminho para o ficheiro");
+            userFile = new NetworkingFile(file.getPath());
+        }
 
         //Criar ideia; FIXME CODIGO FEIO COMO TUDO!!!!
         idea = new Idea();
@@ -92,7 +113,7 @@ public class SubmitIdeaAction extends ClientAction{
 
         topics = getTopicsFromList(topicsList.split("#"));
 
-        if (client.doSubmitIdea(idea,topics,moneyInvested)){
+        if (client.doSubmitIdea(idea,topics,moneyInvested,userFile)){
             System.out.println("Correu bem a submissao da ideia!!!!!!!!");
             return SUCCESS;
         }

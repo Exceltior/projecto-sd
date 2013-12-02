@@ -2,6 +2,7 @@ package actions.model;
 
 import model.RMI.RMIConnection;
 import model.data.Idea;
+import model.data.NetworkingFile;
 import model.data.Topic;
 
 import java.rmi.RemoteException;
@@ -212,9 +213,10 @@ public class Client {
      * @param ideia         The idea we want to create
      * @param topicos       A list of topics in which we want to include the idea.
      * @param moneyInvested The money invested by the user in the idea
+     * @param file          The file attached to the idea
      * @return              A boolean value, indicating the result of the operation (success/failure)
      */
-    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested){
+    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested,NetworkingFile file){
         boolean devolve = false;
         int result;
 
@@ -227,7 +229,13 @@ public class Client {
                     rmi.getRMIInterface().setTopicsIdea(result,topico,getUid());
                 }
 
-                devolve=true;
+                //Tratar do ficheiro
+                if (file != null){
+                    devolve = rmi.getRMIInterface().addFile(ideia.getId(),file);
+                    ideia.setFile("Y");
+                }
+                else
+                    devolve = true;
             }
 
         }catch (RemoteException e){
@@ -380,10 +388,11 @@ public class Client {
      * @param ideia         The idea we want to create
      * @param topics        A list of topics in which we want to include the idea
      * @param moneyInvested The money invested in the idea by the user
+     * @param file          The file attached to the idea
      * @return              A boolean value indicating the result of the operation (success/failure)
      */
-    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested){
-        return doRMISubmitIdea(ideia, topics, moneyInvested);
+    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested,NetworkingFile file){
+        return doRMISubmitIdea(ideia, topics, moneyInvested,file);
     }
 
     /**

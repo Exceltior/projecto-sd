@@ -41,8 +41,9 @@ Welcome, user <s:property value="%{#session.client.uid}" />!
     <p>
         <s:textfield name="moneyInvested" label="Insert the amount of DEI Coins you want to invest"/>
     </p>
-
-    <input type="file" name="file" />
+    <p>
+        <s:file name="file" label="Select a file to attach to the idea" />
+    </p>
     <p>
         <button type="submit">Submit</button>
     </p>
