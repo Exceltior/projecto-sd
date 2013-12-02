@@ -14,6 +14,7 @@
     <link href="css/clouds.css" rel="stylesheet">
     <link href="css/simple-sidebar.css" rel="stylesheet">
     <link href="css/banner.css" rel="stylesheet">
+    <link href="css/bootstrap-dialog.css" rel="stylesheet">
     <!--<link href="css/3dbtn.css" rel="stylesheet">-->
     <title></title>
     <script type="text/javascript">
@@ -68,10 +69,14 @@
                 button.html('<span class="glyphicon glyphicon-share-alt"></span>');
                 button.attr('title', 'Confirmar Alteração de Preço');
                 button.off('click').on('click',{id:id},setSharePrice);
+                text.css('background-color','skyblue');
+                text.css('color','black');
             } else {
                 text.attr('title', 'Preço inválido!');
                 button.addClass('btn-danger').removeClass('btn-success').removeClass('btn-info');
                 button.html('<span class="glyphicon glyphicon-remove"></span>');
+                text.css('background-color','#d2322d');
+                text.css('color','white');
             }
         }
 
@@ -89,17 +94,68 @@
                     button.html('<span class="glyphicon glyphicon-ok-sign"></span>');
                     button.removeAttr('title');
                     button.off('click');
+                    text.css('background-color','white');
+                    text.css('color','black');
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
                 return true;
             });
         }
+
+        gClosedialog = null;
+        function buyShares(id) {
+            var currentnumshares = 0;
+            var numshareslabel = $('#numshares'+id);
+
+            if ( numshareslabel.length != 0)
+                currentnumshares = numshareslabel.text();
+            var numsharesarea =
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares desejadas:&nbsp;<input name="text" id="buysharesinputmodal" value="'+currentnumshares+'" style="width:50px;" /></div>';
+            var maxwillingtosellarea =
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Máximo de DEICoins a gastar:&nbsp;<input name="text" id="maxwillingtosellinput" value="'+currentnumshares+'" style="width:50px;" /></div>';
+
+            var message = function(dialogRef){
+                var $message =
+                        $("<div style='font-size:16pt'>Começou com <span style='color: #6fc65d'>"+currentnumshares+"</span> shares</div>");
+                $message.append(numsharesarea);
+                $message.append($('<div>&nbsp;</div>'));
+                $message.append($(maxwillingtosellarea))
+
+                return $message;
+            }
+            var dialog = new BootstrapDialog({
+                size: BootstrapDialog.SIZE_LARGE,
+                message: message,
+                closable:true
+            });
+            gClosedialog = dialog;
+
+            var button =
+                    '<button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-cloud"></span><span style="margin:-9px; color: #dbd02b" class="glyphicon glyphicon-euro"></span> &nbsp; &nbsp;Comprar Shares</button>';
+            var closebutton
+                    = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
+
+
+            dialog.realize();
+
+            dialog.getModalHeader().html('<div' +
+                    ' class="bootstrap-dialog-title">Comprar Shares</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>');
+
+            dialog.getModalFooter().html(button+closebutton);
+            dialog.open();
+
+            /**
+            * TODO: Handle the click on the button with AJAX (new function) and possibly open up a new dialog
+             * We also want to update these idea's fields explicitly...that is we want o add the number of shares label
+             * (or update it) and the price at which to sell them label. We should probably always add them, just make
+             * them invisible...
+             */
+        }
     </script>
 
 </head>
 <body>
-
 <div id="wrapper">
 
     <!-- Sidebar -->
@@ -151,7 +207,7 @@
                     <li><a href="#" id="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<s:property
                             value="%{#session.client.coins}"/> DEICoins</a></li>
                     <li><a href="#" id="numNotifications"><span class="glyphicon
-                     glyphicon-envelope"></span>&nbsp; Novas
+                     glyphicon-envelope"></span>&nbsp;<s:property value="%{#session.client.numNotifictions}"/> Novas
                         Mensagens</a></li>
                 </ul>
             </nav>
@@ -188,8 +244,10 @@
                                                 <s:if test="top.percentOwned > 0.0">
                                                     <span class="label label-info" id="ownidea<s:property
                                                      value="id" />"><span
-                                                            class="glyphicon glyphicon-ok"></span><s:property
-                                                            value="numSharesOwned" /> shares (<s:property
+                                                            class="glyphicon glyphicon-ok"></span><span
+                                                            id="numshares<s:property
+                                                     value="id" />"><s:property
+                                                            value="numSharesOwned" /></span> shares (<s:property
                                                             value="percentOwned" />%)
                                                     </span>
                                                 </s:if>
@@ -242,6 +300,21 @@
                                                         </a>
                                                     </s:if>
 
+                                                    <!-- Delete idea -->
+                                                    <s:if test="top.percentOwned < 100.0">
+                                                        <!--data-toggle="modal" href="#myModal"-->
+                                                        <a
+                                                           type="button"
+                                                           class="btn btn-primary btn-sm"
+                                                           id="buyshares<s:property value="id" />"
+                                                           onclick="buyShares(<s:property value="id" />);">
+                                                            <span class="glyphicon glyphicon-cloud"></span><span
+                                                                style="margin:-9px; color: #dbd02b"
+                                                                class="glyphicon glyphicon-euro"></span>
+                                                            &nbsp; &nbsp;Comprar Shares
+                                                        </a>
+                                                    </s:if>
+
                                                     <s:if
                                                             test="!top.inWatchList">
                                                         <a href="#" type="button"
@@ -252,7 +325,6 @@
                                                             à Watchlist
                                                         </a>
                                                     </s:if>
-                                                    <!--was btn3d-->
 
                                                 </div>
                                         </div>
@@ -283,6 +355,7 @@
 </div>
 <script src="jquery.js"></script>
 <script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
+<script src="bootstrap-dialog.js"></script>
 </body>
 </html>
 
