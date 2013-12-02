@@ -130,6 +130,10 @@ public class Idea implements Serializable {
         this.body = body1;
     }
 
+    public void setId(int id1){
+        this.id = id1;
+    }
+
     public void setFile(String f){
         this.file = f;
     }

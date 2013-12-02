@@ -23,36 +23,18 @@
     &nbsp;</p>
 <p style="text-align: center;">
     AMAZING HOMEPAGE.</p>
-Welcome, user <s:property value="%{#session.client.uid}"/>!<br />
+Welcome, user <s:property value="%{#session.client.uid}" />!
 
-<a href="<s:url value="submitIdea.jsp" />" >
-    Create Idea
-</a><br />
-<a href="<s:url action="viewuserideas" />" >
-    View User Ideas
-</a><br />
-<a href="<s:url action="viewuserwatchlist" />" >
-    View User Watchlist
-</a><br />
-<a href="<s:url action="listtopics" />" >
-    Check Topics
-</a><br />
-<a href="<s:url value="searchtopic.jsp" />" >
-    Search Topic
-</a><br />
-<a href="<s:url value="searchideas.jsp" />" >
-    Search Idea
-</a><br />
-<a href="<s:url value="removeidea.jsp" />" >
-    Remove Idea
-</a><br />
-<a href="<s:url action="showtransactionhistory" />" >
-    Show Transaction History
-</a><br />
 
-<a href="setSharePrice.action?iid=1&price=9" >
-    Set Shares Price
-</a><br />
+
+<form method="post" action="removeIdea" enctype="multipart/form-data">
+    <p>
+        <s:textfield name="iid" label="Type the idea's id"/>
+    </p>
+    <p>
+        <button type="submit">Submit</button>
+    </p>
+</form>
 
 <!-- Display main menu -->
 

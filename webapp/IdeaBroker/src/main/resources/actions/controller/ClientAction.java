@@ -3,7 +3,6 @@ package actions.controller;
 import com.opensymphony.xwork2.ActionSupport;
 import actions.model.Client;
 import org.apache.struts2.interceptor.SessionAware;
-
 import java.util.Map;
 
 /**
@@ -17,8 +16,8 @@ import java.util.Map;
  * which is guaranteed by ClientAction to always be valid *IF* they comply and call ClientAction's execute method.
  */
 public class ClientAction extends ActionSupport implements SessionAware {
-    protected   Map<String, Object> session;
 
+    protected   Map<String, Object> session;
     protected Client client;
 
     /**

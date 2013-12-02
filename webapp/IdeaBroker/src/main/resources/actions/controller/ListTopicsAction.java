@@ -6,6 +6,10 @@ import model.data.Topic;
  * Lists all the topics stored in the database. In struts.xml, we redirect the user to a jsp which expects this.
  */
 public class ListTopicsAction extends ClientAction{
+
+    /**
+     * The list of topics we are going to present to the user.
+     */
     private Topic[] topics;
 
     /**

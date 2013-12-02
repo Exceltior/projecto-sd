@@ -343,6 +343,29 @@ public class Client {
     }
 
     /**
+     * Safely deletes an idea as requested by the user.
+     * @param iid   The id of the idea.
+     * @return We have 4 possible return values:
+     * -1 -> Idea has no children
+     * -2 -> User is not the owner of the idea
+     * 1 > Everything went well
+     */
+    private int doRMIRemoveIdea(int iid){
+        int devolve = -1;
+        Idea temp = new Idea();
+
+        temp.setId(iid);
+
+        try{
+            devolve = rmi.getRMIInterface().removeIdea(temp,uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -531,5 +554,17 @@ public class Client {
      */
     public boolean doRemoveFromWatchList(int iid) {
         return doRMIRemoveFromWatchList(iid);
+    }
+
+    /**
+     * Public interface to remove an idea from the list of ideas.
+     * @param iid   The id of the idea the user wants to remove.
+     * @return We have 4 possible return values:
+     * -1 -> Idea has no children
+     * -2 -> User is not the owner of the idea
+     * 1 > Everything went well
+     */
+    public int doRemoveIdea(int iid){
+        return doRMIRemoveIdea(iid);
     }
 }

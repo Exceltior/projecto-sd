@@ -61,6 +61,11 @@
             <result name="error">error.jsp</result>
         </action>
 
+        <action name="removeIdea" class="action.controller.RemoveIdeaAction" method="execute">
+            <result name="success">home.jsp</result>
+            <result name="error">error.jsp</result>
+        </action>
+
         <action name="showtransactionhistory" class="actions.controller.ShowTransactionHistoryAction" method="execute">
             <result name="success">showtransactionhistory.jsp</result>
             <result name="error">error.jsp</result>
