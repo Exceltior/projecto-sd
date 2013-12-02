@@ -262,7 +262,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return The number of shares that exist associated with the given id
      */
     private int getNumIdeaShares(int iid) {
-        return 100000;
+        return this.starting_shares;
     }
 
     /**

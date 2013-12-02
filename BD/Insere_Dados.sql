@@ -58,9 +58,10 @@ INSERT INTO TopicoIdeia VALUES (2,20);
 
 /*Inserir Shares*/
 INSERT INTO "Share" VALUES (1,1,50,2);
-INSERT INTO "Share" VALUES (1,5,25,2);
+INSERT INTO "Share" VALUES (1,2,25,2);
 INSERT INTO "Share" VALUES (1,3,20,2);
 INSERT INTO "Share" VALUES (1,4,20,2);
+INSERT INTO "Share" VALUES (1,5,25,2);
 INSERT INTO "Share" VALUES (2,1,100,3);
 INSERT INTO "Share" VALUES (3,2,100,40);
 INSERT INTO "Share" VALUES (4,1,100,6);
@@ -100,3 +101,6 @@ INSERT INTO IdeiaWatchList VALUES (4,19);
 INSERT INTO IdeiaWatchList VALUES (5,16);
 INSERT INTO IdeiaWatchList VALUES (5,3);
 INSERT INTO IdeiaWatchList VALUES (5,12);
+
+/*Inserir Transações*/
+INSERT INTO Transacao VALUES (transaction_seq.nextval,1,2,100,5,1,to_date('2013.10.24','yyyy.mm.dd'));

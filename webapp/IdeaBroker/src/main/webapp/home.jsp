@@ -43,6 +43,9 @@ Welcome, user <s:property value="%{#session.client.uid}"/>!<br />
 <a href="<s:url value="searchideas.jsp" />" >
     Search Idea
 </a><br />
+<a href="<s:url action="showtransactionhistory" />" >
+    Show Transaction History
+</a><br />
 
 <a href="setSharePrice.action?iid=1&price=9" >
     Set Shares Price

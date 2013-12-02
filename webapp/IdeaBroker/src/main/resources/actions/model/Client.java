@@ -2,6 +2,7 @@ package actions.model;
 
 import model.RMI.RMIConnection;
 import model.data.Idea;
+import model.data.NetworkingFile;
 import model.data.Topic;
 
 import java.rmi.RemoteException;
@@ -212,9 +213,10 @@ public class Client {
      * @param ideia         The idea we want to create
      * @param topicos       A list of topics in which we want to include the idea.
      * @param moneyInvested The money invested by the user in the idea
+     * @param file          The file attached to the idea
      * @return              A boolean value, indicating the result of the operation (success/failure)
      */
-    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested){
+    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested,NetworkingFile file){
         boolean devolve = false;
         int result;
 
@@ -227,7 +229,13 @@ public class Client {
                     rmi.getRMIInterface().setTopicsIdea(result,topico,getUid());
                 }
 
-                devolve=true;
+                //Tratar do ficheiro
+                if (file != null){
+                    devolve = rmi.getRMIInterface().addFile(ideia.getId(),file);
+                    ideia.setFile("Y");
+                }
+                else
+                    devolve = true;
             }
 
         }catch (RemoteException e){
@@ -319,6 +327,22 @@ public class Client {
     }
 
     /**
+     * Safely gets all the transactions performed by the user.
+     * @return      An array of String objects, containing all the transactions performed by the user.
+     */
+    private String[] doRMIGetHistory(){
+        String[] devolve = null;
+
+        try{
+           devolve = rmi.getRMIInterface().getHistory(uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+        }
+
+        return devolve;
+    }
+
+    /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
@@ -380,10 +404,11 @@ public class Client {
      * @param ideia         The idea we want to create
      * @param topics        A list of topics in which we want to include the idea
      * @param moneyInvested The money invested in the idea by the user
+     * @param file          The file attached to the idea
      * @return              A boolean value indicating the result of the operation (success/failure)
      */
-    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested){
-        return doRMISubmitIdea(ideia, topics, moneyInvested);
+    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested,NetworkingFile file){
+        return doRMISubmitIdea(ideia, topics, moneyInvested,file);
     }
 
     /**
@@ -431,6 +456,14 @@ public class Client {
      */
     public boolean doSetSharePrice(int iid, float price){
         return doRMISetSharePrice(iid, uid, price);
+    }
+
+    /**
+     * Public interface to try to get the user's transaction history.
+     * @return      An array of String objects, containing all the transactions performed by the user.
+     */
+    public String[] doGetHistory(){
+        return doRMIGetHistory();
     }
 
     /**
@@ -491,6 +524,11 @@ public class Client {
         return adminStatus;
     }
 
+    /**
+     * Public interface to remove an idea from the user's watchlist.
+     * @param iid   The id of the idea.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
     public boolean doRemoveFromWatchList(int iid) {
         return doRMIRemoveFromWatchList(iid);
     }
