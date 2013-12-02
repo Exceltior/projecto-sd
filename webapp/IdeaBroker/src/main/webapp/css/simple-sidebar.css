@@ -82,8 +82,9 @@
 }
 
 .inset {
-    overflow:scroll;
+    overflow-y:scroll;
     padding: 20px;
+    height:100%;
 }
 
 @media (max-width:767px) {
