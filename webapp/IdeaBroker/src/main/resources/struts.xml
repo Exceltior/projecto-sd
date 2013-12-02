@@ -74,6 +74,10 @@
         <action name="setshareprice" class="actions.controller.SetSharePriceAction" method="execute">
             <result type="json"></result>
         </action>
+
+        <action name="buyshares" class="actions.controller.BuySharesAction" method="execute">
+            <result type="json"></result>
+        </action>
     </package>
 
 </struts>
