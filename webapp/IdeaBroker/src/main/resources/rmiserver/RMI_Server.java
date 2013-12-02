@@ -670,20 +670,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     }
 
-    //Fixme: Are we going to need this?
-    /**
-     * Check if an idea has children
-     * @param iid Idea IID
-     * @return true if it has children
-     * @throws RemoteException
-     */
-    boolean ideaHasChildren(int iid) throws RemoteException {
-        String query = "select * from RelacaoIdeias t where t.iidpai = " + iid;
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        return !queryResult.isEmpty();
-    }
-
     /**
      * Removes an idea
      * @param idea Object "Idea" with the idea to be removed
@@ -695,9 +681,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public int removeIdea(Idea idea, int uid) throws  RemoteException {
-        if ( ideaHasChildren(idea.id) ) {
-            return -1;//Idea has children
-        }
 
         //Check if user is owner of the idea
         String query = "Select s.userid from \"Share\" s where s.iid = " + idea.id;
@@ -1584,7 +1567,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     /**
      * Return and effectively commit the changes on a transactional connection
-     * @param c The connection
+     * @param c The connection to the database
      */
     private void returnTransactionalConnection(Connection c) {
         try {
@@ -1599,8 +1582,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     /**
      * This is used for most queries because it grabs any available connection. One might want to use the specialized
      * version which can operate on a given connection (for things such as transactions...)
-     * @param query
-     * @return
+     * @param query The query being executed in the database.
      */
     private void insertData(String query) {
         Connection conn = null;

@@ -51,8 +51,9 @@ public class ViewUserIdeasAction extends ClientAction{
 
         this.ideasList = client.doGetUserIdeas();
 
-        //FIXME: Se o user nao tiver ideias o que fazer???
-
-        return SUCCESS;
+        if (this.ideasList == null || this.ideasList.length == 0)
+            return ERROR;
+        else
+            return SUCCESS;
     }
 }

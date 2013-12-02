@@ -36,6 +36,7 @@
 
         <action name="viewuserideas" class="actions.controller.ViewUserIdeasAction" method="execute">
             <result name="success">viewideas.jsp</result>
+            <result name="error">error.jsp</result>
         </action>
 
         <action name="viewuserwatchlist" class="actions.controller.ViewUserWatchListAction" method="execute">

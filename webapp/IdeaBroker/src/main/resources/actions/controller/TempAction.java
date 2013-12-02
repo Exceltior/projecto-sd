@@ -1,16 +1,11 @@
 package actions.controller;
 
 import model.data.Idea;
-import org.apache.struts2.ServletActionContext;
 
 import java.util.ArrayList;
 
 /**
- * Created with IntelliJ IDEA.
- * User: joaquim
- * Date: 26/11/13
- * Time: 17:35
- * To change this template use File | Settings | File Templates.
+ * TempAction, just for testing purposes.
  */
 public class TempAction extends ClientAction {
     ArrayList<Integer> variavelLocal = new ArrayList<Integer>();
