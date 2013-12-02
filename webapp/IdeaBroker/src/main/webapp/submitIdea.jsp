@@ -27,7 +27,7 @@ Welcome, user <s:property value="%{#session.client.uid}" />!
 
 
 
-<form method="post" action="createIdea">
+<form method="post" action="createIdea" enctype="multipart/form-data">
     <p>
         <s:textfield name="title" label="Type the idea's title"/>
     </p>
@@ -41,9 +41,8 @@ Welcome, user <s:property value="%{#session.client.uid}" />!
     <p>
         <s:textfield name="moneyInvested" label="Insert the amount of DEI Coins you want to invest"/>
     </p>
-    <p>
-        <s:file name="filePath" label="Select the file you want to attach" accept="text/*" />
-    </p>
+
+    <input type="file" name="file" />
     <p>
         <button type="submit">Submit</button>
     </p>

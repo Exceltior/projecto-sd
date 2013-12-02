@@ -328,6 +328,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Method responsible for validating an idea, before adding it to the database.
+     * @param title The title of the idea we want to add.
+     * @return      A boolean value, indicating if the idea's title is already stored in the database.
+     */
+    boolean validateIdea(String title){
+        String query = "Select * from Ideia where titulo LIKE '" + title + "'";
+        ArrayList<String[]> ideas = receiveData(query);
+
+        return ideas == null || ideas.size() == 0;
+    }
+
+    /**
      *  Method responsible for insering a new user in the database
      * @param user Username
      * @param pass Password
@@ -586,6 +598,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         Connection conn;
 
         //FIXME FIXME MAXI MAXI VE SE ESTA MERDA ESTA BEM FEITA!!!!!!!
+        if (!validateIdea(title))//Cannot create the idea
+            return -1;
 
         conn = getTransactionalConnection();
 

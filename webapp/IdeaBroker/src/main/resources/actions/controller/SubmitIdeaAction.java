@@ -1,6 +1,7 @@
 package actions.controller;
 
 import model.data.Idea;
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -9,9 +10,9 @@ public class SubmitIdeaAction extends ClientAction{
     ArrayList<String> topics;
     String title;
     String body;
-    String filePath;
     String topicsList;
     int moneyInvested;
+    File file;
 
     public String getTitle(){
         return this.title;
@@ -19,6 +20,14 @@ public class SubmitIdeaAction extends ClientAction{
 
     public void setTitle(String title1){
         this.title = title1;
+    }
+
+    public File getFile(){
+        return this.file;
+    }
+
+    public void setFile(File file1){
+        this.file = file1;
     }
 
     public int getMoneyInvested(){
@@ -53,14 +62,6 @@ public class SubmitIdeaAction extends ClientAction{
         this.idea = idea2;
     }
 
-    public String getFilePath(){
-        return this.filePath;
-    }
-
-    public void setFilePath(String filePath1){
-        this.filePath = filePath1;
-    }
-
     /**
      * Method to filter the topics inserted by the user. With this method we can discard invalid topic names, like:
      * #this is #topic . In this example we only consider the topics "this" and "topic", since it's impossible to use
@@ -82,7 +83,7 @@ public class SubmitIdeaAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        System.out.println("Ideia submetida e tem " + filePath + " como caminho para o ficheiro");
+        System.out.println("Ideia submetida e tem " + file.getPath() + " como caminho para o ficheiro");
 
         //Criar ideia; FIXME CODIGO FEIO COMO TUDO!!!!
         idea = new Idea();
