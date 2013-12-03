@@ -1288,7 +1288,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param nshares The number of shares we are going to assign to the given idea
      * @param price   The price of each share of the idea
      * @param conn Connection to the RMI Server
-     * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
      */
     private synchronized void setSharesIdea(int uid, int iid,int nshares, float price,
@@ -1340,9 +1339,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     /**
      * Method responsible for updating the time when the user was logged in
-     *
      * @param uid The id of the user
-     * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
      */
     public void updateUserTime(int uid) throws RemoteException{
@@ -1393,6 +1390,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return true; //Change this to return....nothing?
     }
 
+/*
     //Fixme: Are we going to use this??
     ////
     //  Method responible for checking if there ins't already a relationship between two ideas of a different
@@ -1425,6 +1423,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return receiveData(query).size() == 0 && receiveData(query2).size() == 0;
 
     }
+*/
 
 /*
     We should not need this, since there are no relationships between ideas in this project
