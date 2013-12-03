@@ -200,7 +200,7 @@
             /** FIXME: When we show, we need to get the selling price */
             var numshareslabel = $(getNumSharesIdeaStr(id));
             var percentshareslabel = $(getPercentSharesIdeaStr(id));
-            var pct =  num / getMaxSharesForIdea() * 100.0f;
+            var pct =  num / getMaxSharesForIdea() * 100.0;
             percentshareslabel.text(pct);
             numshareslabel.text(num);
             if ( num > 0 ) {
