@@ -31,7 +31,7 @@ INSERT INTO Ideia VALUES (idea_seq.nextval, 'Resposta User 3','Sim, foi exactame
 INSERT INTO Ideia VALUES (idea_seq.nextval, 'Topico Tenis','Este topico anda muito vazio ultimamente....',1,1,null,null,19);
 INSERT INTO Ideia VALUES (idea_seq.nextval, 'Topico Futebol','Gostava de ver aqui mais discussoes sobre os jogos de futebol estrangeiros e nacionais, quer da primeira divisao, quer da segunda divisao',2,1,null,null,22);
 INSERT INTO Ideia VALUES (idea_seq.nextval, 'Sporting','Novamente o Sporting aposta em jovens e mostra ao Benfica e ao Porto por onde vai passar o futuro de Portugal',4,1,null,null,21);
-
+INSERT INTO Ideia VALUES (idea_seq.nextval, 'Ideia para testar coisas', 'Isto e uma ideia para testarmos coisas. A ideia e totalmente detida pelo utilizador Hakuna. e vale dinheiro que nem gente grande',1,1,null,null,1);
 
 
 /*Colocacao das ideias nos diferentes topicos*/
@@ -57,34 +57,35 @@ INSERT INTO TopicoIdeia VALUES (2,19);
 INSERT INTO TopicoIdeia VALUES (2,20);
 
 /*Inserir Shares*/
-INSERT INTO "Share" VALUES (1,1,50,2);
-INSERT INTO "Share" VALUES (1,2,25,2);
-INSERT INTO "Share" VALUES (1,3,20,2);
-INSERT INTO "Share" VALUES (1,4,20,2);
-INSERT INTO "Share" VALUES (1,5,25,2);
-INSERT INTO "Share" VALUES (2,1,100,3);
-INSERT INTO "Share" VALUES (3,2,100,40);
-INSERT INTO "Share" VALUES (4,1,100,6);
-INSERT INTO "Share" VALUES (5,1,50,10);
-INSERT INTO "Share" VALUES (5,2,50,66);
-INSERT INTO "Share" VALUES (6,1,50,77);
-INSERT INTO "Share" VALUES (6,2,10,54);
-INSERT INTO "Share" VALUES (7,2,50,45);
-INSERT INTO "Share" VALUES (8,2,70,97);
-INSERT INTO "Share" VALUES (9,3,50,23);
-INSERT INTO "Share" VALUES (10,2,60,10);
-INSERT INTO "Share" VALUES (11,1,10,100);
-INSERT INTO "Share" VALUES (11,3,50,1);
-INSERT INTO "Share" VALUES (12,2,23,6);
-INSERT INTO "Share" VALUES (13,4,78,8);
-INSERT INTO "Share" VALUES (14,1,100,6);
-INSERT INTO "Share" VALUES (15,5,195,3);
-INSERT INTO "Share" VALUES (16,3,80,4);
-INSERT INTO "Share" VALUES (17,5,69,8);
-INSERT INTO "Share" VALUES (18,1,43,5);
-INSERT INTO "Share" VALUES (19,2,96,63);
-INSERT INTO "Share" VALUES (19,4,102,65);
-INSERT INTO "Share" VALUES (20,4,50,1);
+INSERT INTO "Share" VALUES (1,1,2000,2);
+INSERT INTO "Share" VALUES (1,2,1500,2);
+INSERT INTO "Share" VALUES (1,3,2500,2);
+INSERT INTO "Share" VALUES (1,4,3000,2);
+INSERT INTO "Share" VALUES (1,5,1000,2);
+INSERT INTO "Share" VALUES (2,1,100000,3);
+INSERT INTO "Share" VALUES (3,2,100000,40);
+INSERT INTO "Share" VALUES (4,1,100000,6);
+INSERT INTO "Share" VALUES (5,1,50000,10);
+INSERT INTO "Share" VALUES (5,2,50000,66);
+INSERT INTO "Share" VALUES (6,1,55000,77);
+INSERT INTO "Share" VALUES (6,2,45000,54);
+INSERT INTO "Share" VALUES (7,2,100000,45);
+INSERT INTO "Share" VALUES (8,2,100000,97);
+INSERT INTO "Share" VALUES (9,3,100000,23);
+INSERT INTO "Share" VALUES (10,2,100000,10);
+INSERT INTO "Share" VALUES (11,1,50000,100);
+INSERT INTO "Share" VALUES (11,3,50000,1);
+INSERT INTO "Share" VALUES (12,2,100000,6);
+INSERT INTO "Share" VALUES (13,4,100000,8);
+INSERT INTO "Share" VALUES (14,1,100000,6);
+INSERT INTO "Share" VALUES (15,5,100000,3);
+INSERT INTO "Share" VALUES (16,3,100000,4);
+INSERT INTO "Share" VALUES (17,5,100000,8);
+INSERT INTO "Share" VALUES (18,1,100000,5);
+INSERT INTO "Share" VALUES (19,2,100000,63);
+INSERT INTO "Share" VALUES (19,4,100000,65);
+INSERT INTO "Share" VALUES (20,4,100000,1);
+INSERT INTO "Share" VALUES (21,1,100000,1);
 
 /*Inserir ideias na watchlist*/
 INSERT INTO IdeiaWatchList VALUES (1,4);
