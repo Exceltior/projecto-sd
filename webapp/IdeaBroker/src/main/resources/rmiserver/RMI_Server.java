@@ -1460,7 +1460,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param num               The number of shares in the transaction
      * @param maxpricepershare  The maximum price the buyer wants to pay for the shares
      * @param conn              Connection to the database
-     * @return
+     * @return                  In case of success, returns the id of the transaction inserted in the database. If an
+     *                          error occurred returns -1;
      */
     private int insertIntoQueue(int userid, int iid, int num, float maxpricepershare, Connection conn){
         String query = "INSERT INTO Compra VALUES (fila_seq.nextval," + userid + "," + iid + "," + num + "," +
@@ -1489,7 +1490,20 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         insertData(query,conn);
     }
 
-    //Funcao que vai buscar o pedido que tem o id menor, e devolve os campos todos
+    /**
+     * Returns the most recent transaction in the database.
+     * @param conn  The connection to the database.
+     * @return      An array of String objects, containing the fields correspondent to the Transaction Queue, stored
+     *              in the database.
+     */
+    private String[] returnNewestTransaction(Connection conn){
+        String query = "Select compra_id,userid,iid,num,maxpriceshare from Compra order by compra_id ASC";
+        ArrayList<String[]> queryResult = receiveData(query,conn);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return null;
+        return queryResult.get(0);
+    }
 
     /**
      * Set up the number of shares for a given idea, and the price of each share for that idea
