@@ -1471,10 +1471,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     /**
      * Remove a buying order from the buyShareQueue.
-     * @param userid
-     * @param iid
-     * @param num
-     * @param maxpricepershare
+     * @param id
+     * @param conn
      * @param conn
      */
     private void removeFromQueue(int id,Connection conn){
