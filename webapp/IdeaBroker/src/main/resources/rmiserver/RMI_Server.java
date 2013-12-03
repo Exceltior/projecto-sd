@@ -217,7 +217,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         idea.setNumSharesOwned(numOwned);
 
         if ( numOwned > 0) {
-            idea.setPercentOwned(((float)(numOwned))/totalShares);
+            idea.setPercentOwned(((float)(numOwned))/totalShares*100.0f);
             idea.setSellingPrice(shares.getPrice());
         }
 

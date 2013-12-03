@@ -200,7 +200,7 @@
             /** FIXME: When we show, we need to get the selling price */
             var numshareslabel = $(getNumSharesIdeaStr(id));
             var percentshareslabel = $(getPercentSharesIdeaStr(id));
-            var pct =  num / getMaxSharesForIdea();
+            var pct =  num / getMaxSharesForIdea() * 100.0f;
             percentshareslabel.text(pct);
             numshareslabel.text(num);
             if ( num > 0 ) {
@@ -366,8 +366,8 @@
         }
 
         function buyShares(id) {
-            var currentnumshares = getNumSharesForIdea(id);
-            if ( currentnumshares == 0) currentnumshares = 1;
+            var a = getNumSharesForIdea(id);
+            if ( a == 0 ) a = 1;
             var currentmoney = getUserMoney();
 
             var sellingPrice = getSellingPriceIdea(id);
@@ -375,7 +375,7 @@
                 sellingPrice = getMarketValue(id);
 
             var numsharesarea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+currentnumshares+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+a+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
             var maxpersharearea =
                     '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Máximo por share:&nbsp;<input name="text" id="maxpershareinput" value="'+currentmoney+'" style="width:125px;" onkeyup="onMaxWillingToBuyChanged();" /> DEICoins</div>';
 
@@ -387,7 +387,7 @@
 
             var message = function(dialogRef){
                 var $message =
-                        $("<div style='font-size:16pt'>Começou com <span style='color: #6fc65d'>"+currentnumshares+"</span> shares</div>");
+                        $("<div style='font-size:16pt'>Começou com <span style='color: #6fc65d'>"+getNumSharesForIdea(id)+"</span> shares</div>");
                 $message.append(numsharesarea).append($('<div>&nbsp;</div>')).append($(maxpersharearea)).append($('<div>&nbsp;</div>')).append($(targetsellpricearea)).append($(modalcheckbox));
 
                 return $message;
