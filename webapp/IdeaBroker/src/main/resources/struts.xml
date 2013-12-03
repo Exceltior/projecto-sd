@@ -85,7 +85,7 @@
             <result type="json"></result>
         </action>
 
-        <action name="removeIdea" class="action.controller.RemoveIdeaAction" method="execute">
+        <action name="removeIdea" class="actions.controller.RemoveIdeaAction" method="execute">
             <result type="json"></result>
         </action>
     </package>
