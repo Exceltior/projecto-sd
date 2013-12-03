@@ -1,5 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <oracle.dbtools.crest.model.design.relational.RelationalDesign>
+   <object objectType="Table" objectID="894771D3-ADBB-7922-7763-355DE7D72B6F" name="Compra" seqName="seg_0"/>
    <object objectType="Table" objectID="9CA12B95-DDB7-C1A2-BD4F-A9D1FB3ECEE6" name="HallFame" seqName="seg_0"/>
    <object objectType="Table" objectID="B73AF495-753C-8405-26C3-0E9C773F32EA" name="Ideia" seqName="seg_0"/>
    <object objectType="Table" objectID="BC66B273-95F8-C0E4-1FD9-FB34422E639F" name="IdeiaWatchList" seqName="seg_0"/>
@@ -8,6 +9,8 @@
    <object objectType="Table" objectID="D24492B5-E4CC-C027-FA1C-D22013DF7C27" name="TopicoIdeia" seqName="seg_0"/>
    <object objectType="Table" objectID="63C814E4-6EDF-E6F3-BD77-03D60976F026" name="Transacao" seqName="seg_0"/>
    <object objectType="Table" objectID="668C6582-522C-BE32-A03E-D96083C0417E" name="Utilizador" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="27ADF935-1D2E-1D17-24E8-09446C88897A" name="Compra_Ideia_FK" seqName="seg_0"/>
+   <object objectType="FKIndexAssociation" objectID="44AA8B21-9E10-0E7C-72BE-ED1D9820A7B6" name="Compra_Utilizador_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="BE919961-C269-B456-D31F-BEB5DF542BF1" name="IdeiaWatchList_Ideia_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="77788032-E203-6D9A-0E9C-2D61A49CFE7B" name="IdeiaWatchList_Utilizador_FK" seqName="seg_0"/>
    <object objectType="FKIndexAssociation" objectID="9F12C6A5-A4FD-66FB-FD51-9CBADB96426E" name="Share_Ideia_FK" seqName="seg_0"/>

@@ -1,0 +1,106 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="894771D3-ADBB-7922-7763-355DE7D72B6F" name="Compra">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:08:48 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="compra_id" id="78C404B6-1C61-6EAD-97FD-DFB6902070D7">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:11:25 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="userid" id="2BEFAAFB-DF9C-20DF-8C6A-AA4799C6736D">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:11:25 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="44AA8B21-9E10-0E7C-72BE-ED1D9820A7B6" referredColumn="FE8C4E14-56EB-EEB5-7CB7-6BB7705DF6A4"/>
+</associations>
+</Column>
+<Column name="iid" id="AED24ADB-B275-9C58-B110-8C77867E1F73">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:11:25 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>7</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<delegate>19C0A9E5-DAF8-1971-58ED-D56AE461827D</delegate>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="27ADF935-1D2E-1D17-24E8-09446C88897A" referredColumn="19C0A9E5-DAF8-1971-58ED-D56AE461827D"/>
+</associations>
+</Column>
+<Column name="num" id="8C9705FC-E78E-ACF4-C2BC-C0836B77572F">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:11:25 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>6</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="maxpricepershare" id="3A6C6630-19E2-DA6E-6D34-052BD3D25EC7">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:11:25 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="E8233A91-8464-33F5-974C-464DAD23FA9D" name="Compra_PK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:11:25 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="78C404B6-1C61-6EAD-97FD-DFB6902070D7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="3465B237-98C9-D785-E135-C6C7F3BB19A5" name="Compra_Ideia_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:14:08 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AED24ADB-B275-9C58-B110-8C77867E1F73"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D521AD3D-BD8B-8DA6-006E-C7D216A82E48" name="Compra_Utilizador_FK">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-03 19:14:08 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2BEFAAFB-DF9C-20DF-8C6A-AA4799C6736D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

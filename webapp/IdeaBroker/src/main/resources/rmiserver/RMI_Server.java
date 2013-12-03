@@ -1454,6 +1454,38 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Insert a buying order into the buySharesQueue.
+     * @param userid
+     * @param iid
+     * @param num
+     * @param maxpricepershare
+     * @param conn
+     * @return
+     */
+    private int insertIntoQueue(int userid, int iid, int num, float maxpricepershare, Connection conn){
+        String query = "INSERT INTO Compra VALUES (fila_seq.nextval," + userid + "," + iid + "," + num + "," +
+                maxpricepershare + ")";
+
+        insertData(query,conn);
+    }
+
+    /**
+     * Remove a buying order from the buyShareQueue.
+     * @param userid
+     * @param iid
+     * @param num
+     * @param maxpricepershare
+     * @param conn
+     */
+    private void removeFromQueue(int id,Connection conn){
+        String query = "Delete from Compra where compra_id = " + id;
+
+        insertData(query,conn);
+    }
+
+    //Funcao que vai buscar o pedido que tem o id menor, e devolve os campos todos
+
+    /**
      * Set up the number of shares for a given idea, and the price of each share for that idea
      * @param uid   The User's id
      * @param iid   The id of the idea
