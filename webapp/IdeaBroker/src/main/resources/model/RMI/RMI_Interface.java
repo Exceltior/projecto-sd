@@ -20,6 +20,9 @@ public interface RMI_Interface extends Remote {
     public Idea[] getIdeasFromTopic(int uid, int tid) throws RemoteException;
     public Idea[] getIdeasFromUser(int uid) throws RemoteException;
     public int removeIdea(Idea idea, int uid) throws  RemoteException;
+    public BuySharesReturn buyShares(int uid, int iid, float maxPricePerShare, int buyNumShares,
+                                     boolean addToQueueOnFailure,
+                                     float targetSellPrice) throws RemoteException;
     public Idea getIdeaByIID(int iid, int uid) throws RemoteException;
     public Idea[] getIdeaByIID(int iid, String title) throws RemoteException;
     public ServerTopic getTopic(int tid, String name) throws RemoteException;

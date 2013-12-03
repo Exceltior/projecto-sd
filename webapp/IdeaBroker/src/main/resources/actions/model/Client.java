@@ -1,6 +1,7 @@
 package actions.model;
 
 import model.RMI.RMIConnection;
+import model.data.BuySharesReturn;
 import model.data.Idea;
 import model.data.NetworkingFile;
 import model.data.Topic;
@@ -109,7 +110,7 @@ public class Client {
         Idea[] devolve = null;
 
         try{
-            devolve=rmi.getRMIInterface().getIdeasFromTopic(uid,tid);
+            devolve=rmi.getRMIInterface().getIdeasFromTopic(uid, tid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -365,6 +366,21 @@ public class Client {
         return devolve;
     }
 
+    //TODO: Javadoc
+    private BuySharesReturn doRMIBuyShares(int iid, float maxPricePerShare, int buyNumShares,
+                                           boolean addToQueueOnFailure, float targetSellPrice) {
+        BuySharesReturn ret = null;
+        try {
+            ret = rmi.getRMIInterface().buyShares(uid,iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,
+                                                  targetSellPrice);
+        } catch (RemoteException e) {
+            System.out.println("Exception in doRMIBUyShares");
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        System.out.println("Returning from doRMIBUyShares");
+        return ret;
+    }
+
     /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
@@ -431,7 +447,7 @@ public class Client {
      * @return              A boolean value indicating the result of the operation (success/failure)
      */
     public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested,NetworkingFile file){
-        return doRMISubmitIdea(ideia, topics, moneyInvested,file);
+        return doRMISubmitIdea(ideia, topics, moneyInvested, file);
     }
 
     /**
@@ -468,7 +484,7 @@ public class Client {
      * @return  An array of Idea objects, containing all the ideas in the given topic
      */
     public Idea[] doGetTopicIdeas(int tid){
-        return doRMIGetTopicIdeas(uid,tid);
+        return doRMIGetTopicIdeas(uid, tid);
     }
 
     /**
@@ -566,5 +582,11 @@ public class Client {
      */
     public int doRemoveIdea(int iid){
         return doRMIRemoveIdea(iid);
+    }
+
+    //TODO: Javadoc
+    public BuySharesReturn doBuyShares(int iid, float maxPricePerShare, int buyNumShares,
+                                       boolean addToQueueOnFailure, float targetSellPrice) {
+        return doRMIBuyShares(iid, maxPricePerShare, buyNumShares, addToQueueOnFailure, targetSellPrice);
     }
 }

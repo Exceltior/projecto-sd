@@ -1,5 +1,7 @@
 package actions.controller;
 
+import model.data.BuySharesReturn;
+
 public class BuySharesAction extends AJAXAction {
 
     /**
@@ -18,15 +20,21 @@ public class BuySharesAction extends AJAXAction {
     private String result;
     private int    numSharesBought;
     private int    numSharesFinal;
-    private int    totalSpent;
+    private float    totalSpent;
 
     public String execute() throws Exception {
         super.execute();
-
+        System.out.println("BuySharesAction called!");
+        BuySharesReturn ret = client.doBuyShares(iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,
+                                                 targetSellPrice);
+        System.out.println("BuySharesAction got ret!");
+        System.out.println(ret);
         ajaxSuccess();
-        result = "OK";
-        numSharesFinal = 10000;
-
+        result = ret.result;
+        numSharesBought=ret.numSharesBought;
+        numSharesFinal = ret.numSharesFinal;
+        totalSpent = ret.totalSpent;
+        System.out.println("BuySharesAction leaving!");
         return SUCCESS;
     }
     public boolean isSuccess() {
@@ -57,7 +65,7 @@ public class BuySharesAction extends AJAXAction {
         return numSharesBought;
     }
 
-    public int getTotalSpent() {
+    public float getTotalSpent() {
         return totalSpent;
     }
 

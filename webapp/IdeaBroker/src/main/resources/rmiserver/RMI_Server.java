@@ -1,12 +1,8 @@
 package rmiserver;
 
 import model.RMI.RMI_Interface;
-import model.data.Idea;
-import model.data.NetworkingFile;
-import model.data.ServerTopic;
-import model.data.Share;
+import model.data.*;
 import model.data.queues.Notification;
-import model.data.Transaction;
 import model.data.queues.TransactionQueue;
 
 import java.io.*;
@@ -705,6 +701,195 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return 1;//Everything ok
 
     }
+
+    private BuySharesReturn tryBuyShares (int uid, int iid, float floatmaxPricePerShare, int buyNumShares,
+                                          boolean addToQueueOnFailure, float targetSell) throws RemoteException {
+        System.out.println("tryBuyShares called with uid="+uid+"\n"
+                            +"iid="+iid+"\n"
+                            +"uid="+uid+"\n"
+                            +"floatmaxPricePerShare="+floatmaxPricePerShare+"\n"
+                            +"buyNumShares="+buyNumShares+"\n"
+                            +"addToQueueOnFailure="+addToQueueOnFailure+"\n"
+                            +"targetSell="+targetSell
+        );
+        BuySharesReturn ret = new BuySharesReturn();
+        Share currentShares = getSharesIdeaForUid(iid, uid);
+        int userMoney = getUserMoney(uid);
+        System.out.println("Checkpoint 1");
+        /**
+         * How many we want. Twice because we want to save one of these values as backup FIXME: why?
+         */
+        int startingShares = currentShares != null ? currentShares.getNum() : 0;
+        ret.numSharesFinal = startingShares; // Start with this
+        System.out.println("Checkpoint 1.1.1");
+        int sharesAlvo = startingShares+buyNumShares;
+        System.out.println("Checkpoint 1.1.2");
+        int numShares = buyNumShares;
+        int totalSharesBought = 0;
+
+        System.out.println("Checkpoint 1.1");
+        int totalSpent = 0;
+
+        /**
+         * If there aren't enough shares in the system AT ALL
+         */
+        if ( sharesAlvo > getNumIdeaShares(iid) ) {
+            System.out.println("Checkpoint 1.2");
+            ret.result ="NOBUY.NOMORESHARES"; return ret;
+        }
+        System.out.println("Checkpoint 2");
+        /**
+         * All Shares in system
+         */
+        ArrayList<Share> shares = getSharesIdea(iid);
+        System.out.println("Checkpoint 3");
+        /**
+         * Will store the shares we want to buy
+         */
+        ArrayList<Share> sharesToBuy = new ArrayList<Share>();
+
+        /**
+         * Will store how many of these shares we want to buy. sharesToBuyNum(i) has how many shares from
+         * sharesToBuy(i) to buy.
+         */
+        ArrayList<Integer> sharesToBuyNum = new ArrayList<Integer>();
+
+        /**
+         * Sort the shares from least-expensive to most-expensive
+         */
+        sortByPrice(shares);
+        System.out.println("Checkpoint 4");
+        /**
+         * If we detect that there aren't enough shares and that we won't be adding anything to the queue, we can
+         * instantly fall out
+         */
+        if ( countAvailableShares(shares) < sharesAlvo  ) {
+            if ( !addToQueueOnFailure ) {
+                ret.result ="NOBUY.NOMORESHARES"; return ret;
+            }
+            else
+                ret.result="QUEUED.NOMORESHARES";
+        }
+
+        System.out.println("Checkpoint 5");
+        for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
+            Share s = shares.get(i1);
+
+            System.out.println("processing share: " + s);
+
+            if ( s.getPrice() > floatmaxPricePerShare )
+                continue; //FIXME: Could actualy be break!
+
+            if ( s.getUid() == uid ) {
+                System.out.println("Skipping, its mine");
+                continue;
+            }
+            int availShares = s.getAvailableShares();
+            if (availShares > 0) { //Should always happen
+                System.out.println("ALready, available shares!: " + availShares);
+
+                int toBuy = Math.min(availShares, numShares);
+
+                if (s.getPriceForNum(toBuy) > userMoney) {
+                    System.out.println("Not enough money...:" + userMoney + ", " + s.getPriceForNum(toBuy));
+                    // Not enough money...
+                    float pricePerShare = s.getPrice();
+
+                    // See how many we can buy. Round down!
+                    toBuy = (int) (((double) userMoney) / pricePerShare);
+                    if (toBuy == 0)
+                        break;
+                    System.out.println("Will still try to buy " + toBuy);
+                }
+                System.out.println("Buying " + toBuy +" shares.");
+                sharesToBuy.add(s);
+                sharesToBuyNum.add(toBuy);
+                numShares -= toBuy;
+                userMoney -= s.getPriceForNum(toBuy);
+                totalSpent += s.getPriceForNum(toBuy);;
+                totalSharesBought += toBuy;
+            }
+        }
+
+        //FIXME: STOPPED HERE
+
+        if ( numShares > 0 ) {
+            if ( !addToQueueOnFailure ) {
+                ret.result = "NOBUY.NOMOREMONEY"; return ret;
+            }
+
+            //Can't buy shares!!!
+            System.out.println("Failed to buy shares!!");
+
+            if ( !"QUEUED.NOMORESHARES".equals(ret.result) ) {
+                ret.result = "QUEUED.NOMOREMONEY";
+            }
+        }
+
+        //Okay, move on and let's buy them. this must be transactional
+        Connection conn = getTransactionalConnection();
+        for (int i = 0; i < sharesToBuy.size(); i++) {
+            Share s = sharesToBuy.get(i);
+            int num = sharesToBuyNum.get(i);
+            int resultingShares = s.getNum()-num;
+            System.out.println("Buying "+num+"from "+s.getUid()+"!!");
+            System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
+            setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),conn);
+            insertIntoHistory(uid, s.getUid(), num,s.getPrice(),conn,iid);
+            setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), conn);
+        }
+
+        System.out.println("Before setSharesIdea");
+        setSharesIdea(uid,iid,sharesAlvo,startingShares+totalSharesBought,conn);
+        System.out.println("Before setUserMoney");
+        setUserMoney(uid,userMoney, conn);
+
+        // UNLEASH THE BEAST!
+        returnTransactionalConnection(conn);
+
+
+        //Handle notifications here
+        for (int i = 0; i < sharesToBuy.size(); i++) {
+            Share s = sharesToBuy.get(i);
+            System.out.println("To buy: "+s);
+            System.out.println("(Buying): "+sharesToBuyNum.get(i));
+            /*new model.data.queues.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
+                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
+            new model.data.queues.NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
+                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));*/
+        }
+        ret.numSharesBought = totalSharesBought;
+        ret.numSharesFinal  = startingShares+totalSharesBought;
+        ret.totalSpent      = totalSpent;
+        if ( ret.result.isEmpty() )
+            ret.result = "OK";
+        System.out.println("I'm leaving!");
+        return ret;
+
+    }
+
+    private int countAvailableShares(ArrayList<Share> shares) {
+        int ret = 0;
+        for (Share s : shares)
+            ret += s.getAvailableShares();
+
+        return ret;
+    }
+
+
+    public BuySharesReturn buyShares(int uid, int iid, float maxPricePerShare, int buyNumShares,
+                                     boolean addToQueueOnFailure, float targetSellPrice) throws RemoteException {
+        BuySharesReturn ret = tryBuyShares(uid,iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,targetSellPrice);
+        System.out.println("Got out of tryBuyShares");
+        if ( ret.result.contains("QUEUED.") ) {
+            // Need to queue! But how many? we can calculate them
+            System.out.println("Need to add to queue!");
+        }
+
+        System.out.println("Returning");
+        return ret;
+    }
+
     /**
      * Method responsible for getting the list of topics for a given idea
      * @param iid   The id of the idea
@@ -1798,7 +1983,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{

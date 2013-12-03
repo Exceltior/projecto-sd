@@ -259,7 +259,6 @@
             if ( maxwillingtobuy > currentmoney ) {
                 //Can't sell
                 m.val(currentmoney);
-                modalsubmitbutton.prop('disabled', true);
             } else {
                 //Can sell
                 modalsubmitbutton.prop('disabled', false);
@@ -281,7 +280,6 @@
             if ( maxSharesAvail < currentSharesWant ) {
                 //Can't sell
                 m.val(maxSharesAvail);
-                modalsubmitbutton.prop('disabled', true);
             } else {
                 //Can sell
                 modalsubmitbutton.prop('disabled', false);
@@ -324,8 +322,7 @@
 
                     //Update the money onscreen (it's okay if we don't buy anything because totalspent=0)
                     setUserMoney(getUserMoney()-data.totalSpent);
-
-                    //Update the money onscreen (it's okay if we don't buy anything because numSharesFinal=0)
+                    //FIXME: WARNING, Most of buy shares is all fucked up. We probably will only get QUEUED.NOMOREMONEY OR NOBUY.NOMOREMONEY or NOBUY.NOMORESHARES
                     setNumSharesForidea(id,data.numSharesFinal);
                     if ( data.result == 'OK' ) {
                         //Update the selling price onscreen
@@ -452,13 +449,6 @@
 
             dialog.getModalFooter().html(button+closebutton);
             dialog.open();
-
-            /**
-            * TODO: Handle the click on the button with AJAX (new function) and possibly open up a new dialog
-             * We also want to update these idea's fields explicitly...that is we want o add the number of shares label
-             * (or update it) and the price at which to sell them label. We should probably always add them, just make
-             * them invisible...
-             */
         }
     </script>
 
