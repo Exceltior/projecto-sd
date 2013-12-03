@@ -1455,11 +1455,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     /**
      * Insert a buying order into the buySharesQueue.
-     * @param userid
-     * @param iid
-     * @param num
-     * @param maxpricepershare
-     * @param conn
+     * @param userid            The id of the user requesting the transaction
+     * @param iid               The id of the idea being transactionated
+     * @param num               The number of shares in the transaction
+     * @param maxpricepershare  The maximum price the buyer wants to pay for the shares
+     * @param conn              Connection to the database
      * @return
      */
     private int insertIntoQueue(int userid, int iid, int num, float maxpricepershare, Connection conn){
@@ -1467,13 +1467,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 maxpricepershare + ")";
 
         insertData(query,conn);
+
+        query = "Select from Compra where userid = " + userid + " and iid = " + iid + " and num = " + num +
+                " and maxpriceshare = " + maxpricepershare;
+        ArrayList<String[]>queryResult = receiveData(query,conn);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return -1;
+
+        return Integer.valueOf(queryResult.get(0)[0]);
     }
 
     /**
      * Remove a buying order from the buyShareQueue.
-     * @param id
-     * @param conn
-     * @param conn
+     * @param id    The id of the user requesting the transaction
+     * @param conn  Connection to the database
      */
     private void removeFromQueue(int id,Connection conn){
         String query = "Delete from Compra where compra_id = " + id;
