@@ -18,15 +18,75 @@
     <!--<link href="css/3dbtn.css" rel="stylesheet">-->
     <title></title>
     <script type="text/javascript">
+
+        function getWatchListLabelStr(id) {
+            return '#watchlistlabel'+id;
+        }
+
+        function getAddToWatchListButtonStr(id) {
+            return '#addtowatchlistbtn'+id;
+        }
+
+        function getSetSharePriceBtnStr(id) {
+            return '#btnsellingprice'+id;
+        }
+
+        function getSetSharePriceTextEditStr(id) {
+            return '#sellingprice'+id;
+        }
+
+        function getNumSharesIdeaStr(id) {
+            return '#numshares'+id;
+        }
+
+        function getPercentSharesIdeaStr(id) {
+            return "#percentshares"+id;
+        }
+
+        function getShareNumLabelStr(id) {
+            return "#ownidea"+id;
+        }
+
+        function getSharePriceEditBoxStr(id) {
+            return '#setsharepriceeditbox'+id;
+        }
+
+        function getRemoveIdeaBtnStr(id) {
+            return '#removeidea'+id;
+        }
+
+        function showShareNumLabel(id) {
+            $(getShareNumLabelStr(id)).show();
+        }
+
+        function hideShareNumLabel(id) {
+            $(getShareNumLabelStr(id)).hide();
+        }
+
+
+        function showSetSellingPriceBox(id) {
+            $(getSharePriceEditBoxStr(id)).show();
+        }
+
+        function hideSetSellingPriceBox(id) {
+            $(getSharePriceEditBoxStr(id)).hide();
+        }
+
+        function showRemoveIdeaBtn(id) {
+            $(getRemoveIdeaBtnStr(id)).show();
+        }
+
+        function hideRemoveIdeaBtn(id) {
+            $(getRemoveIdeaBtnStr(id)).hide();
+        }
+
         function addToWatchlist(id){
-            btn = "addtowatchlistbtn"+id;
-            tags = "ideatags"+id;
             var formData = {iid:id}; //Array
             $.getJSON('addtowatchlist.action', formData,function(data) {
 
                 if ( data.success ) {
-                    $('#'+btn).remove();
-                    $('#'+tags).html($('#'+tags).html()+'<span class="label label-success" id="watchlistlabel'+id+'"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist <a href="#" type="button" onclick="removeFromWatchlist('+id+');"><span class="glyphicon glyphicon-remove"></span></a> </span>');
+                    $(getWatchListLabelStr(id)).show();
+                    $(getAddToWatchListButtonStr(id)).hide();
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
@@ -35,16 +95,12 @@
         }
 
         function removeFromWatchlist(id) {
-            btns = "buttons"+id;
-            btn = "addtowatchlistbtn"+id;
-            tags = "ideatags"+id;
-            label = "watchlistlabel"+id;
             var formData = {iid:id}; //Array
             $.getJSON('removefromwatchlist.action', formData,function(data) {
 
                 if ( data.success ) {
-                    $('#'+label).remove();
-                    $('#'+btns).html($('#'+btns).html()+'<a href="#" type="button" class="btn btn-success btn-sm" id="'+btn+'" onclick="addToWatchlist('+id+');"> <span class="glyphicon glyphicon-eye-open"></span> Adicionar à Watchlist </a>');
+                    $(getAddToWatchListButtonStr(id)).show();
+                    $(getWatchListLabelStr(id)).hide();
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
@@ -61,11 +117,8 @@
         }
 
         function sharePriceChanged(id) {
-            btn="btnsellingprice"+id;
-            textarea="sellingprice"+id;
-            text = $('#'+textarea);
-            button = $('#'+btn);
-            //$('#'+btn).addClass('btn-success').removeClass('btn-info');
+            text = $(getSetSharePriceTextEditStr(id));
+            button = $(getSetSharePriceBtnStr(id));
 
             if ( isValidPositiveNum(text.val()) ) {
                 text.removeAttr('title');
@@ -88,10 +141,8 @@
 
         function setSharePrice(event) {
             id = event.data.id;
-            btn="btnsellingprice"+id;
-            textarea="sellingprice"+id;
-            button = $('#'+btn);
-            text = $('#'+textarea);
+            text = $(getSetSharePriceTextEditStr(id));
+            button = $(getSetSharePriceBtnStr(id));
 
             var formData = {iid:id,price:text.val()}; //Array
             $.getJSON('setshareprice.action', formData,function(data) {
@@ -114,16 +165,56 @@
             return parseFloat($('#currmoney').text());
         }
 
+        function setUserMoney(money) {
+            $('#currmoney').text(money);
+        }
+
         function getMaxSharesForIdea(id) {
             return 100000;
         }
 
         function getNumSharesForIdea(id) {
-            var numshareslabel = $('#numshares'+id);
+            var numshareslabel = $(getNumSharesIdeaStr(id));
             if ( numshareslabel.length != 0)
                 return numshareslabel.text();
             else
                 return 0;
+        }
+
+
+        function setSellingPriceIdea(id, price) {
+            $(getSetSharePriceTextEditStr(id)).val(price);
+        }
+
+        function getSellingPriceIdea(id, price) {
+            if ( $(getSetSharePriceTextEditStr(id)).is(":visible") )
+                return $(getSetSharePriceTextEditStr(id)).val();
+            return -1;
+        }
+
+        ////
+        // CALL THIS FUNCTION TO UPDATE THE SHARES FOR AN IDEA. IT UPDATES ALL THE FIELDS IT HAS TOO. ALSO DON'T FORGET
+        // THAT THIS SHOWS THE SET SELLING PRICE FIELD, SO YOU MIGHT WANT TO USE setSellingPriceIdea() TO UPDATE THAT!
+        //
+        function setNumSharesForidea(id, num) {
+            /** FIXME: When we show, we need to get the selling price */
+            var numshareslabel = $(getNumSharesIdeaStr(id));
+            var percentshareslabel = $(getPercentSharesIdeaStr(id));
+            var pct =  num / getMaxSharesForIdea();
+            percentshareslabel.text(pct);
+            numshareslabel.text(num);
+            if ( num > 0 ) {
+                showSetSellingPriceBox(id);
+                showShareNumLabel(id);
+                if ( pct == 100.0 )
+                    showRemoveIdeaBtn(id);
+                else
+                    hideRemoveIdeaBtn(id);
+            } else {
+                hideSetSellingPriceBox(id);
+                hideShareNumLabel(id);
+                hideRemoveIdeaBtn(id);
+            }
         }
 
         gClosedialog = null;
@@ -175,29 +266,103 @@
         }
 
         function doBuyShares(id) {
-            var maxPerShare   = $('#maxpershareinput').val();
-            var numSharesWant = $('#numshareswant').val();
-            var wantToQueue   = $('#addtoqueue').prop('checked');
-
-            var formData = {iid:id,
+            var maxPerShare     = parseFloat($('#maxpershareinput').val());
+            var numSharesWant   = parseInt($('#numshareswant').val());
+            var wantToQueue     = $('#addtoqueue').prop('checked');
+            var targetSellPrice = parseFloat($('#targetsellpriceinput').val());
+            var formData = {iid:parseInt(id),
                             maxPricePerShare:maxPerShare,
-                            targetNumShares:numSharesWant,
-                            addToQueueOnFailure:wantToQueue};
-            /*
+                            buyNumShares:numSharesWant,
+                            addToQueueOnFailure:wantToQueue,
+                            targetSellPrice:targetSellPrice};
+
+            var message, header, type;
+
             $.getJSON('buyshares.action', formData,function(data) {
                 if ( data.success ) {
+                    gClosedialog.close();
+
+                    //Update the money onscreen (it's okay if we don't buy anything because totalspent=0)
+                    setUserMoney(getUserMoney()-data.totalSpent);
+
+                    //Update the money onscreen (it's okay if we don't buy anything because numSharesFinal=0)
+                    setNumSharesForidea(id,data.numSharesFinal);
                     if ( data.result == 'OK' ) {
-                        // Went fine
+                        //Update the selling price onscreen
+                        setSellingPriceIdea(id,targetSellPrice);
+                        message =
+                                '<span style="color: #6fc65d" class="glyphicon glyphicon-ok-circle"></span>&nbsp;<span style="color: #6fc65d">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #6fc65d">'+data.totalSpent+'</span> DEICoins.</span>'
+                        message =
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #6fc65d" class="glyphicon glyphicon-ok-circle"></span></div>&nbsp;<span style="color: #6fc65d">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #6fc65d">'+data.totalSpent+'</span> DEICoins.<br /></div>');
+                        header =
+                                '<div class="bootstrap-dialog-title">Operação concluída com sucesso!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                        type = BootstrapDialog.TYPE_SUCCESS;
                     } else if ( data.result == 'QUEUED.NOMOREMONEY' ) {
                         // Request got queued because we ran out of money
+                        //Update the selling price onscreen
+                        setSellingPriceIdea(id,targetSellPrice);
+                        message =
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #f0ad4e" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #f0ad4e">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #f0ad4e">'+data.totalSpent+'</span> DEICoins.<br /> Não houve dinheiro para comprar mais (apesar de haver shares).<br /><span style="color: #1500d2">As restantes serão compradas assim que possível.</span></span></div>');
+                        header =
+                                '<div class="bootstrap-dialog-title">Nem todas as shares foram compradas</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                        type = BootstrapDialog.TYPE_WARNING;
                     } else if ( data.result == 'QUEUED.NOMORESHARES' ) {
-                        // Request got queued because there are no more shares
+                        // Request got queued because there are no more shares (no more shares at all or at our desired price)
+                        //Update the selling price onscreen
+                        setSellingPriceIdea(id,targetSellPrice);
+                        message =
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #f0ad4e" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #f0ad4e">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #f0ad4e">'+data.totalSpent+'</span> DEICoins.<br /> O número de sahres pedido não está disponível.<br /><span style="color: #1500d2">As restantes serão compradas assim que possível.</span></span></div>');
+                        header =
+                                '<div class="bootstrap-dialog-title">Nem todas as shares foram compradas (não havia shares suficientes)</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                        type = BootstrapDialog.TYPE_WARNING;
+                    } else if ( data.result == 'NOBUY.NOMOREMONEY' ) {
+                        // Not enough money to buy all the required shares, so nothing bought at all
+                        message =
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #d2322d">Nenhuma compra foi feita.<br /> Não há dinheiro suficiente.<br /><span style="color: #1500d2">Por seu pedido, dada esta situação, a operação foi abortada.</span></span></div>');
+                        header =
+                                '<div class="bootstrap-dialog-title">Operação cancelada</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                        type = BootstrapDialog.TYPE_DANGER;
+                    } else if ( data.result == 'NOBUY.NOMORESHARES' ) {
+                        // Not enough shares are available, so none bought at all
+                        message =
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #d2322d">Nenhuma compra foi feita.<br /> Não há shares suficientes.<br /><span style="color: #1500d2">Por seu pedido, dada esta situação, a operação foi abortada.</span></span></div>');
+                        header =
+                                '<div class="bootstrap-dialog-title">Operação cancelada</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                        type = BootstrapDialog.TYPE_DANGER;
                     }
+
+                    var dialog = new BootstrapDialog({
+                        size: BootstrapDialog.SIZE_LARGE,
+                        type: type,
+                        message: message,
+                        closable:true
+                    });
+                    gClosedialog = dialog;
+                    dialog.realize();
+                    dialog.getModalHeader().html(header);
+                    dialog.getModalFooter().html('<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Terminado</button>');
+                    dialog.open();
+
                 } else {
                     alert("Server Internal Error...RMI is probably down!");
                 }
                 return true;
-            });*/
+            });
+        }
+
+        function getMarketValue(id) {
+            return 1; //FIXME
+        }
+
+        function onTargetSellPriceChanged() {
+            var m = $('#targetsellpriceinput');
+            var modalsubmitbutton = $('#modalsubmitbutton');
+            if (m.val() == '' || m.val() == 0 || !isValidPositiveNum(m.val())) {
+                modalsubmitbutton.prop('disabled', true);
+                return;
+            }
+
+            modalsubmitbutton.prop('disabled', false);
         }
 
         function buyShares(id) {
@@ -205,11 +370,17 @@
             if ( currentnumshares == 0) currentnumshares = 1;
             var currentmoney = getUserMoney();
 
+            var sellingPrice = getSellingPriceIdea(id);
+            if (sellingPrice == -1)
+                sellingPrice = getMarketValue(id);
 
             var numsharesarea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares desejadas:&nbsp;<input name="text" id="numshareswant" value="'+currentnumshares+'" style="width:125px;" onkeyup="onNumSharesWantChanged(id);" /></div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+currentnumshares+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
             var maxpersharearea =
                     '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Máximo por share:&nbsp;<input name="text" id="maxpershareinput" value="'+currentmoney+'" style="width:125px;" onkeyup="onMaxWillingToBuyChanged();" /> DEICoins</div>';
+
+            var targetsellpricearea =
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Preço de venda:&nbsp;<input name="text" id="targetsellpriceinput" value="'+sellingPrice+'" style="width:125px;" onkeyup="onTargetSellPriceChanged();" /> DEICoins/share</div>';
 
             var modalcheckbox =
                     '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;<input type="checkbox" id="addtoqueue" value="true" > Colocar pedido na fila se não for possível satisfazer</input></div>';
@@ -217,7 +388,7 @@
             var message = function(dialogRef){
                 var $message =
                         $("<div style='font-size:16pt'>Começou com <span style='color: #6fc65d'>"+currentnumshares+"</span> shares</div>");
-                $message.append(numsharesarea).append($('<div>&nbsp;</div>')).append($(maxpersharearea)).append($(modalcheckbox));
+                $message.append(numsharesarea).append($('<div>&nbsp;</div>')).append($(maxpersharearea)).append($('<div>&nbsp;</div>')).append($(targetsellpricearea)).append($(modalcheckbox));
 
                 return $message;
             }
@@ -229,7 +400,7 @@
             gClosedialog = dialog;
 
             var button =
-                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doBuyShares(id);"><span class="glyphicon glyphicon-cloud"></span><span style="margin:-9px; color: #dbd02b" class="glyphicon glyphicon-euro"></span> &nbsp; &nbsp;Comprar Shares</button>';
+                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doBuyShares('+id+');"><span class="glyphicon glyphicon-cloud"></span><span style="margin:-9px; color: #dbd02b" class="glyphicon glyphicon-euro"></span> &nbsp; &nbsp;Comprar Shares</button>';
             var closebutton
                     = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
 
@@ -339,34 +510,35 @@
                                             <div style="float:right; white-space:nowrap;" id="ideatags<s:property
                                              value="id" />">
                                                 <!-- Labels here -->
-                                                <s:if test="top.percentOwned > 0.0">
-                                                    <span class="label label-info" id="ownidea<s:property
-                                                     value="id" />"><span
+                                                    <span
+                                                            <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>
+                                                            class="label label-info" id="ownidea<s:property value="id" />"><span
                                                             class="glyphicon glyphicon-ok"></span><span
-                                                            id="numshares<s:property
-                                                     value="id" />"><s:property
-                                                            value="numSharesOwned" /></span> shares (<s:property
-                                                            value="percentOwned" />%)
+                                                            id="numshares<s:property value="id" />"><s:property
+                                                            value="numSharesOwned" /></span> shares (
+                                                        <span
+                                                                id="percentshares<s:property value="id" />">
+                                                            <s:property
+                                                            value="percentOwned" /></span>%)
                                                     </span>
-                                                </s:if>
                                                 <!-- Watchlist Label -->
-                                                <s:if test="top.inWatchList">
-
-                                                    <span class="label label-success" id="watchlistlabel<s:property
-                                                     value="id" />"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist
+                                                    <span
+                                                            <s:if test="!top.inWatchList">style="display:none"</s:if>
+                                                            class="label label-success"
+                                                            id="watchlistlabel<s:property value="id"/>"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist
                                                         <a href="#" type="button"
                                                            onclick="removeFromWatchlist(<s:property
                                                                 value="id" />);"><span
                                                                 class="glyphicon glyphicon-remove"></span></a> </span>
-                                                </s:if>
 
                                             </div>
                                             <div style="float:left; white-space:nowrap;" id="idealeftarea<s:property
                                              value="id" />">
                                                 <!-- Left buttons -->
-                                                <s:if test="top.percentOwned > 0.0">
+
                                                     <!-- Set share price -->
-                                                    <div class="input-append">
+                                                    <div class="input-append" id="setsharepriceeditbox<s:property value="id" />"
+                                                         <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>>
                                                         <span
                                                                 class="glyphicon glyphicon-euro"></span>
                                                         Vender a
@@ -381,8 +553,6 @@
                                                             ><span
                                                                 class="glyphicon glyphicon-ok-sign"></span></button>
                                                     </div>
-
-                                                </s:if>
                                             </div>
                                         </div>
                                             <div style="height: 45px">
@@ -391,17 +561,17 @@
                                                     <!-- Buttons here -->
 
                                                     <!-- Delete idea -->
-                                                    <s:if test="top.percentOwned == 100.0">
-                                                        <a href="deleteidea.action?iid=<s:property value="id" />" type="button"
+                                                        <a id="removeidea<s:property value="id" />"
+                                                          <s:if test="top.percentOwned != 100.0">style="display: none"</s:if>
+                                                                href="deleteidea.action?iid=<s:property value="id" />" type="button"
                                                            class="btn btn-danger btn-sm">
                                                             <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
                                                         </a>
-                                                    </s:if>
 
-                                                    <!-- Delete idea -->
-                                                    <s:if test="top.percentOwned < 100.0">
+                                                    <!-- Buy shares-->
+
                                                         <!--data-toggle="modal" href="#myModal"-->
-                                                        <a
+                                                        <a <s:if test="top.percentOwned == 100.0">style="display:none"</s:if>
                                                            type="button"
                                                            class="btn btn-primary btn-sm"
                                                            id="buyshares<s:property value="id" />"
@@ -411,18 +581,18 @@
                                                                 class="glyphicon glyphicon-euro"></span>
                                                             &nbsp; &nbsp;Comprar Shares
                                                         </a>
-                                                    </s:if>
 
-                                                    <s:if
-                                                            test="!top.inWatchList">
-                                                        <a href="#" type="button"
+
+                                                        <a
+                                                                <s:if test="top.inWatchList">style="display:none"</s:if>
+                                                                href="#" type="button"
                                                            class="btn btn-success btn-sm"
                                                            id="addtowatchlistbtn<s:property value="id" />"
                                                            onclick="addToWatchlist(<s:property value="id" />);">
                                                             <span class="glyphicon glyphicon-eye-open"></span> Adicionar
                                                             à Watchlist
                                                         </a>
-                                                    </s:if>
+
 
                                                 </div>
                                         </div>
