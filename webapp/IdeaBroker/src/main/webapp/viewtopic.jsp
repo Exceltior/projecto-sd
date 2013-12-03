@@ -84,9 +84,13 @@
             $(getRemoveIdeaBtnStr(id)).hide();
         }
 
+        function postJSON(page, data, func) {
+            $.post(page, data, func, 'json');
+        }
+
         function addToWatchlist(id){
             var formData = {iid:id}; //Array
-            $.getJSON('addtowatchlist.action', formData,function(data) {
+            postJSON('addtowatchlist.action', formData,function(data) {
 
                 if ( data.success ) {
                     $(getWatchListLabelStr(id)).show();
@@ -100,7 +104,7 @@
 
         function removeFromWatchlist(id) {
             var formData = {iid:id}; //Array
-            $.getJSON('removefromwatchlist.action', formData,function(data) {
+            postJSON('removefromwatchlist.action', formData,function(data) {
 
                 if ( data.success ) {
                     $(getAddToWatchListButtonStr(id)).show();
@@ -149,7 +153,7 @@
             button = $(getSetSharePriceBtnStr(id));
 
             var formData = {iid:id,price:text.val()}; //Array
-            $.getJSON('setshareprice.action', formData,function(data) {
+            postJSON('setshareprice.action', formData,function(data) {
                 if ( data.success ) {
                     button.addClass('btn-success').removeClass('btn-info').removeClass('btn-error');;
                     button.html('<span class="glyphicon glyphicon-ok-sign"></span>');
@@ -288,7 +292,7 @@
 
         function removeIdea(id) {
             var formData = {iid:id}; //Array
-            $.getJSON('removeidea.action', formData,function(data) {
+            postJSON('removeidea.action', formData,function(data) {
                 if ( data.success ) {
                     if ( data.result == "OK" ) {
                         $(getIdeaStr(id)).hide();
@@ -316,7 +320,7 @@
 
             var message, header, type;
 
-            $.getJSON('buyshares.action', formData,function(data) {
+            postJSON('buyshares.action', formData,function(data) {
                 if ( data.success ) {
                     gClosedialog.close();
 
@@ -403,8 +407,6 @@
         }
 
         function buyShares(id) {
-            var a = getNumSharesForIdea(id);
-            if ( a == 0 ) a = 1;
             var currentmoney = getUserMoney();
 
             var sellingPrice = getSellingPriceIdea(id);
@@ -412,7 +414,7 @@
                 sellingPrice = getMarketValue(id);
 
             var numsharesarea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+a+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Número de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+1+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
             var maxpersharearea =
                     '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Máximo por share:&nbsp;<input name="text" id="maxpershareinput" value="'+currentmoney+'" style="width:125px;" onkeyup="onMaxWillingToBuyChanged();" /> DEICoins</div>';
 
