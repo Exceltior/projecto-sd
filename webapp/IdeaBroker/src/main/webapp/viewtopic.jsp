@@ -55,6 +55,10 @@
             return '#removeidea'+id;
         }
 
+        function getIdeaStr(id) {
+            return '#idea'+id;
+        }
+
         function showShareNumLabel(id) {
             $(getShareNumLabelStr(id)).show();
         }
@@ -192,6 +196,25 @@
             return -1;
         }
 
+        function showMessage(title, message, type, callback) {
+            new BootstrapDialog({
+                message: message,
+                type: type,
+                title: title,
+                data: {
+                    'callback': callback
+                },
+                closable: false,
+                buttons: [{
+                    label: 'OK',
+                    action: function(dialog) {
+                        typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
+                        dialog.close();
+                    }
+                }]
+            }).open();
+        }
+
         ////
         // CALL THIS FUNCTION TO UPDATE THE SHARES FOR AN IDEA. IT UPDATES ALL THE FIELDS IT HAS TOO. ALSO DON'T FORGET
         // THAT THIS SHOWS THE SET SELLING PRICE FIELD, SO YOU MIGHT WANT TO USE setSellingPriceIdea() TO UPDATE THAT!
@@ -263,6 +286,23 @@
                 //Can sell
                 modalsubmitbutton.prop('disabled', false);
             }
+        }
+
+        function removeIdea(id) {
+            var formData = {iid:id}; //Array
+            $.getJSON('removeidea.action', formData,function(data) {
+                if ( data.success ) {
+                    if ( data.result == "OK" ) {
+                        $(getIdeaStr(id)).hide();
+                    } else {
+                        showMessage('Erro', 'Não foi possível apgar a ideia porque não detém 100% das suas shares.',
+                                BootstrapDialog.TYPE_DANGER);
+                    }
+                } else {
+                    alert("Server Internal Error...RMI is probably down!");
+                }
+                return true;
+            });
         }
 
         function doBuyShares(id) {
@@ -476,7 +516,7 @@
                             id="currmoney"><s:property
                             value="%{#session.client.coins}"/></span> DEICoins</a></li>
                     <li><a href="#" id="numNotifications"><span class="glyphicon
-                     glyphicon-envelope"></span>&nbsp;<s:property value="%{#session.client.numNotifictions}"/> Novas
+                     glyphicon-envelope"></span>&nbsp;<s:property value="%{#session.client.numNotifications}"/> Novas
                         Mensagens</a></li>
                 </ul>
             </nav>
@@ -500,7 +540,7 @@
                             <h2 style="text-align:center">#<s:property value="topicName" /></h2>
                             <div class="list-group text-center" >
                                 <s:iterator var="i" step="1" value="ideas">
-                                    <div class="list-group-item">
+                                    <div class="list-group-item" id="idea<s:property value="id" />">
                                         <%-- href="viewidea.action?iid=<s:property value="iid" />" --%>
                                         <h4
                                                 class="list-group-item-heading"><s:property value="title" /><div
@@ -563,8 +603,9 @@
                                                     <!-- Delete idea -->
                                                         <a id="removeidea<s:property value="id" />"
                                                           <s:if test="top.percentOwned != 100.0">style="display: none"</s:if>
-                                                                href="deleteidea.action?iid=<s:property value="id" />" type="button"
-                                                           class="btn btn-danger btn-sm">
+                                                                href="#" type="button"
+                                                           class="btn btn-danger btn-sm"
+                                                           onclick="removeIdea(<s:property value="id" />)">
                                                             <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
                                                         </a>
 
