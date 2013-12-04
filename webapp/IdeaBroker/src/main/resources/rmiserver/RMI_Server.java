@@ -894,6 +894,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if ( ret.result.contains("QUEUED.") ) {
             // Need to queue! But how many? we can calculate them
             System.out.println("Need to add to queue!");
+            Connection conn = getTransactionalConnection();
+            insertIntoQueue(uid,iid,buyNumShares,maxPricePerShare,targetSellPrice,conn);
+            returnTransactionalConnection(conn);
         }
 
         System.out.println("Returning");
@@ -1473,9 +1476,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return                  In case of success, returns the id of the transaction inserted in the database. If an
      *                          error occurred returns -1;
      */
-    private int insertIntoQueue(int userid, int iid, int num, float maxpricepershare, Connection conn){
+    synchronized private int insertIntoQueue(int userid, int iid, int num, float maxpricepershare,
+                                             float targetSellPrice, Connection conn){
         String query = "INSERT INTO Compra VALUES (fila_seq.nextval," + userid + "," + iid + "," + num + "," +
-                maxpricepershare + ")";
+                maxpricepershare + "," + targetSellPrice + ")";
 
         insertData(query,conn);
 
@@ -1494,7 +1498,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param id    The id of the user requesting the transaction
      * @param conn  Connection to the database
      */
-    private void removeFromQueue(int id,Connection conn){
+    synchronized private void removeFromQueue(int id,Connection conn){
         String query = "Delete from Compra where compra_id = " + id;
 
         insertData(query,conn);
@@ -1506,13 +1510,39 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return      An array of String objects, containing the fields correspondent to the Transaction Queue, stored
      *              in the database.
      */
-    private String[] returnNewestTransaction(Connection conn){
+    private String[] getQueueHead(Connection conn){
+        /**
+         * FIXME: Joca, falta seleccionar o targetSellPrice e colocá-lo no fim. NO FIM!!
+         */
         String query = "Select compra_id,userid,iid,num,maxpriceshare from Compra order by compra_id ASC";
         ArrayList<String[]> queryResult = receiveData(query,conn);
 
         if (queryResult == null || queryResult.isEmpty())
             return null;
         return queryResult.get(0);
+    }
+
+    //É TUDO SYNCHRONIZED, QUE É LINDO P'RA FODASZ.
+    private synchronized void checkQueue(Connection conn) {
+        String[] head = null;
+        while ( (head = getQueueHead(conn) ) != null ) {
+            int id                    = Integer.valueOf(head[0]);
+            int uid                   = Integer.valueOf(head[1]);
+            int iid                   = Integer.valueOf(head[2]);
+            int num                   = Integer.valueOf(head[3]);
+            float maxpriceshare       = Integer.valueOf(head[4]);
+            float sellingPrice        = Integer.valueOf(head[5]);
+
+            BuySharesReturn ret = null;
+            try { ret = tryBuyShares(uid, iid, maxpriceshare, num, true, sellingPrice); } catch (RemoteException
+                    ignored) {return;}
+            if ( ret.result.equals("OK") ) {
+                //We did it! Send notification to client via websockets and the like
+                System.out.println("We did it! "+ret);
+                // Remove it from the queue, we've processed it
+                removeFromQueue(id, conn);
+            }
+        }
     }
 
     /**
@@ -1523,7 +1553,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param price The price of each share for the given idea
      * @throws RemoteException
      */
-    synchronized public void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
+    public synchronized void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
         /* null here means no transactional connection */
         setSharesIdea(uid, iid, nshares,price,null);
     }
