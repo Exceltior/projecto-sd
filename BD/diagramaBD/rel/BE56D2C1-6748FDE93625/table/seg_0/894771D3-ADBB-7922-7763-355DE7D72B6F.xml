@@ -69,6 +69,17 @@
 <dataTypeScale>2</dataTypeScale>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="targetSellPrice" id="F87FF11E-A0C1-6471-B197-4D8BE8962AB2">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-04 17:10:53 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="E8233A91-8464-33F5-974C-464DAD23FA9D" name="Compra_PK">
