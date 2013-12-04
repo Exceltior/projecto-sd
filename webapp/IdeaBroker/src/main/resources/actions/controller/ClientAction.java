@@ -2,7 +2,13 @@ package actions.controller;
 
 import com.opensymphony.xwork2.ActionSupport;
 import actions.model.Client;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
 import org.apache.struts2.interceptor.SessionAware;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -15,10 +21,14 @@ import java.util.Map;
  * A session variable is exposed to children classes, as well as the client object,
  * which is guaranteed by ClientAction to always be valid *IF* they comply and call ClientAction's execute method.
  */
-public class ClientAction extends ActionSupport implements SessionAware {
+public class ClientAction extends ActionSupport implements SessionAware, ServletResponseAware, ServletRequestAware {
 
-    protected   Map<String, Object> session;
-    protected Client client;
+    private static final String COOKIE_NAME="IdeaBrokerEncodedUid";
+
+    protected Map<String, Object> session;
+    protected Client              client;
+    protected HttpServletResponse servletResponse;
+    protected HttpServletRequest  servletRequest;
 
     /**
      * Needed by SessionAware
@@ -33,22 +43,51 @@ public class ClientAction extends ActionSupport implements SessionAware {
      * Synchronizes this.client and the current session, either creating it if session doesn't have it,
      * or loading it from the session if it exists.
      */
-    public void getClientSession() {
+    private void getClientSession() {
+
         if ( !session.containsKey("client") ) {
             this.client = new Client();
-            client.doLogin("Hakuna","Matata"); //FIXME: HACKED IN to make our lives easier
+            if (!readCookie()) {
+                client.doLogin("Hakuna", "Matata"); //FIXME: HACKED IN to make our lives easier
+            }
             session.put("client", client);
-        } else
+        } else {
             this.client = (Client) session.get("client");
+            writeCookie();
+        }
+    }
+
+    boolean readCookie() {
+        for(Cookie c : servletRequest.getCookies()) {
+            if (c.getName().equals(COOKIE_NAME))
+                return client.loginWithEncodedUid(c.getValue());
+        }
+        return false;
+    }
+
+    private void writeCookie() {
+        Cookie c = new Cookie(COOKIE_NAME, client.getEncodedUid());
+        c.setMaxAge(60*60*24*365); // Make the cookie last a year
+        servletResponse.addCookie(c);
     }
 
     /**
      * Action's execute method, called whenever the action is triggered.
-     * @return              A String object, informing the success or failure of the operation.
+     * @return A String object, informing the success or failure of the operation.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database.
      */
     public String execute() throws Exception {
         getClientSession();
         return SUCCESS;
+    }
+
+    @Override
+    public void setServletResponse(javax.servlet.http.HttpServletResponse httpServletResponse) {
+        this.servletResponse = httpServletResponse;
+    }
+
+    @Override
+    public void setServletRequest(HttpServletRequest httpServletRequest) {
+        this.servletRequest = httpServletRequest;
     }
 }
