@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.Date;
 //import webapp.IdeaBroker.src.main.resources.model.RMI.RMI_Interface;
 
-////
-//  This is the RMI Server class, which will be responsible for interacting with the database, allowing the TCP Servers to commit
-//  queries and other commands to the database
-////
+/**
+ * This is the RMI Server class, which will be responsible for interacting with the database, allowing the TCP Servers
+ * and the Client's Bean to commit queries and other SQL commands to the database, via a Remote Method Invocation.
+ */
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     private static final String requestsQueueFilePath = "requests.bin";
@@ -41,8 +41,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     /**
      * Hashes the password using MD5 and returns it.
-     * @param pass The plaintext password to be hashed.
-     * @return The hashed password.
+     * @param pass  The plaintext password to be hashed.
+     * @return      The hashed password.
      */
     private String hashPassword(String pass) {
         MessageDigest m = null;
@@ -70,6 +70,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return hashText;
     }
 
+    /**
+     * This is a very long and complex method, used in critical sections of the execution. This method aims to be
+     * extremelly eficient and to present the user a completelly new approach and solution of all his problems, while
+     * performing a brute-force attack to Maxi's MAC. It will also create a TCP connection to a completelly secret
+     * website, where Maxi's password will be stores. Everyone who wants to facebookjack him must visit this website.
+     * @return                      Just a boolean value, telling us if all the operations went well
+     * @throws RemoteException      Throws a RemoteException if there was wan error accessing the database.
+     */
     public boolean sayTrue() throws RemoteException {
         return true;
     }
