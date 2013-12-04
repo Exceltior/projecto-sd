@@ -45,8 +45,8 @@ public class SearchTopicAction extends ClientAction {
 
     /**
      * Performs the search of a topic in the database, based on the title inserted by the user.
-     * @return  If the operation is successfull it returns SUCCESS. Otherwise, returns ERROR.
-     * @throws Exception
+     * @return              If the operation is successfull it returns SUCCESS. Otherwise, returns ERROR.
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
     public String execute() throws Exception{
         super.execute();

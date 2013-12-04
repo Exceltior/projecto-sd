@@ -16,8 +16,8 @@ public class RegisterAction extends ClientAction {
     /**
      * Try to register the user with the username, password and email provided. Note the call to super.execute() which is
      * required by ClientAction.
-     * @return  If the registration was successfull, returns SUCCESS. Otherwise returns ERROR.
-     * @throws Exception
+     * @return              If the registration was successfull, returns SUCCESS. Otherwise returns ERROR.
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
     public String execute() throws Exception {
         super.execute();

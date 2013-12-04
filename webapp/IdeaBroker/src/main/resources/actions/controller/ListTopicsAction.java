@@ -22,7 +22,7 @@ public class ListTopicsAction extends ClientAction{
 
     /**
      * Setter for the attribute topics.
-     * @param topics    List of topics we want to assign to the attribute topics
+     * @param topics    List of topics we want to assign to the attribute topics.
      */
     public void setTopics(Topic[] topics) {
         this.topics = topics;
@@ -30,8 +30,8 @@ public class ListTopicsAction extends ClientAction{
 
     /**
      * Action's execute method, called whenever the action is triggered.
-     * @return A String object, informing the success or failure of the operation
-     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
+     * @return              A String object, informing the success or failure of the operation.
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database.
      */
     public String execute() throws Exception {
         super.execute();

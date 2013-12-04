@@ -43,8 +43,8 @@ public class ViewUserIdeasAction extends ClientAction{
 
     /**
      * Action's execute method, called whenever the action is triggered.
-     * @return  A String object, informing the success or failure of the operation
-     * @throws Exception
+     * @return              A String object, informing the success or failure of the operation
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
     public String execute() throws Exception{
         super.execute();

@@ -63,8 +63,8 @@ public class SearchIdeaAction extends ClientAction{
 
     /**
      * Try to find in the database all the ideas with user's defined id and title.
-     * @return  A String object, containing the result of the operation (success/failure).
-     * @throws Exception
+     * @return              A String object, containing the result of the operation (success/failure).
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
     public String execute() throws Exception{
         super.execute();

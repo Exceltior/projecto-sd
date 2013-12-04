@@ -14,8 +14,8 @@ public class LoginAction extends ClientAction{
     /**
      * Try to login with given username and password. Note the call to super.execute() which is required by
      * ClientAction.
-     * @return If login succeeds, returns SUCCESS. Otherwise it returns ERROR.
-     * @throws Exception
+     * @return              If login succeeds, returns SUCCESS. Otherwise it returns ERROR.
+     * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
     public String execute() throws Exception {
         super.execute();
