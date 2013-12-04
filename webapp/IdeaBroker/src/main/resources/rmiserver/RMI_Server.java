@@ -546,6 +546,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return new Share(queryResult.get(0));
     }
 
+/*
     //FIXME: Are we going to need this?
     ////
     // Method responsible for getting all the ideas in favour, neutral or against a given idea
@@ -566,6 +567,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         return devolve;
     }
+*/
 
     /**
      * Method responsible for creating a new topic in the database
