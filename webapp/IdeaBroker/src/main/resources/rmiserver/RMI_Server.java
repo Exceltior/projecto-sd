@@ -1473,14 +1473,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return                  In case of success, returns the id of the transaction inserted in the database. If an
      *                          error occurred returns -1;
      */
-    private int insertIntoQueue(int userid, int iid, int num, float maxpricepershare, Connection conn){
+    private synchronized int insertIntoQueue(int userid, int iid, int num, float maxpricepershare, Connection conn){
         String query = "INSERT INTO Compra VALUES (fila_seq.nextval," + userid + "," + iid + "," + num + "," +
                 maxpricepershare + ")";
 
         insertData(query,conn);
 
-        query = "Select from Compra where userid = " + userid + " and iid = " + iid + " and num = " + num +
-                " and maxpriceshare = " + maxpricepershare;
+        query = "Select fila_seq.currval from DUAL";
         ArrayList<String[]>queryResult = receiveData(query,conn);
 
         if (queryResult == null || queryResult.isEmpty())
@@ -2045,7 +2044,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{
