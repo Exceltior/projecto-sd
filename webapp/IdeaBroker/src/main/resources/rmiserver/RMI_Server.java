@@ -1483,8 +1483,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         insertData(query,conn);
 
-        query = "Select from Compra where userid = " + userid + " and iid = " + iid + " and num = " + num +
-                " and maxpriceshare = " + maxpricepershare;
+        query = "Select fila_seq.currval from DUAL";
         ArrayList<String[]>queryResult = receiveData(query,conn);
 
         if (queryResult == null || queryResult.isEmpty())
@@ -1510,10 +1509,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return      An array of String objects, containing the fields correspondent to the Transaction Queue, stored
      *              in the database.
      */
-    private String[] getQueueHead(Connection conn){
-        /**
-         * FIXME: Joca, falta seleccionar o targetSellPrice e colocá-lo no fim. NO FIM!!
-         */
+    private synchronized String[] getQueueHead(Connection conn) {
         String query = "Select compra_id,userid,iid,num,maxpriceshare from Compra order by compra_id ASC";
         ArrayList<String[]> queryResult = receiveData(query,conn);
 
@@ -1534,16 +1530,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             float sellingPrice        = Integer.valueOf(head[5]);
 
             BuySharesReturn ret = null;
-            try { ret = tryBuyShares(uid, iid, maxpriceshare, num, true, sellingPrice); } catch (RemoteException
-                    ignored) {return;}
-            if ( ret.result.equals("OK") ) {
-                //We did it! Send notification to client via websockets and the like
-                System.out.println("We did it! "+ret);
-                // Remove it from the queue, we've processed it
-                removeFromQueue(id, conn);
-            }
-        }
-    }
+            try { ret = tryBuyShares(uid, iid, maxpriceshare, num, true, sellingPrice); } catch (RemoteException ignored) {return;}
+           if ( ret.result.equals("OK") ) {
+               //We did it! Send notification to client via websockets and the like
+               System.out.println("We did it! "+ret);
+               // Remove it from the queue, we've processed it
+               removeFromQueue(id, conn);
+              }
+          }
+}
 
     /**
      * Set up the number of shares for a given idea, and the price of each share for that idea
@@ -1553,7 +1548,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param price The price of each share for the given idea
      * @throws RemoteException
      */
-    public synchronized void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
+    synchronized public void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
         /* null here means no transactional connection */
         setSharesIdea(uid, iid, nshares,price,null);
     }

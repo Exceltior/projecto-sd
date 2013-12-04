@@ -238,6 +238,9 @@ public class Client {
                 else
                     devolve = true;
             }
+            else{
+                System.out.println("Result e menor que 0!!!");
+            }
 
         }catch (RemoteException e){
             e.printStackTrace();
