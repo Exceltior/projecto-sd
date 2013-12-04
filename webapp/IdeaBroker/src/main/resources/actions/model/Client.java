@@ -384,6 +384,18 @@ public class Client {
         return ret;
     }
 
+    //TODO: Javadoc
+    private String doRMIGetUsername() {
+        String u = null;
+        try {
+            u = rmi.getRMIInterface().getUsername(uid);
+        } catch (RemoteException e) {
+            System.out.println("Exception in doRMIGetUsername");
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return u;
+    }
+
     /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
@@ -402,6 +414,31 @@ public class Client {
         }
 
         return false;
+    }
+
+    /**
+     * Interface to login a client from an encoded uid (probably read from a cookie)
+     * @param encodeduid The encoded uid string
+     * @return True if there is success logging in. False otherwise
+     */
+    public boolean loginWithEncodedUid(String encodeduid) {
+        if ( (this.uid = Integer.valueOf(encodeduid)) != -1 ) {
+            this.username = doRMIGetUsername();
+            this.adminStatus = doRMIGetAdminStatus();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns an encoded UID, which uniquely identifies this client (kind of like a token) and which will probably
+     * be stored in a cookie. Beware of what you do with it
+     * @return
+     */
+    public String getEncodedUid() {
+        return ""+uid;
     }
 
     /**
