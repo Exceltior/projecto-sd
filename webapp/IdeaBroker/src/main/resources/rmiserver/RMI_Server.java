@@ -713,7 +713,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     private BuySharesReturn tryBuyShares (int uid, int iid, float floatmaxPricePerShare, int buyNumShares,
-                                          boolean addToQueueOnFailure, float targetSell) throws RemoteException {
+                                          boolean addToQueueOnFailure, float targetSell,
+                                          Connection conn) throws RemoteException {
         System.out.println("tryBuyShares called with uid="+uid+"\n"
                             +"iid="+iid+"\n"
                             +"uid="+uid+"\n"
@@ -837,25 +838,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
 
         //Okay, move on and let's buy them. this must be transactional
-        Connection conn = getTransactionalConnection();
+
+        Connection c = null;
+        if (conn == null)
+            c = getTransactionalConnection();
+        else
+            c = conn;
         for (int i = 0; i < sharesToBuy.size(); i++) {
             Share s = sharesToBuy.get(i);
             int num = sharesToBuyNum.get(i);
             int resultingShares = s.getNum()-num;
             System.out.println("Buying "+num+"from "+s.getUid()+"!!");
             System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
-            setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),conn);
-            insertIntoHistory(uid, s.getUid(), num,s.getPrice(),conn,iid);
-            setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), conn);
+            setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),c);
+            insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid);
+            setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), c);
         }
 
         System.out.println("Before setSharesIdea");
-        setSharesIdea(uid,iid,sharesAlvo,startingShares+totalSharesBought,conn);
+        setSharesIdea(uid,iid,sharesAlvo,startingShares+totalSharesBought,c);
         System.out.println("Before setUserMoney");
         setUserMoney(uid,userMoney, conn);
 
         // UNLEASH THE BEAST!
-        returnTransactionalConnection(conn);
+        if ( conn == null)
+            returnTransactionalConnection(c);
 
 
         //Handle notifications here
@@ -871,6 +878,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ret.numSharesBought = totalSharesBought;
         ret.numSharesFinal  = startingShares+totalSharesBought;
         ret.totalSpent      = totalSpent;
+
+        // Set the selling price
+        setPricesShares(iid, uid, targetSell);
         if ( ret.result.isEmpty() )
             ret.result = "OK";
         System.out.println("I'm leaving!");
@@ -889,17 +899,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     public BuySharesReturn buyShares(int uid, int iid, float maxPricePerShare, int buyNumShares,
                                      boolean addToQueueOnFailure, float targetSellPrice) throws RemoteException {
-        BuySharesReturn ret = tryBuyShares(uid,iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,targetSellPrice);
+        BuySharesReturn ret = tryBuyShares(uid,iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,targetSellPrice,
+                                           null);
         System.out.println("Got out of tryBuyShares");
         if ( ret.result.contains("QUEUED.") ) {
             // Need to queue! But how many? we can calculate them
             System.out.println("Need to add to queue!");
             Connection conn = getTransactionalConnection();
+            checkQueue(conn);
             insertIntoQueue(uid,iid,buyNumShares,maxPricePerShare,targetSellPrice,conn);
             returnTransactionalConnection(conn);
+        } else if ( ret.result.equals("OK") ) {
+            Connection conn = getTransactionalConnection();
+            checkQueue(conn);
+            returnTransactionalConnection(conn);
         }
-
-        System.out.println("Returning");
         return ret;
     }
 
@@ -1118,12 +1132,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized public boolean setPricesShares(int iid, int uid, float price) throws RemoteException{
         if ( getSharesIdeaForUid(iid,uid) == null)
             return false; // You have no shares!
-        String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
-        Connection conn = getTransactionalConnection();
-        insertData(query,conn);
-        returnTransactionalConnection(conn);
 
-        transactionQueue.checkQueue();
+        Connection conn = getTransactionalConnection();
+
+        String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
+        insertData(query,conn);
+        checkQueue(conn);
+
+        returnTransactionalConnection(conn);
 
         return true;
     }
@@ -1504,40 +1520,57 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
-     * Returns the most recent transaction in the database.
+     * Returns all the queued transactions in the database.
      * @param conn  The connection to the database.
      * @return      An array of String objects, containing the fields correspondent to the Transaction Queue, stored
      *              in the database.
      */
-    private synchronized String[] getQueueHead(Connection conn) {
-        String query = "Select compra_id,userid,iid,num,maxpriceshare from Compra order by compra_id ASC";
+    private synchronized ArrayList<String[]> getQueue(Connection conn) {
+        String query = "Select * from Compra";
         ArrayList<String[]> queryResult = receiveData(query,conn);
 
         if (queryResult == null || queryResult.isEmpty())
             return null;
-        return queryResult.get(0);
+        return queryResult;
     }
 
     //É TUDO SYNCHRONIZED, QUE É LINDO P'RA FODASZ.
     private synchronized void checkQueue(Connection conn) {
-        String[] head = null;
-        while ( (head = getQueueHead(conn) ) != null ) {
-            int id                    = Integer.valueOf(head[0]);
-            int uid                   = Integer.valueOf(head[1]);
-            int iid                   = Integer.valueOf(head[2]);
-            int num                   = Integer.valueOf(head[3]);
-            float maxpriceshare       = Integer.valueOf(head[4]);
-            float sellingPrice        = Integer.valueOf(head[5]);
+        ArrayList<String[]> queue = getQueue(conn);
 
-            BuySharesReturn ret = null;
-            try { ret = tryBuyShares(uid, iid, maxpriceshare, num, true, sellingPrice); } catch (RemoteException ignored) {return;}
-           if ( ret.result.equals("OK") ) {
-               //We did it! Send notification to client via websockets and the like
-               System.out.println("We did it! "+ret);
-               // Remove it from the queue, we've processed it
-               removeFromQueue(id, conn);
-              }
-          }
+        if ( queue == null)
+            return;
+
+        for ( int i = 0; i < queue.size(); i++ ) {
+            System.out.println("Iteration "+i);
+            String[] row = queue.get(i);
+
+            int id = Integer.valueOf(row[0]);
+            int uid = Integer.valueOf(row[1]);
+            int iid = Integer.valueOf(row[2]);
+            int num = Integer.valueOf(row[3]);
+            float maxpriceshare = Float.valueOf(row[4]);
+            float sellingPrice = Float.valueOf(row[5]);
+            System.out.println("cc "+i);
+            BuySharesReturn ret;
+            try {
+                ret = tryBuyShares(uid, iid, maxpriceshare, num, true, sellingPrice,conn);
+            } catch (RemoteException ignored) {
+                return;
+            }
+
+            System.out.println("cc2 "+i);
+            if ( ret.result.equals("OK") ) {
+                //We did it! Send notification to client via websockets and the like
+                System.out.println("We did it! " + ret);
+                // Remove it from the queue, we've processed it
+                removeFromQueue(id, conn);
+                queue.remove(i);
+
+                //Start again, as some of the other queued transactions may potentially take place now
+                i = 0;
+            }
+        }
 }
 
     /**
