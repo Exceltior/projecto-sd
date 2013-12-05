@@ -606,7 +606,7 @@
                     style="color:black">
                 _</span></a> </li>
 
-            <s:if test="client.adminStatus">
+            <s:if test="#session.client.adminStatus">
                 <li><a href="#"><span class="glyphicon glyphicon-wrench">&nbsp;Painel de Administrador</span><span
                         style="color:black">
                 _</span></a></li>
