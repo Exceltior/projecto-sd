@@ -127,7 +127,7 @@ public class Idea implements Serializable {
         this.shares_to_buy = -2;
         this.marketValue= Float.valueOf(row[7]);
 
-        if (row[8].compareTo("null") != 0)
+        if ( "null".equals(row[8]) )
             this.facebookId=Integer.valueOf(row[8]);
 
         /**
