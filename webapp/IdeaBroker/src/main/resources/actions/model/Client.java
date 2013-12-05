@@ -5,6 +5,9 @@ import model.data.BuySharesReturn;
 import model.data.Idea;
 import model.data.NetworkingFile;
 import model.data.Topic;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.FacebookApi;
+import org.scribe.oauth.OAuthService;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -395,6 +398,29 @@ public class Client {
         return u;
     }
 
+    private boolean doRMIFacebookLogin(String token){
+        //TODO: 1 - Get user Facebook id; 2 - Confirm it in the database
+        int facebookId;
+
+        OAuthService service = new ServiceBuilder()
+                .provider(FacebookApi.class)
+                .apiKey("436480809808619")
+                .apiSecret("af8edf703b7a95f5966e9037b545b7ce")
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        /*
+        String verifierCode = request.getParameter("code");
+
+        if(verifierCode == null) {
+            String authURL = service.getAuthorizationUrl(null);
+            return new ActionForward(authURL, true);
+        }
+        */
+        return true;
+
+    }
+
     /**
      * Public interface to try to login a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
@@ -413,6 +439,10 @@ public class Client {
         }
 
         return false;
+    }
+
+    public boolean doFacebookLogin(String token){
+        return this.doRMIFacebookLogin(token);
     }
 
     /**

@@ -96,6 +96,12 @@
           <version>2.1.6</version>
       </dependency>
 
+      <dependency>
+          <groupId>org.scribe</groupId>
+          <artifactId>scribe</artifactId>
+          <version>1.2.2</version>
+      </dependency>
+
   </dependencies>
   <build>
     <finalName>IdeaBroker</finalName>
