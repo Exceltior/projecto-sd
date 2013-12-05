@@ -10,10 +10,12 @@ public class Idea implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public int id, uid, shares_to_buy;
+    private int id, uid, shares_to_buy;
 
     public    float  marketValue;
     protected String body, title, file;
+
+    public Topic[] topics;
 
     /**
      * Specific for the user which makes the request
@@ -227,5 +229,18 @@ public class Idea implements Serializable {
     }
     public float getMarketValue() {
         return marketValue;
+    }
+
+    public Topic[] getTopics() {
+        return topics;
+    }
+
+    public void setTopics(Topic[] topics) {
+        this.topics = new Topic[topics.length];
+        for ( int i = 0; i < topics.length; i++ ) {
+            this.topics[i] = topics[i];
+
+        }
+
     }
 }

@@ -624,12 +624,12 @@
             <nav class="navbar navbar-default navbar-static-top" role="navigation">
                 <ul class="nav nav-pills nav-justified"  style="font-size: 18pt;">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;
-                        <s:property value="%{#session.client.username}"/></a></li>
+                        <s:property value="#session.client.username"/></a></li>
                     <li><a href="#" id="coins"><span class="glyphicon glyphicon-euro"></span>&nbsp;<span
                             id="currmoney"><s:property
-                            value="%{#session.client.coins}"/></span> DEICoins</a></li>
+                            value="#session.client.coins"/></span> DEICoins</a></li>
                     <li><a href="#" id="numNotifications"><span class="glyphicon
-                     glyphicon-envelope"></span>&nbsp;<s:property value="%{#session.client.numNotifications}"/> Novas
+                     glyphicon-envelope"></span>&nbsp;<s:property value="#session.client.numNotifications"/> Novas
                         Mensagens</a></li>
                 </ul>
             </nav>
@@ -651,13 +651,13 @@
 
                         <div class="col-md-8 col-md-offset-2">
                             <h2 style="text-align:center">#<s:property value="topicName" /></h2>
-                            <div class="list-group text-center" >
+                            <div class="list-group text-center" style = "margin-top:25px;">
                                 <s:iterator var="i" step="1" value="ideas">
-                                    <div class="list-group-item" id="idea<s:property value="id" />">
+                                    <div class="list-group-item" id="idea<s:property value="id" />"
+                                            style = "margin-top:25px; padding-bottom:50px;">
                                         <%-- href="viewidea.action?iid=<s:property value="iid" />" --%>
                                         <h4
-                                                class="list-group-item-heading"><s:property value="title" /><div
-                                                "></span></h4>
+                                                class="list-group-item-heading"><s:property value="title" /></h4>
                                         <p class="list-group-item-text">
                                             <div style="height: 25px">
                                             <div style="float:right; white-space:nowrap;" id="ideatags<s:property
@@ -764,7 +764,23 @@
                                             <%--Watchlist: <s:property value="inWatchList" />
                                             Owned: <s:property value="numSharesOwned" />
                                             Percent Owned: <s:property value="percentOwned" />--%>
-                                                <s:property value="body" /> </p>
+                                            <div>
+                                                <s:property value="body" />
+                                                <hr/>
+                                            </div>
+
+                                        <!-- Topic hashtags -->
+                                            <div style="float:left; min-height:40px;" id="ideatopics<s:property
+                                             value="id" />">
+                                                <s:iterator var="i" step="1" value="topics">
+                                                    <p><a href="viewtopic.action?tid=<s:property value="id" />">
+
+                                                        <span
+                                                            class="label label-primary">
+                                                         #<s:property value="title" />
+                                                    </span></a></p>
+                                                </s:iterator>
+                                            </div>
                                     </div>
                                 </s:iterator>
                             </div><%--

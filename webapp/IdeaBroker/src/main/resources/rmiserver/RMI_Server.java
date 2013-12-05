@@ -162,7 +162,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return getTopics();//FIXME: MAXI SHOULD WE DO THIS???
 
         String query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid";
+                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid ";
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -257,6 +257,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         for (int i = 0; i < queryResult.size(); i++){
             ideas[i] = new Idea(queryResult.get(i));
+            ideas[i].setTopics(getIdeaTopics(ideas[i].getId()));
             if(getFile(Integer.parseInt(queryResult.get(i)[0])) != null)
                 ideas[i].setFile("Y");
         }
@@ -297,6 +298,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         for (int i = 0; i < result.size(); i++){
             ideas[i] = new Idea(result.get(i));
+            ideas[i].setTopics(getIdeaTopics(ideas[i].getId()));
 
             if(getFile(Integer.parseInt(result.get(i)[0])) != null)
                 ideas[i].setFile("Y");
@@ -527,6 +529,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         for (int i=0;i<devolve.length;i++) {
             devolve[i] = new Idea(queryResut.get(i));
 
+
             addUserSpecificInfoToIdea(devolve[i], uid);
         }
 
@@ -695,7 +698,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public int removeIdea(Idea idea, int uid) throws  RemoteException {
 
         //Check if user is owner of the idea
-        String query = "Select s.userid from \"Share\" s where s.iid = " + idea.id;
+        String query = "Select s.userid from \"Share\" s where s.iid = " + idea.getId();
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult.size() != 1)
@@ -707,11 +710,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         //Here we know that the user is the owner of the idea
 
-        if ( ideaHasFiles(idea.id) ) {
-            deleteIdeaFiles(idea.id);
+        if ( ideaHasFiles(idea.getId()) ) {
+            deleteIdeaFiles(idea.getId());
         }
 
-        query = "update Ideia set activa = 0 where iid="+idea.id;
+        query = "update Ideia set activa = 0 where iid="+idea.getId();
         insertData(query);
 
         return 1;//Everything ok
@@ -987,7 +990,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         listTopics = new ServerTopic[queryResult.size()];
         for (int i=0;i<queryResult.size();i++){
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where i.tid = t.tid and t.tid = " + queryResult.get(i)[0];
+                    "where i.tid = t.tid and t.tid = " + queryResult.get(i)[0] + " group by t.tid, t.nome, t.userid";
             topic = receiveData(query);
             listTopics[i] = new ServerTopic(topic.get(0));
         }
@@ -1012,6 +1015,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return null;
 
         devolve = new Idea(queryResult.get(0));
+        devolve.setTopics(getIdeaTopics(devolve.getId()));
 
         if (getFile(iid) != null)
             devolve.setFile("Y");
@@ -1048,30 +1052,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * UNUSED
      */
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
-        ArrayList<Idea> devolve = new ArrayList<Idea>();
-        String query = "Select i.iid, i.titulo, i.descricao, i.userid, s.numShares, s.numMin from \"Share\" s, " +
-                "Ideia i where s.userid != " +  uid + " and s.nummin < s.numshares and s.iid = i.iid";
-        ArrayList<String[]> queryResult = receiveData(query);
-        Idea temp;
-        int index;
-
-        if ( queryResult.isEmpty() )
-            return null;
-
-        else{
-            for (String[] row : queryResult) {
-                index = hasElement(devolve, row);
-                if (index == -1) {
-                    temp = new Idea(row);
-                    temp.setSharesBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
-                    devolve.add(temp);
-                }
-                else{
-                    devolve.get(index).addSharesToBuy(Integer.parseInt(row[4]) - (Integer.parseInt(row[5])));
-                }
-            }
-        }
-        return devolve;
+        // CAGUEI. E ANDEI.
+        return null;
     }
 
     /**
@@ -1102,6 +1084,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         devolve = new Idea[queryResult.size()];
         for (int i=0;i<queryResult.size();i++){
             devolve[i] = new Idea(queryResult.get(i));
+            devolve[i].setTopics(getIdeaTopics(devolve[i].getId()));
             if (getFile(devolve[i].getId()) != null)
                 devolve[i].setFile("Y");
         }
@@ -1118,17 +1101,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     public ServerTopic getTopic(int tid, String name) throws RemoteException{
         String query;
-
+//FIXME: Check topics!! by maxi
         if (tid != -2 && !name.equals(""))
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
                     "where t.nome LIKE '%" + name +"%' and t.tid = " + tid + " and i.tid = t.tid" +
                     " group by t.tid, t.nome, t.userid";
         else if(tid != -2)
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.tid = " + tid + " and t.tid = i.tid group by t.tid, t.nome, t.userid";
+                    "where t.tid = " + tid + " and t.tid = i.tid group by t.tid, t.nome, t.userid"+
+                    " group by t.tid, t.nome, t.userid";
         else if (!name.equals(""))
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid group by t.tid, t.nome, t.userid";
+                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid group by t.tid, t.nome, t.userid"+
+                    " group by t.tid, t.nome, t.userid";
         else
             return null;
 
