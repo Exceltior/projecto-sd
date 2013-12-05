@@ -16,7 +16,6 @@ import java.util.ArrayList;
 public class Client {
     private final static String RMI_HOST = "localhost";//FIXME: MUDAR ISTO?? NAO SEI SE O PROF QUER VER LOCALHOST NO CODIGO
 
-
     private RMIConnection rmi;
     private int           uid;
     private String        username;
@@ -260,7 +259,7 @@ public class Client {
         boolean devolve = false;
 
         try{
-            devolve = rmi.getRMIInterface().setPricesShares(iid,uid,price);
+            devolve = rmi.getRMIInterface().setPricesShares(iid, uid, price);
             System.out.println("Recebi " + devolve + " do rmi no set share price");
         }catch(RemoteException e){
             e.printStackTrace();
@@ -361,7 +360,7 @@ public class Client {
         temp.setId(iid);
 
         try{
-            devolve = rmi.getRMIInterface().removeIdea(temp,uid);
+            devolve = rmi.getRMIInterface().removeIdea(temp, uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -628,5 +627,9 @@ public class Client {
     public BuySharesReturn doBuyShares(int iid, float maxPricePerShare, int buyNumShares,
                                        boolean addToQueueOnFailure, float targetSellPrice) {
         return doRMIBuyShares(iid, maxPricePerShare, buyNumShares, addToQueueOnFailure, targetSellPrice);
+    }
+
+    public RMIConnection getRMI() {
+        return rmi;
     }
 }
