@@ -1,9 +1,11 @@
 package rmiserver;
 
+import model.RMI.RMINotificationCallbackInterface;
 import model.RMI.RMI_Interface;
 import model.data.*;
 import model.data.queues.Notification;
 import model.data.queues.TransactionQueue;
+import websockets.ClientWebsocketConnection;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -19,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 //import webapp.IdeaBroker.src.main.resources.model.RMI.RMI_Interface;
 
 /**
@@ -29,8 +32,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     private static final String requestsQueueFilePath = "requests.bin";
     private String url;
-    private final float starting_money = 1000000;
-    private final int starting_shares = 100000;
+    private final float starting_money  = 1000000;
+    private final int   starting_shares = 100000;
     private ConnectionPool connectionPool;
     private int lastFile = 0;
 
@@ -39,10 +42,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     private final        Object requestsLock      = new Object();
     private TransactionQueue transactionQueue;
 
+    private HashMap<Integer, RMINotificationCallbackInterface> callbacks = new HashMap<Integer,
+            RMINotificationCallbackInterface>();
+
     /**
      * Hashes the password using MD5 and returns it.
      * @param pass  The plaintext password to be hashed.
-     * @return      The hashed password.
+     * @return The hashed password.
      */
     private String hashPassword(String pass) {
         MessageDigest m = null;
@@ -885,7 +891,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         // Set the selling price
         System.out.println("Going to setPricesSharesInternal!");
-        setPricesSharesInternal(iid, uid, targetSell, conn,false);
+        setPricesSharesInternal(iid, uid, targetSell, conn, false);
         if ( ret.result.isEmpty() )
             ret.result = "OK";
         System.out.println("I'm leaving!");
@@ -1315,6 +1321,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "delete from IdeiaWatchList where userid = "+uid+" and iid="+iid;
 
         insertData(query);
+    }
+
+    @Override
+    public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException {
+        callbacks.put(uid,c);
+        c.notify("You're registered!");
     }
 
     /**

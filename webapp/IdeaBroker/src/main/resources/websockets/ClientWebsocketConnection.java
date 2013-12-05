@@ -29,13 +29,26 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
     protected void onOpen(WsOutbound outbound) {
         try {
             getWsOutbound().writeTextMessage(CharBuffer.wrap("Hello!"));
+            RMINotificationCallback callback = new RMINotificationCallback(this);
+            client.getRMI().getRMIInterface().addCallbackToUid(client.getUid(), callback);
         } catch (IOException e) {
             System.out.println("onOpen exception!");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
+
     protected void onClose(int status) {
     }
+
+    public void notify(String msg) {
+        try {
+            getWsOutbound().writeTextMessage(CharBuffer.wrap(msg));
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    protected void onTextMessage(CharBuffer message) throws IOException {
     }
 
     protected void onBinaryMessage(ByteBuffer message) throws IOException {
