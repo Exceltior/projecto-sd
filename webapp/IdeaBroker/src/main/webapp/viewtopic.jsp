@@ -19,6 +19,55 @@
     <title></title>
     <script type="text/javascript">
 
+        /**
+         * WEBSOCKETS
+         */
+        window.onload = function() { // execute once the page loads
+            initializeWebSockets();
+        }
+
+        function initializeWebSockets() { // URI = ws://10.16.0.165:8080/chat/chat
+            connect('ws://' + window.location.host + '/chat');
+        }
+
+        function connect(host) { // connect to the host websocket servlet
+            if ('WebSocket' in window)
+                websocket = new WebSocket(host);
+            else if ('MozWebSocket' in window)
+                websocket = new MozWebSocket(host);
+            else {
+                //FIXME: SHIT
+                return;
+            }
+
+            websocket.onopen    = onOpen; // set the event listeners below
+            websocket.onclose   = onClose;
+            websocket.onmessage = onMessage;
+            websocket.onerror   = onError;
+        }
+        function onOpen(event) {
+            console.log('Connected to ' + window.location.host + '.');
+        }
+
+        function onClose(event) {
+            //FIXME: CLosed, shit
+            console.log("Websocket closed!");
+        }
+
+        function onMessage(message) { // print the received message
+            console.log(message);
+            console.log(message.data);
+        }
+
+        function onError(event) {
+            console.log('WebSocket error (' + event.data + ').');
+        }
+
+        /**
+         * MAXI STUFF
+         */
+
+
         function getWatchListLabelStr(id) {
             return '#watchlistlabel'+id;
         }
