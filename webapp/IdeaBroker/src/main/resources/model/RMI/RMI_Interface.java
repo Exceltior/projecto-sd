@@ -14,6 +14,7 @@ public interface RMI_Interface extends Remote {
     public int login(String user, String pwd) throws  RemoteException;
     //public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
+    public boolean register(String user, String pass, String email,String faceId) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
     public ServerTopic[] getTopics(String title) throws RemoteException;
     public boolean createTopic(String nome, int uid) throws  RemoteException;
@@ -28,6 +29,7 @@ public interface RMI_Interface extends Remote {
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid,int moneyInvested) throws RemoteException;
+    public int createIdea(String title, String description, int uid, int moneyInvested,String faceId) throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
     //public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
