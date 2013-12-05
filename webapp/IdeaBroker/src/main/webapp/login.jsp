@@ -56,23 +56,33 @@
         // listen for and handle auth.statusChange events
         FB.Event.subscribe('auth.statusChange', function (response) {
 
+            if (response.authResponse){
+                alert("Entrei no authResponse");
 
+                if (response.authResponse.accessToken){
+                    alert("Entrei no accessToken");
+
+                    doPost("http://" + window.location.host + "/loginfacebook.action",
+                            { token:response.authResponse.accessToken });
+                }
+            }
+            /*
             if (response.authResponse) {
                 // user has auth'd your app and is logged into Facebook
                 //$('#AccessToken').val(response.authResponse.accessToken);
+
 
                 FB.api('/me', function (me) {
                     console.log(me);
                     if (me.id) {
                         token = me.token;
 
-
                         doPost("http://" + window.location.host + "/loginfacebook.action",
-                                { id:me.token });
-
+                                { token:me.token });
                     }
                 });
             }
+            */
         });
         $("#auth-logoutlink").click(function () { FB.logout(function () { window.location.reload(); }); });
     }
