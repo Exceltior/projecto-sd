@@ -32,19 +32,13 @@
             type: "POST",
             url: url,
             data: data,
-            dataType: "json",
+            dataType: "html",
             success: function(data, textStatus) {
-                 console.log(data);
-                 console.log(textStatus);
-                if (data.redirect) {
-                    // data.redirect contains the string URL to redirect to
-                    alert(data.redirect);
-                    window.location.href = data.redirect;
-                }
-                else {
-                    // data.form contains the HTML for the replacement form
-                    alert("Deu MERDA");
-                }
+                console.log(data);
+                console.log(textStatus);
+                document.open();
+                document.write(data);
+                document.close();
             }
         });
     }
@@ -74,7 +68,7 @@
 
 
                         doPost("http://" + window.location.host + "/loginfacebook.action",
-                                { id:"MERDA" });
+                                { id:me.token });
 
                     }
                 });

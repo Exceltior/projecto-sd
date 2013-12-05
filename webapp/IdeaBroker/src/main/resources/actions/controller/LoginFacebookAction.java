@@ -2,19 +2,19 @@ package actions.controller;
 
 
 public class LoginFacebookAction extends ClientAction{
-    private String id;
+    private String token;
 
-    public String getId(){
-        return this.id;
+    public String getToken() {
+        return this.token;
     }
 
-    public void setId(String id1){
-        this.id = id1;
+    public void setToken(String id1){
+        this.token = id1;
     }
 
     public String execute() throws Exception{
-        System.out.println("O id do user no facebook e " + id);
-        //super.execute();
+        System.out.println("O token do user no facebook e " + token);
+        super.execute();
         return SUCCESS;
     }
 }
