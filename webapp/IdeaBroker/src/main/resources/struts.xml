@@ -4,6 +4,7 @@
         "http://struts.apache.org/dtds/struts-2.0.dtd">
 
 <struts>
+    <constant name="struts.action.excludePattern" value="/chat*"/>
 
     <constant name="struts.devMode" value="true" />
 
