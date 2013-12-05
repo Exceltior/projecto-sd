@@ -22,6 +22,14 @@ public class RMINotificationCallback extends UnicastRemoteObject implements RMIN
     @Override
     public void notify(String username, String type, float currentMoney, float pricePerShare, int numShares, int iid,
                        int currentSharesIid, float currPricePerShare) throws RemoteException {
+        System.out.println("inside notify");
         websocket.notify(username, type, currentMoney, pricePerShare, numShares, iid, currentSharesIid, currPricePerShare);
+        System.out.println("after notify");
+    }
+
+    @Override
+    public void notifyNewMarketValue(int iid, float value) throws RemoteException {
+        System.out.println("notifyNewMarketValue");
+        websocket.notifyNewMarketValue(iid,value);
     }
 }

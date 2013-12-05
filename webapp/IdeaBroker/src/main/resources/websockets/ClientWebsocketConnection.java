@@ -45,7 +45,7 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
     public void notify(String username, String type, float currentMoney, float pricePerShare, int numShares, int iid,
                        int currentSharesIid, float currPricePerShare) {
         JSONObject obj = new JSONObject();
-
+        System.out.println("in real notify");
 
         try {
             obj.put("money", currentMoney);
@@ -72,5 +72,24 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
 
     protected void onBinaryMessage(ByteBuffer message) throws IOException {
         throw new UnsupportedOperationException("Binary messages not supported.");
+    }
+
+    public void notifyNewMarketValue(int iid, float value) {
+        JSONObject obj = new JSONObject();
+        System.out.println("\n\nin notifyNewMarketValue\n\n");
+
+        try {
+            obj.put("marketValue", value);
+            obj.put("iid", iid);
+            obj.put("type","MARKETVALUE");
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        try {
+            getWsOutbound().writeTextMessage(CharBuffer.wrap(obj.toString()));
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

@@ -48,13 +48,14 @@ public class ClientAction extends ActionSupport implements SessionAware, Servlet
         if ( !session.containsKey("client") ) {
             this.client = new Client();
             if (!readCookie()) {
+                //Logged with encodeduserid
                 client.doLogin("Hakuna", "Matata"); //FIXME: HACKED IN to make our lives easier
             }
             session.put("client", client);
         } else {
             this.client = (Client) session.get("client");
-            writeCookie();
         }
+        writeCookie();
     }
 
     boolean readCookie() {

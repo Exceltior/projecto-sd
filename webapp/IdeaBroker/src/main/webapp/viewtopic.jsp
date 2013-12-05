@@ -17,6 +17,12 @@
     <link href="css/bootstrap-dialog.css" rel="stylesheet">
     <!--<link href="css/3dbtn.css" rel="stylesheet">-->
     <title></title>
+    <script src="jquery.js"></script>
+    <script type="text/javascript" src="noty/jquery.noty.js"></script>
+
+    <script type="text/javascript" src="noty/layouts/top.js"></script>
+    <script type="text/javascript" src="noty/layouts/topRight.js"></script>
+    <script type="text/javascript" src="noty/themes/default.js"></script>
     <script type="text/javascript">
 
         /**
@@ -47,6 +53,18 @@
         }
         function onOpen(event) {
             console.log('Connected to ' + window.location.host + '.');
+            makeNotification("Hello World!", "A Mariana é linda!!!!")
+        }
+
+        function makeNotification(title, body) {
+            noty(
+                    {   text:
+                            '<div><h4 style="text-align:center; color:#ffcd41; text-shadow: 2px 2px 0px black;"><b>'+title+'<hr style="margin-top:10px;"/></b></h4></div><div>'+body+'</div>',
+                        layout: 'topRight',
+                        timeout: 5000,
+                        type: 'information'
+                    }
+            );
         }
 
         function onClose(event) {
@@ -57,26 +75,45 @@
         function onMessage(message) { // print the received message
             console.log(message);
             console.log(message.data);
-            console.log($.parseJSON(message.data).message);
             not = $.parseJSON(message.data);
 
-            numShares = not.numShares;
-            pricePerShareTransaction = not.pricePerShare;
-            username=not.username;
-            iid=not.iid;
-            currentShares=not.currentShares;
-            money=not.money;
-            currPricePerShare=not.currPricePerShare;
-            totalInvolved = numShares*pricePerShareTransaction;
 
-            if ( not.type == "BOUGHT" ) {
-                console.log("We just bought "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" from "+username+" for idea "+iid);
+            if ( not.type == "MARKETVALUE") {
+                console.log("New marketvalue!");
+                updateMarketValue(not.iid, not.marketValue);
             } else {
-                console.log("We just sold "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" to "+username+" for idea "+iid);
+
+                numShares = not.numShares;
+                pricePerShareTransaction = not.pricePerShare;
+                username=not.username;
+                iid=not.iid;
+                currentShares=not.currentShares;
+                money=not.money;
+                currPricePerShare=not.currPricePerShare;
+                totalInvolved = numShares*pricePerShareTransaction;
+                // idea name MISSING FIXME
+
+                if ( not.type == "BOUGHT" ) {
+                    makeNotification("Bought Shares", "You have acquired "+numShares+" shares for idea "+iid
+                                     +" at "+pricePerShareTransaction+" DEICoins each, for a total of "+totalInvolved
+                                     +" DEICoins from user "+username);
+
+                    console.log("We just bought "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" from "+username+" for idea "+iid);
+                } else {
+                    makeNotification("Sold Shares", "You have sold "+numShares+" shares from idea "+iid
+                            +" at "+pricePerShareTransaction+" DEICoins each, for a total of "+totalInvolved
+                            +" DEICoins to user "+username);
+                    console.log("We just sold "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" to "+username+" for idea "+iid);
+                }
+
+                if ( haveIdeaOnWebpage(iid) ) {
+                    setNumSharesForidea(iid, currentShares);
+                    setSellingPriceIdea(iid, currPricePerShare);
+                }
+                setUserMoney(money);
+
+                console.log("We currently have "+currentShares+" valuated at "+currPricePerShare+" each. And we have "+money+" DEICoins.");
             }
-
-            console.log("We currently have "+currentShares+" valuated at "+currPricePerShare+" each. And we have "+money+" DEICoins.");
-
         }
 
         function onError(event) {
@@ -126,6 +163,21 @@
 
         function getIdeaStr(id) {
             return '#idea'+id;
+        }
+
+        function getMarketValueStr(id) {
+            return '#marketvalue'+id;
+        }
+
+        function updateMarketValue(id, val) {
+            if ( haveIdeaOnWebpage(id) ) {
+                console.log("Printing new value: "+val);
+                $(getMarketValueStr(id)).text(val);
+            }
+        }
+
+        function haveIdeaOnWebpage(id) {
+            return $(getIdeaStr(id)).length != 0;
         }
 
         function showShareNumLabel(id) {
@@ -461,7 +513,7 @@
         }
 
         function getMarketValue(id) {
-            return 1; //FIXME
+            return parseFloat($(getMarketValueStr(id)).val()); //FIXME
         }
 
         function onTargetSellPriceChanged() {
@@ -657,6 +709,17 @@
                                             </div>
                                         </div>
                                             <div style="height: 45px">
+                                                <div style="float:left; margin-top: 5px;" id="buttonsleft<s:property
+                                                     value="id" />">
+                                                    <a id="marketvaluebtn<s:property value="id" />"
+                                                       class = "btn btn-info btn-sm"
+                                                       type="button"><span
+                                                            class="glyphicon glyphicon-tags"
+                                                            ></span> Market Value:
+                                                        <span
+                                                    id="marketvalue<s:property value="id" />"><s:property
+                                                                value="marketValue" /></span></a>
+                                                </div>
                                                 <div style="float:right" id="buttons<s:property
                                                      value="id" />">
                                                     <!-- Buttons here -->
@@ -723,7 +786,6 @@
         </div>
     </div>
 </div>
-<script src="jquery.js"></script>
 <script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
 <script src="bootstrap-dialog.js"></script>
 </body>
