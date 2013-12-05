@@ -55,11 +55,12 @@ public interface RMI_Interface extends Remote {
     public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException;
     public Idea[] getIdeasFromWatchList(int uid) throws RemoteException;
     public String getTopicTitle(int tid) throws RemoteException;
-    public int getUserMoney(int uid) throws RemoteException;
+    public float getUserMoney(int uid) throws RemoteException;
     public boolean getAdminStatus(int uid) throws RemoteException;
     public void addIdeaToWatchlist(int iid, int uid) throws RemoteException;
 
     public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
 
     public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException;
+    public float getMarketValue(int iid) throws RemoteException;
 }

@@ -11,15 +11,17 @@ public class Idea implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public int id, uid, shares_to_buy;
+
+    public    float  marketValue;
     protected String body, title, file;
 
     /**
      * Specific for the user which makes the request
      */
-    private int numSharesOwned;
-    private float percentOwned;
+    private int     numSharesOwned;
+    private float   percentOwned;
     private boolean inWatchList;
-    private float sellingPrice; //The price at which this user is selling shares, if he owns any
+    private float   sellingPrice; //The price at which this user is selling shares, if he owns any
 
 
     ////
@@ -30,6 +32,7 @@ public class Idea implements Serializable {
         this.body = this.title = null;
         this.file = "N";
         this.shares_to_buy = -2;
+        this.marketValue = 0;
 
         /**
          * User specific, might be null at start (changed later with setters)
@@ -64,6 +67,8 @@ public class Idea implements Serializable {
             return false;
         if ( ! Common.sendFloat(sellingPrice, out) )
             return false;
+        if ( ! Common.sendFloat(marketValue, out) )
+            return false;
 
         return true;
     }
@@ -97,6 +102,8 @@ public class Idea implements Serializable {
 
         if ( (this.sellingPrice = Common.recvFloat(in)) == -1)
             return false;
+        if ( (this.marketValue = Common.recvFloat(in)) == -1)
+            return false;
 
         return true;
     }
@@ -111,6 +118,7 @@ public class Idea implements Serializable {
         this.uid = Integer.valueOf(row[3]);
         this.file = "N";
         this.shares_to_buy = -2;
+        this.marketValue= Float.valueOf(row[7]);
 
         /**
          * User specific, might be null at start (changed later with setters)
@@ -216,5 +224,8 @@ public class Idea implements Serializable {
 
     public void setSellingPrice(float sellingPrice) {
         this.sellingPrice = sellingPrice;
+    }
+    public float getMarketValue() {
+        return marketValue;
     }
 }

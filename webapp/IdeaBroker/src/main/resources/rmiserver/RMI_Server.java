@@ -18,10 +18,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
 //import webapp.IdeaBroker.src.main.resources.model.RMI.RMI_Interface;
 
 /**
@@ -247,7 +245,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     public Idea[] getIdeasFromUser(int uid) throws RemoteException{
         Idea[] ideas;
-        String query = "Select i.iid,i.titulo,i.descricao,i.userid from Ideia i, \"Share\" s where i.activa = 1 and s.iid = i.iid" +
+        //FIXME IN CASE OF ERROR WAS i.iid,i.titulo,i.descricao,i.userid
+        String query = "Select * from Ideia i, \"Share\" s where i.activa = 1 and s.iid = i.iid" +
                 " and s.userid = " + uid;
         ArrayList<String[]> queryResult = receiveData(query);
 
@@ -284,7 +283,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public Idea[] getIdeasFromTopic(int uid, int tid) throws RemoteException{
-        String query = "select e.iid, e.titulo, e.descricao, e.userid, e.activa from Ideia e, " +
+        //FIXME in case of error was e.iid, e.titulo, e.descricao, e.userid, e.activa
+        String query = "select * from Ideia e, " +
                 "TopicoIdeia t where t.iid = e.iid and t" +
                 ".tid = "+tid+" and e.activa = 1";
 
@@ -736,7 +736,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             c = conn;
         BuySharesReturn ret = new BuySharesReturn();
         Share currentShares = getSharesIdeaForUid(iid, uid, c);
-        int userMoney = getUserMoney(uid, c);
+        float userMoney = getUserMoney(uid, c);
         System.out.println("Checkpoint 1");
         /**
          * How many we want. Twice because we want to save one of these values as backup FIXME: why?
@@ -849,9 +849,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
 
         //Okay, move on and let's buy them. this must be transactional
-
+        Share s = null;
         for (int i = 0; i < sharesToBuy.size(); i++) {
-            Share s = sharesToBuy.get(i);
+            s = sharesToBuy.get(i);
             int num = sharesToBuyNum.get(i);
             int resultingShares = s.getNum()-num;
             System.out.println("Buying "+num+"from "+s.getUid()+"!!");
@@ -872,7 +872,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         System.out.println("Before setUserMoney");
         setUserMoney(uid,userMoney, c);
 
-
+        //Set it to the last transaction price that happened
+        if (s != null)
+            setMarketValue(iid,s.getPrice(),c);
 
         ret.numSharesBought = totalSharesBought;
         ret.numSharesFinal  = startingShares+totalSharesBought;
@@ -888,13 +890,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             returnTransactionalConnection(c);
         System.out.println("CC!");
         //Handle notifications here
-        if ( generateNotifications )
+        //if ( generateNotifications ) FIXME
         for (int i = 0; i < sharesToBuy.size(); i++) {
-            Share s = sharesToBuy.get(i);
+            s = sharesToBuy.get(i);
             System.out.println("To buy: "+s);
             System.out.println("(Buying): "+sharesToBuyNum.get(i));
-            if ( callbacks.containsKey(s.getUid()) )
-                callbacks.get(s.getUid()).notify(getUsername(uid),
+
+                System.out.println("CC2");
+            try {
+                if ( callbacks.containsKey(s.getUid()) )
+                    callbacks.get(s.getUid()).notify(getUsername(uid),
                                                  "SOLD",
                                                  getUserMoney(s.getUid()),
                                                  s.getPrice(),
@@ -902,8 +907,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                                                  iid,
                                                  s.getAvailableShares()-sharesToBuyNum.get(i),
                                                  s.getPrice());
+            } catch (Exception e) {
+                System.err.println("EXCEPTION REMOTE: "+e+" "+e.getMessage()+"\n"+e.getCause());
+                e.printStackTrace();
+            }
             System.out.println("CC3");
             if ( callbacks.containsKey(uid) ) {
+                try {
                 callbacks.get(uid).notify(getUsername(s.getUid()),
                                           "BOUGHT",
                                           getUserMoney(uid),
@@ -912,6 +922,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                                           iid,
                                           ret.numSharesFinal,
                                           targetSell);
+                } catch (Exception e) {
+                System.err.println("EXCEPTION REMOTE2: "+e+" "+e.getMessage()+"\n"+e.getCause());
+                    e.printStackTrace();
+            }
             }
             System.out.println("CC4");
             /*new model.data.queues.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
@@ -1031,6 +1045,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param uid
      * @return
      * @throws RemoteException
+     * UNUSED
      */
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
         ArrayList<Idea> devolve = new ArrayList<Idea>();
@@ -1328,11 +1343,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The money of the specified user
      * @throws RemoteException
      */
-    public int getUserMoney(int uid) throws RemoteException {
+    public float getUserMoney(int uid) throws RemoteException {
         return getUserMoney(uid,null);
     }
 
-    private int getUserMoney(int uid, Connection c) throws RemoteException {
+    private float getUserMoney(int uid, Connection c) throws RemoteException {
         String query = "select dinheiro from Utilizador where userid="+uid;
 
         ArrayList<String[]> result = receiveData(query, c);
@@ -1342,7 +1357,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return 0;
         }
 
-        return Integer.valueOf(result.get(0)[0]);
+        return Float.valueOf(result.get(0)[0]);
     }
 
     /**
@@ -1444,6 +1459,38 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return ret;
     }
 
+    synchronized private boolean setMarketValue(int iid, float value, Connection c) {
+        String query = "UPDATE Ideia set ultimatransacao = "+value+" where iid="+iid;
+
+        insertData(query,c);
+
+        for (int id : callbacks.keySet()) {
+            System.out.println("setMarketValue id: "+id);
+            try {
+                callbacks.get(id).notifyNewMarketValue(iid, value);
+            } catch (RemoteException e) {
+                System.err.println("OPa client probably dead");
+                callbacks.remove(id);
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+        System.out.println("Leaving setMarketValue!");
+        return true;
+    }
+    public float getMarketValue(int iid) throws RemoteException {
+        String query = "select ultimatransacao from Compra where iid="+iid;
+        Connection c = null;
+        try {
+            c = connectionPool.checkOutConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return -1;
+        }
+        ArrayList<String[]> ans = receiveData(query,c);
+        connectionPool.returnConnection(c);
+        return Float.valueOf(ans.get(0)[0]);
+    }
+
     /**
      * This tries to GET numShare shares. Notice that it doesn't try to BUY. If the user already has them,
      * it just quits and errors out.
@@ -1460,7 +1507,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         System.out.println("tryGetSharesIdea called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
                 ", targetPrice="+targetPrice);
         Share currentShares = getSharesIdeaForUid(iid, uid);
-        int userMoney = getUserMoney(uid);
+        float userMoney = getUserMoney(uid);
         int sharesAlvo = numShares;
 
         if ( currentShares != null) {
@@ -1598,7 +1645,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      *              in the database.
      */
     private synchronized ArrayList<String[]> getQueue(Connection conn) {
-        String query = "Select * from Compra";
+        String query = "Select * from Compra order by compra_id ASC"; //FIXME FIXME FIXME falta order by id
         ArrayList<String[]> queryResult = receiveData(query,conn);
 
         if (queryResult == null || queryResult.isEmpty())
@@ -1633,7 +1680,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             System.out.println("cc2 "+i);
             if ( ret.result.equals("OK") ) {
-                //We did it! Send notification to client via websockets and the like
                 System.out.println("We did it! " + ret);
                 // Remove it from the queue, we've processed it
                 removeFromQueue(id, conn);
@@ -1916,7 +1962,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 cont = true;
             }
         } while ( cont );
-
+        System.out.println("-------------------------------DONE");
         return result;
     }
 
@@ -1996,6 +2042,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             }
 
         } while ( cont );
+
+        System.out.println("-------------------------------DONE");
     }
 
     private void execute(){
