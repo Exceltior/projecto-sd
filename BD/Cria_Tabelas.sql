@@ -39,7 +39,7 @@ CREATE TABLE Ideia
     activa          NUMBER (1) NOT NULL ,
     path            VARCHAR2 (70) ,
     originalfile    VARCHAR2 (100) ,
-    ultimatransacao NUMBER (10) ,
+    ultimatransacao NUMBER (10,2) ,
     facebook_id     VARCHAR2 (100)
   ) ;
 ALTER TABLE Ideia ADD CONSTRAINT Ideia_PK PRIMARY KEY

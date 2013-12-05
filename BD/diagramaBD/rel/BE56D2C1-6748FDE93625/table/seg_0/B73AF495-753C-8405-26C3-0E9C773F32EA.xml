@@ -90,7 +90,7 @@
 <use>1</use>
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>10</dataTypePrecision>
-<dataTypeScale>0</dataTypeScale>
+<dataTypeScale>2</dataTypeScale>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 <Column name="facebook_id" id="B701706B-210D-3649-CC49-C48C120D041F">
