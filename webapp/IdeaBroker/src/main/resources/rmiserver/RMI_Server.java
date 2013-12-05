@@ -162,7 +162,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return getTopics();//FIXME: MAXI SHOULD WE DO THIS???
 
         String query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid ";
+                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid";
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -257,7 +257,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         for (int i = 0; i < queryResult.size(); i++){
             ideas[i] = new Idea(queryResult.get(i));
-            ideas[i].setTopics(getIdeaTopics(ideas[i].getId()));
+            ideas[i].setTopics(getIdeaTopics(ideas[i].getId()));            
+
             if(getFile(Integer.parseInt(queryResult.get(i)[0])) != null)
                 ideas[i].setFile("Y");
         }
@@ -369,6 +370,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "INSERT INTO Utilizador VALUES (user_seq.nextval,'" + email + "','" + user + "'," +
                 "'" + pass +
                 "'," + starting_money + ",sysdate, null)";
+
+        insertData(query);
+
+        return true;
+    }
+
+    /**
+     *  Method responsible for insering a new user in the database
+     * @param user Username
+     * @param pass Password
+     * @param email User's email address
+     * @param faceId User's id on facebook
+     * @return  Boolean value, indicating if the operation went well
+     * @throws RemoteException
+     */
+    synchronized public boolean register(String user, String pass, String email,String faceId) throws RemoteException {
+        if (! validateData(user)){
+            System.err.println("O validate data devolveu false");
+            return false;
+        }
+        pass = hashPassword(pass);
+
+        String query = "INSERT INTO Utilizador VALUES (user_seq.nextval,'" + email + "','" + user + "'," +
+                "'" + pass +
+                "'," + starting_money + ",sysdate, null," + faceId +")";
 
         insertData(query);
 
@@ -628,7 +654,65 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +
-                "" + "1,null,null,"+ initialSell +")";
+                "" + "1,null,null,"+ initialSell +",null)";
+
+        insertData(query,conn);//Insert the idea
+
+        query = "Select i.iid from Ideia i where i.titulo = '" + title + "' and i.descricao = '" + description +
+                "' and i.userid = " + uid + " and i.activa = 1";
+
+        queryResult = receiveData(query,conn);
+
+        if (queryResult.size()>0){
+            iid =  Integer.parseInt(queryResult.get(0)[0]);
+
+            //Insert the shares
+            setSharesIdea(uid,iid,starting_shares,initialSell,conn);
+
+            //Deduce the money from the user's account
+            setUserMoney(uid,starting_money-moneyInvested,conn);
+        }
+        else
+            iid = -1;
+
+        returnTransactionalConnection(conn);
+        System.out.println("Vou retornar " + iid +" no createIdea");
+        return iid;
+
+    }
+
+    /**
+     * Method responsible for creating a new idea in the database
+     * @param title The title of the idea
+     * @param description   The description of the idea
+     * @param uid   The id of the user who created the idea
+     * @param faceId The id of the idea on facebook
+     * @return  The id of the idea we just created
+     * @throws RemoteException
+     */
+    synchronized public int createIdea(String title, String description, int uid, int moneyInvested,String faceId) throws RemoteException{
+        String query;
+        ArrayList<String[]> queryResult;
+        float initialSell;
+        int iid;
+        Connection conn;
+
+        if (!validateIdea(title))//Cannot create the idea
+            return -1;
+
+        conn = getTransactionalConnection();
+
+        if (getUserMoney(uid) < moneyInvested){//If the user doesn't have enough money
+            System.err.println("Error while creating the idea! the user doesn't have enought money!" +
+                    " " + getUserMoney(uid) + " " + moneyInvested);
+            return -1;
+        }
+
+        initialSell = moneyInvested/starting_shares;
+
+        query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
+                "" + uid + "," +
+                "" + "1,null,null,"+ initialSell +"," + faceId+")";
 
         insertData(query,conn);//Insert the idea
 
@@ -1108,12 +1192,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                     " group by t.tid, t.nome, t.userid";
         else if(tid != -2)
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.tid = " + tid + " and t.tid = i.tid group by t.tid, t.nome, t.userid"+
-                    " group by t.tid, t.nome, t.userid";
+                    "where t.tid = " + tid + " and t.tid = i.tid group by t.tid, t.nome, t.userid";
         else if (!name.equals(""))
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid group by t.tid, t.nome, t.userid"+
-                    " group by t.tid, t.nome, t.userid";
+                    "where t.nome LIKE '%" + name + "%' and t.tid = i.tid group by t.tid, t.nome, t.userid";
         else
             return null;
 

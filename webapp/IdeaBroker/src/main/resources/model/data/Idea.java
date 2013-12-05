@@ -10,7 +10,7 @@ public class Idea implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int id, uid, shares_to_buy;
+    private int id, uid, shares_to_buy, facebookId;
 
     public    float  marketValue;
     protected String body, title, file;
@@ -43,6 +43,7 @@ public class Idea implements Serializable {
         this.percentOwned = 0;
         this.inWatchList = false;
         this.sellingPrice = 0;
+        this.facebookId = 0;
     }
 
     ////
@@ -70,6 +71,8 @@ public class Idea implements Serializable {
         if ( ! Common.sendFloat(sellingPrice, out) )
             return false;
         if ( ! Common.sendFloat(marketValue, out) )
+            return false;
+        if ( ! Common.sendInt(facebookId, out) )
             return false;
 
         return true;
@@ -106,6 +109,8 @@ public class Idea implements Serializable {
             return false;
         if ( (this.marketValue = Common.recvFloat(in)) == -1)
             return false;
+        if ( (this.facebookId = Common.recvInt(in)) == -1)
+            return false;
 
         return true;
     }
@@ -129,7 +134,16 @@ public class Idea implements Serializable {
         this.percentOwned = 0;
         this.inWatchList = false;
         this.sellingPrice = 0;
+        this.facebookId = 0;
 
+    }
+
+    public int getFacebookId(){
+        return this.facebookId;
+    }
+
+    public void setFacebookId(int id){
+        this.facebookId = id;
     }
 
     public void setTitle(String title1){
