@@ -21,6 +21,7 @@
 <createdBy>joaquim</createdBy>
 <createdTime>2013-11-20 22:31:39 UTC</createdTime>
 <ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -31,6 +32,7 @@
 <createdBy>joaquim</createdBy>
 <createdTime>2013-11-20 22:31:39 UTC</createdTime>
 <ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -41,6 +43,7 @@
 <createdBy>joaquim</createdBy>
 <createdTime>2013-11-20 22:31:39 UTC</createdTime>
 <ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
 <useDomainConstraints>false</useDomainConstraints>
 <use>1</use>
 <logicalDatatype>LOGDT024</logicalDatatype>
@@ -86,6 +89,17 @@
 <logicalDatatype>LOGDT019</logicalDatatype>
 <dataTypePrecision>1</dataTypePrecision>
 <dataTypeScale>0</dataTypeScale>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_facebook" id="866477AE-74B9-69E5-BC28-AE926CFEBE98">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-05 16:40:06 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
 </columns>
