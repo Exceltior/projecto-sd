@@ -817,7 +817,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 sharesToBuyNum.add(toBuy);
                 numShares -= toBuy;
                 userMoney -= s.getPriceForNum(toBuy);
-                totalSpent += s.getPriceForNum(toBuy);;
+                totalSpent += s.getPriceForNum(toBuy);
                 totalSharesBought += toBuy;
             }
         }
@@ -850,15 +850,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             int resultingShares = s.getNum()-num;
             System.out.println("Buying "+num+"from "+s.getUid()+"!!");
             System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
+            System.out.println("H 1!");
             setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),c);
+            System.out.println("H 2!");
             insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid);
+            System.out.println("H 3!");
             setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), c);
+            System.out.println("H 4!");
         }
 
         System.out.println("Before setSharesIdea");
         setSharesIdea(uid,iid,sharesAlvo,startingShares+totalSharesBought,c);
         System.out.println("Before setUserMoney");
-        setUserMoney(uid,userMoney, conn);
+        setUserMoney(uid,userMoney, c);
 
         // UNLEASH THE BEAST!
         if ( conn == null)
@@ -880,7 +884,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ret.totalSpent      = totalSpent;
 
         // Set the selling price
-        setPricesShares(iid, uid, targetSell);
+        System.out.println("Going to setPricesSharesInternal!");
+        setPricesSharesInternal(iid, uid, targetSell, conn,false);
         if ( ret.result.isEmpty() )
             ret.result = "OK";
         System.out.println("I'm leaving!");
@@ -1121,6 +1126,27 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return Integer.parseInt(queryResult.get(0)[0]);
     }
 
+    synchronized private boolean setPricesSharesInternal(int iid, int uid, float price, Connection conn,
+                                                         boolean checkQueue
+                                                         ) throws RemoteException{
+        if ( getSharesIdeaForUid(iid,uid) == null)
+            return false; // You have no shares!
+        Connection c;
+        if ( conn != null) c = conn;
+        else c = getTransactionalConnection();
+
+        String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
+        insertData(query,c);
+        System.out.println("OKAY, updated!");
+        if ( checkQueue )
+            checkQueue(c);
+
+        if ( conn == null )
+            returnTransactionalConnection(c);
+
+        return true;
+    }
+
     /**
      * Sets the price of the shares of the user for a given idea to a given value
      * @param iid The id of the idea
@@ -1130,18 +1156,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     synchronized public boolean setPricesShares(int iid, int uid, float price) throws RemoteException{
-        if ( getSharesIdeaForUid(iid,uid) == null)
-            return false; // You have no shares!
-
-        Connection conn = getTransactionalConnection();
-
-        String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
-        insertData(query,conn);
-        checkQueue(conn);
-
-        returnTransactionalConnection(conn);
-
-        return true;
+        return setPricesSharesInternal(iid, uid, price, null, true);
     }
 
     /**
@@ -1538,7 +1553,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     private synchronized void checkQueue(Connection conn) {
         ArrayList<String[]> queue = getQueue(conn);
 
-        if ( queue == null)
+        if ( queue == null )
             return;
 
         for ( int i = 0; i < queue.size(); i++ ) {
@@ -1915,7 +1930,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try{
                 conn.createStatement().executeUpdate(query);
             }catch(SQLException s){
-                System.err.println("SQLException in the insertData method");
+                System.err.println("SQLException in the insertData method: "+s.getMessage());
+
                 cont = true;
                 try { Thread.sleep(1000); } catch (InterruptedException e) {}
             }
