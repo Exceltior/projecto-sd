@@ -93,6 +93,17 @@
 <dataTypeScale>0</dataTypeScale>
 <autoIncrementCycle>false</autoIncrementCycle>
 </Column>
+<Column name="facebook_id" id="B701706B-210D-3649-CC49-C48C120D041F">
+<createdBy>joaquim</createdBy>
+<createdTime>2013-12-05 16:41:44 UTC</createdTime>
+<ownerDesignName>diagramaBD</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
 </columns>
 <indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
 <ind_PK_UK id="5541DFFC-870A-8B58-06BF-5D642D6C03FF" name="Ideia_PK">

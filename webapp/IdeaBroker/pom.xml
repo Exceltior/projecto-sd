@@ -82,6 +82,20 @@
           <artifactId>json</artifactId>
           <version>20090211</version>
       </dependency>
+
+
+      <dependency>
+          <groupId>com.restfb</groupId>
+          <artifactId>restfb</artifactId>
+          <version>1.6.12</version>
+      </dependency>
+
+      <dependency>
+          <groupId>com.opensymphony</groupId>
+          <artifactId>xwork-core</artifactId>
+          <version>2.1.6</version>
+      </dependency>
+
   </dependencies>
   <build>
     <finalName>IdeaBroker</finalName>
