@@ -57,6 +57,26 @@
         function onMessage(message) { // print the received message
             console.log(message);
             console.log(message.data);
+            console.log($.parseJSON(message.data).message);
+            not = $.parseJSON(message.data);
+
+            numShares = not.numShares;
+            pricePerShareTransaction = not.pricePerShare;
+            username=not.username;
+            iid=not.iid;
+            currentShares=not.currentShares;
+            money=not.money;
+            currPricePerShare=not.currPricePerShare;
+            totalInvolved = numShares*pricePerShareTransaction;
+
+            if ( not.type == "BOUGHT" ) {
+                console.log("We just bought "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" from "+username+" for idea "+iid);
+            } else {
+                console.log("We just sold "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" to "+username+" for idea "+iid);
+            }
+
+            console.log("We currently have "+currentShares+" valuated at "+currPricePerShare+" each. And we have "+money+" DEICoins.");
+
         }
 
         function onError(event) {

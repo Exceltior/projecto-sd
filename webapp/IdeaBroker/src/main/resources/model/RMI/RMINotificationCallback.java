@@ -20,7 +20,8 @@ public class RMINotificationCallback extends UnicastRemoteObject implements RMIN
     }
 
     @Override
-    public void notify(String msg) throws RemoteException {
-        websocket.notify(msg);
+    public void notify(String username, String type, float currentMoney, float pricePerShare, int numShares, int iid,
+                       int currentSharesIid, float currPricePerShare) throws RemoteException {
+        websocket.notify(username, type, currentMoney, pricePerShare, numShares, iid, currentSharesIid, currPricePerShare);
     }
 }

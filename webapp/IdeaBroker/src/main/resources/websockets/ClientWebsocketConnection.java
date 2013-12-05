@@ -4,6 +4,8 @@ import actions.model.Client;
 import model.RMI.RMINotificationCallback;
 import org.apache.catalina.websocket.MessageInbound;
 import org.apache.catalina.websocket.WsOutbound;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +30,7 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
 
     protected void onOpen(WsOutbound outbound) {
         try {
-            getWsOutbound().writeTextMessage(CharBuffer.wrap("Hello!"));
+            //getWsOutbound().writeTextMessage(CharBuffer.wrap("Hello!"));
             RMINotificationCallback callback = new RMINotificationCallback(this);
             client.getRMI().getRMIInterface().addCallbackToUid(client.getUid(), callback);
         } catch (IOException e) {
@@ -40,9 +42,26 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
     protected void onClose(int status) {
     }
 
-    public void notify(String msg) {
+    public void notify(String username, String type, float currentMoney, float pricePerShare, int numShares, int iid,
+                       int currentSharesIid, float currPricePerShare) {
+        JSONObject obj = new JSONObject();
+
+
         try {
-            getWsOutbound().writeTextMessage(CharBuffer.wrap(msg));
+            obj.put("money", currentMoney);
+            obj.put("iid", iid);
+            obj.put("currentShares", currentSharesIid);
+            obj.put("pricePerShare",pricePerShare);
+            obj.put("numShares",numShares);
+            obj.put("username",username);
+            obj.put("type",type);
+            obj.put("currPricePerShare", currPricePerShare);
+
+        } catch (JSONException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        try {
+            getWsOutbound().writeTextMessage(CharBuffer.wrap(obj.toString()));
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

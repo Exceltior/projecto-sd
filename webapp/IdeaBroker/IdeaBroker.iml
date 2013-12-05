@@ -50,6 +50,7 @@
     <orderEntry type="library" name="Maven: org.apache.tomcat:tomcat-annotations-api:7.0.47" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat:tomcat-websocket-api:7.0.47" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat:tomcat7-websocket:7.0.47" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
   </component>
 </module>
 
