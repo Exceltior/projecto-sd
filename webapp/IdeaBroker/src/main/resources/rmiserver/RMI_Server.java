@@ -86,10 +86,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     public void updateFacebookToken(int uid,String facebookToken)throws RemoteException{
-        tokens.put(uid,facebookToken);
+        System.out.println("Tokens: "+uid + " " + facebookToken);
+        tokens.put(uid, facebookToken);
     }
 
     public void invalidateFacebookToken(int uid)throws RemoteException{
+        System.out.println("Tokens Remove: "+uid);
         tokens.remove(uid);
     }
 
@@ -146,24 +148,24 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
-     * Method responsible for performing the login for Facebook users. In these cases we are only going to check if there
+     * Method responsible for performing the facebookLogin for Facebook users. In these cases we are only going to check if there
      * is one entry in the database for the given user.
      * @param idFacebook    The facebook id of the user.
      * @return              A boolean value, indicating if the id is in the database or not.
      */
-    public boolean login(String idFacebook) throws RemoteException{
+    public int facebookLogin(String idFacebook) throws RemoteException{
 
-        String query = "Select id_facebook from Utilizador where id_facebook LIKE '" + idFacebook +"'";
+        String query = "Select id_facebook, userid from Utilizador where id_facebook LIKE '" + idFacebook +"'";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null || queryResult.isEmpty())
-            return false;
+            return -1;
 
-        return true;
+        return Integer.valueOf(queryResult.get(0)[1]);
     }
 
     /**
-     * This is the same as login, except it doesn't do anything to say we're online. It's meant to be used by the
+     * This is the same as facebookLogin, except it doesn't do anything to say we're online. It's meant to be used by the
      * notification server.
      * @param user  The User's username
      * @param pwd   The User's password
@@ -712,55 +714,60 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             //Deduce the money from the user's account
             setUserMoney(uid,starting_money-moneyInvested,conn);
 
-            String clientToken = tokens.get(uid);
-            query = "Select facbook_id from Ideia where i.iid = " + iid;
-            queryResult = receiveData(query);
-            String ideaFacebookId = queryResult.get(0)[0];
-
-            //Post on facebook
-            OAuthService service = new ServiceBuilder()
-                    .provider(FacebookApi.class)
-                    .apiKey(AppPublic)
-                    .apiSecret(AppSecret)
-                    .callback("http://localhost:8080")   //should be the full URL to this action
-                    .build();
-
-            OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/me/feed");
-            authRequest.addHeader("Content-Type", "text/html");
-            authRequest.addBodyParameter("message","O user " + uid
-                    + " criou a seguinte ideia: \"" + description + "\"\nA ideia esta a venda por " +
-                    initialSell + " DEICoins!");
-            Token token_final = new Token(clientToken,AppSecret);
-
-            service.signRequest(token_final, authRequest);
-            Response authResponse = authRequest.send();
-
-            System.out.println("BODY " + authResponse.getBody());
-
-            String messageId = null;
-
-            try {
-                messageId = new JSONObject(authResponse.getBody()).getString("id");
-            } catch (JSONException e) {
-                e.printStackTrace();
-                //FIXME WHAT TO DO WITH THIS?????
-            }
-
-            if (messageId != null)
-                addIdeaFacebookId(iid,messageId,conn);
-            else{
-                System.err.println("Cannot get message facebook id");
-                //FIXME: DEAL WITH THIS
-            }
-
             //Tratar dos topicos
             for (String topico : topics)
-                setTopicsIdea(iid,topico,uid);
-
+                setTopicsIdea(iid,topico,uid,conn);
+            System.out.println("Antes de adicionar o ficheiro");
             //Tratar do ficheiro
             if (file != null)
                 addFile(iid,file);
+            System.out.println("Já adicionei o ficheiro");
+            //FACEBOOK
+            String clientToken = tokens.get(uid);
+            if ( clientToken == null ) {
+                System.out.println("Invalid or no token in hashmap");
 
+            } else {
+                System.out.println("S1");
+                //Post on facebook
+                OAuthService service = new ServiceBuilder()
+                        .provider(FacebookApi.class)
+                        .apiKey(AppPublic)
+                        .apiSecret(AppSecret)
+                        .callback("http://localhost:8080")   //should be the full URL to this action
+                        .build();
+                System.out.println("S2");
+                OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/me/feed");
+                System.out.println("S3");
+                authRequest.addHeader("Content-Type", "text/html");
+                authRequest.addBodyParameter("message","O user " + uid
+                        + " criou a seguinte ideia: \"" + description + "\"\nA ideia esta a venda por " +
+                        initialSell + " DEICoins!");
+                System.out.println("S4");
+                Token token_final = new Token(clientToken,AppSecret);
+                System.out.println("S5");
+                service.signRequest(token_final, authRequest);
+                System.out.println("S6");
+                Response authResponse = authRequest.send();
+                System.out.println("S7");
+                System.out.println("BODY " + authResponse.getBody());
+
+                String messageId = null;
+
+                try {
+                    messageId = new JSONObject(authResponse.getBody()).getString("id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    //FIXME WHAT TO DO WITH THIS?????
+                }
+
+                if (messageId != null)
+                    addIdeaFacebookId(iid,messageId,conn);
+                else{
+                    System.err.println("Cannot get message facebook id");
+                    //FIXME: DEAL WITH THIS
+                }
+            }
         }
         else
             iid = -1;
@@ -855,7 +862,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         insertData(query);
 
         String clientToken = tokens.get(uid);
-        query = "Select facbook_id from Ideia where i.iid = " + idea.getId();
+        query = "Select facebook_id from Ideia where iid = " + idea.getId();
         queryResult = receiveData(query);
         if (queryResult != null && !queryResult.isEmpty()){
             //Delete post on facebook
@@ -1254,7 +1261,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return An array of Idea objects, with all the ideas with the specified id and title
      * @throws RemoteException
      */
-    public Idea[] getIdeaByIID(int iid, String title) throws RemoteException{
+    public Idea[] searchIdeas(int uid, int iid, String title) throws RemoteException{
         String query;
         Idea[] devolve;
 
@@ -1276,6 +1283,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         for (int i=0;i<queryResult.size();i++){
             devolve[i] = new Idea(queryResult.get(i));
             devolve[i].setTopics(getIdeaTopics(devolve[i].getId()));
+            addUserSpecificInfoToIdea(devolve[i],uid);
             if (getFile(devolve[i].getId()) != null)
                 devolve[i].setFile("Y");
         }
@@ -1950,15 +1958,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         insertData(queryData);
     }
 
-    /**
-     * Method responsible for creating the connection between an idea and one or more topics
-     * @param iid   The id of the idea
-     * @param topicTitle    The title of the topics
-     * @param uid   The id of the user
-     * @return A boolean value, indicating the success or failure of the operation
-     * @throws RemoteException
-     */
-    synchronized public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
+    synchronized private boolean setTopicsIdea(int iid, String topicTitle, int uid,
+                                               Connection conn) throws RemoteException{
+        Connection c = null;
+        if ( conn == null ) c = getTransactionalConnection();
+        else c = conn;
 
         String query ;
         ArrayList<String[]> topics;
@@ -1966,7 +1970,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         //ideas = receiveData(query);
         query = "Select t.tid from Topico t where t.nome='" + topicTitle + "'";
-        topics = receiveData(query);
+        topics = receiveData(query,c);
 
         ////
         //  There is no topic with the given title, so let's create it
@@ -1976,15 +1980,32 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             //Add the number of the topic to the ArrayList
             query = "Select t.tid from Topico t where t.nome='" + topicTitle + "'";
-            topics = receiveData(query);
+            topics = receiveData(query,c);
         }
 
         topic_id = Integer.valueOf(topics.get(0)[0]);//Get topic id
 
         query = "INSERT INTO TopicoIdeia VALUES (" + topic_id + "," + iid + ")";
+        System.out.println("Antes do insert");
+        insertData(query,c);
+        System.out.println("Antes do true");
 
-        insertData(query);
+        if ( conn == null )
+            returnTransactionalConnection(c);
+
         return true; //Change this to return....nothing?
+    }
+
+    /**
+     * Method responsible for creating the connection between an idea and one or more topics
+     * @param iid   The id of the idea
+     * @param topicTitle    The title of the topics
+     * @param uid   The id of the user
+     * @return A boolean value, indicating the success or failure of the operation
+     * @throws RemoteException
+     */
+    synchronized public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException{
+        return setTopicsIdea ( iid, topicTitle, uid, null);
     }
 
     synchronized private void addToHallOfFame(int iid, Connection c) {
@@ -2439,7 +2460,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{
