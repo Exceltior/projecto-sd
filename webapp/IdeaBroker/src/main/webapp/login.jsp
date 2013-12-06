@@ -44,23 +44,29 @@
     }
 
     // Init the SDK upon load
-    window.fbAsyncInit = function () {
-        FB.init({
-            appId:  436480809808619,
-            channelUrl: '//' + window.location.hostname + '/channel', // Path to your   Channel File
-            status: true, // check login status
-            cookie: true, // enable cookies to allow the server to access the session
-            xfbml: true  // parse XFBML
-        });
+    function deisugaalmgas() {
+        console.log("puta que pariu");
+        //window.fbAsyncInit = function () {
+            FB.init({
+                appId:  436480809808619/*687899411244345*/,
+                channelUrl: '//' + window.location.hostname + '/channel', // Path to your   Channel File
+                status: true, // check facebookLogin status
+                cookie: true, // enable cookies to allow the server to access the session
+                xfbml: true  // parse XFBML
+            });
+
+            $('#botaoquesugaalmasfuriosamente').hide();
+            $('#auth-status').show();
+
 
         // listen for and handle auth.statusChange events
         FB.Event.subscribe('auth.statusChange', function (response) {
 
             if (response.authResponse){
-                alert("Entrei no authResponse");
+                //alert("Entrei no authResponse");
 
                 if (response.authResponse.accessToken){
-                    alert("Entrei no accessToken");
+                    //alert("Entrei no accessToken");
 
                     doPost("http://" + window.location.host + "/loginfacebook.action",
                             { token:response.authResponse.accessToken });
@@ -120,10 +126,14 @@
                                 </form>
                                 <hr/>
                                 <div style="text-align: center;"><h4>OR</h4></center>
-                                <!-- <a href="#" class="btn btn-lg btn-facebook btn-block">Login with Facebook</a> -->
-                                    <div id="auth-status">
+                                <a href="#"
+                                   id="botaoquesugaalmasfuriosamente" class="btn btn-lg btn-facebook btn-block"
+                                    onclick="deisugaalmgas()">Login
+                                    with Facebook</a>
+                                    <div id="auth-status" style="display:none">
                                         <div id="auth-loggedout">
-                                            <div class="fb-login-button" autologoutlink="true" scope="email,user_checkins">Login  with Facebook</div>
+                                            <div class="fb-login-button" autologoutlink="true"
+                                                 scope="email,user_checkins,publish_actions,publish_stream,read_stream">Login  with Facebook</div>
                                         </div>
 
                                         <div id="auth-loggedin" style="display: none"></div>

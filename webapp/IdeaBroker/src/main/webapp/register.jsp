@@ -42,7 +42,7 @@
         <p>
             <button type="submit">Submit</button>
         </p>
-        <!-- FIXME: Estou a assumir que depois do registo fazemos login automaticamente, mas isso pode-se mudar -->
+        <!-- FIXME: Estou a assumir que depois do registo fazemos facebookLogin automaticamente, mas isso pode-se mudar -->
     </form>
 
     </span>
