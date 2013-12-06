@@ -6,8 +6,8 @@
   To change this template use File | Settings | File Templates.
 --%>
 <!-- STRUTS -->
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=utf8"
+         pageEncoding="utf8"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <jsp:useBean id="client" scope="session" class="actions.model.Client" />
 <!-- END STRUTS -->
