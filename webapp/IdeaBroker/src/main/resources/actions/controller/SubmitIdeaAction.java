@@ -149,6 +149,17 @@ public class SubmitIdeaAction extends ClientAction{
         this.idea = idea2;
     }
 
+    private boolean verifyTopicString(String temp){
+        if (!temp.trim().contains(" "))
+            return true;
+        //Here we know the string has at least one space, lets check if it is at the end of the string
+        String substring = temp.substring(0,temp.length()-1);
+        if (!substring.trim().contains(" "))//The space is in the last position of the string
+            return true;
+        //Note: I left the if unsimplified for better understanding of the code
+        return false;
+    }
+
     /**
      * Method to filter the topics inserted by the user. With this method we can discard invalid topic names, like:
      * #this is #topic . In this example we only consider the topics "this" and "topic", since it's impossible to use
@@ -160,7 +171,7 @@ public class SubmitIdeaAction extends ClientAction{
         ArrayList<String> devolve = new ArrayList<String>();
 
         for (String aList : list) {
-            if (!aList.trim().contains(" ") && !aList.trim().equals(""))//If the topic doesnt have a space
+            if (!aList.trim().equals("") && verifyTopicString(aList))//If the topic doesnt have a space
                 devolve.add(aList.trim());
         }
 
