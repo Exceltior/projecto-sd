@@ -925,7 +925,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             String requestUrl = "https://graph.facebook.com/" + ideaFacebookId;
             Token finalToken = new Token(clientToken,AppSecret);
 
-            doFacebookRemoveIdea(requestUrl,finalToken);
+            doFacebookRemovePost(requestUrl,finalToken);
         }
 
 
