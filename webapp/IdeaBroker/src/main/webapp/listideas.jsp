@@ -427,10 +427,13 @@
         }
 
         function removeIdea(id) {
+            console.log("No removeIdea");
             var formData = {iid:id}; //Array
             postJSON('removeidea.action', formData,function(data) {
+                console.log(data);
                 if ( data.success ) {
                     if ( data.result == "OK" ) {
+                        console.log("Hiding idea" + getIdeaStr(id));
                         $(getIdeaStr(id)).hide();
                     } else {
                         showMessage('Erro', 'Não foi possível apgar a ideia porque não detém 100% das suas shares.',

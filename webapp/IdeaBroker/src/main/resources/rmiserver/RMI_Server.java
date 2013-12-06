@@ -274,7 +274,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         for (int i = 0; i < queryResult.size(); i++){
             ideas[i] = new Idea(queryResult.get(i));
-            ideas[i].setTopics(getIdeaTopics(ideas[i].getId()));            
+            ideas[i].setTopics(getIdeaTopics(ideas[i].getId()));
+            addUserSpecificInfoToIdea(ideas[i],uid);
 
             if(getFile(Integer.parseInt(queryResult.get(i)[0])) != null)
                 ideas[i].setFile("Y");
@@ -2377,7 +2378,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{

@@ -20,13 +20,14 @@ public class RemoveIdeaAction extends AJAXAction{
     public String execute() throws Exception {
         super.execute();
         int retval;
-
-        setAjaxStatus((retval = client.doRemoveIdea(iid)) > 0);
-        if ( retval == -2 )
+        System.out.println("REmove idea "+iid);
+        setAjaxStatus(client.doRemoveIdea(iid) !=-1);
+        /*if ( retval == -2 )
             result = "NOT_OWNER";
-        else
+        else*/
             result = "OK";
 
+        System.out.println("result "+result);
         return SUCCESS;
     }
     public boolean isSuccess() {

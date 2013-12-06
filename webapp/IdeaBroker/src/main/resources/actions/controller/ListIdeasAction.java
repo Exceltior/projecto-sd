@@ -67,6 +67,9 @@ public class ListIdeasAction extends ClientAction{
         } else if ( mode.equals("searchidea") ) {
             this.ideas     = client.doSearchIdea(-1,this.q);
             this.title     = "Resultados da pesquisa para '"+q+"'";
+        } else if ( mode.equals("watchlist") ) {
+            this.ideas     = client.doGetUserWatchList();
+            this.title     = "Watchlist";
         }
         //System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
