@@ -869,6 +869,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             c = conn;
         BuySharesReturn ret = new BuySharesReturn();
         Share currentShares = getSharesIdeaForUid(iid, uid, c);
+        if ( currentShares != null)
+            System.out.println("User already has "+currentShares.getAvailableShares());
         float userMoney = getUserMoney(uid, c);
         System.out.println("Checkpoint 1");
         /**
@@ -1079,6 +1081,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         for (Share s : shares)
             ret += s.getAvailableShares();
 
+        System.out.println("-->countAvailableShares: "+ret);
         return ret;
     }
 
@@ -1668,7 +1671,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                         break;
                     System.out.println("Will still try to buy " + toBuy);
                 }
-                System.out.println("Buying " + toBuy +" shares.");
+                System.out.println("Ordering Buying " + toBuy +" shares.");
                 sharesToBuy.add(s);
                 sharesToBuyNum.add(toBuy);
                 numShares -= toBuy;
