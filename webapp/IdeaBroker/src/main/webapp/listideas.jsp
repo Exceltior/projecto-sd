@@ -624,12 +624,23 @@
         function createIdea() {
 
             var html =
-                    '<div class="input-group"><span class="input-group-addon">Título: </span><input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatitle"/></div>';
+                    '<div class="input-group">' +
+                    '<span class="input-group-addon">Título: </span>' +
+                    '<input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatitle"/>' +
+                    '</div>' +
+                    '<div class="input-group">' +
+                    '<span class="input-group-addon">Conteúdo: </span>' +
+                    '<input type="textarea" class="form-control" placeholder="A Mariana é mesmo Linda" id="ideabody"/>' +
+                    '</div>' +
+                    '<div class="input-group">' +
+                    '<span class="input-group-addon">Tópicos: </span>' +
+                    '<input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatopics"/>' +
+                    '</div>';
 
             var message = function(dialogRef){
                 var $message =
                         $("<div style='font-size:16pt; text-align:center;'>Insira os dados da ideia</div>");
-                $message.append($(searchbox));
+                $message.append($(html));
 
                 return $message;
             }
@@ -728,7 +739,7 @@
             <li><a href="#"><span class="glyphicon glyphicon-search">&nbsp;Pesquisar Tópicos</span><span
                     style="color:black">
                 _</span></a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-search"  style="z-index:0"></span><span
+            <li><a href="#" onclick="searchIdea()"><span class="glyphicon glyphicon-search"  style="z-index:0"></span><span
                     class="glyphicon glyphicon-cloud" style="margin-left:-5px; z-index:1">&nbsp;Pesquisar
                 Ideias</span><span
                     style="color:black">
