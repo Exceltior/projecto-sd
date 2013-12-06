@@ -737,7 +737,9 @@ public class Client {
      * @return  A boolean value, telling us if the current user is an administrator
      */
     public boolean getAdminStatus() {
-        return adminStatus;
+        //FIXME: MEGA FIX ME
+        //return adminStatus;
+        return false;
     }
 
     /**
