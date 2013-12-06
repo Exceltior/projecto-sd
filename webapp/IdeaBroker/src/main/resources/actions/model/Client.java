@@ -42,7 +42,7 @@ public class Client {
         this.rmi = new RMIConnection(RMI_HOST);
         this.uid = -1;
         this.coins = 0;
-        this.numNotifications = 0; /* FIXME: On login, set this */
+        this.numNotifications = 0; /* FIXME: On facebookLogin, set this */
         this.adminStatus = true;
         this.clientToken = null;
         this.user_facebook_id = null;
@@ -51,7 +51,7 @@ public class Client {
     }
 
     /**
-     * Calls RMI's login safely. We have chosen to encapsulate it so that we can later on (FIXME) implement retry
+     * Calls RMI's facebookLogin safely. We have chosen to encapsulate it so that we can later on (FIXME) implement retry
      * mechanisms. We will need to indicate the calling function if the RMI fails. <-- FIXME
      * @param username User's username
      * @param password User's password
@@ -201,7 +201,7 @@ public class Client {
         Idea[] devolve = null;
 
         try{
-            devolve = rmi.getRMIInterface().getIdeaByIID(id, title);
+            devolve = rmi.getRMIInterface().searchIdeas(uid, id, title);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -432,6 +432,15 @@ public class Client {
             return false;
 
         System.out.println("O id e " + id);
+
+        //Ir verificar se o id existe na base de dados
+        try{
+            this.uid = rmi.getRMIInterface().facebookLogin(id);
+        }catch(RemoteException e){
+            System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
+            e.printStackTrace();
+        }
+
         try{
             this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
         }catch(RemoteException e){
@@ -443,15 +452,9 @@ public class Client {
         this.clientToken = token;
         this.user_facebook_id = id;
 
-        //Ir verificar se o id existe na base de dados
-        try{
-              devolve = rmi.getRMIInterface().login(id);
-        }catch(RemoteException e){
-            System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
-            e.printStackTrace();
-        }
 
-        return devolve;
+
+        return this.uid != -1;
     }
 
     private boolean doRMITakeover(int iid) {
@@ -469,7 +472,7 @@ public class Client {
     }
 
     /**
-     * Public interface to try to login a client. If successful, current state will be updated to indicate that this
+     * Public interface to try to facebookLogin a client. If successful, current state will be updated to indicate that this
      * Client represents the user given by this (username,password). Specifically, this.uid will be set to its uid
      * @param username User's username
      * @param password User's password
@@ -493,7 +496,7 @@ public class Client {
     }
 
     /**
-     * Interface to login a client from an encoded uid (probably read from a cookie)
+     * Interface to facebookLogin a client from an encoded uid (probably read from a cookie)
      * @param encodeduid The encoded uid string
      * @return True if there is success logging in. False otherwise
      */
@@ -567,7 +570,7 @@ public class Client {
     }
 
     /**
-     * Public interface to try to register a client. If successful, we automatically perform the login for the given
+     * Public interface to try to register a client. If successful, we automatically perform the facebookLogin for the given
      * client.
      * @param username User's username
      * @param password User's password
