@@ -160,8 +160,8 @@ public class SubmitIdeaAction extends ClientAction{
         ArrayList<String> devolve = new ArrayList<String>();
 
         for (String aList : list) {
-            if (!aList.contains(" ") && !aList.equals(""))//If the topic doesnt have a space
-                devolve.add(aList);
+            if (!aList.trim().contains(" ") && !aList.trim().equals(""))//If the topic doesnt have a space
+                devolve.add(aList.trim());
         }
 
         return devolve;
