@@ -1,10 +1,23 @@
 package rmiserver;
 
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Parameter;
+import com.restfb.types.FacebookType;
 import model.RMI.RMINotificationCallbackInterface;
 import model.RMI.RMI_Interface;
 import model.data.*;
 import model.data.queues.Notification;
 import model.data.queues.TransactionQueue;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.FacebookApi;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
 import websockets.ClientWebsocketConnection;
 
 import java.io.*;
@@ -29,6 +42,8 @@ import java.util.Date;
 public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     private static final String requestsQueueFilePath = "requests.bin";
+    private final static String AppPublic = "436480809808619";
+    private final static String AppSecret = "af8edf703b7a95f5966e9037b545b7ce";
     private String url;
     private final float starting_money  = 1000000;
     private final int   starting_shares = 100000;
@@ -364,7 +379,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return      A boolean value, indicating if the idea's title is already stored in the database.
      */
     boolean validateIdea(String title){
-        String query = "Select * from Ideia where i.activa = 1 and titulo LIKE '" + title + "'";
+        String query = "Select * from Ideia i where i.activa = 1 and i.titulo LIKE '" + title + "'";
         ArrayList<String[]> ideas = receiveData(query);
 
         return ideas == null || ideas.size() == 0;
@@ -718,14 +733,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param id    The id of the idea on facebook
      * @throws RemoteException
      */
-    public void addIdeaFacebookId(int iid,String id) throws RemoteException{
-
+    private void addIdeaFacebookId(int iid,String id,Connection conn) throws RemoteException{
         String query = "UPDATE Ideia set facebook_id = '" + id + "' where iid = " + iid;
-        Connection conn;
 
-        conn = getTransactionalConnection();
         insertData(query,conn);
-        returnTransactionalConnection(conn);
     }
 
     /**
@@ -737,8 +748,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The id of the idea we just created
      * @throws RemoteException
      */
-    synchronized public int createIdea(String title, String description, int uid, int moneyInvested,String faceId) throws RemoteException{
-        String query;
+    synchronized public int createIdea(String title, String description, int uid, int moneyInvested,String faceId,String clientToken) throws RemoteException{
+        String query, messageId = null;
         ArrayList<String[]> queryResult;
         float initialSell;
         int iid;
@@ -755,11 +766,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return -1;
         }
 
-        initialSell = moneyInvested/starting_shares;
+        initialSell = moneyInvested;
+        initialSell = initialSell/starting_shares;
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +
-                "" + "1,null,null,"+ initialSell +"," + faceId+")";
+                "" + "1,null,null,"+ initialSell +",null)";
 
         insertData(query,conn);//Insert the idea
 
@@ -776,14 +788,48 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             //Deduce the money from the user's account
             setUserMoney(uid,starting_money-moneyInvested,conn);
+
+            //Post on facebook
+            OAuthService service = new ServiceBuilder()
+                    .provider(FacebookApi.class)
+                    .apiKey(AppPublic)
+                    .apiSecret(AppSecret)
+                    .callback("http://localhost:8080")   //should be the full URL to this action
+                    .build();
+
+            OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/me/feed");
+            authRequest.addHeader("Content-Type", "text/html");
+            authRequest.addBodyParameter("message","O user " + faceId
+                    + " criou a seguinte ideia: \"" + description + "\"\nA ideia esta a venda por " +
+                    initialSell + " DEICoins!");
+            Token token_final = new Token(clientToken,AppSecret);
+
+            service.signRequest(token_final, authRequest);
+            Response authResponse = authRequest.send();
+
+            System.out.println("BODY " + authResponse.getBody());
+
+            try {
+                messageId = new JSONObject(authResponse.getBody()).getString("id");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                //FIXME WHAT TO DO WITH THIS?????
+            }
+
+            if (messageId != null)
+                addIdeaFacebookId(iid,messageId,conn);
+            else{
+                System.err.println("Cannot get message facebook id");
+                //FIXME: DEAL WITH THIS
+            }
         }
         else
             iid = -1;
 
         returnTransactionalConnection(conn);
         System.out.println("Vou retornar " + iid +" no createIdea");
-        return iid;
 
+        return iid;
     }
 
     /**
@@ -846,6 +892,57 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         query = "update Ideia set activa = 0 where iid="+idea.getId();
         insertData(query);
+
+        return 1;//Everything ok
+
+    }
+
+    /**
+     * Removes an idea
+     * @param idea Object "Idea" with the idea to be removed
+     * @param uid  User that wants to remove the idea
+     * @return We have 2 possible return values:
+     * -2 -> User is not the owner of the idea
+     * 1 > Everything went well
+     * @throws RemoteException
+     */
+    public int removeIdea(Idea idea, int uid,String ideaFacebookId,String clientToken) throws  RemoteException {
+
+        //Check if user is owner of the idea
+        String query = "Select s.userid from \"Share\" s where s.iid = " + idea.getId();
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult.size() != 1)
+            return -2;//User is not owner of the idea
+
+            //Only has one owner
+        else if (Integer.parseInt(queryResult.get(0)[0]) != uid )
+            return -2;//User is not owner of the idea
+
+        //Here we know that the user is the owner of the idea
+
+        if ( ideaHasFiles(idea.getId()) ) {
+            deleteIdeaFiles(idea.getId());
+        }
+
+        query = "update Ideia set activa = 0 where iid=" + idea.getId();
+        insertData(query);
+        System.out.println("Vou remover a ideia do facebook");
+
+        //Remove post from Facebook
+        //Post on facebook
+        OAuthService service = new ServiceBuilder()
+                .provider(FacebookApi.class)
+                .apiKey(AppPublic)
+                .apiSecret(AppSecret)
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        OAuthRequest authRequest = new OAuthRequest(Verb.DELETE, "https://graph.facebook.com/" + ideaFacebookId);
+        Token token_final = new Token(clientToken,AppSecret);
+
+        service.signRequest(token_final, authRequest);
+        Response authResponse = authRequest.send();
 
         return 1;//Everything ok
 
@@ -2378,7 +2475,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{

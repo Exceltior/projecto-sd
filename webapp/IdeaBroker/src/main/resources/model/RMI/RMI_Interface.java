@@ -13,7 +13,6 @@ import model.data.*;
 public interface RMI_Interface extends Remote {
     public int login(String user, String pwd) throws  RemoteException;
     public boolean login(String idFacebook) throws RemoteException;
-    public void addIdeaFacebookId(int iid,String id) throws RemoteException;
     public String getIdeaFacebookId(int iid) throws RemoteException;
     //public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
@@ -24,6 +23,7 @@ public interface RMI_Interface extends Remote {
     public Idea[] getIdeasFromTopic(int uid, int tid) throws RemoteException;
     public Idea[] getIdeasFromUser(int uid) throws RemoteException;
     public int removeIdea(Idea idea, int uid) throws  RemoteException;
+    public int removeIdea(Idea idea, int uid,String ideaFacebookId,String clientToken) throws  RemoteException;
     public BuySharesReturn buyShares(int uid, int iid, float maxPricePerShare, int buyNumShares,
                                      boolean addToQueueOnFailure,
                                      float targetSellPrice) throws RemoteException;
@@ -32,7 +32,7 @@ public interface RMI_Interface extends Remote {
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid,int moneyInvested) throws RemoteException;
-    public int createIdea(String title, String description, int uid, int moneyInvested,String faceId) throws RemoteException;
+    public int createIdea(String title, String description, int uid, int moneyInvested,String faceId,String clientToken) throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
     //public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
