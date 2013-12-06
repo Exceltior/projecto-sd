@@ -168,6 +168,10 @@
             return '#idea'+id;
         }
 
+        function getBuySharesBtnStr(id) {
+            return "#buyshares"+id;
+        }
+
         function getMarketValueStr(id) {
             return '#marketvalue'+id;
         }
@@ -202,6 +206,14 @@
 
         function showRemoveIdeaBtn(id) {
             $(getRemoveIdeaBtnStr(id)).show();
+        }
+
+        function showBuySharesBtn(id) {
+            $(getBuySharesBtnStr(id)).show();
+        }
+
+        function hideBuySharesBtn(id) {
+            $(getBuySharesBtnStr(id)).hide();
         }
 
         function hideRemoveIdeaBtn(id) {
@@ -369,10 +381,14 @@
             if ( num > 0 ) {
                 showSetSellingPriceBox(id);
                 showShareNumLabel(id);
-                if ( pct == 100.0 )
+                if ( pct == 100.0 ) {
                     showRemoveIdeaBtn(id);
-                else
+                    hideBuySharesBtn(id);
+                }
+                else {
                     hideRemoveIdeaBtn(id);
+                    showBuySharesBtn(id);
+                }
             } else {
                 hideSetSellingPriceBox(id);
                 hideShareNumLabel(id);
@@ -406,7 +422,7 @@
         }
 
         function onNumSharesWantChanged(id) {
-            var maxSharesAvail=getMaxSharesForIdea(id);
+            var maxSharesAvail=getMaxSharesForIdea(id)-parseInt($(getNumSharesIdeaStr(id)).text());
             var m = $('#numshareswant');
             var modalsubmitbutton = $('#modalsubmitbutton');
             if (m.val() == '' || m.val() == 0 || !isValidPositiveInt(m.val())) {
@@ -466,8 +482,9 @@
                     //Update the money onscreen (it's okay if we don't buy anything because totalspent=0)
                     setUserMoney(getUserMoney()-data.totalSpent);
                     //FIXME: WARNING, Most of buy shares is all fucked up. We probably will only get QUEUED.NOMOREMONEY OR NOBUY.NOMOREMONEY or NOBUY.NOMORESHARES
-                    setNumSharesForidea(id,data.numSharesFinal);
+
                     if ( data.result == 'OK' ) {
+                        setNumSharesForidea(id,data.numSharesFinal);
                         //Update the selling price onscreen
                         setSellingPriceIdea(id,targetSellPrice);
                         message =
@@ -478,6 +495,7 @@
                                 '<div class="bootstrap-dialog-title">Operação concluída com sucesso!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_SUCCESS;
                     } else if ( data.result == 'QUEUED.NOMOREMONEY' ) {
+                        setNumSharesForidea(id,data.numSharesFinal);
                         // Request got queued because we ran out of money
                         //Update the selling price onscreen
                         setSellingPriceIdea(id,targetSellPrice);
@@ -487,6 +505,7 @@
                                 '<div class="bootstrap-dialog-title">Nem todas as shares foram compradas</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_WARNING;
                     } else if ( data.result == 'QUEUED.NOMORESHARES' ) {
+                        setNumSharesForidea(id,data.numSharesFinal);
                         // Request got queued because there are no more shares (no more shares at all or at our desired price)
                         //Update the selling price onscreen
                         setSellingPriceIdea(id,targetSellPrice);
