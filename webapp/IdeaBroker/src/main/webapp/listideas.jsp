@@ -528,7 +528,7 @@
         }
 
         function getMarketValue(id) {
-            return parseFloat($(getMarketValueStr(id)).val()); //FIXME
+            return parseFloat($(getMarketValueStr(id)).text()); //FIXME
         }
 
         function onTargetSellPriceChanged() {
@@ -665,7 +665,7 @@
                     <div class="row" style="margin:10px; margin-top:30px">
 
                         <div class="col-md-8 col-md-offset-2">
-                            <h2 style="text-align:center">#<s:property value="topicName" /></h2>
+                            <h2 style="text-align:center"><s:property value="title" /></h2>
                             <div class="list-group text-center" style = "margin-top:25px;">
                                 <s:iterator var="i" step="1" value="ideas">
                                     <div class="list-group-item" id="idea<s:property value="id" />"
@@ -705,8 +705,10 @@
                                                 <!-- Left buttons -->
                                                 <s:if test="!#session.client.adminStatus">
                                                     <!-- Set share price -->
+
+                                                    <div class="input-append"
+                                                         id="setsharepriceeditbox<s:property value="id" />"
                                                 <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>>
-                                                    <div class="input-append" id="setsharepriceeditbox<s:property value="id" />"
 
                                                         <span
                                                                 class="glyphicon glyphicon-euro"></span>

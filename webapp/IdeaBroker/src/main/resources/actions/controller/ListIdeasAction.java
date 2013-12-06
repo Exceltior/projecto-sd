@@ -6,14 +6,20 @@ import model.data.Idea;
  * Given a topic ID, fetch its data (ideas, etc), store them in the current Action. In struts.xml,
  * we redirect the user to a jsp which expects this.
  */
-public class ViewTopicAction extends ClientAction{
+public class ListIdeasAction extends ClientAction{
     private int    tid;
     private Idea[] ideas;
-    private String topicName;
+    private String title;
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    private String mode;
 
     /**
      * Gets the id of the topic we are showing to the user.
-     * @return  The id of the topic we are showing to the user.
+     * @return The id of the topic we are showing to the user.
      */
     public int getTid() {
         return tid;
@@ -51,14 +57,19 @@ public class ViewTopicAction extends ClientAction{
     public String execute() throws Exception {
         super.execute();
 
-        this.ideas     = client.doGetTopicIdeas(tid);
-        this.topicName = client.doGetTopicTitle(tid);
+        if ( mode.equals("topic") ) {
+            this.ideas     = client.doGetTopicIdeas(tid);
+            this.title = "#"+client.doGetTopicTitle(tid);
+        } else if ( mode.equals("userideas") ) {
+            this.ideas     = client.doGetUserIdeas();
+            this.title     = "As minhas ideias";
+        }
         //System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
         return SUCCESS;
     }
 
-    public String getTopicName() {
-        return topicName;
+    public String getTitle() {
+        return title;
     }
 }

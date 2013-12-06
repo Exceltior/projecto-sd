@@ -31,13 +31,8 @@
             <result name="success">testelayout.jsp</result>
         </action>
 
-        <action name="viewtopic" class="actions.controller.ViewTopicAction" method="execute">
-            <result name="success">viewtopic.jsp</result>
-        </action>
-
-        <action name="viewuserideas" class="actions.controller.ViewUserIdeasAction" method="execute">
-            <result name="success">viewideas.jsp</result>
-            <result name="error">error.jsp</result>
+        <action name="listideas" class="actions.controller.ListIdeasAction" method="execute">
+            <result name="success">listideas.jsp</result>
         </action>
 
         <action name="viewuserwatchlist" class="actions.controller.ViewUserWatchListAction" method="execute">
