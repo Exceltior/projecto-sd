@@ -363,7 +363,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return      A boolean value, indicating if the idea's title is already stored in the database.
      */
     boolean validateIdea(String title){
-        String query = "Select * from Ideia where titulo LIKE '" + title + "'";
+        String query = "Select * from Ideia where i.activa = 1 and titulo LIKE '" + title + "'";
         ArrayList<String[]> ideas = receiveData(query);
 
         return ideas == null || ideas.size() == 0;
@@ -523,7 +523,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public Idea[] getFilesIdeas()throws RemoteException{
-        String query = "Select i.iid, i.titulo, i.descricao, i.userid from Ideia i where i.path is not null";
+        String query = "Select i.iid, i.titulo, i.descricao, i.userid from Ideia i where i.path is not null and i" +
+                ".activa = 1";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null || queryResult.isEmpty())
@@ -559,8 +560,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public Idea[] getIdeasFromWatchList(int uid) throws RemoteException{
-        String query = "Select w.iid, i.titulo, i.descricao, w.userid from Ideia i, IdeiaWatchList w " +
-                "where w.iid = i.iid and w.userid = " + uid;
+        //FIXME was w.iid, i.titulo, i.descricao, w.userid
+        String query = "Select * from Ideia i, IdeiaWatchList w " +
+                "where i.activa = 1 and w.iid = i.iid and w.userid = " + uid;
         ArrayList<String[]> queryResut = receiveData(query);
         Idea[] devolve;
 
@@ -991,7 +993,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             System.out.println("H 2!");
             insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid);
             System.out.println("H 3!");
-            setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), c);
+            setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getPriceForNum(num), c);
             System.out.println("H 4!");
         }
 
@@ -1588,7 +1590,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return true;
     }
     public float getMarketValue(int iid) throws RemoteException {
-        String query = "select ultimatransacao from Compra where iid="+iid;
+        String query = "select ultimatransacao from Ideia where iid="+iid;
         Connection c = null;
         try {
             c = connectionPool.checkOutConnection();
@@ -1921,6 +1923,45 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         insertData(query);
         return true; //Change this to return....nothing?
+    }
+
+    synchronized private void addToHallOfFame(int iid, Connection c) {
+        String query = "INSERT INTO HallFame VALUES (fame_seq.nextval," + iid + ")";
+        insertData(query, c);
+        query = "update Ideia set activa=0 where iid = "+iid;
+        insertData(query, c);
+    }
+
+    synchronized public void takeOver(int iid) throws RemoteException {
+        Connection c = getTransactionalConnection();
+        takeOver(iid, c);
+        returnTransactionalConnection(c);
+    }
+
+    synchronized private void takeOver(int iid, Connection c) throws RemoteException {
+        ArrayList<Share> currentShares = getSharesIdea(iid, c);
+        float marketPrice = getMarketValue(iid);
+
+        for ( Share s : currentShares ) {
+            System.out.println("Taking over "+s.getAvailableShares()+"from "+s.getUid()+"!!");
+            System.out.println("T 1!");
+            setSharesIdea(s.getUid(),s.getIid(),0,s.getPrice(),c);
+            System.out.println("T 3!");
+            setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getAvailableShares()*marketPrice, c);
+            System.out.println("T 4!");
+
+            try {
+                if ( callbacks.containsKey(s.getUid()) )
+                    callbacks.get(s.getUid()).notifyTakenOver(iid, marketPrice, s.getAvailableShares()*marketPrice);
+            } catch (Exception e) {
+                System.err.println("EXCEPTION REMOTE TAKEOVER: "+e+" "+e.getMessage()+"\n"+e.getCause());
+                e.printStackTrace();
+            }
+        }
+
+        addToHallOfFame(iid, c);
+        //Need to check the queue, as we may have given enough money to a user...
+        checkQueue(c);
     }
 
 /*

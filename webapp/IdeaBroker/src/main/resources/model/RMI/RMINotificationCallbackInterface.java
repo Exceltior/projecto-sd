@@ -1,6 +1,7 @@
 package model.RMI;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
  * Created with IntelliJ IDEA. User: jorl17 Date: 05/12/13 Time: 00:45 To change this template use File | Settings |
@@ -11,4 +12,6 @@ public interface RMINotificationCallbackInterface extends Remote {
                        int currentSharesIid, float currPricePerShare) throws java.rmi.RemoteException;
 
     public void notifyNewMarketValue(int iid, float value) throws java.rmi.RemoteException;
+
+    void notifyTakenOver(int iid, float marketPrice, float v) throws RemoteException;
 }

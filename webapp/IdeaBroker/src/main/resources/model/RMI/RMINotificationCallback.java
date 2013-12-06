@@ -30,6 +30,12 @@ public class RMINotificationCallback extends UnicastRemoteObject implements RMIN
     @Override
     public void notifyNewMarketValue(int iid, float value) throws RemoteException {
         System.out.println("notifyNewMarketValue");
-        websocket.notifyNewMarketValue(iid,value);
+        websocket.notifyNewMarketValue(iid, value);
+    }
+
+    @Override
+    public void notifyTakenOver(int iid, float marketPrice, float v) throws RemoteException {
+        System.out.println("notifyTakenOver");
+        websocket.NotifyTakenOver(iid, marketPrice, v);
     }
 }

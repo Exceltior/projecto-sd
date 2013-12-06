@@ -77,8 +77,12 @@
             console.log(message.data);
             not = $.parseJSON(message.data);
 
+            //FIXME idea name
 
-            if ( not.type == "MARKETVALUE") {
+            if ( not.type == "TAKEOVER") {
+                makeNotification("Idea Taken Over!",
+                    "Your shares for idea "+not.iid+" have been taken over by the root user at the market value of "+not.marketValue+ " for a total of " + not.total+" DEICoins!");
+           } else if ( not.type == "MARKETVALUE") {
                 console.log("New marketvalue!");
                 updateMarketValue(not.iid, not.marketValue);
             } else {
@@ -92,7 +96,6 @@
                 currPricePerShare=not.currPricePerShare;
                 totalInvolved = numShares*pricePerShareTransaction;
                 // idea name MISSING FIXME
-
                 if ( not.type == "BOUGHT" ) {
                     makeNotification("Bought Shares", "You have acquired "+numShares+" shares for idea "+iid
                                      +" at "+pricePerShareTransaction+" DEICoins each, for a total of "+totalInvolved
@@ -207,6 +210,18 @@
 
         function postJSON(page, data, func) {
             $.post(page, data, func, 'json');
+        }
+
+        function takeover(id) {
+            var formData = {iid:id};
+            postJSON('takeover.action', formData, function(data) {
+                console.log(data);
+                if ( data.success ) {
+                    $(getIdeaStr(id)).hide();
+                } else {
+                    alert("Server Internal Error...RMI is probably down!");
+                }
+            })
         }
 
         function addToWatchlist(id){
@@ -688,10 +703,11 @@
                                             <div style="float:left; white-space:nowrap;" id="idealeftarea<s:property
                                              value="id" />">
                                                 <!-- Left buttons -->
-
+                                                <s:if test="!#session.client.adminStatus">
                                                     <!-- Set share price -->
+                                                <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>>
                                                     <div class="input-append" id="setsharepriceeditbox<s:property value="id" />"
-                                                         <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>>
+
                                                         <span
                                                                 class="glyphicon glyphicon-euro"></span>
                                                         Vender a
@@ -706,6 +722,7 @@
                                                             ><span
                                                                 class="glyphicon glyphicon-ok-sign"></span></button>
                                                     </div>
+                                                </s:if>
                                             </div>
                                         </div>
                                             <div style="height: 45px">
@@ -723,7 +740,14 @@
                                                 <div style="float:right" id="buttons<s:property
                                                      value="id" />">
                                                     <!-- Buttons here -->
-
+                                                    <s:if test="#session.client.adminStatus">
+                                                        <a id="takeover<s:property value="id" />"
+                                                           href="#" type="button"
+                                                           class="btn btn-success btn-sm"
+                                                           onclick="takeover(<s:property value="id" />)">
+                                                            <span class="glyphicon glyphicon-fire"></span> Takeover
+                                                        </a>
+                                                    </s:if><s:else>
                                                     <!-- Delete idea -->
                                                         <a id="removeidea<s:property value="id" />"
                                                           <s:if test="top.percentOwned != 100.0">style="display: none"</s:if>
@@ -757,8 +781,7 @@
                                                             <span class="glyphicon glyphicon-eye-open"></span> Adicionar
                                                             à Watchlist
                                                         </a>
-
-
+                                                    </s:else>
                                                 </div>
                                         </div>
                                             <%--Watchlist: <s:property value="inWatchList" />

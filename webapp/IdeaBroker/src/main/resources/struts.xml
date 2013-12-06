@@ -94,6 +94,10 @@
         <action name="removeidea" class="actions.controller.RemoveIdeaAction" method="execute">
             <result type="json"></result>
         </action>
+
+        <action name="takeover" class="actions.controller.TakeoverAction" method="execute">
+            <result type="json"></result>
+        </action>
     </package>
 
 </struts>

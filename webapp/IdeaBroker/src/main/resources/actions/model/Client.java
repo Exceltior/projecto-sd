@@ -444,7 +444,7 @@ public class Client {
                                            boolean addToQueueOnFailure, float targetSellPrice) {
         BuySharesReturn ret = null;
         try {
-            ret = rmi.getRMIInterface().buyShares(uid,iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,
+            ret = rmi.getRMIInterface().buyShares(uid, iid, maxPricePerShare, buyNumShares, addToQueueOnFailure,
                                                   targetSellPrice);
         } catch (RemoteException e) {
             System.out.println("Exception in doRMIBUyShares");
@@ -513,6 +513,20 @@ public class Client {
         }
 
         return devolve;
+    }
+
+    private boolean doRMITakeover(int iid) {
+        try {
+            rmi.getRMIInterface().takeOver(iid);
+        } catch (RemoteException e) {
+            System.err.println("Takeover error");
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return true;
+    }
+
+    public boolean doTakeover(int iid) {
+        return doRMITakeover(iid);
     }
 
     /**
