@@ -10,7 +10,7 @@
 
     <package name="basicstruts2" extends="struts-default">
 
-        <!-- Quando acedem a /, isto é, aao root, redireccionar para o login FIXME: Isto vai mudar no futuro-->
+        <!-- Quando acedem a /, isto é, aao root, redireccionar para o facebookLogin FIXME: Isto vai mudar no futuro-->
         <action name="">
             <result type="redirect">login.jsp</result>
         </action>
@@ -20,7 +20,7 @@
             <result name="success">home.jsp</result>
         </action>
 
-        <!-- A acção de login (de notar que é bem distinta de um acesso ao login.jsp -->
+        <!-- A acção de facebookLogin (de notar que é bem distinta de um acesso ao facebookLogin.jsp -->
         <action name="login" class="actions.controller.LoginAction" method="execute">
                 <result name="success">home.jsp</result>
                 <result name="error">error.jsp</result>
