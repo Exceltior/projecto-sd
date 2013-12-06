@@ -564,6 +564,97 @@
             modalsubmitbutton.prop('disabled', false);
         }
 
+        function doPost(url,data){
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: data,
+                dataType: "html",
+                success: function(data, textStatus) {
+                    console.log(data);
+                    console.log(textStatus);
+                    document.open();
+                    document.write(data);
+                    document.close();
+                }
+            });
+
+        }
+
+        function doSearch() {
+                var s = $('#searchcontent').val();
+            console.log('Searching; '+s);
+                doPost('listideas.action',{q:s,mode:'searchidea'});
+        }
+
+        function searchIdea() {
+
+            var searchbox =
+                    '<div class="input-group"><span class="input-group-addon">Título: </span><input type="text" class="form-control" placeholder="A Mariana é Linda" id="searchcontent"/></div>';
+
+            var message = function(dialogRef){
+                var $message =
+                        $("<div style='font-size:16pt; text-align:center;'>Insira os dados da pesquisa</div>");
+                $message.append($(searchbox));
+
+                return $message;
+            }
+            var dialog = new BootstrapDialog({
+                size: BootstrapDialog.SIZE_LARGE,
+                message: message,
+                closable:true
+            });
+            gClosedialog = dialog;
+
+            var button =
+                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doSearch()"><span style="color: #dbd02b" class="glyphicon glyphicon-search"></span> &nbsp; &nbsp;Pesquisar!</button>';
+            var closebutton
+                    = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
+
+
+            dialog.realize();
+
+            dialog.getModalHeader().html('<div' +
+                    ' class="bootstrap-dialog-title">Pesquisar Ideia</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>');
+
+            dialog.getModalFooter().html(button+closebutton);
+            dialog.open();
+        }
+
+        function createIdea() {
+
+            var html =
+                    '<div class="input-group"><span class="input-group-addon">Título: </span><input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatitle"/></div>';
+
+            var message = function(dialogRef){
+                var $message =
+                        $("<div style='font-size:16pt; text-align:center;'>Insira os dados da ideia</div>");
+                $message.append($(searchbox));
+
+                return $message;
+            }
+            var dialog = new BootstrapDialog({
+                size: BootstrapDialog.SIZE_LARGE,
+                message: message,
+                closable:true
+            });
+            gClosedialog = dialog;
+
+            var button =
+                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doSearch()"><span style="color: #dbd02b" class="glyphicon glyphicon-search"></span> &nbsp; &nbsp;Pesquisar!</button>';
+            var closebutton
+                    = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
+
+
+            dialog.realize();
+
+            dialog.getModalHeader().html('<div' +
+                    ' class="bootstrap-dialog-title">Criar Ideia</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>');
+
+            dialog.getModalFooter().html(button+closebutton);
+            dialog.open();
+        }
+
         function buyShares(id) {
             var currentmoney = getUserMoney();
 
@@ -820,12 +911,13 @@
                                             <div style="float:left; min-height:40px;" id="ideatopics<s:property
                                              value="id" />">
                                                 <s:iterator var="i" step="1" value="topics">
-                                                    <p><a href="viewtopic.action?tid=<s:property value="id" />">
+                                                    <a href="listideas.action?mode=topic&tid=<s:property value="id" />"
+                                                       style="padding-right:5px;">
 
                                                         <span
                                                             class="label label-primary">
                                                          #<s:property value="title" />
-                                                    </span></a></p>
+                                                    </span></a>
                                                 </s:iterator>
                                             </div>
                                     </div>
