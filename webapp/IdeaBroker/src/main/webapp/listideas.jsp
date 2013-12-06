@@ -1,6 +1,6 @@
 <!-- STRUTS -->
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=utf8"
+         pageEncoding="utf8"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <%@ taglib prefix="c"
            uri="http://java.sun.com/jsp/jstl/core" %>
@@ -53,7 +53,7 @@
         }
         function onOpen(event) {
             console.log('Connected to ' + window.location.host + '.');
-            makeNotification("Hello World!", "A Mariana È linda!!!!")
+            makeNotification("Hello World!", "A Mariana √© linda!!!!")
         }
 
         function makeNotification(title, body) {
@@ -281,13 +281,13 @@
                 text.removeAttr('title');
                 button.addClass('btn-info').removeClass('btn-success').removeClass('btn-error');
                 button.html('<span class="glyphicon glyphicon-share-alt"></span>');
-                button.attr('title', 'Confirmar AlteraÁ„o de PreÁo');
+                button.attr('title', 'Confirmar Altera√ß√£o de Pre√ßo');
                 button.off('click').on('click',{id:id},setSharePrice);
                 text.css('background-color','skyblue');
                 text.css('color','black');
             } else {
-                text.attr('title', 'PreÁo inv·lido!');
-                button.attr('title', 'PreÁo inv·lido!');
+                text.attr('title', 'Pre√ßo inv√°lido!');
+                button.attr('title', 'Pre√ßo inv√°lido!');
                 button.addClass('btn-danger').removeClass('btn-success').removeClass('btn-info');
                 button.html('<span class="glyphicon glyphicon-remove"></span>');
                 text.css('background-color','#d2322d');
@@ -452,7 +452,7 @@
                         console.log("Hiding idea" + getIdeaStr(id));
                         $(getIdeaStr(id)).hide();
                     } else {
-                        showMessage('Erro', 'N„o foi possÌvel apgar a ideia porque n„o detÈm 100% das suas shares.',
+                        showMessage('Erro', 'N√£o foi poss√≠vel apgar a ideia porque n√£o det√©m 100% das suas shares.',
                                 BootstrapDialog.TYPE_DANGER);
                     }
                 } else {
@@ -480,7 +480,7 @@
                     gClosedialog.close();
 
                     //Update the money onscreen (it's okay if we don't buy anything because totalspent=0)
-                    setUserMoney(getUserMoney()-data.totalSpent);
+                    //setUserMoney(getUserMoney()-data.totalSpent); FIXME Disabled because we get the notification
                     //FIXME: WARNING, Most of buy shares is all fucked up. We probably will only get QUEUED.NOMOREMONEY OR NOBUY.NOMOREMONEY or NOBUY.NOMORESHARES
 
                     if ( data.result == 'OK' ) {
@@ -492,7 +492,7 @@
                         message =
                                 $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #6fc65d" class="glyphicon glyphicon-ok-circle"></span></div>&nbsp;<span style="color: #6fc65d">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #6fc65d">'+data.totalSpent+'</span> DEICoins.<br /></div>');
                         header =
-                                '<div class="bootstrap-dialog-title">OperaÁ„o concluÌda com sucesso!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                                '<div class="bootstrap-dialog-title">Opera√ß√£o conclu√≠da com sucesso!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_SUCCESS;
                     } else if ( data.result == 'QUEUED.NOMOREMONEY' ) {
                         setNumSharesForidea(id,data.numSharesFinal);
@@ -500,7 +500,7 @@
                         //Update the selling price onscreen
                         setSellingPriceIdea(id,targetSellPrice);
                         message =
-                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #f0ad4e" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #f0ad4e">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #f0ad4e">'+data.totalSpent+'</span> DEICoins.<br /> N„o houve dinheiro para comprar mais (apesar de haver shares).<br /><span style="color: #1500d2">As restantes ser„o compradas assim que possÌvel.</span></span></div>');
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #f0ad4e" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #f0ad4e">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #f0ad4e">'+data.totalSpent+'</span> DEICoins.<br /> N√£o houve dinheiro para comprar mais (apesar de haver shares).<br /><span style="color: #1500d2">As restantes ser√£o compradas assim que poss√≠vel.</span></span></div>');
                         header =
                                 '<div class="bootstrap-dialog-title">Nem todas as shares foram compradas</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_WARNING;
@@ -510,23 +510,23 @@
                         //Update the selling price onscreen
                         setSellingPriceIdea(id,targetSellPrice);
                         message =
-                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #f0ad4e" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #f0ad4e">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #f0ad4e">'+data.totalSpent+'</span> DEICoins.<br /> O n˙mero de sahres pedido n„o est· disponÌvel.<br /><span style="color: #1500d2">As restantes ser„o compradas assim que possÌvel.</span></span></div>');
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #f0ad4e" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #f0ad4e">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #f0ad4e">'+data.totalSpent+'</span> DEICoins.<br /> O n√∫mero de sahres pedido n√£o est√° dispon√≠vel.<br /><span style="color: #1500d2">As restantes ser√£o compradas assim que poss√≠vel.</span></span></div>');
                         header =
-                                '<div class="bootstrap-dialog-title">Nem todas as shares foram compradas (n„o havia shares suficientes)</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                                '<div class="bootstrap-dialog-title">Nem todas as shares foram compradas (n√£o havia shares suficientes)</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_WARNING;
                     } else if ( data.result == 'NOBUY.NOMOREMONEY' ) {
                         // Not enough money to buy all the required shares, so nothing bought at all
                         message =
-                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #d2322d">Nenhuma compra foi feita.<br /> N„o h· dinheiro suficiente.<br /><span style="color: #1500d2">Por seu pedido, dada esta situaÁ„o, a operaÁ„o foi abortada.</span></span></div>');
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #d2322d">Nenhuma compra foi feita.<br /> N√£o h√° dinheiro suficiente.<br /><span style="color: #1500d2">Por seu pedido, dada esta situa√ß√£o, a opera√ß√£o foi abortada.</span></span></div>');
                         header =
-                                '<div class="bootstrap-dialog-title">OperaÁ„o cancelada</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                                '<div class="bootstrap-dialog-title">Opera√ß√£o cancelada</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_DANGER;
                     } else if ( data.result == 'NOBUY.NOMORESHARES' ) {
                         // Not enough shares are available, so none bought at all
                         message =
-                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #d2322d">Nenhuma compra foi feita.<br /> N„o h· shares suficientes.<br /><span style="color: #1500d2">Por seu pedido, dada esta situaÁ„o, a operaÁ„o foi abortada.</span></span></div>');
+                                $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;<span style="color: #d2322d">Nenhuma compra foi feita.<br /> N√£o h√° shares suficientes.<br /><span style="color: #1500d2">Por seu pedido, dada esta situa√ß√£o, a opera√ß√£o foi abortada.</span></span></div>');
                         header =
-                                '<div class="bootstrap-dialog-title">OperaÁ„o cancelada</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+                                '<div class="bootstrap-dialog-title">Opera√ß√£o cancelada</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
                         type = BootstrapDialog.TYPE_DANGER;
                     }
 
@@ -590,7 +590,7 @@
         function searchIdea() {
 
             var searchbox =
-                    '<div class="input-group"><span class="input-group-addon">TÌtulo: </span><input type="text" class="form-control" placeholder="A Mariana È Linda" id="searchcontent"/></div>';
+                    '<div class="input-group" ><span class="input-group-addon">T√≠tulo: </span><input type="text" class="form-control" placeholder="A Mariana √© Linda" id="searchcontent" onshow="$(\'#searchcontent\').focus();"/></div>';
 
             var message = function(dialogRef){
                 var $message =
@@ -602,7 +602,7 @@
             var dialog = new BootstrapDialog({
                 size: BootstrapDialog.SIZE_LARGE,
                 message: message,
-                closable:true
+                closable:true,
             });
             gClosedialog = dialog;
 
@@ -619,22 +619,27 @@
 
             dialog.getModalFooter().html(button+closebutton);
             dialog.open();
+
         }
 
         function createIdea() {
 
             var html =
                     '<div class="input-group">' +
-                    '<span class="input-group-addon">TÌtulo: </span>' +
-                    '<input type="text" class="form-control" placeholder="A Mariana È Linda" id="ideatitle"/>' +
+                    '<span class="input-group-addon">T√≠tulo: </span>' +
+                    '<input type="text" class="form-control" placeholder="A Mariana √© Linda" id="ideatitle"/>' +
                     '</div>' +
                     '<div class="input-group">' +
-                    '<span class="input-group-addon">Conte˙do: </span>' +
-                    '<input type="textarea" class="form-control" placeholder="A Mariana È mesmo Linda" id="ideabody"/>' +
+                    '<span class="input-group-addon">Conte√∫do: </span>' +
+                    '<textarea style="resize:vertical"' +
+                            'rows="3"' +
+                            'type="textarea"' +
+                            'class="form-control"' +
+                            'placeholder="A Mariana √© mesmo Linda" id="ideabody"/>' +
                     '</div>' +
                     '<div class="input-group">' +
-                    '<span class="input-group-addon">TÛpicos: </span>' +
-                    '<input type="text" class="form-control" placeholder="A Mariana È Linda" id="ideatopics"/>' +
+                    '<span class="input-group-addon">T√≥picos: </span>' +
+                    '<input type="text" class="form-control" placeholder="A Mariana √© Linda" id="ideatopics"/>' +
                     '</div>';
 
             var message = function(dialogRef){
@@ -674,19 +679,19 @@
                 sellingPrice = getMarketValue(id);
 
             var numsharesarea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; N˙mero de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+1+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; N√∫mero de shares a comprar:&nbsp;<input name="text" id="numshareswant" value="'+1+'" style="width:125px;" onkeyup="onNumSharesWantChanged('+id+');" /></div>';
             var maxpersharearea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; M·ximo por share:&nbsp;<input name="text" id="maxpershareinput" value="'+currentmoney+'" style="width:125px;" onkeyup="onMaxWillingToBuyChanged();" /> DEICoins</div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; M√°ximo por share:&nbsp;<input name="text" id="maxpershareinput" value="'+currentmoney+'" style="width:125px;" onkeyup="onMaxWillingToBuyChanged();" /> DEICoins</div>';
 
             var targetsellpricearea =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; PreÁo de venda:&nbsp;<input name="text" id="targetsellpriceinput" value="'+sellingPrice+'" style="width:125px;" onkeyup="onTargetSellPriceChanged();" /> DEICoins/share</div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp; Pre√ßo de venda:&nbsp;<input name="text" id="targetsellpriceinput" value="'+sellingPrice+'" style="width:125px;" onkeyup="onTargetSellPriceChanged();" /> DEICoins/share</div>';
 
             var modalcheckbox =
-                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;<input type="checkbox" id="addtoqueue" value="true" > Colocar pedido na fila se n„o for possÌvel satisfazer</input></div>';
+                    '<div class="input-append"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;<input type="checkbox" id="addtoqueue" value="true" > Colocar pedido na fila se n√£o for poss√≠vel satisfazer</input></div>';
 
             var message = function(dialogRef){
                 var $message =
-                        $("<div style='font-size:16pt'>ComeÁou com <span style='color: #6fc65d'>"+getNumSharesForIdea(id)+"</span> shares</div>");
+                        $("<div style='font-size:16pt'>Come√ßou com <span style='color: #6fc65d'>"+getNumSharesForIdea(id)+"</span> shares</div>");
                 $message.append(numsharesarea).append($('<div>&nbsp;</div>')).append($(maxpersharearea)).append($('<div>&nbsp;</div>')).append($(targetsellpricearea)).append($(modalcheckbox));
 
                 return $message;
@@ -727,7 +732,7 @@
                 _</span></a></li>
             <li style="background-color: black"><a href="listtopics.action"><span
                     class="glyphicon glyphicon-list">&nbsp;Ver
-                TÛpicos</span><span style="color:black">_</span></a></li>
+                T√≥picos</span><span style="color:black">_</span></a></li>
             <li><a
                     href="#"><span class="glyphicon glyphicon-eye-open">&nbsp;Watchlist</span><span
                     style="color:black">
@@ -736,7 +741,7 @@
             <li><a href="#"><span class="glyphicon glyphicon-bell">&nbsp;Mensagens</span><span style="color:black">_</span></a></li>
             <li><a href="#"><span class="glyphicon glyphicon-fire">&nbsp;Hall of Fame</span><span style="color:black">
                 _</span></a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-search">&nbsp;Pesquisar TÛpicos</span><span
+            <li><a href="#"><span class="glyphicon glyphicon-search">&nbsp;Pesquisar T√≥picos</span><span
                     style="color:black">
                 _</span></a></li>
             <li><a href="#" onclick="searchIdea()"><span class="glyphicon glyphicon-search"  style="z-index:0"></span><span
@@ -905,7 +910,7 @@
                                                            id="addtowatchlistbtn<s:property value="id" />"
                                                            onclick="addToWatchlist(<s:property value="id" />);">
                                                             <span class="glyphicon glyphicon-eye-open"></span> Adicionar
-                                                            ‡ Watchlist
+                                                            √† Watchlist
                                                         </a>
                                                     </s:else>
                                                 </div>

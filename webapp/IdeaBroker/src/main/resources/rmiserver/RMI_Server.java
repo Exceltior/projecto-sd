@@ -929,6 +929,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         System.out.println("Checkpoint 1.1");
         int totalSpent = 0;
 
+        System.out.println("--->sharesAlvo: "+sharesAlvo);
+        System.out.println("--->getNumIdeaShares(iid): "+getNumIdeaShares(iid));
         /**
          * If there aren't enough shares in the system AT ALL
          */
@@ -1091,28 +1093,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             System.out.println("CC3");
             if ( callbacks.containsKey(uid) ) {
 
-                //Post on facebook
-                OAuthService service = new ServiceBuilder()
-                        .provider(FacebookApi.class)
-                        .apiKey(AppPublic)
-                        .apiSecret(AppSecret)
-                        .callback("http://localhost:8080")   //should be the full URL to this action
-                        .build();
-
-                OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/" + ideaFacebookId
-                                                            + "/comments");
-                authRequest.addHeader("Content-Type", "text/html");
-                authRequest.addBodyParameter("message",getUsername(s.getUid())+ "BOUGHT " + ret.numSharesBought + " shares" +
-                        " of the idea " + iid + " for " + s.getPrice() + " DEICoins!");
-
-                String clientToken = tokens.get(uid);
-                Token token_final = new Token(clientToken,AppSecret);
-
-                service.signRequest(token_final, authRequest);
-                Response authResponse = authRequest.send();
-
-                System.out.println("BODY " + authResponse.getBody());
-
                 try {
                 callbacks.get(uid).notify(getUsername(s.getUid()),
                                           "BOUGHT",
@@ -1134,6 +1114,35 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                     s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));*/
         }
 
+
+        if ( ideaFacebookId != null ) {
+            //Post on facebook
+            OAuthService service = new ServiceBuilder()
+                    .provider(FacebookApi.class)
+                    .apiKey(AppPublic)
+                    .apiSecret(AppSecret)
+                    .callback("http://localhost:8080")   //should be the full URL to this action
+                    .build();
+
+            OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/" + ideaFacebookId
+                    + "/comments");
+            authRequest.addHeader("Content-Type", "text/html");
+            authRequest.addBodyParameter("message",getUsername(uid)+ " BOUGHT " + ret.numSharesBought + " " +
+                    "shares" +
+                    " of the idea " + iid + " for " + s.getPrice() + " DEICoins!");
+
+            String clientToken = tokens.get(uid);
+            if ( clientToken != null) {
+                Token token_final = new Token(clientToken,AppSecret);
+
+                service.signRequest(token_final, authRequest);
+                Response authResponse = authRequest.send();
+
+                System.out.println("BODY " + authResponse.getBody());
+            } else {
+                System.err.println("INVALID CLIENTTOKEN!");
+            }
+        }
         if ( ret.result.isEmpty() )
             ret.result = "OK";
         System.out.println("I'm leaving! " + ret);
