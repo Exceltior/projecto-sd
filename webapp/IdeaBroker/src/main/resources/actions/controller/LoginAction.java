@@ -1,8 +1,8 @@
 package actions.controller;
 
 /**
- * This action is used when the user tries to login. When execute() is called, the username and password are expected
- * to be filled with username and password to attempt login.
+ * This action is used when the user tries to facebookLogin. When execute() is called, the username and password are expected
+ * to be filled with username and password to attempt facebookLogin.
  */
 public class LoginAction extends ClientAction{
 
@@ -12,9 +12,9 @@ public class LoginAction extends ClientAction{
     private String username, password;
 
     /**
-     * Try to login with given username and password. Note the call to super.execute() which is required by
+     * Try to facebookLogin with given username and password. Note the call to super.execute() which is required by
      * ClientAction.
-     * @return              If login succeeds, returns SUCCESS. Otherwise it returns ERROR.
+     * @return              If facebookLogin succeeds, returns SUCCESS. Otherwise it returns ERROR.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
     public String execute() throws Exception {
