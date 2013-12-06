@@ -903,12 +903,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (queryResult.size() != 1)
             return -2;//User is not owner of the idea
 
-            //Only has one owner
+        //Only has one owner
         else if (Integer.parseInt(queryResult.get(0)[0]) != uid )
             return -2;//User is not owner of the idea
 
         //Here we know that the user is the owner of the idea
-
         if ( ideaHasFiles(idea.getId()) ) {
             deleteIdeaFiles(idea.getId());
         }
@@ -927,7 +926,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             doFacebookRemovePost(requestUrl,finalToken);
         }
-
 
         return 1;//Everything ok
 
