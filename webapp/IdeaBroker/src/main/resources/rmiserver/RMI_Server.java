@@ -1,9 +1,5 @@
 package rmiserver;
 
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Parameter;
-import com.restfb.types.FacebookType;
 import model.RMI.RMINotificationCallbackInterface;
 import model.RMI.RMI_Interface;
 import model.data.*;
@@ -18,7 +14,6 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
-import websockets.ClientWebsocketConnection;
 
 import java.io.*;
 import java.math.BigInteger;
