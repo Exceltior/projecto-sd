@@ -1,6 +1,7 @@
 package actions.controller;
 
 import model.data.Idea;
+import org.apache.commons.lang.xwork.StringEscapeUtils;
 
 /**
  * Given a topic ID, fetch its data (ideas, etc), store them in the current Action. In struts.xml,
@@ -65,7 +66,7 @@ public class ListIdeasAction extends ClientAction{
             this.ideas     = client.doGetUserIdeas();
             this.title     = "As minhas ideias";
         } else if ( mode.equals("searchidea") ) {
-            this.ideas     = client.doSearchIdea(-1,this.q);
+            this.ideas     = client.doSearchIdea(-1, StringEscapeUtils.escapeSql(this.q));
             this.title     = "Resultados da pesquisa para '"+q+"'";
         } else if ( mode.equals("watchlist") ) {
             this.ideas     = client.doGetUserWatchList();
