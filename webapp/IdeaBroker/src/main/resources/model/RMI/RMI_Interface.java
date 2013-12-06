@@ -14,7 +14,7 @@ public interface RMI_Interface extends Remote {
     public void invalidateFacebookToken(int uid)throws RemoteException;
     public void updateFacebookToken(int uid,String facebookToken)throws RemoteException;
     public int login(String user, String pwd) throws  RemoteException;
-    public boolean login(String idFacebook) throws RemoteException;
+    public int facebookLogin(String idFacebook) throws RemoteException;
     public String getIdeaFacebookId(int iid) throws RemoteException;
     //public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
@@ -29,7 +29,7 @@ public interface RMI_Interface extends Remote {
                                      boolean addToQueueOnFailure,
                                      float targetSellPrice) throws RemoteException;
     public Idea getIdeaByIID(int iid, int uid) throws RemoteException;
-    public Idea[] getIdeaByIID(int iid, String title) throws RemoteException;
+    public Idea[] searchIdeas(int uid, int iid, String title) throws RemoteException;
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid,int moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException;
