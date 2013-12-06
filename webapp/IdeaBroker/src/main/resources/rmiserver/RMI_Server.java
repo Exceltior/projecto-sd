@@ -699,6 +699,32 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     }
 
+    public String getIdeaFacebookId(int iid) throws RemoteException{
+        String query = "Select facebook_id from Ideia where iid = " + iid;
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return null;
+
+        return queryResult.get(0)[0];
+    }
+
+    /**
+     * Adds the facebook id of an idea stored in the database and posted on facebook
+     * @param iid   The id of the idea in the database
+     * @param id    The id of the idea on facebook
+     * @throws RemoteException
+     */
+    public void addIdeaFacebookId(int iid,String id) throws RemoteException{
+
+        String query = "UPDATE Ideia set facebook_id = '" + id + "' where iid = " + iid;
+        Connection conn;
+
+        conn = getTransactionalConnection();
+        insertData(query,conn);
+        returnTransactionalConnection(conn);
+    }
+
     /**
      * Method responsible for creating a new idea in the database
      * @param title The title of the idea
@@ -791,8 +817,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * Removes an idea
      * @param idea Object "Idea" with the idea to be removed
      * @param uid  User that wants to remove the idea
-     * @return We have 4 possible return values:
-     * -1 -> Idea has no children
+     * @return We have 2 possible return values:
      * -2 -> User is not the owner of the idea
      * 1 > Everything went well
      * @throws RemoteException

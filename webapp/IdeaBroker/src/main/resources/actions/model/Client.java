@@ -40,8 +40,7 @@ public class Client {
     private int           numNotifications;
     private boolean       adminStatus;
     private String        clientToken;
-    private Token         clientTokenObject;
-    private String        facebook_id;
+    private String user_facebook_id;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
@@ -50,8 +49,7 @@ public class Client {
         this.numNotifications = 0; /* FIXME: On login, set this */
         this.adminStatus = true;
         this.clientToken = null;
-        this.clientTokenObject = null;
-        this.facebook_id = null;
+        this.user_facebook_id = null;
         //FIXME: E a partir destes objectos a nulo que eu vou saber se ele esta ou nao logado com o facebook, e ver se e
         // preciso postar no face ou nao - Let's hope this works!
     }
@@ -249,6 +247,8 @@ public class Client {
             result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested);
 
             if (result > 0){
+
+                ideia.setId(result);
                 //Associar aos topicos
                 for (String topico : topicos) {
                     rmi.getRMIInterface().setTopicsIdea(result,topico,getUid());
@@ -263,7 +263,7 @@ public class Client {
                     devolve = true;
 
                 //Se o utilizador estiver logado com o facebook temos que postar no facebook
-                if (this.clientTokenObject != null && this.clientToken != null){
+                if (this.clientToken != null){
                     //User logado com o facebook
                     System.out.println("O user esta logado com o facebook!!!");
 
@@ -274,11 +274,13 @@ public class Client {
 
                     FacebookClient facebookClient = new DefaultFacebookClient(this.clientToken);
                     FacebookType publishMessageResponse = facebookClient.publish
-                            ("me/feed",FacebookType.class,Parameter.with("message", "O user " + this.facebook_id
-                                    + " criou a seguinte ideia:" + ideia.getBody() + "\nA ideia esta a venda por " +
+                            ("me/feed",FacebookType.class,Parameter.with("message", "O user " + this.user_facebook_id
+                                    + " criou a seguinte ideia: \"" + ideia.getBody() + "\"\nA ideia esta a venda por " +
                             ideia.getSellingPrice() + " DEICoins!"));
 
                     System.out.println("Published message ID: " + publishMessageResponse.getId());
+                    //Inserir id na base de dados
+                    rmi.getRMIInterface().addIdeaFacebookId(ideia.getId(),publishMessageResponse.getId());
                 }
 
                 else{
@@ -404,12 +406,32 @@ public class Client {
      */
     private int doRMIRemoveIdea(int iid){
         int devolve = -1;
+        String ideaFacebookId = null;
         Idea temp = new Idea();
 
         temp.setId(iid);
 
         try{
+
+            //Se o utilizador estiver logado com o facebook temos que postar no facebook
+            if (this.clientToken != null){
+                //Ir buscar o id da ideia no facebook
+                ideaFacebookId = rmi.getRMIInterface().getIdeaFacebookId(iid);
+            }
+
             devolve = rmi.getRMIInterface().removeIdea(temp, uid);
+
+            if (devolve == 1){
+                //Remover o post do facebook
+                FacebookClient facebookClient = new DefaultFacebookClient(this.clientToken);
+                if (!facebookClient.deleteObject(ideaFacebookId)){
+                    System.err.println("Error deleting the post in facebook");
+                    //FIXME: DEAL WITH THIS!!!
+                }
+                else{
+                    System.out.println("Ideia removida do facebook com sucesso");
+                }
+            }
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -476,8 +498,7 @@ public class Client {
 
         //Lets save the client's token in the session
         this.clientToken = token;
-        this.clientTokenObject = token_final;
-        this.facebook_id = id;
+        this.user_facebook_id = id;
 
         //FIXME: MAXI, COMO AINDA NAO SEI QUE TOKEN E QUE VOU PRECISAR DE USAR (OU SE VOU PRECISAR DOS DOIS), PARA JA
         //      GUARDO TUDO NO CLIENTE, DEPOIS LOGO SE VE.
