@@ -10,6 +10,7 @@ public class ListIdeasAction extends ClientAction{
     private int    tid;
     private Idea[] ideas;
     private String title;
+    private String q;
 
     public void setMode(String mode) {
         this.mode = mode;
@@ -63,6 +64,9 @@ public class ListIdeasAction extends ClientAction{
         } else if ( mode.equals("userideas") ) {
             this.ideas     = client.doGetUserIdeas();
             this.title     = "As minhas ideias";
+        } else if ( mode.equals("searchidea") ) {
+            this.ideas     = client.doSearchIdea(-1,this.q);
+            this.title     = "Resultados da pesquisa para '"+q+"'";
         }
         //System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
@@ -71,5 +75,9 @@ public class ListIdeasAction extends ClientAction{
 
     public String getTitle() {
         return title;
+    }
+
+    public void setQ(String q) {
+        this.q = q;
     }
 }
