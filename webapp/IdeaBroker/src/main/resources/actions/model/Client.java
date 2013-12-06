@@ -240,27 +240,10 @@ public class Client {
         int result;
 
         try{
-            if (this.user_facebook_id == null)
-                result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested);
-            else
-                result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested,this.user_facebook_id,this.clientToken);
+            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested,topicos,file);
 
-            if (result > 0){
-
-                ideia.setId(result);
-                //Associar aos topicos
-                for (String topico : topicos) {
-                    rmi.getRMIInterface().setTopicsIdea(result,topico,getUid());
-                }
-
-                //Tratar do ficheiro
-                if (file != null){
-                    devolve = rmi.getRMIInterface().addFile(ideia.getId(),file);
-                    ideia.setFile("Y");
-                }
-                else
-                    devolve = true;
-            }
+            if (result > 0)
+                devolve = true;
             else{
                 System.out.println("Result e menor que 0!!!");
             }
@@ -385,20 +368,7 @@ public class Client {
         temp.setId(iid);
 
         try{
-
-            //Se o utilizador estiver logado com o facebook temos que postar no facebook
-            if (this.clientToken != null){
-                ideaFacebookId = rmi.getRMIInterface().getIdeaFacebookId(iid);
-                if (ideaFacebookId != null){
-                    System.out.println("Vou remover a ideia do facebook com o id " + ideaFacebookId + " e o token e " + this.clientToken);
-                    devolve = rmi.getRMIInterface().removeIdea(temp, uid,ideaFacebookId,this.clientToken);
-                }
-                else
-                    System.err.println("ERRO NO RMIREMOVEIDEA!!!!");//FIXME FIXME HANDLE THIS!!!
-            }
-
-            else
-                devolve = rmi.getRMIInterface().removeIdea(temp, uid);
+            devolve = rmi.getRMIInterface().removeIdea(temp, uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -462,16 +432,18 @@ public class Client {
             return false;
 
         System.out.println("O id e " + id);
+        try{
+            this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: HANDLE THIS!!!
+        }
 
         //Lets save the client's token in the session
         this.clientToken = token;
         this.user_facebook_id = id;
 
-        //FIXME: MAXI, COMO AINDA NAO SEI QUE TOKEN E QUE VOU PRECISAR DE USAR (OU SE VOU PRECISAR DOS DOIS), PARA JA
-        //      GUARDO TUDO NO CLIENTE, DEPOIS LOGO SE VE.
-
         //Ir verificar se o id existe na base de dados
-
         try{
               devolve = rmi.getRMIInterface().login(id);
         }catch(RemoteException e){

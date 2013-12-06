@@ -52,6 +52,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     private HashMap<Integer, RMINotificationCallbackInterface> callbacks = new HashMap<Integer,
             RMINotificationCallbackInterface>();
+    private HashMap<Integer, String> tokens = new HashMap<Integer,String>();
 
     /**
      * Hashes the password using MD5 and returns it.
@@ -82,6 +83,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             hashText = "0" + hashText;
 
         return hashText;
+    }
+
+    public void updateFacebookToken(int uid,String facebookToken)throws RemoteException{
+        tokens.put(uid,facebookToken);
+    }
+
+    public void invalidateFacebookToken(int uid)throws RemoteException{
+        tokens.remove(uid);
     }
 
     /**
@@ -661,7 +670,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The id of the idea we just created
      * @throws RemoteException
      */
-    synchronized public int createIdea(String title, String description, int uid, int moneyInvested) throws RemoteException{
+    synchronized public int createIdea(String title, String description, int uid,int moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException{
         String query;
         ArrayList<String[]> queryResult;
         float initialSell;
@@ -702,6 +711,56 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             //Deduce the money from the user's account
             setUserMoney(uid,starting_money-moneyInvested,conn);
+
+            String clientToken = tokens.get(uid);
+            query = "Select facbook_id from Ideia where i.iid = " + iid;
+            queryResult = receiveData(query);
+            String ideaFacebookId = queryResult.get(0)[0];
+
+            //Post on facebook
+            OAuthService service = new ServiceBuilder()
+                    .provider(FacebookApi.class)
+                    .apiKey(AppPublic)
+                    .apiSecret(AppSecret)
+                    .callback("http://localhost:8080")   //should be the full URL to this action
+                    .build();
+
+            OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/me/feed");
+            authRequest.addHeader("Content-Type", "text/html");
+            authRequest.addBodyParameter("message","O user " + uid
+                    + " criou a seguinte ideia: \"" + description + "\"\nA ideia esta a venda por " +
+                    initialSell + " DEICoins!");
+            Token token_final = new Token(clientToken,AppSecret);
+
+            service.signRequest(token_final, authRequest);
+            Response authResponse = authRequest.send();
+
+            System.out.println("BODY " + authResponse.getBody());
+
+            String messageId = null;
+
+            try {
+                messageId = new JSONObject(authResponse.getBody()).getString("id");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                //FIXME WHAT TO DO WITH THIS?????
+            }
+
+            if (messageId != null)
+                addIdeaFacebookId(iid,messageId,conn);
+            else{
+                System.err.println("Cannot get message facebook id");
+                //FIXME: DEAL WITH THIS
+            }
+
+            //Tratar dos topicos
+            for (String topico : topics)
+                setTopicsIdea(iid,topico,uid);
+
+            //Tratar do ficheiro
+            if (file != null)
+                addFile(iid,file);
+
         }
         else
             iid = -1;
@@ -732,99 +791,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "UPDATE Ideia set facebook_id = '" + id + "' where iid = " + iid;
 
         insertData(query,conn);
-    }
-
-    /**
-     * Method responsible for creating a new idea in the database
-     * @param title The title of the idea
-     * @param description   The description of the idea
-     * @param uid   The id of the user who created the idea
-     * @param faceId The id of the idea on facebook
-     * @return  The id of the idea we just created
-     * @throws RemoteException
-     */
-    synchronized public int createIdea(String title, String description, int uid, int moneyInvested,String faceId,String clientToken) throws RemoteException{
-        String query, messageId = null;
-        ArrayList<String[]> queryResult;
-        float initialSell;
-        int iid;
-        Connection conn;
-
-        if (!validateIdea(title))//Cannot create the idea
-            return -1;
-
-        conn = getTransactionalConnection();
-
-        if (getUserMoney(uid) < moneyInvested){//If the user doesn't have enough money
-            System.err.println("Error while creating the idea! the user doesn't have enought money!" +
-                    " " + getUserMoney(uid) + " " + moneyInvested);
-            return -1;
-        }
-
-        initialSell = moneyInvested;
-        initialSell = initialSell/starting_shares;
-
-        query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
-                "" + uid + "," +
-                "" + "1,null,null,"+ initialSell +",null)";
-
-        insertData(query,conn);//Insert the idea
-
-        query = "Select i.iid from Ideia i where i.titulo = '" + title + "' and i.descricao = '" + description +
-                "' and i.userid = " + uid + " and i.activa = 1";
-
-        queryResult = receiveData(query,conn);
-
-        if (queryResult.size()>0){
-            iid =  Integer.parseInt(queryResult.get(0)[0]);
-
-            //Insert the shares
-            setSharesIdea(uid,iid,starting_shares,initialSell,conn);
-
-            //Deduce the money from the user's account
-            setUserMoney(uid,starting_money-moneyInvested,conn);
-
-            //Post on facebook
-            OAuthService service = new ServiceBuilder()
-                    .provider(FacebookApi.class)
-                    .apiKey(AppPublic)
-                    .apiSecret(AppSecret)
-                    .callback("http://localhost:8080")   //should be the full URL to this action
-                    .build();
-
-            OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/me/feed");
-            authRequest.addHeader("Content-Type", "text/html");
-            authRequest.addBodyParameter("message","O user " + faceId
-                    + " criou a seguinte ideia: \"" + description + "\"\nA ideia esta a venda por " +
-                    initialSell + " DEICoins!");
-            Token token_final = new Token(clientToken,AppSecret);
-
-            service.signRequest(token_final, authRequest);
-            Response authResponse = authRequest.send();
-
-            System.out.println("BODY " + authResponse.getBody());
-
-            try {
-                messageId = new JSONObject(authResponse.getBody()).getString("id");
-            } catch (JSONException e) {
-                e.printStackTrace();
-                //FIXME WHAT TO DO WITH THIS?????
-            }
-
-            if (messageId != null)
-                addIdeaFacebookId(iid,messageId,conn);
-            else{
-                System.err.println("Cannot get message facebook id");
-                //FIXME: DEAL WITH THIS
-            }
-        }
-        else
-            iid = -1;
-
-        returnTransactionalConnection(conn);
-        System.out.println("Vou retornar " + iid +" no createIdea");
-
-        return iid;
     }
 
     /**
@@ -888,56 +854,28 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         query = "update Ideia set activa = 0 where iid="+idea.getId();
         insertData(query);
 
-        return 1;//Everything ok
+        String clientToken = tokens.get(uid);
+        query = "Select facbook_id from Ideia where i.iid = " + idea.getId();
+        queryResult = receiveData(query);
+        if (queryResult != null && !queryResult.isEmpty()){
+            //Delete post on facebook
+            String ideaFacebookId = queryResult.get(0)[0];
 
-    }
+            //Post on facebook
+            OAuthService service = new ServiceBuilder()
+                    .provider(FacebookApi.class)
+                    .apiKey(AppPublic)
+                    .apiSecret(AppSecret)
+                    .callback("http://localhost:8080")   //should be the full URL to this action
+                    .build();
 
-    /**
-     * Removes an idea
-     * @param idea Object "Idea" with the idea to be removed
-     * @param uid  User that wants to remove the idea
-     * @return We have 2 possible return values:
-     * -2 -> User is not the owner of the idea
-     * 1 > Everything went well
-     * @throws RemoteException
-     */
-    public int removeIdea(Idea idea, int uid,String ideaFacebookId,String clientToken) throws  RemoteException {
+            OAuthRequest authRequest = new OAuthRequest(Verb.DELETE, "https://graph.facebook.com/" + ideaFacebookId);
+            Token token_final = new Token(clientToken,AppSecret);
 
-        //Check if user is owner of the idea
-        String query = "Select s.userid from \"Share\" s where s.iid = " + idea.getId();
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult.size() != 1)
-            return -2;//User is not owner of the idea
-
-            //Only has one owner
-        else if (Integer.parseInt(queryResult.get(0)[0]) != uid )
-            return -2;//User is not owner of the idea
-
-        //Here we know that the user is the owner of the idea
-
-        if ( ideaHasFiles(idea.getId()) ) {
-            deleteIdeaFiles(idea.getId());
+            service.signRequest(token_final, authRequest);
+            Response authResponse = authRequest.send();
         }
 
-        query = "update Ideia set activa = 0 where iid=" + idea.getId();
-        insertData(query);
-        System.out.println("Vou remover a ideia do facebook");
-
-        //Remove post from Facebook
-        //Post on facebook
-        OAuthService service = new ServiceBuilder()
-                .provider(FacebookApi.class)
-                .apiKey(AppPublic)
-                .apiSecret(AppSecret)
-                .callback("http://localhost:8080")   //should be the full URL to this action
-                .build();
-
-        OAuthRequest authRequest = new OAuthRequest(Verb.DELETE, "https://graph.facebook.com/" + ideaFacebookId);
-        Token token_final = new Token(clientToken,AppSecret);
-
-        service.signRequest(token_final, authRequest);
-        Response authResponse = authRequest.send();
 
         return 1;//Everything ok
 
@@ -959,6 +897,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             c = getTransactionalConnection();
         else
             c = conn;
+
+        //Get the id of the idea on facebook
+        String ideaFacebookId = null;
+        ideaFacebookId = getIdeaFacebookId(iid);
+
         BuySharesReturn ret = new BuySharesReturn();
         Share currentShares = getSharesIdeaForUid(iid, uid, c);
         if ( currentShares != null)
@@ -1140,6 +1083,29 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             }
             System.out.println("CC3");
             if ( callbacks.containsKey(uid) ) {
+
+                //Post on facebook
+                OAuthService service = new ServiceBuilder()
+                        .provider(FacebookApi.class)
+                        .apiKey(AppPublic)
+                        .apiSecret(AppSecret)
+                        .callback("http://localhost:8080")   //should be the full URL to this action
+                        .build();
+
+                OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/" + ideaFacebookId
+                                                            + "/comments");
+                authRequest.addHeader("Content-Type", "text/html");
+                authRequest.addBodyParameter("message",getUsername(s.getUid())+ "BOUGHT " + ret.numSharesBought + " shares" +
+                        " of the idea " + iid + " for " + s.getPrice() + " DEICoins!");
+
+                String clientToken = tokens.get(uid);
+                Token token_final = new Token(clientToken,AppSecret);
+
+                service.signRequest(token_final, authRequest);
+                Response authResponse = authRequest.send();
+
+                System.out.println("BODY " + authResponse.getBody());
+
                 try {
                 callbacks.get(uid).notify(getUsername(s.getUid()),
                                           "BOUGHT",
@@ -1152,7 +1118,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 } catch (Exception e) {
                 System.err.println("EXCEPTION REMOTE2: "+e+" "+e.getMessage()+"\n"+e.getCause());
                     e.printStackTrace();
-            }
+                }
             }
             System.out.println("CC4");
             /*new model.data.queues.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),

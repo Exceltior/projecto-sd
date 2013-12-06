@@ -11,6 +11,8 @@ import model.data.*;
 //	This is the model.RMI Server Interface, that will allow the TCP Servers to interact with the model.RMI and execute its remote methods
 ////
 public interface RMI_Interface extends Remote {
+    public void invalidateFacebookToken(int uid)throws RemoteException;
+    public void updateFacebookToken(int uid,String facebookToken)throws RemoteException;
     public int login(String user, String pwd) throws  RemoteException;
     public boolean login(String idFacebook) throws RemoteException;
     public String getIdeaFacebookId(int iid) throws RemoteException;
@@ -23,7 +25,6 @@ public interface RMI_Interface extends Remote {
     public Idea[] getIdeasFromTopic(int uid, int tid) throws RemoteException;
     public Idea[] getIdeasFromUser(int uid) throws RemoteException;
     public int removeIdea(Idea idea, int uid) throws  RemoteException;
-    public int removeIdea(Idea idea, int uid,String ideaFacebookId,String clientToken) throws  RemoteException;
     public BuySharesReturn buyShares(int uid, int iid, float maxPricePerShare, int buyNumShares,
                                      boolean addToQueueOnFailure,
                                      float targetSellPrice) throws RemoteException;
@@ -31,8 +32,7 @@ public interface RMI_Interface extends Remote {
     public Idea[] getIdeaByIID(int iid, String title) throws RemoteException;
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
-    public int createIdea(String title, String description, int uid,int moneyInvested) throws RemoteException;
-    public int createIdea(String title, String description, int uid, int moneyInvested,String faceId,String clientToken) throws RemoteException;
+    public int createIdea(String title, String description, int uid,int moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
     //public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
