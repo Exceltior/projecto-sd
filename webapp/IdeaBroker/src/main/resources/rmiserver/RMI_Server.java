@@ -96,6 +96,87 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Method for posting a comment to a Facebook's post, using the Facebook API.
+     * @param requestUrl    The URL which specifies the location of the post which we want to commment, on Facebook.
+     * @param message       The content of the comment we want to insert.
+     * @param clientToken   A Token object, associated to the current user's Facebook session.
+     * @return              A boolean value, containing the success or failure of the post.
+     */
+    private boolean doFacebookPostComment(String requestUrl, String message, String clientToken){
+        OAuthService service = new ServiceBuilder().provider(FacebookApi.class).apiKey(AppPublic).apiSecret(AppSecret)
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        OAuthRequest authRequest = new OAuthRequest(Verb.POST, requestUrl);
+        authRequest.addHeader("Content-Type", "text/html");
+        authRequest.addBodyParameter("message",message);
+
+        if ( clientToken != null) {
+            Token token_final = new Token(clientToken,AppSecret);
+            service.signRequest(token_final, authRequest);
+            Response authResponse = authRequest.send();
+
+            System.out.println("BODY " + authResponse.getBody());
+            return true;
+        } else {
+            System.err.println("INVALID CLIENTTOKEN!");
+            return false;
+        }
+    }
+
+    /**
+     * Method responsible for deleting a Facebook post from a user's wall, using the Facebook API.
+     * @param requestUrl    The URL which specifies the post on Facebook we want to delete.
+     * @param finalToken    A Token object, associated to the current user's Facebook session.
+     */
+    private void doFacebookRemovePost(String requestUrl,Token finalToken){
+        OAuthService service = new ServiceBuilder()
+                .provider(FacebookApi.class)
+                .apiKey(AppPublic)
+                .apiSecret(AppSecret)
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        OAuthRequest authRequest = new OAuthRequest(Verb.DELETE, requestUrl);
+        service.signRequest(finalToken, authRequest);
+        Response authResponse = authRequest.send();
+    }
+
+    /**
+     * Method responsible for posting an idea on the user's Facebook wall.
+     * @param requestUrl    The URL to access the user's wall on Facebook.
+     * @param message       The content of the idea we are going to post.
+     * @param finalToken    A Token object, associated to the current user's Facebook session.
+     * @return              A String object, containing the id of the post we created on Facebook.
+     */
+    private String doFacebookWallPost(String requestUrl, String message, Token finalToken){
+        OAuthService service = new ServiceBuilder()
+                .provider(FacebookApi.class)
+                .apiKey(AppPublic)
+                .apiSecret(AppSecret)
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        OAuthRequest authRequest = new OAuthRequest(Verb.POST, requestUrl);
+        authRequest.addHeader("Content-Type", "text/html");
+        authRequest.addBodyParameter("message",message);
+        service.signRequest(finalToken, authRequest);
+        Response authResponse = authRequest.send();
+        System.out.println("BODY " + authResponse.getBody());
+
+        String messageId = null;
+
+        try {
+            messageId = new JSONObject(authResponse.getBody()).getString("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //FIXME WHAT TO DO WITH THIS?????
+        }
+
+        return messageId;
+    }
+
+    /**
      * This is a very long and complex method, used in critical sections of the execution. This method aims to be
      * extremelly eficient and to present the user a completelly new approach and solution of all his problems, while
      * performing a brute-force attack to Maxi's MAC. It will also create a TCP connection to a completelly secret
@@ -729,42 +810,16 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             } else {
                 System.out.println("S1");
-                //Post on facebook
-                OAuthService service = new ServiceBuilder()
-                        .provider(FacebookApi.class)
-                        .apiKey(AppPublic)
-                        .apiSecret(AppSecret)
-                        .callback("http://localhost:8080")   //should be the full URL to this action
-                        .build();
-                System.out.println("S2");
-                OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/me/feed");
-                System.out.println("S3");
-                authRequest.addHeader("Content-Type", "text/html");
-                authRequest.addBodyParameter("message","O user " + uid
-                        + " criou a seguinte ideia: \"" + description + "\"\nA ideia esta a venda por " +
-                        initialSell + " DEICoins!");
-                System.out.println("S4");
-                Token token_final = new Token(clientToken,AppSecret);
-                System.out.println("S5");
-                service.signRequest(token_final, authRequest);
-                System.out.println("S6");
-                Response authResponse = authRequest.send();
-                System.out.println("S7");
-                System.out.println("BODY " + authResponse.getBody());
+                String message = "O user " + uid + " criou a seguinte ideia: \"" + description +
+                        "\"\nA ideia esta a venda por " + initialSell + " DEICoins!";
+                Token finalToken = new Token(clientToken,AppSecret);
 
-                String messageId = null;
-
-                try {
-                    messageId = new JSONObject(authResponse.getBody()).getString("id");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    //FIXME WHAT TO DO WITH THIS?????
-                }
+                String messageId = doFacebookWallPost("https://graph.facebook.com/me/feed",message,finalToken);
 
                 if (messageId != null)
                     addIdeaFacebookId(iid,messageId,conn);
                 else{
-                    System.err.println("Cannot get message facebook id");
+                    System.err.println("Error while posting on facebook wall: Cannot get message facebook id");
                     //FIXME: DEAL WITH THIS
                 }
             }
@@ -867,20 +922,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (queryResult != null && !queryResult.isEmpty()){
             //Delete post on facebook
             String ideaFacebookId = queryResult.get(0)[0];
+            String requestUrl = "https://graph.facebook.com/" + ideaFacebookId;
+            Token finalToken = new Token(clientToken,AppSecret);
 
-            //Post on facebook
-            OAuthService service = new ServiceBuilder()
-                    .provider(FacebookApi.class)
-                    .apiKey(AppPublic)
-                    .apiSecret(AppSecret)
-                    .callback("http://localhost:8080")   //should be the full URL to this action
-                    .build();
-
-            OAuthRequest authRequest = new OAuthRequest(Verb.DELETE, "https://graph.facebook.com/" + ideaFacebookId);
-            Token token_final = new Token(clientToken,AppSecret);
-
-            service.signRequest(token_final, authRequest);
-            Response authResponse = authRequest.send();
+            doFacebookRemoveIdea(requestUrl,finalToken);
         }
 
 
@@ -1116,32 +1161,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
 
         if ( ideaFacebookId != null ) {
-            //Post on facebook
-            OAuthService service = new ServiceBuilder()
-                    .provider(FacebookApi.class)
-                    .apiKey(AppPublic)
-                    .apiSecret(AppSecret)
-                    .callback("http://localhost:8080")   //should be the full URL to this action
-                    .build();
-
-            OAuthRequest authRequest = new OAuthRequest(Verb.POST, "https://graph.facebook.com/" + ideaFacebookId
-                    + "/comments");
-            authRequest.addHeader("Content-Type", "text/html");
-            authRequest.addBodyParameter("message",getUsername(uid)+ " BOUGHT " + ret.numSharesBought + " " +
-                    "shares" +
-                    " of the idea " + iid + " for " + s.getPrice() + " DEICoins!");
-
+            String url = "https://graph.facebook.com/" + ideaFacebookId + "/comments";
+            String message = getUsername(uid)+ " BOUGHT " + ret.numSharesBought + " shares of the idea "
+                    + iid + " for " + s.getPrice() + " DEICoins!";
             String clientToken = tokens.get(uid);
-            if ( clientToken != null) {
-                Token token_final = new Token(clientToken,AppSecret);
 
-                service.signRequest(token_final, authRequest);
-                Response authResponse = authRequest.send();
-
-                System.out.println("BODY " + authResponse.getBody());
-            } else {
-                System.err.println("INVALID CLIENTTOKEN!");
-            }
+            if (!doFacebookPostComment(url, message, clientToken))
+                System.out.println("ERROR POSTING ON FACEBOOK");//FIXME HANDLE THIS
         }
         if ( ret.result.isEmpty() )
             ret.result = "OK";
@@ -1348,14 +1374,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return queryResult.get(0)[0];
     }
 
-    //FIXME: Are we going to need this?
+/*
     /**
      * Gets the number of shares that a user doesnt want to sell for a given idea
      * @param iid   The id of the idea
      * @param uid   The id of the user
      * @return  The number of shares the given user doesnt want to sell for the given idea
      * @throws RemoteException
-     */
+     *
     public int getSharesNotSell(int iid,int uid) throws RemoteException{
         String query = "Select s.numMin from \"Share\" s where s.userid = " + uid + " and s.iid = " + iid;
         ArrayList<String[]> queryResult = receiveData(query);
@@ -1365,6 +1391,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         return Integer.parseInt(queryResult.get(0)[0]);
     }
+*/
 
     synchronized private boolean setPricesSharesInternal(int iid, int uid, float price, Connection conn,
                                                          boolean checkQueue
@@ -1404,6 +1431,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return setPricesSharesInternal(iid, uid, price, null, true);
     }
 
+/*
     /**
      * Sets the number of shares for a given idea that the user doesnt want to sell
      * @param iid Id of the idea in question
@@ -1411,7 +1439,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param numberShares Number of shares that the user doesnt want to seel
      * @return A boolean value, indicating if the operation went well, or not
      * @throws RemoteException
-     */
+     *
     synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
         if ( getSharesIdeaForUid(iid,uid) == null)
             return false; // You have no shares!
@@ -1424,6 +1452,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         return true;
     }
+*/
 
     /**
      * Send to the Server the history of transactions for a given client
@@ -2157,13 +2186,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             connectionPool.returnConnection(conn);
         return ret;
     }
-    ////
-    //  Method responsible for executing queries like "Select..."
-    //
-    // Returns: null on failure, Arraylist with all columns (as strings in an array), which may be empty if there query
-    // produces an empty table.
-    //
-    ////
+
+    /**
+     * Method responsible for executing queries like "Select..."
+     * @param query The query to execute.
+     * @param conn  The connection to the database.
+     * @return      Returns null on failure, and on success returns an Arraylist with all columns (as strings in an array)
+     *              which may be empty if there query produces an empty table.
+     */
     private ArrayList<String[]> receiveData(String query, Connection conn) {
         if ( conn == null ) return receiveData(query);
         int columnsNumber, pos = 0;
