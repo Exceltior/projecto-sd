@@ -1,12 +1,22 @@
 package actions.model;
 
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Parameter;
+import com.restfb.types.FacebookType;
 import model.RMI.RMIConnection;
 import model.data.BuySharesReturn;
 import model.data.Idea;
 import model.data.NetworkingFile;
 import model.data.Topic;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.FacebookApi;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
 import java.rmi.RemoteException;
@@ -19,12 +29,19 @@ import java.util.ArrayList;
 public class Client {
     private final static String RMI_HOST = "localhost";//FIXME: MUDAR ISTO?? NAO SEI SE O PROF QUER VER LOCALHOST NO CODIGO
 
+    private final static String AppPublic = "436480809808619";
+    private final static String AppSecret = "af8edf703b7a95f5966e9037b545b7ce";
+    private final static int   starting_shares = 100000;
+
     private RMIConnection rmi;
     private int           uid;
     private String        username;
     private float         coins;
     private int           numNotifications;
     private boolean       adminStatus;
+    private String        clientToken;
+    private Token         clientTokenObject;
+    private String        facebook_id;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
@@ -32,6 +49,11 @@ public class Client {
         this.coins = 0;
         this.numNotifications = 0; /* FIXME: On login, set this */
         this.adminStatus = true;
+        this.clientToken = null;
+        this.clientTokenObject = null;
+        this.facebook_id = null;
+        //FIXME: E a partir destes objectos a nulo que eu vou saber se ele esta ou nao logado com o facebook, e ver se e
+        // preciso postar no face ou nao - Let's hope this works!
     }
 
     /**
@@ -239,6 +261,30 @@ public class Client {
                 }
                 else
                     devolve = true;
+
+                //Se o utilizador estiver logado com o facebook temos que postar no facebook
+                if (this.clientTokenObject != null && this.clientToken != null){
+                    //User logado com o facebook
+                    System.out.println("O user esta logado com o facebook!!!");
+
+                    float temp = moneyInvested;
+                    temp = temp/starting_shares;
+                    System.out.println("SSSS " + temp);
+                    ideia.setSellingPrice(temp);
+
+                    FacebookClient facebookClient = new DefaultFacebookClient(this.clientToken);
+                    FacebookType publishMessageResponse = facebookClient.publish
+                            ("me/feed",FacebookType.class,Parameter.with("message", "O user " + this.facebook_id
+                                    + " criou a seguinte ideia:" + ideia.getBody() + "\nA ideia esta a venda por " +
+                            ideia.getSellingPrice() + " DEICoins!"));
+
+                    System.out.println("Published message ID: " + publishMessageResponse.getId());
+                }
+
+                else{
+                    System.out.println("O user nao esta logado com o facebook");
+                    //FIXME: REMOVE THIS!
+                }
             }
             else{
                 System.out.println("Result e menor que 0!!!");
@@ -400,7 +446,8 @@ public class Client {
 
     private boolean doRMIFacebookLogin(String token){
         //TODO: 1 - Get user Facebook id; 2 - Confirm it in the database
-        int facebookId;
+        String id = null;
+        boolean devolve= false;
 
         OAuthService service = new ServiceBuilder()
                 .provider(FacebookApi.class)
@@ -409,16 +456,42 @@ public class Client {
                 .callback("http://localhost:8080")   //should be the full URL to this action
                 .build();
 
-        /*
-        String verifierCode = request.getParameter("code");
+        OAuthRequest authRequest = new OAuthRequest(Verb.GET, "https://graph.facebook.com/me?access_token="+token);
+        Token token_final = new Token(token,AppSecret);
 
-        if(verifierCode == null) {
-            String authURL = service.getAuthorizationUrl(null);
-            return new ActionForward(authURL, true);
+        service.signRequest(token_final, authRequest);
+        Response authResponse = authRequest.send();
+
+        try {
+            id = new JSONObject(authResponse.getBody()).getString("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //FIXME WHAT TO DO WITH THIS?????
         }
-        */
-        return true;
 
+        if (id == null)
+            return false;
+
+        System.out.println("O id e " + id);
+
+        //Lets save the client's token in the session
+        this.clientToken = token;
+        this.clientTokenObject = token_final;
+        this.facebook_id = id;
+
+        //FIXME: MAXI, COMO AINDA NAO SEI QUE TOKEN E QUE VOU PRECISAR DE USAR (OU SE VOU PRECISAR DOS DOIS), PARA JA
+        //      GUARDO TUDO NO CLIENTE, DEPOIS LOGO SE VE.
+
+        //Ir verificar se o id existe na base de dados
+
+        try{
+              devolve = rmi.getRMIInterface().login(id);
+        }catch(RemoteException e){
+            System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
+            e.printStackTrace();
+        }
+
+        return devolve;
     }
 
     /**
@@ -441,7 +514,7 @@ public class Client {
         return false;
     }
 
-    public boolean doFacebookLogin(String token){
+    public boolean doFacebokLogin(String token){
         return this.doRMIFacebookLogin(token);
     }
 

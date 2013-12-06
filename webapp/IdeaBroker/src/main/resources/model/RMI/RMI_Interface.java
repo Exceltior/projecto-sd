@@ -12,6 +12,7 @@ import model.data.*;
 ////
 public interface RMI_Interface extends Remote {
     public int login(String user, String pwd) throws  RemoteException;
+    public boolean login(String idFacebook) throws RemoteException;
     //public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
     public boolean register(String user, String pass, String email,String faceId) throws RemoteException;

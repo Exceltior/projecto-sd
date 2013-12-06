@@ -127,6 +127,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Method responsible for performing the login for Facebook users. In these cases we are only going to check if there
+     * is one entry in the database for the given user.
+     * @param idFacebook    The facebook id of the user.
+     * @return              A boolean value, indicating if the id is in the database or not.
+     */
+    public boolean login(String idFacebook) throws RemoteException{
+
+        String query = "Select id_facebook from Utilizador where id_facebook LIKE '" + idFacebook +"'";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return false;
+
+        return true;
+    }
+
+    /**
      * This is the same as login, except it doesn't do anything to say we're online. It's meant to be used by the
      * notification server.
      * @param user  The User's username
@@ -650,7 +667,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return -1;
         }
 
-        initialSell = moneyInvested/starting_shares;
+        initialSell = moneyInvested;
+        initialSell = initialSell/starting_shares;
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +
@@ -2293,7 +2311,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{

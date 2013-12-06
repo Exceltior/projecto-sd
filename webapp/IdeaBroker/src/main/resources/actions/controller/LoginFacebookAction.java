@@ -15,12 +15,9 @@ public class LoginFacebookAction extends ClientAction{
     public String execute() throws Exception{
         super.execute();
         System.out.println("O token do user no facebook e " + token);
-        /*if (client.doFacebokLogin(token))
+        if (client.doFacebokLogin(token))
             return SUCCESS;
         else
             return ERROR;
-        */
-
-        return SUCCESS;
     }
 }
