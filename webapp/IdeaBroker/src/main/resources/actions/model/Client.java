@@ -1,9 +1,5 @@
 package actions.model;
 
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Parameter;
-import com.restfb.types.FacebookType;
 import model.RMI.RMIConnection;
 import model.data.BuySharesReturn;
 import model.data.Idea;
@@ -244,7 +240,10 @@ public class Client {
         int result;
 
         try{
-            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested);
+            if (this.user_facebook_id == null)
+                result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested);
+            else
+                result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested,this.user_facebook_id,this.clientToken);
 
             if (result > 0){
 
@@ -261,32 +260,6 @@ public class Client {
                 }
                 else
                     devolve = true;
-
-                //Se o utilizador estiver logado com o facebook temos que postar no facebook
-                if (this.clientToken != null){
-                    //User logado com o facebook
-                    System.out.println("O user esta logado com o facebook!!!");
-
-                    float temp = moneyInvested;
-                    temp = temp/starting_shares;
-                    System.out.println("SSSS " + temp);
-                    ideia.setSellingPrice(temp);
-
-                    FacebookClient facebookClient = new DefaultFacebookClient(this.clientToken);
-                    FacebookType publishMessageResponse = facebookClient.publish
-                            ("me/feed",FacebookType.class,Parameter.with("message", "O user " + this.user_facebook_id
-                                    + " criou a seguinte ideia: \"" + ideia.getBody() + "\"\nA ideia esta a venda por " +
-                            ideia.getSellingPrice() + " DEICoins!"));
-
-                    System.out.println("Published message ID: " + publishMessageResponse.getId());
-                    //Inserir id na base de dados
-                    rmi.getRMIInterface().addIdeaFacebookId(ideia.getId(),publishMessageResponse.getId());
-                }
-
-                else{
-                    System.out.println("O user nao esta logado com o facebook");
-                    //FIXME: REMOVE THIS!
-                }
             }
             else{
                 System.out.println("Result e menor que 0!!!");
@@ -415,23 +388,17 @@ public class Client {
 
             //Se o utilizador estiver logado com o facebook temos que postar no facebook
             if (this.clientToken != null){
-                //Ir buscar o id da ideia no facebook
                 ideaFacebookId = rmi.getRMIInterface().getIdeaFacebookId(iid);
+                if (ideaFacebookId != null){
+                    System.out.println("Vou remover a ideia do facebook com o id " + ideaFacebookId + " e o token e " + this.clientToken);
+                    devolve = rmi.getRMIInterface().removeIdea(temp, uid,ideaFacebookId,this.clientToken);
+                }
+                else
+                    System.err.println("ERRO NO RMIREMOVEIDEA!!!!");//FIXME FIXME HANDLE THIS!!!
             }
 
-            devolve = rmi.getRMIInterface().removeIdea(temp, uid);
-
-            if (devolve == 1){
-                //Remover o post do facebook
-                FacebookClient facebookClient = new DefaultFacebookClient(this.clientToken);
-                if (!facebookClient.deleteObject(ideaFacebookId)){
-                    System.err.println("Error deleting the post in facebook");
-                    //FIXME: DEAL WITH THIS!!!
-                }
-                else{
-                    System.out.println("Ideia removida do facebook com sucesso");
-                }
-            }
+            else
+                devolve = rmi.getRMIInterface().removeIdea(temp, uid);
         }catch(RemoteException e){
             e.printStackTrace();
         }
