@@ -91,25 +91,6 @@ function hideRemoveIdeaBtn(id) {
     $(getRemoveIdeaBtnStr(id)).hide();
 }
 
-function showMessage(title, message, type, callback) {
-    new BootstrapDialog({
-        message: message,
-        type: type,
-        title: title,
-        data: {
-            'callback': callback
-        },
-        closable: false,
-        buttons: [{
-            label: 'OK',
-            action: function(dialog) {
-                typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
-                dialog.close();
-            }
-        }]
-    }).open();
-}
-
 function takeover(id) {
     var formData = {iid:id};
     postJSON('takeover.action', formData, function(data) {

@@ -26,3 +26,37 @@ function doPost(url,data){
     });
 
 }
+
+function doPostRefresh(url,data){
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+        dataType: "html",
+        success: function(data, textStatus) {
+            console.log(data);
+            console.log(textStatus);
+          window.location.reload();
+        }
+    });
+
+}
+
+function showMessage(title, message, type, callback) {
+    new BootstrapDialog({
+        message: message,
+        type: type,
+        title: title,
+        data: {
+            'callback': callback
+        },
+        closable: false,
+        buttons: [{
+            label: 'OK',
+            action: function(dialog) {
+                typeof dialog.getData('callback') === 'function' && dialog.getData('callback')(true);
+                dialog.close();
+            }
+        }]
+    }).open();
+}

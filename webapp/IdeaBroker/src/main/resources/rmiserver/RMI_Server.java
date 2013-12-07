@@ -121,6 +121,15 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return name;
     }
 
+    public String getFacebookUserId(int uid) throws RemoteException{
+        String query = "select id_facebook from utilizador where userid = "+uid;
+        ArrayList<String[]> table = receiveData(query);
+
+        if ( table == null || table.isEmpty()) return null;
+
+        return table.get(0)[0];
+    }
+
     public String getFacebookUserIdFromToken(String token) throws RemoteException{
         String id = null;
         OAuthService service = new ServiceBuilder()

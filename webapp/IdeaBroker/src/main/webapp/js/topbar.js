@@ -6,7 +6,6 @@ function setUserMoney(money) {
     $('#currmoney').text(money);
 }
 
-
 // Load the SDK Asynchronously
 (function (d) {
     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
@@ -15,8 +14,45 @@ function setUserMoney(money) {
     js.src="//connect.facebook.net/en_US/all.js";
     ref.parentNode.insertBefore(js, ref);
 }(document));
+
+var fbloaded=false;
+
 var token;
 gFacebookAssociateDialog = null;
+
+function doWaitForFacebookLogin() {
+    var check= function(){
+        if ( typeof FB != "undefined" ) {
+            console.log("FB loaded!");
+            if ( !fbloaded ) {
+                FB.init({
+                    appId:  436480809808619/*687899411244345*/,
+                    channelUrl: '//' + window.location.hostname + '/channel', // Path to your   Channel File
+                    status: true, // check facebookLogin status
+                    cookie: true, // enable cookies to allow the server to access the session
+                    xfbml: true  // parse XFBML
+                });
+                fbloaded=true;
+            }
+            FB.Event.subscribe('auth.statusChange', function (response) {
+
+                if (response.authResponse){
+                    //alert("Entrei no authResponse");
+
+                    if (response.authResponse.accessToken){
+                        doPostRefresh("http://" + window.location.host + "/loginfacebook.action",
+                            { token:response.authResponse.accessToken });
+                    }
+                }
+            });
+        }
+        else {
+            setTimeout(check, 500); // check again in a second
+        }
+    };
+    check();
+
+}
 
 function doFacebookAssociate(money) {
 
@@ -25,7 +61,7 @@ function doFacebookAssociate(money) {
         $('<div style="text-align:center;"><div style="font-size:40pt;">' +
             '<span style="color: #428bca" class="glyphicon glyphicon-thumbs-up"></span>' +
             '</div>&nbsp;Verifique a sua identidade e autorize a nossa aplicação a espalhar pelo Facebook as suas' +
-            'Ideias!</div><div id="auth-status" style="text-align: center"><div id="auth-loggedout"><div ' +
+            ' Ideias!</div><div id="auth-status" style="text-align: center"><div id="auth-loggedout"><div ' +
             'class="fb-login-button" autologoutlink="true"' +
             'scope="email,user_checkins,publish_actions,publish_stream,read_stream">Login ' +
             'with Facebook</div></div><div id="auth-loggedin" style="display: none"></div></div>');
@@ -46,14 +82,16 @@ function doFacebookAssociate(money) {
 
     var check = function(){
         if($('#auth-status').is(":visible")){
-            FB.init({
-                appId:  436480809808619/*687899411244345*/,
-                channelUrl: '//' + window.location.hostname + '/channel', // Path to your   Channel File
-                status: true, // check facebookLogin status
-                cookie: true, // enable cookies to allow the server to access the session
-                xfbml: true  // parse XFBML
-            });
-
+            if ( !fbloaded ) {
+                FB.init({
+                    appId:  436480809808619/*687899411244345*/,
+                    channelUrl: '//' + window.location.hostname + '/channel', // Path to your   Channel File
+                    status: true, // check facebookLogin status
+                    cookie: true, // enable cookies to allow the server to access the session
+                    xfbml: true  // parse XFBML
+                });
+                fbloaded=true;
+            }
             $('#auth-status').show();
 
 
@@ -69,6 +107,14 @@ function doFacebookAssociate(money) {
                         postJSON("facebookassociate.action",
                             { token:response.authResponse.accessToken }, function(data) {
                                 console.log(data);
+                                if ( !data.success ) {
+                                    gFacebookAssociateDialog.close();
+                                    showMessage('Erro', 'Não foi possível associar a sua conta de Facebook.',
+                                        BootstrapDialog.TYPE_DANGER);
+                                } else {
+                                    gFacebookAssociateDialog.close();
+                                    window.location.reload();
+                                }
                             });
                     }
                 }
@@ -76,7 +122,7 @@ function doFacebookAssociate(money) {
             $("#auth-logoutlink").click(function () { FB.logout(function () { window.location.reload(); }); });
         }
         else {
-            setTimeout(check, 1000); // check again in a second
+            setTimeout(check, 500); // check again in a second
         }
     }
 

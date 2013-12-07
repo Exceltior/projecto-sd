@@ -20,7 +20,18 @@
         <li><a href="#">
                     <span class="glyphicon
                      glyphicon-thumbs-up">
-                    <s:property value="#session.client.facebookName"/>
+
+                    <s:if test="#session.client.facebookName == null">
+                        <script>doWaitForFacebookLogin();</script>
+                        <div id="auth-status" style="text-align: center"><div id="auth-loggedout"><div
+                                class="fb-login-button" autologoutlink="true"
+                                scope="email,user_checkins,publish_actions,publish_stream,read_stream">
+                            Login with Facebook</div></div>
+                            <div id="auth-loggedin" style="display: none"></div>
+                    </s:if>
+                    <s:else>
+                        <s:property value="#session.client.facebookName"/>
+                    </s:else>
                 </s:if>
                 <s:else>
         <li><a href="#" onclick="doFacebookAssociate();">&nbsp;

@@ -528,6 +528,17 @@ public class Client {
         return true;
     }
 
+    public String doRMIGetFacebookUserId() {
+        String ret = null;
+        try {
+            ret = rmi.getRMIInterface().getFacebookUserId(this.uid);
+        } catch (RemoteException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return ret;
+    }
+
     /**
      * Public interface to perform an administrator's takeover on the system.
      * @param iid   The id of the user.
@@ -601,6 +612,7 @@ public class Client {
         if ( (this.uid = Integer.valueOf(encodeduid)) != -1 ) {
             this.username = doRMIGetUsername();
             this.adminStatus = doRMIGetAdminStatus();
+            this.facebookAccount = doRMIGetFacebookUserId() != null;
 
             return true;
         }
