@@ -777,7 +777,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The id of the idea we just created
      * @throws RemoteException
      */
-    synchronized public int createIdea(String title, String description, int uid,int moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException{
+    synchronized public int createIdea(String title, String description, int uid,float moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException{
         String query;
         ArrayList<String[]> queryResult;
         float initialSell;
@@ -796,8 +796,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return -1;
         }
 
-        initialSell = moneyInvested;
-        initialSell = initialSell/starting_shares;
+        initialSell = starting_shares;
+        initialSell = moneyInvested/initialSell;
+
+        System.out.println("O preço de venda inicial e " + initialSell);
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +

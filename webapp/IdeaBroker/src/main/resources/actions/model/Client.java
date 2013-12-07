@@ -219,7 +219,7 @@ public class Client {
      * @param file          The file attached to the idea
      * @return              A boolean value, indicating the result of the operation (success/failure)
      */
-    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,int moneyInvested,NetworkingFile file){
+    private boolean doRMISubmitIdea(Idea ideia,ArrayList<String> topicos,float moneyInvested,NetworkingFile file){
         boolean devolve = false;
         int result;
 
@@ -528,7 +528,7 @@ public class Client {
      * @param file          The file attached to the idea
      * @return              A boolean value indicating the result of the operation (success/failure)
      */
-    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,int moneyInvested,NetworkingFile file){
+    public boolean doSubmitIdea(Idea ideia,ArrayList<String> topics,float moneyInvested,NetworkingFile file){
         return doRMISubmitIdea(ideia, topics, moneyInvested, file);
     }
 

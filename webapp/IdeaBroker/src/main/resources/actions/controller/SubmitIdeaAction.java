@@ -27,7 +27,7 @@ public class SubmitIdeaAction extends ClientAction{
     String title;
     String body;
     String topicsList;
-    int moneyInvested;
+    float moneyInvested;
     File file;
     String contentType;
     String filename;
@@ -93,7 +93,7 @@ public class SubmitIdeaAction extends ClientAction{
      * Gets the money invested by the user in the idea.
      * @return  The money invested by the user in the idea.
      */
-    public int getMoneyInvested(){
+    public float getMoneyInvested(){
         return this.moneyInvested;
     }
 
@@ -101,7 +101,7 @@ public class SubmitIdeaAction extends ClientAction{
      * Defines the money the user is going to invest in this new idea.
      * @param money The money the user is going to invest in this new idea.
      */
-    public void setMoneyInvested(int money){
+    public void setMoneyInvested(float money){
         this.moneyInvested = money;
     }
 
