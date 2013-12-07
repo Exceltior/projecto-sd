@@ -18,7 +18,14 @@
     <!--<link href="css/3dbtn.css" rel="stylesheet">-->
     <title></title>
     <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/noty/jquery.noty.js"></script>
+    <script type="text/javascript" src="js/noty/layouts/top.js"></script>
+    <script type="text/javascript" src="js/noty/layouts/topRight.js"></script>
+    <script type="text/javascript" src="js/noty/themes/default.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
     <script type="text/javascript" src="js/notifications.js"></script>
+    <script type="text/javascript" src="js/topbar.js"></script>
+    <script type="text/javascript" src="js/sidebar.js"></script>
     <script type="text/javascript" src="js/websockets.js"></script>
     <script type="text/javascript">
 
@@ -42,7 +49,7 @@
                     class="glyphicon glyphicon-list">&nbsp;Ver
                 Tópicos</span><span>&nbsp;</span></a></li>
             <li><a
-                    href="listideas.action?mode=watchlist"><span class="glyphicon glyphicon-eye-open">&nbsp;
+                    href="listideas.action?mode=watchlist"><span class="glyphicon glyphicon-eye-open">
                 Watchlist</span><span>&nbsp;</span></a></li>
             <li><a href="listideas.action?mode=userideas"><span class="glyphicon glyphicon-cloud">&nbsp;As Minhas
                 Ideias</span><span>&nbsp;</span></a></li>
@@ -110,7 +117,6 @@
 </div>
             </div>
     </div>
-<script src="js/jquery.js"></script>
 <script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

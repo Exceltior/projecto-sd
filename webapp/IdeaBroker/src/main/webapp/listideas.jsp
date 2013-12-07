@@ -25,6 +25,8 @@
     <script type="text/javascript" src="js/util.js"></script>
     <script type="text/javascript" src="js/notifications.js"></script>
     <script type="text/javascript" src="js/websockets.js"></script>
+    <script type="text/javascript" src="js/topbar.js"></script>
+    <script type="text/javascript" src="js/sidebar.js"></script>
     <script type="text/javascript" src="js/viewideas.js"></script>
     <script type="text/javascript">
 
@@ -48,7 +50,7 @@
                 class="glyphicon glyphicon-list">&nbsp;Ver
                 Tópicos</span><span>&nbsp;</span></a></li>
         <li><a
-                href="listideas.action?mode=watchlist"><span class="glyphicon glyphicon-eye-open">&nbsp;
+                href="listideas.action?mode=watchlist"><span class="glyphicon glyphicon-eye-open">
                 Watchlist</span><span>&nbsp;</span></a></li>
         <li><a href="listideas.action?mode=userideas"><span class="glyphicon glyphicon-cloud">&nbsp;As Minhas
                 Ideias</span><span>&nbsp;</span></a></li>
@@ -251,7 +253,7 @@
 </div>
 </div>
 <script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
-<script src="bootstrap-dialog.js"></script>
+<script src="js/bootstrap-dialog.js"></script>
 </body>
 </html>
 

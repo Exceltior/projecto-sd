@@ -777,7 +777,8 @@ public class Client {
     public boolean getAdminStatus() {
         //FIXME: MEGA FIX ME
         //return adminStatus;
-        return true;
+        //return true;
+        return false;
     }
 
     /**

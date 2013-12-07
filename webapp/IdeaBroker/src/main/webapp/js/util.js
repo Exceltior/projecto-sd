@@ -18,6 +18,7 @@ function doPost(url,data){
         success: function(data, textStatus) {
             console.log(data);
             console.log(textStatus);
+//            window.location.replace(url);
             document.open();
             document.write(data);
             document.close();
