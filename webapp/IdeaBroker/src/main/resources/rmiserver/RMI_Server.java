@@ -1008,7 +1008,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         insertData(query);
 
         String clientToken = tokens.get(uid);
-        query = "Select facebook_id from Ideia where iid = " + idea.getId();
+        query = "Select facebook_id from Ideia where iid = " + idea.getId()+ " and facebook_id IS NOT NULL";
         queryResult = receiveData(query);
         if (queryResult != null && !queryResult.isEmpty()){
             //Delete post on facebook
@@ -2617,7 +2617,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{
