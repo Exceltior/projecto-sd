@@ -2,6 +2,8 @@ package actions.controller;
 
 import model.data.Idea;
 import model.data.NetworkingFile;
+import org.apache.commons.lang.xwork.StringEscapeUtils;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -119,7 +121,7 @@ public class SubmitIdeaAction extends AJAXAction{
             if (!aList.trim().equals("")){
                 temp = verifyTopicString(aList);
                 if (temp != null && !devolve.contains(temp.trim()))
-                    devolve.add(aList.trim());
+                    devolve.add(StringEscapeUtils.escapeSql(aList.trim()));
             }
         }
 
@@ -149,8 +151,8 @@ public class SubmitIdeaAction extends AJAXAction{
         }
 
         idea = new Idea();
-        idea.setBody(body);
-        idea.setTitle(title);
+        idea.setBody(StringEscapeUtils.escapeSql(body));
+        idea.setTitle(StringEscapeUtils.escapeSql(title));
 
         topics = getTopicsFromList(topicsList.split("#"));
 
