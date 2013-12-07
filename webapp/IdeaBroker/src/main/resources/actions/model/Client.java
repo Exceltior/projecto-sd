@@ -70,7 +70,7 @@ public class Client {
     }
 
     /**
-     * Call's RMI register to safely register a new user in the database.
+     * Call's RMI registerWithFacebook to safely registerWithFacebook a new user in the database.
      * @param username  The new user's username
      * @param password  The new user's password
      * @param email     The new user's email
@@ -456,49 +456,28 @@ public class Client {
     }
 
     private boolean doRMIAssociateWithFacebook(String token) {
-        boolean result;
+        boolean result = false;
 
         //Store the id on the database
         try{
             result = this.rmi.getRMIInterface().associateWithFacebook(this.uid, token);
         }catch(RemoteException e){
             e.printStackTrace();
-            return false;
         }
 
         return result;
     }
 
-    private boolean doRMIRegisterNewAccountWithFacebook(String username, String password, String email, String token){
-        String facebookId = null;
+    private boolean doRMIRegisterNewAccountWithFacebook(String token){
         boolean result = false;
 
-        doRMIGetFacebookUserIdFromToken(token);
-
-        if (facebookId == null)
-            return false;
-        System.out.println("O id e " + facebookId);
-
-        //Register the account
         try{
-            result = this.rmi.getRMIInterface().register(username,password,email,token);
+            result = this.rmi.getRMIInterface().registerWithFacebook(token);
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME: DEAL WITH THIS!
-            return false;
         }
 
-        if (!result)
-            return result;
-
-        //Update mapping userId - Clienttoken, stored in the RMI
-        try{
-            this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
-        }catch(RemoteException e){
-            e.printStackTrace();
-            //FIXME: HANDLE THIS!!!
-        }
-        return true;
+        return result;
     }
 
     /**
@@ -679,7 +658,7 @@ public class Client {
     }
 
     /**
-     * Public interface to try to register a client. If successful, we automatically perform the facebookLogin for the given
+     * Public interface to try to registerWithFacebook a client. If successful, we automatically perform the facebookLogin for the given
      * client.
      * @param username User's username
      * @param password User's password
@@ -690,18 +669,13 @@ public class Client {
         return doRMIRegister(username, password, email) && doLogin(username, password);
     }
 
-    /**
-     * Pubic interface to try and register a new account, associated with a valid Facebook Account.
-     * @param username  User's username.
-     * @param password  User's password.
-     * @param email     User's password.
-     * @param token     User's Facebook Access Token.
-     * @return          A boolean value, indicating the success or failure of the operation
-     */
-    public boolean doRegisterNewAccountWithFacebook(String username, String password, String email, String token){
-        boolean devolve =doRMIRegisterNewAccountWithFacebook(username, password, email, token);
-        if (devolve)
+
+    public boolean doRegisterNewAccountWithFacebook( String token){
+        boolean devolve =doRMIRegisterNewAccountWithFacebook(token);
+        if (devolve) {
             this.facebookAccount = true;
+            this.username = doRMIGetFacebookUsernameFromToken(token);
+        }
 
         return devolve;
     }

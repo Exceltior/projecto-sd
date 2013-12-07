@@ -589,25 +589,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return true;
     }
 
-    /**
-     *  Method responsible for insering a new user in the database
-     * @param user Username
-     * @param pass Password
-     * @param email User's email address
-     * @param faceId User's id on facebook
-     * @return  Boolean value, indicating if the operation went well
-     * @throws RemoteException
-     */
-    synchronized public boolean register(String user, String pass, String email,String faceId) throws RemoteException {
-        if (! validateData(user)){
-            System.err.println("O validate data devolveu false");
-            return false;
-        }
-        pass = hashPassword(pass);
+    synchronized public boolean registerWithFacebook(String token) throws RemoteException {
+        String user   = getFacebookUsernameFromToken(token);
+        String faceId = getFacebookUserIdFromToken(token);
+        String email  = "null"; //FIXME JOCA
 
         String query = "INSERT INTO Utilizador VALUES (user_seq.nextval,'" + email + "','" + user + "'," +
-                "'" + pass +
-                "'," + starting_money + ",sysdate, null," + faceId +")";
+                "null, " + starting_money + ",sysdate, null," + faceId +")";
 
         insertData(query);
 

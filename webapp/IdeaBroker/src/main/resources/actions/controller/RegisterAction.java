@@ -1,7 +1,7 @@
 package actions.controller;
 
 /**
- * This action is used when the user tries to register. When execute() is called, the username, password and email are
+ * This action is used when the user tries to registerWithFacebook. When execute() is called, the username, password and email are
  * expected to be filled with username, password and email of the user performing the registration.
  */
 public class RegisterAction extends ClientAction {
@@ -14,7 +14,7 @@ public class RegisterAction extends ClientAction {
     private String email;
 
     /**
-     * Try to register the user with the username, password and email provided. Note the call to super.execute() which is
+     * Try to registerWithFacebook the user with the username, password and email provided. Note the call to super.execute() which is
      * required by ClientAction.
      * @return              If the registration was successfull, returns SUCCESS. Otherwise returns ERROR.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database

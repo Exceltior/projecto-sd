@@ -12,47 +12,16 @@ public class RegisterNewAccountWithFacebook extends ClientAction{
      * email contains the user's email
      */
     private String token;
-    private String username;
-    private String email;//FIXME Este atributo e preciso???? - Podemos ir buscar o email do facebook, se for preciso
-    private String password;//FIXME Este atributo e preciso????
-
-    public String getEmail(){
-        return this.email;
-    }
-
-    public void setEmail(String email1){
-        this.email = email1;
-    }
-
-    public String getToken() {
-        return token;
-    }
 
     public void setToken(String token) {
         this.token = token;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String execute() throws Exception{
         super.execute();
-        System.out.println("O token do utilizador no facebook e " + token);
+        System.out.println("O token do utilizador no asdasdasd facebook e " + token);
 
-        if (client.doRegisterNewAccountWithFacebook(username, password, email, token))
+        if (client.doRegisterNewAccountWithFacebook(token))
             return SUCCESS;
         else
             return ERROR;
