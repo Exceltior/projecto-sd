@@ -1651,6 +1651,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Gets all the ideas of the Hall of Fame, stored in the database.
+     * @return  An array of Idea objects, containing all the ideas of the Hall of Fame, stored in the database.
+     */
+    public Idea[] getHallOfFameIdeas(){
+        Idea[] devolve = null;
+        String query = "Select * from Ideia i, HallFame h where i.iid = h.iid";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return null;
+
+        devolve = new Idea[queryResult.size()];
+        for (int i=0;i<queryResult.size();i++)
+            devolve[i] = new Idea(queryResult.get(i));
+
+        return devolve;
+    }
+
+    /**
      * Sets the money for a given user. The user must exist
      * @param uid   The id of the user
      * @param money The money we are going to set for the user

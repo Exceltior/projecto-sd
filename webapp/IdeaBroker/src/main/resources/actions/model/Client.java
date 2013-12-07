@@ -287,6 +287,7 @@ public class Client {
             e.printStackTrace();
         }
 
+        System.out.println("O doRMIGetAdminStatus devolve " + devolve);
         return devolve;
     }
 
@@ -387,6 +388,11 @@ public class Client {
         return u;
     }
 
+    /**
+     * Safely tries to log in a user registered with a Facebook account, given a Facebook Token.
+     * @param token The Facebook Token.
+     * @return      In case of success returns true. If an error occurs, returns false.
+     */
     private boolean doRMIFacebookLogin(String token){
         String id = null;
 
@@ -418,6 +424,23 @@ public class Client {
         }
 
         return this.uid != -1;
+    }
+
+    /**
+     * Safely gets all the ideas in the hall of fame, stored in the database
+     * @return  An array of Idea objects, containing all the ideas in the hall of fame stored in the database.
+     */
+    private Idea[] doRMIGetHallOfFameIdeas(){
+        Idea[] devolve = null;
+
+        try{
+            devolve = rmi.getRMIInterface().getHallOfFameIdeas();
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: HANDLE THIS!!!
+        }
+
+        return devolve;
     }
 
     private boolean doRMITakeover(int iid) {
@@ -454,6 +477,11 @@ public class Client {
         return false;
     }
 
+    /**
+     * Public interface to try and log
+     * @param token
+     * @return
+     */
     public boolean doFacebokLogin(String token){
         return this.doRMIFacebookLogin(token);
     }
@@ -654,6 +682,14 @@ public class Client {
      */
     public boolean doRemoveFromWatchList(int iid) {
         return doRMIRemoveFromWatchList(iid);
+    }
+
+    /**
+     * Public interface to get all the ideas in the Hall of Fame.
+     * @return  An array of Idea objects, containing all the ideas in the Hall of Fame.
+     */
+    public Idea[] doGetHallOfFameIdeas(){
+        return doRMIGetHallOfFameIdeas();
     }
 
     /**
