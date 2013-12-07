@@ -221,7 +221,7 @@ public class Client {
         int result;
 
         try{
-            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested,topicos,file);
+            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested, topicos, file);
 
             if (result > 0)
                 devolve = true;
@@ -433,6 +433,7 @@ public class Client {
      */
     private boolean doRMIFacebookRegistration(String token){
         String facebookId = null;
+        boolean result = false;
 
         try{
             facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
@@ -448,13 +449,61 @@ public class Client {
 
         //Store the id on the database
         try{
-            this.rmi.getRMIInterface().registerWithFacebook(uid,facebookId);
+            result = this.rmi.getRMIInterface().registerWithFacebook(this.uid,facebookId);
         }catch(RemoteException e){
             e.printStackTrace();
             //FIXME: DEAL WITH THIS
             return false;
         }
 
+        if (!result)
+            return result;
+
+        //Update mapping userId - Clienttoken, stored in the RMI
+        try{
+            this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: HANDLE THIS!!!
+        }
+        return true;
+    }
+
+    private boolean doRMIRegisterNewAccountWithFacebook(String username, String password, String email, String token){
+        String facebookId = null;
+        boolean result = false;
+
+        try{
+            facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: DEAL WITH THIS!
+            return false;
+        }
+
+        if (facebookId == null)
+            return false;
+        System.out.println("O id e " + facebookId);
+
+        //Register the account
+        try{
+            result = this.rmi.getRMIInterface().register(username,password,email,token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: DEAL WITH THIS!
+            return false;
+        }
+
+        if (!result)
+            return result;
+
+        //Update mapping userId - Clienttoken, stored in the RMI
+        try{
+            this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: HANDLE THIS!!!
+        }
         return true;
     }
 
@@ -611,11 +660,23 @@ public class Client {
      * client.
      * @param username User's username
      * @param password User's password
-     * @param email User's password
-     * @return A boolean value, indicating the success or failure of the operation
+     * @param email    User's password
+     * @return         A boolean value, indicating the success or failure of the operation
      */
     public boolean doRegister(String username, String password, String email){
         return doRMIRegister(username, password, email) && doLogin(username, password);
+    }
+
+    /**
+     * Pubic interface to try and register a new account, associated with a valid Facebook Account.
+     * @param username  User's username.
+     * @param password  User's password.
+     * @param email     User's password.
+     * @param token     User's Facebook Access Token.
+     * @return          A boolean value, indicating the success or failure of the operation
+     */
+    public boolean doRegisterNewAccountWithFacebook(String username, String password, String email, String token){
+        return doRMIRegisterNewAccountWithFacebook(username, password, email, token);
     }
 
     /**
