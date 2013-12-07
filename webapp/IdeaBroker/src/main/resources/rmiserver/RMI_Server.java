@@ -770,6 +770,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
+     * Gets the title of an idea, given its id.
+     * @param iid   The id of the idea whose title we want to obtain.
+     * @return      The title of the idea.
+     * @throws RemoteException
+     */
+    public String getIdeaTitle(int iid)throws RemoteException{
+        String query = "Select i.titulo from Ideia i where i.iid = " + iid;
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return null;
+        return queryResult.get(0)[0];
+    }
+
+    /**
      * Method responsible for creating a new idea in the database
      * @param title The title of the idea
      * @param description   The description of the idea
