@@ -27,7 +27,6 @@
     <script type="text/javascript" src="js/websockets.js"></script>
     <script type="text/javascript" src="js/topbar.js"></script>
     <script type="text/javascript" src="js/sidebar.js"></script>
-    <script type="text/javascript" src="js/viewideas.js"></script>
     <script type="text/javascript">
 
         /**
@@ -100,7 +99,7 @@
                 <div class="row" style="margin:10px; margin-top:30px">
 
                     <div class="col-md-8 col-md-offset-2">
-                        <h2 style="text-align:center"><s:property value="title" /></h2>
+                        <h2 style="text-align:center">Hall of Fame</h2>
                         <div class="list-group text-center" style = "margin-top:25px;">
                             <s:iterator var="i" step="1" value="ideas">
                                 <div class="list-group-item" id="idea<s:property value="id" />"
@@ -109,59 +108,6 @@
                                     <h4
                                             class="list-group-item-heading"><s:property value="title" /></h4>
                                     <p class="list-group-item-text">
-                                    <div style="height: 25px">
-                                        <div style="float:right; white-space:nowrap;" id="ideatags<s:property
-                                             value="id" />">
-                                            <!-- Labels here -->
-                                                    <span
-                                                            <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>
-                                                            class="label label-info" id="ownidea<s:property value="id" />"><span
-                                                            class="glyphicon glyphicon-ok"></span><span
-                                                            id="numshares<s:property value="id" />"><s:property
-                                                            value="numSharesOwned" /></span> shares (
-                                                        <span
-                                                                id="percentshares<s:property value="id" />">
-                                                            <s:property
-                                                                    value="percentOwned" /></span>%)
-                                                    </span>
-                                            <!-- Watchlist Label -->
-                                                    <span
-                                                            <s:if test="!top.inWatchList">style="display:none"</s:if>
-                                                            class="label label-success"
-                                                            id="watchlistlabel<s:property value="id"/>"><span class="glyphicon glyphicon-eye-open"></span>Na Watchlist
-                                                        <a href="#" type="button"
-                                                           onclick="removeFromWatchlist(<s:property
-                                                                   value="id" />);"><span
-                                                                class="glyphicon glyphicon-remove"></span></a> </span>
-
-                                        </div>
-                                        <div style="float:left; white-space:nowrap;" id="idealeftarea<s:property
-                                             value="id" />">
-                                            <!-- Left buttons -->
-                                            <s:if test="!#session.client.adminStatus">
-                                                <!-- Set share price -->
-
-                                                <div class="input-append"
-                                                     id="setsharepriceeditbox<s:property value="id" />"
-                                                     <s:if test="top.percentOwned == 0.0">style="display:none"</s:if>>
-
-                                                        <span
-                                                                class="glyphicon glyphicon-euro"></span>
-                                                    Vender a
-                                                    <input name="text" id="sellingprice<s:property value="id" />"
-                                                           value="<s:property value="sellingPrice" />"
-                                                           style="width:50px;"
-                                                           onkeyup="sharePriceChanged(<s:property
-                                                                   value="id" />);"/>
-                                                    DEICoins/share <button
-                                                        id="btnsellingprice<s:property value="id" />"
-                                                        class="btn btn-success btn-sm"
-                                                        ><span
-                                                        class="glyphicon glyphicon-ok-sign"></span></button>
-                                                </div>
-                                            </s:if>
-                                        </div>
-                                    </div>
                                     <div style="height: 45px">
                                         <div style="float:left; margin-top: 5px;" id="buttonsleft<s:property
                                                      value="id" />">
@@ -173,52 +119,6 @@
                                                         <span
                                                                 id="marketvalue<s:property value="id" />"><s:property
                                                                 value="marketValue" /></span></a>
-                                        </div>
-                                        <div style="float:right" id="buttons<s:property
-                                                     value="id" />">
-                                            <!-- Buttons here -->
-                                            <s:if test="#session.client.adminStatus">
-                                                <a id="takeover<s:property value="id" />"
-                                                   href="#" type="button"
-                                                   class="btn btn-success btn-sm"
-                                                   onclick="takeover(<s:property value="id" />)">
-                                                    <span class="glyphicon glyphicon-fire"></span> Takeover
-                                                </a>
-                                            </s:if><s:else>
-                                            <!-- Delete idea -->
-                                            <a id="removeidea<s:property value="id" />"
-                                               <s:if test="top.percentOwned != 100.0">style="display: none"</s:if>
-                                               href="#" type="button"
-                                               class="btn btn-danger btn-sm"
-                                               onclick="removeIdea(<s:property value="id" />)">
-                                                <span class="glyphicon glyphicon-remove"></span> Apagar Ideia
-                                            </a>
-
-                                            <!-- Buy shares-->
-
-                                            <!--data-toggle="modal" href="#myModal"-->
-                                            <a <s:if test="top.percentOwned == 100.0">style="display:none"</s:if>
-                                               type="button"
-                                               class="btn btn-primary btn-sm"
-                                               id="buyshares<s:property value="id" />"
-                                               onclick="buyShares(<s:property value="id" />);">
-                                                <span class="glyphicon glyphicon-cloud"></span><span
-                                                    style="margin:-9px; color: #dbd02b"
-                                                    class="glyphicon glyphicon-euro"></span>
-                                                &nbsp; &nbsp;Comprar Shares
-                                            </a>
-
-
-                                            <a
-                                                    <s:if test="top.inWatchList">style="display:none"</s:if>
-                                                    href="#" type="button"
-                                                    class="btn btn-success btn-sm"
-                                                    id="addtowatchlistbtn<s:property value="id" />"
-                                                    onclick="addToWatchlist(<s:property value="id" />);">
-                                                <span class="glyphicon glyphicon-eye-open"></span> Adicionar
-                                                à Watchlist
-                                            </a>
-                                        </s:else>
                                         </div>
                                     </div>
                                         <%--Watchlist: <s:property value="inWatchList" />
