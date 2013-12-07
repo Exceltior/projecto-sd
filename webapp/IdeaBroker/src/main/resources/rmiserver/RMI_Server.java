@@ -834,8 +834,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             } else {
                 System.out.println("S1");
-                String message = "O user " + uid + " criou a seguinte ideia: \"" + description +
-                        "\"\nA ideia esta a venda por " + initialSell + " DEICoins!";
+                String message = "O user " + uid + " criou a ideia '"+title+"' com o conteúdo '"+description+"' com " +
+                        "um " +
+                        "investimento inicial de "+moneyInvested+" DEICoins!";
                 Token finalToken = new Token(clientToken,AppSecret);
 
                 String messageId = doFacebookWallPost("https://graph.facebook.com/me/feed",message,finalToken);
@@ -994,7 +995,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         int totalSharesBought = 0;
 
         System.out.println("Checkpoint 1.1");
-        int totalSpent = 0;
+        float totalSpent = 0;
 
         System.out.println("--->sharesAlvo: "+sharesAlvo);
         System.out.println("--->getNumIdeaShares(iid): "+getNumIdeaShares(iid));
@@ -1184,8 +1185,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         if ( ideaFacebookId != null ) {
             String url = "https://graph.facebook.com/" + ideaFacebookId + "/comments";
-            String message = getUsername(uid)+ " BOUGHT " + ret.numSharesBought + " shares of the idea "
-                    + iid + " for " + s.getPrice() + " DEICoins!";
+            String message = getUsername(uid)+ " comprou " + ret.numSharesBought + " shares da ideia "
+                    + iid + " por " + ret.totalSpent + " DEICoins!";
             String clientToken = tokens.get(uid);
 
             if (!doFacebookPostComment(url, message, clientToken))
@@ -2529,7 +2530,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{

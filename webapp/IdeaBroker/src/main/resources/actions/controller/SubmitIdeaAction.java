@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * This action is used when the user wants to create a new idea. When this action is "generated" the following attributes
  * are expected to have been defined by the user: title; body; topicsList; moneyInvested; contentType; filename.
  */
-public class SubmitIdeaAction extends ClientAction{
+public class SubmitIdeaAction extends AJAXAction{
 
     /**
      * idea contains an Idea object, with the idea created by the user.
@@ -33,14 +33,6 @@ public class SubmitIdeaAction extends ClientAction{
     String filename;
 
     /**
-     * Gets the file attached to the idea.
-     * @return  A File object, containing the file attached to the idea.
-     */
-    public File getFile(){
-        return this.file;
-    }
-
-    /**
      * Defines a new file to attach to the idea.
      * @param file1 A File object, which is the new file to attach to the idea.
      */
@@ -58,27 +50,11 @@ public class SubmitIdeaAction extends ClientAction{
     }
 
     /**
-     * Gets the type of content of the file uploaded with the idea.
-     * @return  A String object, containing the type of content of the file uploaded with the idea.
-     */
-    public String getFileContentType(){
-        return this.contentType;
-    }
-
-    /**
      * Sets a new file name for the file uploaded with the idea
      * @param temp  The name of the file uploaded with the idea
      */
     public void setfileFileName(String temp){
         this.filename = temp;
-    }
-
-    /**
-     * Gets the title of the idea being created.
-     * @return  A String object, containig the title of the idea being created.
-     */
-    public String getTitle(){
-        return this.title;
     }
 
     /**
@@ -90,14 +66,6 @@ public class SubmitIdeaAction extends ClientAction{
     }
 
     /**
-     * Gets the money invested by the user in the idea.
-     * @return  The money invested by the user in the idea.
-     */
-    public int getMoneyInvested(){
-        return this.moneyInvested;
-    }
-
-    /**
      * Defines the money the user is going to invest in this new idea.
      * @param money The money the user is going to invest in this new idea.
      */
@@ -105,24 +73,8 @@ public class SubmitIdeaAction extends ClientAction{
         this.moneyInvested = money;
     }
 
-    /**
-     * Gets the list of topics in which we are going to include the new idea.
-     * @return  An array of String objects, containing the list of topics in which we are going to include the new idea.
-     */
-    public String getTopicsList(){
-        return this.topicsList;
-    }
-
     public void setTopicsList(String topicsq){
         this.topicsList = topicsq;
-    }
-
-    /**
-     * Gets the body of the idea the user tried to submit.
-     * @return  A String object, with the body of the idea the user tried to submit.
-     */
-    public String getBody(){
-        return this.body;
     }
 
     /**
@@ -131,14 +83,6 @@ public class SubmitIdeaAction extends ClientAction{
      */
     public void setBody(String body1){
         this.body = body1;
-    }
-
-    /**
-     * Returns the idea the user tried to submit.
-     * @return  An Idea object, containing the idea the user tried to submit.
-     */
-    public Idea getIdea(){
-        return this.idea;
     }
 
     /**
@@ -200,7 +144,6 @@ public class SubmitIdeaAction extends ClientAction{
             userFile = new NetworkingFile(file.getPath());
         }
 
-        //Criar ideia; FIXME CODIGO FEIO COMO TUDO!!!!
         idea = new Idea();
         idea.setBody(body);
         idea.setTitle(title);
@@ -209,11 +152,16 @@ public class SubmitIdeaAction extends ClientAction{
 
         if (client.doSubmitIdea(idea,topics,moneyInvested,userFile)){
             System.out.println("Correu bem a submissao da ideia!!!!!!!!");
-            return SUCCESS;
+            ajaxSuccess();
         }
         else{
             System.out.println("Correu mal a submissao da ideia!!!!!!!");
-            return ERROR;
+            ajaxFailure();
         }
+
+        return SUCCESS;
+    }
+    public boolean isSuccess() {
+        return super.isSuccess();
     }
 }

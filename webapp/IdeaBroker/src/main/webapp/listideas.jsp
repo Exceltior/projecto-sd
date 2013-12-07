@@ -622,24 +622,69 @@
 
         }
 
+        function onIdeaInvestmentChange() {
+            var investmentbox = $('#ideainvestment');
+            var modalsubmitbutton = $('#modalsubmitbutton');
+            console.log("val: "+investmentbox.val());
+            if ( investmentbox.val().length == 0 || !isValidPositiveNum(investmentbox.val()) ) {
+                modalsubmitbutton.prop('disabled',true);
+                return;
+            }
+
+            var value = parseFloat(investmentbox.val());
+            var money = getUserMoney();
+
+            if ( value > money ) {
+                investmentbox.val(money);
+                modalsubmitbutton.prop('disabled',false);
+            } else if ( value <= 0 ) {
+                modalsubmitbutton.prop('disabled',true);
+            }
+            else
+                modalsubmitbutton.prop('disabled',false);
+        }
+
+        function doSubmitIdea() {
+            title = $('#ideatitle').val();
+            body = $('#ideabody').val();
+            topics = $('#ideatopics').val();
+            moneyinvested = $('#ideainvestment').val();
+            console.log('t: '+title);
+            console.log('bo: '+body);
+            console.log('to: '+topics);
+            doPost('submitidea.action',{title:title,body:body,topicsList:topics,moneyinvested:moneyinvested},function(data){
+                if ( data.success ) {
+                    console.log('success!');
+                } else {
+                    console.log('error!');
+                }
+            }
+            );
+        }
         function createIdea() {
 
             var html =
-                    '<div class="input-group" style=" padding-bottom:10px;">' +
+                    '<div class="input-group" style="padding-bottom:10px;">' +
                     '<span class="input-group-addon" >Título: </span>' +
-                    '<input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatitle"/>' +
+                    '<input type="text" class="form-control" placeholder="Exemplo: DEI Suga Almas" id="ideatitle"/>' +
                     '</div>' +
-                    '<div class="input-group"  >' +
+                    '<div class="input-group"   style="padding-bottom:10px;">' +
                     '<span class="input-group-addon">Conteúdo: </span>' +
                     '<textarea style="resize:vertical;"' +
                             'rows="3"' +
                             'type="textarea"' +
                             'class="form-control"' +
-                            'placeholder="A Mariana é mesmo Linda" id="ideabody"/>' +
+                            'placeholder="Exemplo: 90% do meu tempo útil é passado no DEI" id="ideabody"/>' +
                     '</div>' +
-                    '<div class="input-group">' +
+                    '<div class="input-group"  style="padding-bottom:10px;">' +
                     '<span class="input-group-addon">Tópicos: </span>' +
-                    '<input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatopics"/>' +
+                    '<input type="text" class="form-control" placeholder="Exemplo #Topico1 #Topico2 #TopicoTrês" id="ideatopics"/>' +
+                    '</div>'+
+                    '<div class="input-group">' +
+                    '<span class="input-group-addon">Investimento Inicial: </span>' +
+                    '<input type="text" class="form-control" placeholder="Exemplo: 19930507.1605" id="ideainvestment"' +
+                            '' +
+                            'onkeyup="onIdeaInvestmentChange()"/>' +
                     '</div>';
 
             var message = function(dialogRef){
@@ -657,7 +702,7 @@
             gClosedialog = dialog;
 
             var button =
-                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doSubmitIdea()"><span style="color: #dbd02b" class="glyphicon glyphicon-edit"></span> &nbsp; &nbsp;Submeter Ideia</button>';
+                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doSubmitIdea()" disabled><span style="color: #dbd02b" class="glyphicon glyphicon-edit"></span> &nbsp; &nbsp;Submeter Ideia</button>';
             var closebutton
                     = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
 
@@ -669,6 +714,7 @@
 
             dialog.getModalFooter().html(button+closebutton);
             dialog.open();
+            $('#modalsubmitbutton').prop('disabled',true);
         }
 
         function buyShares(id) {
