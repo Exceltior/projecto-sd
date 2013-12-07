@@ -24,9 +24,9 @@
     <script type="text/javascript" src="js/noty/themes/default.js"></script>
     <script type="text/javascript" src="js/util.js"></script>
     <script type="text/javascript" src="js/notifications.js"></script>
+    <script type="text/javascript" src="js/websockets.js"></script>
     <script type="text/javascript" src="js/topbar.js"></script>
     <script type="text/javascript" src="js/sidebar.js"></script>
-    <script type="text/javascript" src="js/websockets.js"></script>
     <script type="text/javascript">
 
         /**
@@ -118,5 +118,6 @@
             </div>
     </div>
 <script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
+<script src="js/bootstrap-dialog.js"></script>
 </body>
 </html>
