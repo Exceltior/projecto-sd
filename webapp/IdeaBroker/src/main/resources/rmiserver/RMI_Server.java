@@ -95,6 +95,34 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         tokens.remove(uid);
     }
 
+    public String doGetUserNameFromToken(String token) throws RemoteException{
+        String name = null;
+        OAuthService service = new ServiceBuilder()
+                .provider(FacebookApi.class)
+                .apiKey("436480809808619")
+                .apiSecret("af8edf703b7a95f5966e9037b545b7ce")
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        OAuthRequest authRequest = new OAuthRequest(Verb.GET, "https://graph.facebook.com/me?access_token="+token);
+        Token token_final = new Token(token,AppSecret);
+
+        service.signRequest(token_final, authRequest);
+        Response authResponse = authRequest.send();
+
+        System.out.println("AQUI \n" + authResponse.getBody());
+
+        try {
+            name = new JSONObject(authResponse.getBody()).getString("name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //FIXME WHAT TO DO WITH THIS?????
+            return null;
+        }
+
+        return name;
+    }
+
     public String doGetUserIdFromToken(String token) throws RemoteException{
         String id = null;
         OAuthService service = new ServiceBuilder()
@@ -115,6 +143,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         } catch (JSONException e) {
             e.printStackTrace();
             //FIXME WHAT TO DO WITH THIS?????
+            return null;
         }
         return id;
     }
@@ -864,6 +893,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             if (file != null)
                 addFile(iid,file);
             System.out.println("Já adicionei o ficheiro");
+
             //FACEBOOK
             String clientToken = tokens.get(uid);
             if ( clientToken == null ) {
@@ -2586,7 +2616,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{

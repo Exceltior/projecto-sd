@@ -25,6 +25,9 @@ public class Client {
     private float         coins;
     private int           numNotifications;
     private boolean       adminStatus;
+    private String        facebookId;
+    private boolean       isFacebookAccountLoggedIn;//Indica se o user esta logado com o facebook ou normalmente
+    private String        facebookName;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
@@ -32,6 +35,17 @@ public class Client {
         this.coins = 0;
         this.numNotifications = 0; /* FIXME: On facebookLogin, set this */
         this.adminStatus = true;
+        this.facebookId = null;
+        this.isFacebookAccountLoggedIn = false;
+        this.facebookName = null;
+    }
+
+    public String getFacebookName(){
+        return this.facebookName;
+    }
+
+    public boolean getIsFacebookAccountLoggedIn(){
+        return this.isFacebookAccountLoggedIn;
     }
 
     /**
@@ -49,6 +63,10 @@ public class Client {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+
+        if (ret>0)
+            this.isFacebookAccountLoggedIn = false;
+
         return ret;
     }
 
@@ -388,28 +406,31 @@ public class Client {
         return u;
     }
 
+    private void doRMIGetIdFromToken(String token){
+        try{
+            facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: DEAL WITH THIS!
+        }
+    }
+
     /**
      * Safely tries to log in a user registered with a Facebook account, given a Facebook Token.
      * @param token The Facebook Access Token.
      * @return      In case of success returns true. If an error occurs, returns false.
      */
     private boolean doRMIFacebookLogin(String token){
-        String id = null;
 
-        try{
-            id = rmi.getRMIInterface().doGetUserIdFromToken(token);
-        }catch(RemoteException e){
-            e.printStackTrace();
-            //FIXME: DEAL WITH THIS!
-        }
+        doRMIGetIdFromToken(token);
 
-        if (id == null)
+        if (facebookId == null)
             return false;
-        System.out.println("O id e " + id);
+        System.out.println("O id e " + facebookId);
 
         //Check if the received ID is stored in the database
         try{
-            this.uid = rmi.getRMIInterface().facebookLogin(id);
+            this.uid = rmi.getRMIInterface().facebookLogin(facebookId);
         }catch(RemoteException e){
             System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
             e.printStackTrace();
@@ -421,6 +442,17 @@ public class Client {
         }catch(RemoteException e){
             e.printStackTrace();
             //FIXME: HANDLE THIS!!!
+        }
+
+        if (uid != -1)
+            this.isFacebookAccountLoggedIn = true;
+
+        //Ir buscar nome do animal
+        try{
+            this.facebookName = rmi.getRMIInterface().doGetUserNameFromToken(token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: HANDLE THIS!!!!
         }
 
         return this.uid != -1;
@@ -435,13 +467,7 @@ public class Client {
         String facebookId = null;
         boolean result = false;
 
-        try{
-            facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
-        }catch(RemoteException e){
-            e.printStackTrace();
-            //FIXME: DEAL WITH THIS!
-            return false;
-        }
+        doRMIGetIdFromToken(token);
 
         if (facebookId == null)
             return false;
@@ -473,13 +499,7 @@ public class Client {
         String facebookId = null;
         boolean result = false;
 
-        try{
-            facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
-        }catch(RemoteException e){
-            e.printStackTrace();
-            //FIXME: DEAL WITH THIS!
-            return false;
-        }
+        doRMIGetIdFromToken(token);
 
         if (facebookId == null)
             return false;

@@ -66,7 +66,7 @@ public interface RMI_Interface extends Remote {
     public boolean getAdminStatus(int uid) throws RemoteException;
     public void addIdeaToWatchlist(int iid, int uid) throws RemoteException;
     public Idea[] getHallOfFameIdeas() throws RemoteException;
-
+    public String doGetUserNameFromToken(String token) throws RemoteException;
     public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
 
     public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException;
