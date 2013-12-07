@@ -14,7 +14,12 @@ public class TransactionHistoryEntry implements Serializable {
     private String title;
     private String date;
 
+    private boolean bought;
+
     public TransactionHistoryEntry(String[] entry) {
+        this(entry,-1);
+    }
+    public TransactionHistoryEntry(String[] entry, int uid) {
         this.buyer = entry[0];
         this.seller = entry[1];
         this.pricePerShare = Float.valueOf(entry[2]);
@@ -22,6 +27,10 @@ public class TransactionHistoryEntry implements Serializable {
         this.title = entry[4];
         this.date = entry[5];
         this.total = this.pricePerShare * this.numShares;
+
+        if ( uid != -1 ) {
+            bought =  Integer.valueOf(entry[6]) == uid;
+        }
     }
 
     public int getNumShares() {
@@ -42,5 +51,17 @@ public class TransactionHistoryEntry implements Serializable {
 
     public String getDate() {
         return date;
+    }
+
+    public String getBuyer() {
+        return buyer;
+    }
+
+    public String getSeller() {
+        return seller;
+    }
+
+    public boolean isBought() {
+        return bought;
     }
 }
