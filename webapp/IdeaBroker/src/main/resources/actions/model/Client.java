@@ -127,9 +127,6 @@ public class Client {
     private Idea[] doRMIGetUserIdeas(){
         Idea[] devolve = null;
 
-        uid = 1;
-        //FIXME Eliminar isto!
-
         try{
             devolve=rmi.getRMIInterface().getIdeasFromUser(uid);
         }catch (RemoteException e){
@@ -376,7 +373,10 @@ public class Client {
         return ret;
     }
 
-    //TODO: Javadoc
+    /**
+     * Gets the user's username, accessing to the database through a RMI Interface.
+     * @return  The user's username.
+     */
     private String doRMIGetUsername() {
         String u = null;
         try {
@@ -453,6 +453,11 @@ public class Client {
         return true;
     }
 
+    /**
+     * Public interface to perform an administrator's takeover on the system.
+     * @param iid   The id of the user.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
     public boolean doTakeover(int iid) {
         return doRMITakeover(iid);
     }
