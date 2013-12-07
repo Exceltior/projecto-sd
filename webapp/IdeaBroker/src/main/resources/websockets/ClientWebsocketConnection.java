@@ -20,13 +20,14 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
 
     public ClientWebsocketConnection(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        for ( Cookie c : cookies ) {
-            if ( c.getName().equals(COOKIE_NAME) )
-                if ( !client.loginWithEncodedUid(c.getValue()) ) {
-                    /* FIXME: Should not happen...ever...*/
-                }
+        if ( cookies != null )
+            for ( Cookie c : cookies ) {
+                if ( c.getName().equals(COOKIE_NAME) )
+                    if ( !client.loginWithEncodedUid(c.getValue()) ) {
+                        /* FIXME: Should not happen...ever...*/
+                    }
+            }
         }
-    }
 
     protected void onOpen(WsOutbound outbound) {
         try {

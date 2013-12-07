@@ -95,7 +95,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         tokens.remove(uid);
     }
 
-    public String doGetUserNameFromToken(String token) throws RemoteException{
+    public String getFacebookUsernameFromToken(String token) throws RemoteException{
         String name = null;
         OAuthService service = new ServiceBuilder()
                 .provider(FacebookApi.class)
@@ -121,7 +121,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return name;
     }
 
-    public String doGetUserIdFromToken(String token) throws RemoteException{
+    public String getFacebookUserIdFromToken(String token) throws RemoteException{
         String id = null;
         OAuthService service = new ServiceBuilder()
                 .provider(FacebookApi.class)
@@ -282,18 +282,22 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     /**
      * Method responsible for performing the facebookLogin for Facebook users. In these cases we are only going to check if there
      * is one entry in the database for the given user.
-     * @param idFacebook    The facebook id of the user.
+     * @param token    The facebook id of the user.
      * @return              A boolean value, indicating if the id is in the database or not.
      */
-    public int facebookLogin(String idFacebook) throws RemoteException{
-
+    public int facebookLogin(String token) throws RemoteException{
+        String idFacebook = getFacebookUserIdFromToken(token);
+        System.out.println("O id e " + idFacebook+ " em facebookLogin");
         String query = "Select id_facebook, userid from Utilizador where id_facebook LIKE '" + idFacebook +"'";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null || queryResult.isEmpty())
             return -1;
 
-        return Integer.valueOf(queryResult.get(0)[1]);
+        int uid = Integer.valueOf(queryResult.get(0)[1]);
+        updateFacebookToken(uid,token);
+
+        return uid;
     }
 
     /**
@@ -558,18 +562,22 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     /**
      * Method responsible for associating a facebook account with an already created account in our app.
      * @param uid           The user's id on our system.
-     * @param facebookId    The user's id on facebook.
+     * @param token    The user's id on facebook.
      * @return              Boolean value, indicating if the operation went well.
      */
-    synchronized public boolean registerWithFacebook(int uid,String facebookId) throws RemoteException{
-        String query = "Select id_facebook From Utilizador where userid = " + uid;
+    synchronized public boolean associateWithFacebook(int uid, String token) throws RemoteException{
+        String query = "Select id_facebook From Utilizador where userid = " + uid+" and id_facebook is not null";
         ArrayList<String[]>queryResult = receiveData(query);
 
-        if (queryResult != null && !queryResult.isEmpty())//There is already a facebook account associated with the user
+        if ( !queryResult.isEmpty())
             return false;
+
+        String facebookId = getFacebookUserIdFromToken(token);
 
         query = "Update Utilizador set id_facebook = " + facebookId + " where userid = " + uid;
         insertData(query);
+
+        updateFacebookToken(uid,token);
 
         return true;
     }

@@ -3,20 +3,12 @@ package actions.controller;
 /**
  * Class responsible for handling the association of a Facebook Account to an existing account in our system.
  */
-public class RegisterFacebookAction extends ClientAction {
+public class AssociateWithFacebookAction extends AJAXAction {
 
     /**
      * token stores the user's Facebook Access Token.
      */
     private String token;
-
-    /**
-     * Gets the user's Facebook Access Token.
-     * @return  A String object, containing the user's Facebook Access Token.
-     */
-    public String getToken() {
-        return this.token;
-    }
 
     /**
      * Defines a new Facebook Access Token for the user.
@@ -33,10 +25,11 @@ public class RegisterFacebookAction extends ClientAction {
      */
     public String execute() throws Exception{
         super.execute();
-        System.out.println("O token do utilizador no facebook e " + token);
-        if (client.doFacebookRegistration(token))
-            return SUCCESS;
-        else
-            return ERROR;
+        System.out.println("O token do utilizador no facebook 222 e " + token);
+        setAjaxStatus(client.doAssociateWithFacebook(token));
+        return SUCCESS;
+    }
+    public boolean isSuccess() {
+        return super.isSuccess();
     }
 }

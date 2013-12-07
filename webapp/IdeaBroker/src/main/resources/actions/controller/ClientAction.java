@@ -59,10 +59,11 @@ public class ClientAction extends ActionSupport implements SessionAware, Servlet
     }
 
     boolean readCookie() {
-        for(Cookie c : servletRequest.getCookies()) {
-            if (c.getName().equals(COOKIE_NAME))
-                return client.loginWithEncodedUid(c.getValue());
-        }
+        if ( servletRequest.getCookies() != null )
+            for(Cookie c : servletRequest.getCookies()) {
+                if (c.getName().equals(COOKIE_NAME))
+                    return client.loginWithEncodedUid(c.getValue());
+            }
         return false;
     }
 

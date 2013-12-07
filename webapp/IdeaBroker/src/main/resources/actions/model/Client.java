@@ -406,13 +406,26 @@ public class Client {
         return u;
     }
 
-    private void doRMIGetIdFromToken(String token){
+    private void doRMIGetFacebookUserIdFromToken(String token){
         try{
-            facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
+            facebookId = rmi.getRMIInterface().getFacebookUserIdFromToken(token);
         }catch(RemoteException e){
             e.printStackTrace();
             //FIXME: DEAL WITH THIS!
         }
+    }
+
+    private String doRMIGetFacebookUsernameFromToken(String token) {
+        String ret = null;
+        //Ir buscar nome do animal
+        try{
+            ret = rmi.getRMIInterface().getFacebookUsernameFromToken(token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: HANDLE THIS!!!!
+        }
+
+        return ret;
     }
 
     /**
@@ -420,23 +433,18 @@ public class Client {
      * @param token The Facebook Access Token.
      * @return      In case of success returns true. If an error occurs, returns false.
      */
-    private boolean doRMIFacebookLogin(String token){
-
-        doRMIGetIdFromToken(token);
-
-        if (facebookId == null)
-            return false;
-        System.out.println("O id e " + facebookId);
-
-        //Check if the received ID is stored in the database
+    private int doRMIFacebookLogin(String token){
+        int ret=-1;
         try{
-            this.uid = rmi.getRMIInterface().facebookLogin(facebookId);
+            ret = rmi.getRMIInterface().facebookLogin(token);
         }catch(RemoteException e){
             System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
             e.printStackTrace();
         }
+        return ret;
+    }
 
-        //Update mapping userId - Clienttoken, stored in the RMI
+    private boolean doRMIUpdateFacebookToken(String token) {
         try{
             this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
         }catch(RemoteException e){
@@ -444,59 +452,28 @@ public class Client {
             //FIXME: HANDLE THIS!!!
         }
 
-        //Ir buscar nome do animal
-        try{
-            this.facebookName = rmi.getRMIInterface().doGetUserNameFromToken(token);
-        }catch(RemoteException e){
-            e.printStackTrace();
-            //FIXME: HANDLE THIS!!!!
-        }
-
-        return this.uid != -1;
+        return true;
     }
 
-    /**
-     * Safely tries to associate an already created account in our app with an existing and valid facebook account.
-     * @param token The Facebook Access Token.
-     * @return      In case of success returns true. If an error occurs, returns false.
-     */
-    private boolean doRMIFacebookRegistration(String token){
-        String facebookId = null;
-        boolean result = false;
-
-        doRMIGetIdFromToken(token);
-
-        if (facebookId == null)
-            return false;
-        System.out.println("O id e " + facebookId);
+    private boolean doRMIAssociateWithFacebook(String token) {
+        boolean result;
 
         //Store the id on the database
         try{
-            result = this.rmi.getRMIInterface().registerWithFacebook(this.uid,facebookId);
+            result = this.rmi.getRMIInterface().associateWithFacebook(this.uid, token);
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME: DEAL WITH THIS
             return false;
         }
 
-        if (!result)
-            return result;
-
-        //Update mapping userId - Clienttoken, stored in the RMI
-        try{
-            this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
-        }catch(RemoteException e){
-            e.printStackTrace();
-            //FIXME: HANDLE THIS!!!
-        }
-        return true;
+        return result;
     }
 
     private boolean doRMIRegisterNewAccountWithFacebook(String username, String password, String email, String token){
         String facebookId = null;
         boolean result = false;
 
-        doRMIGetIdFromToken(token);
+        doRMIGetFacebookUserIdFromToken(token);
 
         if (facebookId == null)
             return false;
@@ -575,6 +552,11 @@ public class Client {
             this.adminStatus = doRMIGetAdminStatus();
 
             this.facebookAccount = doRMIIsFacebookAccount();
+            this.facebookName = null;
+            /* DAMN FIXME
+            if ( this.facebookAccount)
+                this.facebookName = doRMIGetFacebookUsernameFromToken()
+                */
 
             return true;
         }
@@ -588,11 +570,12 @@ public class Client {
      * @return      A boolean value, indicating the success or failure of the operation
      */
     public boolean doFacebokLogin(String token){
-        boolean devolve = this.doRMIFacebookLogin(token);
+        if ((this.uid = doRMIFacebookLogin(token)) == -1)
+            return false;
 
-        if (devolve)
-            this.facebookAccount = true;
-        return devolve;
+        this.facebookAccount = true;
+        this.facebookName = doRMIGetFacebookUsernameFromToken(token);
+        return true;
     }
 
     /**
@@ -600,12 +583,13 @@ public class Client {
      * @param token The facebook's Access token
      * @return      A boolean value, indicating the success or failure of the operation
      */
-    public boolean doFacebookRegistration(String token){
-        boolean devolve = this.doRMIFacebookRegistration(token);
+    public boolean doAssociateWithFacebook(String token){
+        if (!doRMIAssociateWithFacebook(token))
+            return false;
 
-        if(devolve)
-            this.facebookAccount = true;
-        return devolve;
+        this.facebookAccount = true;
+        this.facebookName = doRMIGetFacebookUsernameFromToken(token);
+        return true;
     }
 
     /**

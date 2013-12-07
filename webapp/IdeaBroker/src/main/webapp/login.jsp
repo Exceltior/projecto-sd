@@ -1,6 +1,6 @@
 <!-- STRUTS -->
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=utf8"
+         pageEncoding="utf8"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <!-- END STRUTS -->
 
@@ -12,7 +12,6 @@
     <link href="css/clouds.css" rel="stylesheet">
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <title>Idea Broker</title>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 </head>
 <body>
 
@@ -72,23 +71,6 @@
                             { token:response.authResponse.accessToken });
                 }
             }
-            /*
-            if (response.authResponse) {
-                // user has auth'd your app and is logged into Facebook
-                //$('#AccessToken').val(response.authResponse.accessToken);
-
-
-                FB.api('/me', function (me) {
-                    console.log(me);
-                    if (me.id) {
-                        token = me.token;
-
-                        doPost("http://" + window.location.host + "/loginfacebook.action",
-                                { token:me.token });
-                    }
-                });
-            }
-            */
         });
         $("#auth-logoutlink").click(function () { FB.logout(function () { window.location.reload(); }); });
     }

@@ -82,6 +82,10 @@
         <action name="submitidea" class="actions.controller.SubmitIdeaAction" method="execute">
             <result type="json"></result>
         </action>
+
+        <action name="facebookassociate" class="actions.controller.AssociateWithFacebookAction" method="execute">
+            <result type="json"></result>
+        </action>
     </package>
 
 </struts>

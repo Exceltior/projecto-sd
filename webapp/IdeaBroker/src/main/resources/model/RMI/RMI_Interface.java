@@ -13,14 +13,14 @@ import model.data.*;
 public interface RMI_Interface extends Remote {
     public void invalidateFacebookToken(int uid)throws RemoteException;
     public void updateFacebookToken(int uid,String facebookToken)throws RemoteException;
-    public String doGetUserIdFromToken(String token) throws RemoteException;
+    public String getFacebookUserIdFromToken(String token) throws RemoteException;
     public int login(String user, String pwd) throws  RemoteException;
     public int facebookLogin(String idFacebook) throws RemoteException;
     public String getIdeaFacebookId(int iid) throws RemoteException;
     //public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
     public boolean register(String user, String pass, String email,String faceId) throws RemoteException;
-    public boolean registerWithFacebook(int uid,String facebookId) throws RemoteException;
+    public boolean associateWithFacebook(int uid, String token) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
     public ServerTopic[] getTopics(String title) throws RemoteException;
     public boolean createTopic(String nome, int uid) throws  RemoteException;
@@ -66,7 +66,7 @@ public interface RMI_Interface extends Remote {
     public boolean getAdminStatus(int uid) throws RemoteException;
     public void addIdeaToWatchlist(int iid, int uid) throws RemoteException;
     public Idea[] getHallOfFameIdeas() throws RemoteException;
-    public String doGetUserNameFromToken(String token) throws RemoteException;
+    public String getFacebookUsernameFromToken(String token) throws RemoteException;
     public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
     public boolean isFacebookAccount(int uid) throws RemoteException;
     public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException;
