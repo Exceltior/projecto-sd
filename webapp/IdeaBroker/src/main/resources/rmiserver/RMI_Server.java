@@ -790,9 +790,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         conn = getTransactionalConnection();
 
-        if (getUserMoney(uid) < moneyInvested){//If the user doesn't have enough money
+        if (getUserMoney(uid,conn) < moneyInvested){//If the user doesn't have enough money
             System.err.println("Error while creating the idea! the user doesn't have enought money!" +
-                    " " + getUserMoney(uid) + " " + moneyInvested);
+                    " " + getUserMoney(uid,conn) + " " + moneyInvested);
             return -1;
         }
 
@@ -1220,7 +1220,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             System.out.println("Need to add to queue!");
             Connection conn = getTransactionalConnection();
             checkQueue(conn);
-            insertIntoQueue(uid,iid,buyNumShares,maxPricePerShare,targetSellPrice,conn);
+            insertIntoQueue(uid,iid,buyNumShares-ret.numSharesBought,maxPricePerShare,targetSellPrice,conn);
             returnTransactionalConnection(conn);
         } else if ( ret.result.equals("OK") ) {
             Connection conn = getTransactionalConnection();
@@ -1871,6 +1871,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return Integer.valueOf(queryResult.get(0)[0]);
     }
 
+    synchronized private void updateQueueEntry(int id, float num, Connection conn){
+        String query = "UPDATE Compra SET num="+num+" where compra_id="+id;
+
+        insertData(query,conn);
+    }
+
     /**
      * Remove a buying order from the buyShareQueue.
      * @param id    The id of the user requesting the transaction
@@ -1931,6 +1937,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
                 //Start again, as some of the other queued transactions may potentially take place now
                 i = 0;
+            } else if (ret.result.contains("QUEUE")) {
+                updateQueueEntry(id, num-ret.numSharesBought,conn);
             }
         }
 }

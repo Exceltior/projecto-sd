@@ -602,7 +602,7 @@
             var dialog = new BootstrapDialog({
                 size: BootstrapDialog.SIZE_LARGE,
                 message: message,
-                closable:true,
+                closable:true
             });
             gClosedialog = dialog;
 
@@ -625,13 +625,13 @@
         function createIdea() {
 
             var html =
-                    '<div class="input-group">' +
-                    '<span class="input-group-addon">Título: </span>' +
+                    '<div class="input-group" style=" padding-bottom:10px;">' +
+                    '<span class="input-group-addon" >Título: </span>' +
                     '<input type="text" class="form-control" placeholder="A Mariana é Linda" id="ideatitle"/>' +
                     '</div>' +
-                    '<div class="input-group">' +
+                    '<div class="input-group"  >' +
                     '<span class="input-group-addon">Conteúdo: </span>' +
-                    '<textarea style="resize:vertical"' +
+                    '<textarea style="resize:vertical;"' +
                             'rows="3"' +
                             'type="textarea"' +
                             'class="form-control"' +
@@ -657,7 +657,7 @@
             gClosedialog = dialog;
 
             var button =
-                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doSearch()"><span style="color: #dbd02b" class="glyphicon glyphicon-search"></span> &nbsp; &nbsp;Pesquisar!</button>';
+                    '<button class="btn btn-primary btn-lg" id="modalsubmitbutton" onclick="doSubmitIdea()"><span style="color: #dbd02b" class="glyphicon glyphicon-edit"></span> &nbsp; &nbsp;Submeter Ideia</button>';
             var closebutton
                     = '<button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Cancelar</button>';
 
