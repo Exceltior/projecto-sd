@@ -36,7 +36,7 @@ public interface RMI_Interface extends Remote {
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
     public int createIdea(String title, String description, int uid,float moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
-    public String[] getHistory(int iid) throws RemoteException;
+    public TransactionHistoryEntry[] getHistory(int iid) throws RemoteException;
     //public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
     //public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException;
     //public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException;

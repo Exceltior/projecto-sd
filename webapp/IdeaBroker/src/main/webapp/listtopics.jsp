@@ -18,14 +18,8 @@
     <!--<link href="css/3dbtn.css" rel="stylesheet">-->
     <title></title>
     <script type="text/javascript" src="js/jquery.js"></script>
-    <script type="text/javascript" src="js/noty/jquery.noty.js"></script>
-    <script type="text/javascript" src="js/noty/layouts/top.js"></script>
-    <script type="text/javascript" src="js/noty/layouts/topRight.js"></script>
-    <script type="text/javascript" src="js/noty/themes/default.js"></script>
-    <script type="text/javascript" src="js/util.js"></script>
     <script type="text/javascript" src="js/notifications.js"></script>
     <script type="text/javascript" src="js/websockets.js"></script>
-    <script type="text/javascript" src="js/viewideas.js"></script>
     <script type="text/javascript">
 
         /**

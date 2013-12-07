@@ -3,22 +3,18 @@ package actions.controller;
 import model.data.Idea;
 
 public class ViewHallOfFameAction extends ClientAction{
-    private Idea[] hallOfFameIdeas;
+    private Idea[] ideas;
 
-    public Idea[] getHallOfFameIdeas() {
-        return hallOfFameIdeas;
+    public Idea[] getIdeas() {
+        return ideas;
     }
 
-    public void setHallOfFameIdeas(Idea[] hallOfFameIdeas) {
-        this.hallOfFameIdeas = hallOfFameIdeas;
-    }
-
-    public String execute() throws Exception{
+    public String execute() throws Exception {
         super.execute();
 
-        hallOfFameIdeas = client.doGetHallOfFameIdeas();
+        ideas = client.doGetHallOfFameIdeas();
 
-        if (hallOfFameIdeas == null)
+        if ( ideas == null)
             return ERROR;
         else
             return SUCCESS;

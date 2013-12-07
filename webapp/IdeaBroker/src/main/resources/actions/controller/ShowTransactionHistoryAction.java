@@ -1,24 +1,27 @@
 package actions.controller;
 
+import model.data.TransactionHistoryEntry;
+
 /**
  * This class is used when the user wants to see his/hers history of transactions, stored in the database. When execute()
  * is called, there are no requirements in terms of "user-defined data". We just access the database and extract the user's
  * history of transactions.
  */
 public class ShowTransactionHistoryAction extends ClientAction {
+    public class Transaction {}
 
     /**
      * historyList is an Array of String objects, each containing the information about a transaction in which the user is
      * involved (as a buyer or a seller).
      */
-    private String[] historyList;
+    private TransactionHistoryEntry[] historyList;
 
 
     public String execute() throws Exception {
         super.execute();
 
         this.historyList = client.doGetHistory();
-        if (this.historyList != null)
+        if ( this.historyList != null )
             return SUCCESS;
         else
             return ERROR;
@@ -26,19 +29,10 @@ public class ShowTransactionHistoryAction extends ClientAction {
 
     /**
      * Gets the user's transaction history.
-     * @return  An array of String objects, each containing the information about a transaction in which the user is involved
+     * @return An array of String objects, each containing the information about a transaction in which the user is involved
      *          (as a buyer or a seller).
      */
-    public String[] getHistoryList() {
+    public TransactionHistoryEntry[] getHistoryList() {
         return historyList;
-    }
-
-    /**
-     * Sets the user's transaction history
-     * @param historyList   An array of String objects, each containing the information about a transaction in which the
-     *                      user is involved (as a buyer or a seller).
-     */
-    public void setHistoryList(String[] historyList) {
-        this.historyList = historyList;
     }
 }

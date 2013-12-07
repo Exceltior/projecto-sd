@@ -1516,31 +1516,28 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     /**
      * Send to the Server the history of transactions for a given client
+     *
      * @param uid The id of the user
      * @return an array of objects of type String containing the transactional history for the given user
      * @throws RemoteException
      */
-    public String[] getHistory(int uid) throws RemoteException{
-        String[] history;
-        String query = "Select t.comprador, t.vendedor, t.valor*t.numShares, t.valor, " +
-                "t.numShares, i.titulo, t.data from Transacao t, Ideia i " +
-                "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid order by t.data";
-
+    public TransactionHistoryEntry[] getHistory(int uid) throws RemoteException{
+        TransactionHistoryEntry[] history;
+        String query = "Select u.username, u2.username, t.valor, " +
+                       "t.numShares, i.titulo, t.data from Transacao t, Ideia i, Utilizador u, Utilizador u2 " +
+                       "where (t.comprador = " + uid + " or t.vendedor = " + uid + ") and t.iid = i.iid and " +
+                       "u.userid=t.comprador and u2.userid=t.vendedor by t.data";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null)
             return null;
 
-        history = new String[queryResult.size()];
+        history = new TransactionHistoryEntry[queryResult.size()];
 
 
 
         for (int i=0;i<queryResult.size();i++)
-            history[i] = queryResult.get(i)[5] + ": ID " + queryResult.get(i)[0] + " bought "+ queryResult.get(i)[4] +
-                    " " +
-                    "shares from " + "ID "
-                    + queryResult.get(i)[1] + " at " + queryResult.get(i)[3] + " DEI Coins per share, " +
-                    "for a total of " + queryResult.get(i)[2] + " DEI Coins. model.data.Idea.Transaction date: " + queryResult.get(i)[6];
+            history[i] =new TransactionHistoryEntry(queryResult.get(i));
 
         return  history;
     }
@@ -1690,17 +1687,19 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * Gets all the ideas of the Hall of Fame, stored in the database.
      * @return  An array of Idea objects, containing all the ideas of the Hall of Fame, stored in the database.
      */
-    public Idea[] getHallOfFameIdeas(){
+    public Idea[] getHallOfFameIdeas() throws RemoteException{
         Idea[] devolve = null;
         String query = "Select * from Ideia i, HallFame h where i.iid = h.iid";
         ArrayList<String[]> queryResult = receiveData(query);
 
         if (queryResult == null || queryResult.isEmpty())
-            return null;
+            return new Idea[0]; //FIXME: Never goes wrong
 
         devolve = new Idea[queryResult.size()];
-        for (int i=0;i<queryResult.size();i++)
+        for (int i=0;i<queryResult.size();i++) {
             devolve[i] = new Idea(queryResult.get(i));
+            devolve[i].setTopics(getIdeaTopics(devolve[i].getId()));
+        }
 
         return devolve;
     }

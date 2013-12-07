@@ -1,10 +1,8 @@
 package actions.model;
 
 import model.RMI.RMIConnection;
-import model.data.BuySharesReturn;
-import model.data.Idea;
-import model.data.NetworkingFile;
-import model.data.Topic;
+import model.data.*;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -322,8 +320,8 @@ public class Client {
      * Safely gets all the transactions performed by the user.
      * @return      An array of String objects, containing all the transactions performed by the user.
      */
-    private String[] doRMIGetHistory(){
-        String[] devolve = null;
+    private TransactionHistoryEntry[] doRMIGetHistory(){
+        TransactionHistoryEntry[] devolve = null;
 
         try{
            devolve = rmi.getRMIInterface().getHistory(uid);
@@ -718,7 +716,7 @@ public class Client {
      * Public interface to try to get the user's transaction history.
      * @return      An array of String objects, containing all the transactions performed by the user.
      */
-    public String[] doGetHistory(){
+    public TransactionHistoryEntry[] doGetHistory(){
         return doRMIGetHistory();
     }
 
@@ -779,7 +777,7 @@ public class Client {
     public boolean getAdminStatus() {
         //FIXME: MEGA FIX ME
         //return adminStatus;
-        return false;
+        return true;
     }
 
     /**
