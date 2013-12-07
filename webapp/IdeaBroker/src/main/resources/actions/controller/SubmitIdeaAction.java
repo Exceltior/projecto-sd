@@ -27,7 +27,7 @@ public class SubmitIdeaAction extends AJAXAction{
     String title;
     String body;
     String topicsList;
-    int moneyInvested;
+    float moneyInvested;
     File file;
     String contentType;
     String filename;
@@ -69,7 +69,7 @@ public class SubmitIdeaAction extends AJAXAction{
      * Defines the money the user is going to invest in this new idea.
      * @param money The money the user is going to invest in this new idea.
      */
-    public void setMoneyInvested(int money){
+    public void setMoneyInvested(float money){
         this.moneyInvested = money;
     }
 
@@ -136,6 +136,10 @@ public class SubmitIdeaAction extends AJAXAction{
      */
     public String execute() throws Exception {
         super.execute();
+
+        System.out.println("moneyInvested: "+moneyInvested);
+        System.out.println("title: "+title);
+        System.out.println("topicsList: "+topicsList);
 
         NetworkingFile userFile = null;
 

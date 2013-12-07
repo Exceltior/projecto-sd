@@ -304,8 +304,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (title==null)
             return getTopics();//FIXME: MAXI SHOULD WE DO THIS???
 
-        String query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
-                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid";
+        String query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i, Ideia ii " +
+                "where t.nome LIKE '%" + title + "%' and i.tid = t.tid and ii.iid=i.iid and ii.activa = 1";
 
         ArrayList<String[]> result = receiveData(query);
 
@@ -326,7 +326,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public ServerTopic[] getTopics() throws RemoteException{
-        String query = "select t.tid, t.nome, t.userid, count(*) from Topico t, TopicoIdeia i where i.tid = t.tid " +
+        String query = "select t.tid, t.nome, t.userid, count(*) from Topico t, TopicoIdeia i, " +
+                "Ideia ii where i.tid = t.tid  and ii.iid=i.iid and ii.activa = 1 " +
                 "group by t.tid, t.nome, t.userid";
 
         ArrayList<String[]> result = receiveData(query);
@@ -777,7 +778,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  The id of the idea we just created
      * @throws RemoteException
      */
-    synchronized public int createIdea(String title, String description, int uid,int moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException{
+    synchronized public int createIdea(String title, String description, int uid,float moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException{
         String query;
         ArrayList<String[]> queryResult;
         float initialSell;
@@ -796,8 +797,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return -1;
         }
 
-        initialSell = moneyInvested;
-        initialSell = initialSell/starting_shares;
+        initialSell = starting_shares;
+        initialSell = moneyInvested/initialSell;
+
+        System.out.println("O preço de venda inicial e " + initialSell);
 
         query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
                 "" + uid + "," +
@@ -1645,6 +1648,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         if ( result.get(0)[0].equals("1") )
             devolve = true;
+
+        return devolve;
+    }
+
+    /**
+     * Gets all the ideas of the Hall of Fame, stored in the database.
+     * @return  An array of Idea objects, containing all the ideas of the Hall of Fame, stored in the database.
+     */
+    public Idea[] getHallOfFameIdeas(){
+        Idea[] devolve = null;
+        String query = "Select * from Ideia i, HallFame h where i.iid = h.iid";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || queryResult.isEmpty())
+            return null;
+
+        devolve = new Idea[queryResult.size()];
+        for (int i=0;i<queryResult.size();i++)
+            devolve[i] = new Idea(queryResult.get(i));
 
         return devolve;
     }

@@ -488,8 +488,6 @@
                         //Update the selling price onscreen
                         setSellingPriceIdea(id,targetSellPrice);
                         message =
-                                '<span style="color: #6fc65d" class="glyphicon glyphicon-ok-circle"></span>&nbsp;<span style="color: #6fc65d">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #6fc65d">'+data.totalSpent+'</span> DEICoins.</span>'
-                        message =
                                 $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #6fc65d" class="glyphicon glyphicon-ok-circle"></span></div>&nbsp;<span style="color: #6fc65d">'+data.numSharesBought+'</span> shares foram compradas pelo total de <span style="color: #6fc65d">'+data.totalSpent+'</span> DEICoins.<br /></div>');
                         header =
                                 '<div class="bootstrap-dialog-title">Operação concluída com sucesso!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
@@ -622,7 +620,7 @@
 
         }
 
-        function onIdeaInvestmentChange() {
+        function onIdeaformChange() {
             var investmentbox = $('#ideainvestment');
             var modalsubmitbutton = $('#modalsubmitbutton');
             console.log("val: "+investmentbox.val());
@@ -644,6 +642,53 @@
                 modalsubmitbutton.prop('disabled',false);
         }
 
+        function goToUserIdeas() {
+            doPost('listideas.action',{mode:'userideas'});
+        }
+
+        function onSubmitIdeaSuccess() {
+            gClosedialog.close();
+            var message, header, type;
+            message =
+                    $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #6fc65d" class="glyphicon glyphicon-ok-circle"></span></div>&nbsp;A ideia criada com sucesso!</div>');
+            header =
+                    '<div class="bootstrap-dialog-title">Operação concluída com sucesso!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gClosedialog.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+            type = BootstrapDialog.TYPE_SUCCESS;
+            var dialog = new BootstrapDialog({
+                size: BootstrapDialog.SIZE_LARGE,
+                type: type,
+                message: message,
+                closable:true
+            });
+            gClosedialog = dialog;
+            dialog.realize();
+            dialog.getModalHeader().html(header);
+            dialog.getModalFooter().html('<button class="btn btn-success btn-lg" onclick="goToUserIdeas();">Ir para a Lista de Ideias</button><button class="btn btn-default btn-lg" onclick="gClosedialog.close();">Continuar</button>');
+            dialog.open();
+        }
+
+        gIdeaStateBox = null;
+        function onSubmitIdeaFailure() {
+
+            var message, header, type;
+            message =
+                    $('<div style="text-align:center;"><div style="font-size:40pt;"><span style="color: #d2322d" class="glyphicon glyphicon-remove-circle"></span></div>&nbsp;Já existe uma ideia com esse título!</div>');
+            header =
+                    '<div class="bootstrap-dialog-title">A ideia não foi criada!</div><div class="bootstrap-dialog-close-button" style="display: block;"><button class="close"  onclick="gIdeaStateBox.close();"><span class="glyphicon glyphicon-remove"></span></button></div>';
+            type = BootstrapDialog.TYPE_DANGER;
+            var dialog = new BootstrapDialog({
+                size: BootstrapDialog.SIZE_LARGE,
+                type: type,
+                message: message,
+                closable:true
+            });
+            gIdeaStateBox = dialog;
+            dialog.realize();
+            dialog.getModalHeader().html(header);
+            dialog.getModalFooter().html('<button class="btn btn-danger btn-lg" onclick="gIdeaStateBox.close();gClosedialog.close();">Voltar para a feed</button><button class="btn btn-default btn-lg" onclick="gIdeaStateBox.close();">Voltar</button>');
+            dialog.open();
+        }
+
         function doSubmitIdea() {
             title = $('#ideatitle').val();
             body = $('#ideabody').val();
@@ -652,11 +697,12 @@
             console.log('t: '+title);
             console.log('bo: '+body);
             console.log('to: '+topics);
-            doPost('submitidea.action',{title:title,body:body,topicsList:topics,moneyinvested:moneyinvested},function(data){
+            console.log('money: '+moneyinvested);
+            postJSON('submitidea.action',{title:title,body:body,topicsList:topics,moneyInvested:moneyinvested},function(data){
                 if ( data.success ) {
-                    console.log('success!');
+                    onSubmitIdeaSuccess();
                 } else {
-                    console.log('error!');
+                    onSubmitIdeaFailure();
                 }
             }
             );
@@ -666,11 +712,11 @@
             var html =
                     '<div class="input-group" style="padding-bottom:10px;">' +
                     '<span class="input-group-addon" >Título: </span>' +
-                    '<input type="text" class="form-control" placeholder="Exemplo: DEI Suga Almas" id="ideatitle"/>' +
+                    '<input onkeyup="onIdeaformChange()" type="text" class="form-control" placeholder="Exemplo: DEI Suga Almas" id="ideatitle"/>' +
                     '</div>' +
                     '<div class="input-group"   style="padding-bottom:10px;">' +
                     '<span class="input-group-addon">Conteúdo: </span>' +
-                    '<textarea style="resize:vertical;"' +
+                    '<textarea onkeyup="onIdeaformChange()" style="resize:vertical;"' +
                             'rows="3"' +
                             'type="textarea"' +
                             'class="form-control"' +
@@ -678,13 +724,13 @@
                     '</div>' +
                     '<div class="input-group"  style="padding-bottom:10px;">' +
                     '<span class="input-group-addon">Tópicos: </span>' +
-                    '<input type="text" class="form-control" placeholder="Exemplo #Topico1 #Topico2 #TopicoTrês" id="ideatopics"/>' +
+                    '<input onkeyup="onIdeaformChange()" type="text" class="form-control" placeholder="Exemplo #Topico1 #Topico2 #TopicoTrês" id="ideatopics"/>' +
                     '</div>'+
                     '<div class="input-group">' +
                     '<span class="input-group-addon">Investimento Inicial: </span>' +
                     '<input type="text" class="form-control" placeholder="Exemplo: 19930507.1605" id="ideainvestment"' +
                             '' +
-                            'onkeyup="onIdeaInvestmentChange()"/>' +
+                            'onkeyup="onIdeaformChange()"/>' +
                     '</div>';
 
             var message = function(dialogRef){
@@ -787,7 +833,8 @@
             <li><a href="#"><span class="glyphicon glyphicon-bell">&nbsp;Mensagens</span><span style="color:black">_</span></a></li>
             <li><a href="#"><span class="glyphicon glyphicon-fire">&nbsp;Hall of Fame</span><span style="color:black">
                 _</span></a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-search">&nbsp;Pesquisar Tópicos</span><span
+            <li><a href="#" onclick="createIdea();"><span class="glyphicon glyphicon-edit">&nbsp;Adicionar
+                Ideia</span><span
                     style="color:black">
                 _</span></a></li>
             <li><a href="#" onclick="searchIdea()"><span class="glyphicon glyphicon-search"  style="z-index:0"></span><span

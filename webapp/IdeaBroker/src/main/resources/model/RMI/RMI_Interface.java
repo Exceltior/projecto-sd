@@ -33,7 +33,7 @@ public interface RMI_Interface extends Remote {
     public Idea[] searchIdeas(int uid, int iid, String title) throws RemoteException;
     public ServerTopic getTopic(int tid, String name) throws RemoteException;
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException;
-    public int createIdea(String title, String description, int uid,int moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException;
+    public int createIdea(String title, String description, int uid,float moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException;
     public boolean setTopicsIdea(int iid, String topicTitle, int uid) throws RemoteException;
     public String[] getHistory(int iid) throws RemoteException;
     //public boolean setIdeasRelations(int iidpai,int idfilho, int tipo) throws RemoteException;
@@ -64,6 +64,7 @@ public interface RMI_Interface extends Remote {
     public float getUserMoney(int uid) throws RemoteException;
     public boolean getAdminStatus(int uid) throws RemoteException;
     public void addIdeaToWatchlist(int iid, int uid) throws RemoteException;
+    public Idea[] getHallOfFameIdeas() throws RemoteException;
 
     public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
 
