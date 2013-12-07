@@ -25,10 +25,9 @@ public class Idea implements Serializable {
     private boolean inWatchList;
     private float   sellingPrice; //The price at which this user is selling shares, if he owns any
 
-
-    ////
-    // Class Constructor
-    ////
+    /**
+     * Class Constructor.
+     */
     public Idea() {
         this.id = this.uid = 0;
         this.body = this.title = null;
@@ -45,10 +44,11 @@ public class Idea implements Serializable {
         this.sellingPrice = 0;
         this.facebookId = 0;
     }
-
-    ////
-    //  Method responsible for comunicating with the Server, writing information to the data Output Stream
-    ////
+    /**
+     * Method responsible for comunicating with the Server, writing information to the DataOutputStream.
+     * @param out   The DataOutputStream where we are going to write the information about the idea.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
     public boolean writeToDataStream(DataOutputStream out) {
         if ( ! Common.sendInt(id, out) )
             return false;
@@ -78,9 +78,11 @@ public class Idea implements Serializable {
         return true;
     }
 
-    ////
-    //  Method responsible for receiving messages from the Server, reading information from the data Output Stream
-    ////
+    /**
+     * Method responsible for receiving messages from the Server, reading information from the DataInputStream.
+     * @param in    The DataInputStream where we are going to read the information about the idea.
+     * @return      A boolean value, indicating the success or failure of the operation.
+     */
     public boolean readFromDataStream(DataInputStream in) {
 
         if ( (this.id = Common.recvInt(in)) == -1)
@@ -237,6 +239,10 @@ public class Idea implements Serializable {
         return this.body;
     }
 
+    /**
+     * Add a given number of shares to the number of shares a user wants to buy for the given idea.
+     * @param n The number of share to add to the number of shares a user wants to buy for the given idea.
+     */
     public void addSharesToBuy(int n){
         this.shares_to_buy = this.shares_to_buy + n;
     }
