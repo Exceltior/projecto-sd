@@ -498,7 +498,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     /**
-     *  Method responsible for insering a new user in the database
+     * Method responsible for insering a new user in the database
      * @param user Username
      * @param pass Password
      * @param email User's email address
@@ -516,6 +516,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 "'" + pass +
                 "'," + starting_money + ",sysdate, null)";
 
+        insertData(query);
+
+        return true;
+    }
+
+    /**
+     * Method responsible for associating a facebook account with an already created account in our app.
+     * @param uid           The user's id on our system.
+     * @param facebookId    The user's id on facebook.
+     * @return              Boolean value, indicating if the operation went well.
+     */
+    synchronized public boolean registerWithFacebook(int uid,String facebookId) throws RemoteException{
+        String query = "Select id_facebook From Utilizador where userid = " + uid;
+        ArrayList<String[]>queryResult = receiveData(query);
+
+        if (queryResult != null && !queryResult.isEmpty())//There is already a facebook account associated with the user
+            return false;
+
+        query = "Update Utilizador set id_facebook = " + facebookId + " where userid = " + uid;
         insertData(query);
 
         return true;

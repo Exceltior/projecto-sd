@@ -390,7 +390,7 @@ public class Client {
 
     /**
      * Safely tries to log in a user registered with a Facebook account, given a Facebook Token.
-     * @param token The Facebook Token.
+     * @param token The Facebook Access Token.
      * @return      In case of success returns true. If an error occurs, returns false.
      */
     private boolean doRMIFacebookLogin(String token){
@@ -424,6 +424,38 @@ public class Client {
         }
 
         return this.uid != -1;
+    }
+
+    /**
+     * Safely tries to associate an already created account in our app with an existing and valid facebook account.
+     * @param token The Facebook Access Token.
+     * @return      In case of success returns true. If an error occurs, returns false.
+     */
+    private boolean doRMIFacebookRegistration(String token){
+        String facebookId = null;
+
+        try{
+            facebookId = rmi.getRMIInterface().doGetUserIdFromToken(token);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: DEAL WITH THIS!
+            return false;
+        }
+
+        if (facebookId == null)
+            return false;
+        System.out.println("O id e " + facebookId);
+
+        //Store the id on the database
+        try{
+            this.rmi.getRMIInterface().registerWithFacebook(uid,facebookId);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME: DEAL WITH THIS
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -483,12 +515,21 @@ public class Client {
     }
 
     /**
-     * Public interface to try and log
-     * @param token
-     * @return
+     * Public interface to try and log in with a facebook account
+     * @param token The facebook's Access token
+     * @return      A boolean value, indicating the success or failure of the operation
      */
     public boolean doFacebokLogin(String token){
         return this.doRMIFacebookLogin(token);
+    }
+
+    /**
+     * Public interface to try and associate a facebook account to an existing regular account in our app.
+     * @param token The facebook's Access token
+     * @return      A boolean value, indicating the success or failure of the operation
+     */
+    public boolean doFacebookRegistration(String token){
+        return this.doRMIFacebookRegistration(token);
     }
 
     /**
