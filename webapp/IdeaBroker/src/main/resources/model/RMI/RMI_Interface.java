@@ -13,6 +13,7 @@ import model.data.*;
 public interface RMI_Interface extends Remote {
     public void invalidateFacebookToken(int uid)throws RemoteException;
     public void updateFacebookToken(int uid,String facebookToken)throws RemoteException;
+    public String doGetUserIdFromToken(String token) throws RemoteException;
     public int login(String user, String pwd) throws  RemoteException;
     public int facebookLogin(String idFacebook) throws RemoteException;
     public String getIdeaFacebookId(int iid) throws RemoteException;

@@ -95,6 +95,30 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         tokens.remove(uid);
     }
 
+    public String doGetUserIdFromToken(String token) throws RemoteException{
+        String id = null;
+        OAuthService service = new ServiceBuilder()
+                .provider(FacebookApi.class)
+                .apiKey("436480809808619")
+                .apiSecret("af8edf703b7a95f5966e9037b545b7ce")
+                .callback("http://localhost:8080")   //should be the full URL to this action
+                .build();
+
+        OAuthRequest authRequest = new OAuthRequest(Verb.GET, "https://graph.facebook.com/me?access_token="+token);
+        Token token_final = new Token(token,AppSecret);
+
+        service.signRequest(token_final, authRequest);
+        Response authResponse = authRequest.send();
+
+        try {
+            id = new JSONObject(authResponse.getBody()).getString("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //FIXME WHAT TO DO WITH THIS?????
+        }
+        return id;
+    }
+
     /**
      * Method for posting a comment to a Facebook's post, using the Facebook API.
      * @param requestUrl    The URL which specifies the location of the post which we want to commment, on Facebook.

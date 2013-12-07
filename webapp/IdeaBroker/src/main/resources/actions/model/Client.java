@@ -5,16 +5,6 @@ import model.data.BuySharesReturn;
 import model.data.Idea;
 import model.data.NetworkingFile;
 import model.data.Topic;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.FacebookApi;
-import org.scribe.model.OAuthRequest;
-import org.scribe.model.Response;
-import org.scribe.model.Token;
-import org.scribe.model.Verb;
-import org.scribe.oauth.OAuthService;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -35,8 +25,6 @@ public class Client {
     private float         coins;
     private int           numNotifications;
     private boolean       adminStatus;
-    private String        clientToken;
-    private String user_facebook_id;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
@@ -44,10 +32,6 @@ public class Client {
         this.coins = 0;
         this.numNotifications = 0; /* FIXME: On facebookLogin, set this */
         this.adminStatus = true;
-        this.clientToken = null;
-        this.user_facebook_id = null;
-        //FIXME: E a partir destes objectos a nulo que eu vou saber se ele esta ou nao logado com o facebook, e ver se e
-        // preciso postar no face ou nao - Let's hope this works!
     }
 
     /**
@@ -404,36 +388,20 @@ public class Client {
     }
 
     private boolean doRMIFacebookLogin(String token){
-        //TODO: 1 - Get user Facebook id; 2 - Confirm it in the database
         String id = null;
-        boolean devolve= false;
 
-        OAuthService service = new ServiceBuilder()
-                .provider(FacebookApi.class)
-                .apiKey("436480809808619")
-                .apiSecret("af8edf703b7a95f5966e9037b545b7ce")
-                .callback("http://localhost:8080")   //should be the full URL to this action
-                .build();
-
-        OAuthRequest authRequest = new OAuthRequest(Verb.GET, "https://graph.facebook.com/me?access_token="+token);
-        Token token_final = new Token(token,AppSecret);
-
-        service.signRequest(token_final, authRequest);
-        Response authResponse = authRequest.send();
-
-        try {
-            id = new JSONObject(authResponse.getBody()).getString("id");
-        } catch (JSONException e) {
+        try{
+            id = rmi.getRMIInterface().doGetUserIdFromToken(token);
+        }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME WHAT TO DO WITH THIS?????
+            //FIXME: DEAL WITH THIS!
         }
 
         if (id == null)
             return false;
-
         System.out.println("O id e " + id);
 
-        //Ir verificar se o id existe na base de dados
+        //Check if the received ID is stored in the database
         try{
             this.uid = rmi.getRMIInterface().facebookLogin(id);
         }catch(RemoteException e){
@@ -441,18 +409,13 @@ public class Client {
             e.printStackTrace();
         }
 
+        //Update mapping userId - Clienttoken, stored in the RMI
         try{
             this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
         }catch(RemoteException e){
             e.printStackTrace();
             //FIXME: HANDLE THIS!!!
         }
-
-        //Lets save the client's token in the session
-        this.clientToken = token;
-        this.user_facebook_id = id;
-
-
 
         return this.uid != -1;
     }
