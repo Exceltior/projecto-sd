@@ -147,7 +147,7 @@
         </div>
     </div>
 </div>
-<script src="jquery.js"></script>
+<script src="js/jquery.js"></script>
 <script src="bootstrap-3.0.2/dist/js/bootstrap.min.js"></script>
 
 </body>

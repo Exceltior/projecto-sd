@@ -26,17 +26,8 @@
                 <result name="error">error.jsp</result>
         </action>
 
-        <!-- Acção de teste -->
-        <action name="testlayout" class="actions.controller.TempAction" method="execute">
-            <result name="success">testelayout.jsp</result>
-        </action>
-
         <action name="listideas" class="actions.controller.ListIdeasAction" method="execute">
             <result name="success">listideas.jsp</result>
-        </action>
-
-        <action name="viewuserwatchlist" class="actions.controller.ViewUserWatchListAction" method="execute">
-            <result name="success">viewideas.jsp</result>
         </action>
 
         <action name="listtopics" class="actions.controller.ListTopicsAction" method="execute">
@@ -46,11 +37,6 @@
 
         <action name="searchtopic" class="actions.controller.SearchTopicAction" method="execute">
             <result name="success">listtopics.jsp</result>
-            <result name="error">error.jsp</result>
-        </action>
-
-        <action name="showtransactionhistory" class="actions.controller.ShowTransactionHistoryAction" method="execute">
-            <result name="success">showtransactionhistory.jsp</result>
             <result name="error">error.jsp</result>
         </action>
 
