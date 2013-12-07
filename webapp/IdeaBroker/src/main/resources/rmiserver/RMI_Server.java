@@ -110,8 +110,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         service.signRequest(token_final, authRequest);
         Response authResponse = authRequest.send();
 
-        System.out.println("AQUI \n" + authResponse.getBody());
-
         try {
             name = new JSONObject(authResponse.getBody()).getString("name");
         } catch (JSONException e) {
@@ -320,6 +318,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return Integer.valueOf(result.get(0)[0]);
         else
             return -1;
+    }
+
+    public boolean isFacebookAccount(int uid) throws RemoteException{
+        String query = "Select id_facebook from Utilizador where userid = " + uid + " and id_facebook is not null";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        return queryResult!=null && !queryResult.isEmpty();
     }
 
     /**

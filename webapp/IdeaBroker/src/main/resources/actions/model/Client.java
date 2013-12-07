@@ -24,8 +24,8 @@ public class Client {
     private int           numNotifications;
     private boolean       adminStatus;
     private String        facebookId;
-    private boolean       isFacebookAccountLoggedIn;//Indica se o user esta logado com o facebook ou normalmente
     private String        facebookName;
+    private boolean       facebookAccount;
 
     public Client() {
         this.rmi = new RMIConnection(RMI_HOST);
@@ -34,16 +34,8 @@ public class Client {
         this.numNotifications = 0; /* FIXME: On facebookLogin, set this */
         this.adminStatus = true;
         this.facebookId = null;
-        this.isFacebookAccountLoggedIn = false;
         this.facebookName = null;
-    }
-
-    public String getFacebookName(){
-        return this.facebookName;
-    }
-
-    public boolean getIsFacebookAccountLoggedIn(){
-        return this.isFacebookAccountLoggedIn;
+        this.facebookAccount = false;
     }
 
     /**
@@ -62,10 +54,19 @@ public class Client {
             e.printStackTrace();
         }
 
-        if (ret>0)
-            this.isFacebookAccountLoggedIn = false;
-
         return ret;
+    }
+
+    private boolean doRMIIsFacebookAccount(){
+        boolean devolve = false;
+
+        try{
+            devolve = rmi.getRMIInterface().isFacebookAccount(uid);
+        }catch(RemoteException e){
+            e.printStackTrace();
+            //FIXME:HANDLE THIS!!! O maxi e gay
+        }
+        return devolve;
     }
 
     /**
@@ -82,6 +83,7 @@ public class Client {
         } catch(RemoteException e){
             e.printStackTrace();
         }
+
         return ret;
     }
 
@@ -442,9 +444,6 @@ public class Client {
             //FIXME: HANDLE THIS!!!
         }
 
-        if (uid != -1)
-            this.isFacebookAccountLoggedIn = true;
-
         //Ir buscar nome do animal
         try{
             this.facebookName = rmi.getRMIInterface().doGetUserNameFromToken(token);
@@ -575,6 +574,8 @@ public class Client {
             //Gets client's admin status
             this.adminStatus = doRMIGetAdminStatus();
 
+            this.facebookAccount = doRMIIsFacebookAccount();
+
             return true;
         }
 
@@ -587,7 +588,11 @@ public class Client {
      * @return      A boolean value, indicating the success or failure of the operation
      */
     public boolean doFacebokLogin(String token){
-        return this.doRMIFacebookLogin(token);
+        boolean devolve = this.doRMIFacebookLogin(token);
+
+        if (devolve)
+            this.facebookAccount = true;
+        return devolve;
     }
 
     /**
@@ -596,7 +601,11 @@ public class Client {
      * @return      A boolean value, indicating the success or failure of the operation
      */
     public boolean doFacebookRegistration(String token){
-        return this.doRMIFacebookRegistration(token);
+        boolean devolve = this.doRMIFacebookRegistration(token);
+
+        if(devolve)
+            this.facebookAccount = true;
+        return devolve;
     }
 
     /**
@@ -694,7 +703,11 @@ public class Client {
      * @return          A boolean value, indicating the success or failure of the operation
      */
     public boolean doRegisterNewAccountWithFacebook(String username, String password, String email, String token){
-        return doRMIRegisterNewAccountWithFacebook(username, password, email, token);
+        boolean devolve =doRMIRegisterNewAccountWithFacebook(username, password, email, token);
+        if (devolve)
+            this.facebookAccount = true;
+
+        return devolve;
     }
 
     /**
@@ -838,5 +851,13 @@ public class Client {
 
     public RMIConnection getRMI() {
         return rmi;
+    }
+
+    public String getFacebookName(){
+        return this.facebookName;
+    }
+
+    public boolean isFacebookAccount(){
+        return facebookAccount;
     }
 }

@@ -68,7 +68,7 @@ public interface RMI_Interface extends Remote {
     public Idea[] getHallOfFameIdeas() throws RemoteException;
     public String doGetUserNameFromToken(String token) throws RemoteException;
     public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
-
+    public boolean isFacebookAccount(int uid) throws RemoteException;
     public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException;
     public float getMarketValue(int iid) throws RemoteException;
     public void takeOver(int iid) throws RemoteException;
