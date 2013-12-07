@@ -149,15 +149,15 @@ public class SubmitIdeaAction extends ClientAction{
         this.idea = idea2;
     }
 
-    private boolean verifyTopicString(String temp){
+    private String verifyTopicString(String temp){
         if (!temp.trim().contains(" "))
-            return true;
+            return temp.trim();
         //Here we know the string has at least one space, lets check if it is at the end of the string
         String substring = temp.substring(0,temp.length()-1);
         if (!substring.trim().contains(" "))//The space is in the last position of the string
-            return true;
+            return temp.trim();
         //Note: I left the if unsimplified for better understanding of the code
-        return false;
+        return null;
     }
 
     /**
@@ -169,10 +169,14 @@ public class SubmitIdeaAction extends ClientAction{
      */
     private ArrayList<String> getTopicsFromList(String[] list){
         ArrayList<String> devolve = new ArrayList<String>();
+        String temp;
 
         for (String aList : list) {
-            if (!aList.trim().equals("") && verifyTopicString(aList))//If the topic doesnt have a space
-                devolve.add(aList.trim());
+            if (!aList.trim().equals("")){
+                temp = verifyTopicString(aList);
+                if (temp != null && !devolve.contains(temp.trim()))
+                    devolve.add(aList.trim());
+            }
         }
 
         return devolve;
