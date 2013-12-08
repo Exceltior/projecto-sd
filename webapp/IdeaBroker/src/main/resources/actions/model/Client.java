@@ -15,7 +15,6 @@ public class Client {
 
     private final static String AppPublic = "436480809808619";
     private final static String AppSecret = "af8edf703b7a95f5966e9037b545b7ce";
-    private final static int   starting_shares = 100000;
 
     private RMIConnection rmi;
     private int           uid;
@@ -565,6 +564,7 @@ public class Client {
 
         this.facebookAccount = true;
         this.facebookName = doRMIGetFacebookUsernameFromToken(token);
+        this.username = doRMIGetUsername();
         return true;
     }
 
@@ -674,7 +674,7 @@ public class Client {
         boolean devolve =doRMIRegisterNewAccountWithFacebook(token);
         if (devolve) {
             this.facebookAccount = true;
-            this.username = doRMIGetFacebookUsernameFromToken(token);
+            this.facebookName = this.username = doRMIGetFacebookUsernameFromToken(token);
         }
 
         return devolve;

@@ -1208,6 +1208,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         System.out.println("CC!");
         //Handle notifications here
         //if ( generateNotifications ) FIXME
+
+        System.out.println("Our callbacks: ");
+        for ( int i : callbacks.keySet())
+        System.out.println("--->" + i+ " "+callbacks.get(i));
+        System.out.println("END CALLBACKS");
+
         for (int i = 0; i < sharesToBuy.size(); i++) {
             s = sharesToBuy.get(i);
             System.out.println("To buy: "+s);
@@ -1688,6 +1694,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     @Override
     public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException {
+        System.out.println("Adding a new callback for "+uid+" "+getUsername(uid));
         callbacks.put(uid,c);
     }
 

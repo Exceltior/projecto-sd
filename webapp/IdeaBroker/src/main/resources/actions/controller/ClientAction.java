@@ -44,17 +44,17 @@ public class ClientAction extends ActionSupport implements SessionAware, Servlet
      * or loading it from the session if it exists.
      */
     private void getClientSession() {
-
         if ( !session.containsKey("client") ) {
             this.client = new Client();
             if (!readCookie()) {
                 //Logged with encodeduserid
-                client.doLogin("Hakuna", "Matata"); //FIXME: HACKED IN to make our lives easier
+                //client.doLogin("Hakuna", "Matata"); //FIXME: HACKED IN to make our lives easier
             }
             session.put("client", client);
         } else {
             this.client = (Client) session.get("client");
         }
+        System.out.println("getClientSession(): "+client.getUid());
         writeCookie();
     }
 

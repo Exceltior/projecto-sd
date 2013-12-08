@@ -34,8 +34,8 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
             //getWsOutbound().writeTextMessage(CharBuffer.wrap("Hello!"));
             RMINotificationCallback callback = new RMINotificationCallback(this);
             client.getRMI().getRMIInterface().addCallbackToUid(client.getUid(), callback);
-        } catch (IOException e) {
-            System.out.println("onOpen exception!");
+        } catch (Exception e) {
+            System.err.println("onOpen exception!\n\n\n\n");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }

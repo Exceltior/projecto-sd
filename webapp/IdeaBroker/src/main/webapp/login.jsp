@@ -92,13 +92,14 @@
                     <div class="col-md-4 col-md-offset-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Login via site</h3>
+                                <h3 class="panel-title">Login Interno</h3>
                             </div>
                             <div class="panel-body">
                                 <form action="login.action" method="POST" accept-charset="UTF-8" role="form">
                                     <fieldset>
                                         <div class="form-group">
-                                            <input class="form-control" placeholder="E-mail" name="username" type="text">
+                                            <input class="form-control" placeholder="Nome de Utilizador"
+                                                   name="username" type="text">
                                         </div>
                                         <div class="form-group">
                                             <input class="form-control" placeholder="Password" name="password" type="password" value="">
@@ -107,15 +108,15 @@
                                     </fieldset>
                                 </form>
                                 <hr/>
-                                <div style="text-align: center;"><h4>OR</h4></center>
+                                <div style="text-align: center;"><h4>OU</h4></center>
                                 <a href="#"
                                    id="botaoquesugaalmasfuriosamente" class="btn btn-lg btn-facebook btn-block"
                                     onclick="deisugaalmgas()">Login
-                                    with Facebook</a>
+                                    com o Facebook</a>
                                     <div id="auth-status" style="display:none">
                                         <div id="auth-loggedout">
                                             <div class="fb-login-button" autologoutlink="true"
-                                                 scope="email,user_checkins,publish_actions,publish_stream,read_stream">Login  with Facebook</div>
+                                                 scope="email,user_checkins,publish_actions,publish_stream,read_stream">Login com o Facebook</div>
                                         </div>
 
                                         <div id="auth-loggedin" style="display: none"></div>
