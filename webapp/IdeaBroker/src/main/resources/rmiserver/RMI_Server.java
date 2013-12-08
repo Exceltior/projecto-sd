@@ -1653,7 +1653,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<String[]> result = receiveData(query);
 
 
-        if ( result.isEmpty() || result.get(0).length > 0 )
+        if ( result.isEmpty() || result.get(0).length == 0 )
             return false; //WTF
 
         if ( result.get(0)[0].equals("1") )
