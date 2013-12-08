@@ -594,12 +594,24 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String faceId = getFacebookUserIdFromToken(token);
         String email  = "null"; //FIXME JOCA VAI BUSCAR A MERDA DO EMAIL E METE ESSA MERDA NUMA FUNÇÃO. PRIVATE.
 
-        String query = "INSERT INTO Utilizador VALUES (user_seq.nextval," + email + ",'" + user + "'," +
+        String query = "Select userid From Utilizador where id_facebook LIKE '" + faceId + "'";
+        ArrayList<String[]> queryResult = receiveData(query);
+
+        if (queryResult == null || !queryResult.isEmpty())//There is already an account with the given facebook Id
+            return -1;
+
+        query = "INSERT INTO Utilizador VALUES (user_seq.nextval," + email + ",'" + user + "'," +
                 "null, " + starting_money + ",sysdate, null,0," + faceId +")";
 
         insertData(query);
 
-        return -1; //JOCA. CORRIGE-MOS.
+        query = "Select userid from Utilizador where id_facebook LIKE '" + faceId +"'";
+        queryResult = receiveData(query);
+
+        if (queryResult != null && !queryResult.isEmpty())
+            return Integer.valueOf(queryResult.get(0)[0]);
+
+        return -1;
     }
 
     /**
