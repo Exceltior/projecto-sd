@@ -115,6 +115,11 @@ public class ServerClient implements Runnable {
                     //System.err.println("Error in the handle buy shares method!!!!!");
                     break;
                 }
+            }else if (msg == Common.Message.REQUEST_GET_IDEA){
+                if (!handleGetIdea()){
+                    //System.err.println("Error in the handle buy shares method!!!!!");
+                    break;
+                }
             }
         }
 
@@ -123,6 +128,46 @@ public class ServerClient implements Runnable {
         else
             System.out.println("Connection to a client dropped!");
         server.removeSocket(socket);
+    }
+
+    private boolean handleGetIdea() {
+        if ( !isLoggedIn() ) {
+            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
+        }
+
+        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+            return false;
+
+        Idea[] ideias = null;
+        try {
+            ideias = connection.getRMIInterface().getAllIdeas();
+        } catch (RemoteException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return false;
+        }
+
+        if ( ideias == null )
+            if ( !Common.sendMessage(Common.Message.MSG_ERR, outStream))
+                return false;
+        else
+            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
+                return false;
+
+        ObjectOutputStream out;
+        try {
+
+            out = new ObjectOutputStream(outStream);
+        } catch (IOException e) {
+            return false;
+        }
+
+        try {
+            out.writeObject(ideias);
+        } catch (IOException e) {
+            return false;
+        }
+
+        return true;
     }
 
     private boolean handleRegistration(){

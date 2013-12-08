@@ -325,4 +325,46 @@ class ClientConnection {
             }
         }
     }
+
+    public Idea[] getIdeas() {
+        Common.Message reply;
+        Idea[] ret = null;
+
+        for(;;) {
+            if ( !Common.sendMessage(Common.Message.REQUEST_GET_IDEA, outStream) ) {
+                reconnect(); continue;
+            }
+
+            if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
+                reconnect(); continue;
+            }
+
+            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
+                return null;
+            }
+
+            ObjectInputStream in;
+            try {
+
+                in = new ObjectInputStream(inStream);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                return null;
+            }
+
+            try {
+                ret= (Idea[])in.readObject();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            break;
+        }
+
+        return ret;
+
+
+    }
 }

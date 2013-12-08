@@ -1,5 +1,6 @@
 import model.data.Idea;
 import model.data.NetworkingFile;
+import model.data.Topic;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,7 +84,7 @@ public class Client {
             System.out.println(sentence);
             response = sc.nextLine();
 
-            if ( true && response.equals("")){//Empty String, going to ask the user again
+            if ( response.equals("") ){//Empty String, going to ask the user again
                 System.out.println("Invalid input!");
                 repeat = true;
             }else if(response.equals(""))
@@ -187,6 +188,7 @@ public class Client {
         System.out.println("\n\nMain Menu");
         System.out.println("1 - Create Idea");//List all topics and choose one. While "inside" a topic list all ideas
         System.out.println("2 - Buy Shares of Idea");
+        System.out.println("3 - Ver Ideias");
         System.out.println("0 - Quit");
 
         do{
@@ -195,7 +197,7 @@ public class Client {
             try{
                 line = sc.nextLine();
                 choice = Integer.parseInt(line);
-                if(choice < 0 || choice > 2)
+                if(choice < 0 || choice > 3)
                     repeat = true;
             }catch(NumberFormatException n){
                 repeat = true;
@@ -403,6 +405,12 @@ public class Client {
                     break;
                 }
 
+                case 3:{
+                    if (!getIdeas())
+                        System.out.println("No ideas!");
+                    break;
+                }
+
                 //Wrong choice
                 default:{
                     System.out.println("Invalid option!");
@@ -410,6 +418,31 @@ public class Client {
                 }
             }
         }
+    }
+
+    private boolean getIdeas() {
+
+        Idea[] ideas = conn.getIdeas();
+        if ( ideas == null )
+            return false;
+
+        for ( int i1 = 0; i1 < ideas.length; i1++ ) {
+            Idea i = ideas[i1];
+            System.out.println("Ideia "+(i1+1));
+
+            System.out.println("ID "+i.getId());
+            System.out.println("Title: "+i.getTitle());
+            System.out.println("Body: "+i.getBody());
+            System.out.println("Topics: ");
+            Topic[] topics = i.getTopics();
+
+            if ( topics != null)
+                for ( int i2 = 0; i2  < topics.length; i2++) {
+                    System.out.println(" ==> "+i2+". "+topics[i2].getTitle()+ " ("+topics[i2].getNumIdeas()+")");
+                }
+        }
+
+        return true;
     }
 
     public static void main(String[] args) {

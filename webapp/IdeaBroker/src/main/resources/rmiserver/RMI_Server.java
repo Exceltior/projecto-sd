@@ -494,6 +494,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return ideas;
     }
 
+    public Idea[] getAllIdeas() throws RemoteException {
+        String query = "Select * from Ideia where activa = 1";
+
+        ArrayList<String[]> result = receiveData(query);
+
+        if ( result == null || result.isEmpty() )
+            return null;
+
+        Idea[] ideias = new Idea[result.size()];
+
+        for ( int i = 0; i < result.size(); i++ ) {
+            String[] r = result.get(i);
+            ideias[i] = new Idea(r);
+            ideias[i].setTopics(getIdeaTopics(ideias[i].getId()));
+        }
+
+        return ideias;
+    }
+
     /**
      * Method responsible for checking if there aren't any topics already created with the same name as the one we want to
      * create
@@ -2209,7 +2228,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{
