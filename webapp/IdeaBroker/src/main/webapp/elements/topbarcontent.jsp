@@ -26,7 +26,7 @@
                         <span></span><div id="auth-status" style="text-align: center"><div id="auth-loggedout"><div
                                 class="fb-login-button" autologoutlink="true"
                                 scope="email,user_checkins,publish_actions,publish_stream,read_stream">
-                            Login com o <Facebook></Facebook></div></div>
+                            Login com o Facebook</div></div>
                             <div id="auth-loggedin" style="display: none"></div></span>
                     </s:if>
                     <s:else>
