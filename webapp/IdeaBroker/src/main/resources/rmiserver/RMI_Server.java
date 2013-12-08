@@ -1721,6 +1721,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "Select funcao from Utilizador where userid=" + uid;
         ArrayList<String[]> result = receiveData(query);
 
+
+        if ( result.isEmpty() || result.get(0).length > 0 )
+            return false; //WTF
+
         if ( result.get(0)[0].equals("1") )
             devolve = true;
 
@@ -2629,7 +2633,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{
