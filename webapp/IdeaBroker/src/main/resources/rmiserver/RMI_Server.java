@@ -2049,7 +2049,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement = null;
 
-        System.out.println("\n-------------------------------\nRunning query: "+query);
+        //System.out.println("\n-------------------------------\nRunning query: "+query);
 
         boolean cont;
         do {
