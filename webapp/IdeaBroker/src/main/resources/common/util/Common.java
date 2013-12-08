@@ -154,7 +154,7 @@ public class Common {
         try {
             ret = inStream.readInt();
             if ( ret == -1 ) {
-                System.err.println("They're trying to hack us!");
+                //System.err.println("They're trying to hack us!");
                 inStream.close(); // Our humble attempt at solving this
             }
         } catch (IOException e) {
@@ -173,7 +173,7 @@ public class Common {
         try {
             ret = inStream.readFloat();
             if ( ret == -1 ) {
-                System.err.println("They're trying to hack us!");
+                //System.err.println("They're trying to hack us!");
                 inStream.close(); // Our humble attempt at solving this
             }
         } catch (IOException e) {

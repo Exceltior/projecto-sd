@@ -491,7 +491,7 @@ public class Client {
         try {
             rmi.getRMIInterface().takeOver(iid);
         } catch (RemoteException e) {
-            System.err.println("Takeover error");
+            //System.err.println("Takeover error");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return true;

@@ -53,10 +53,10 @@ public class RMIConnection {
             RMIregistry = LocateRegistry.getRegistry(RMIHost, 7000);
             RMIInterface = (RMI_Interface) RMIregistry.lookup("academica");
         } catch (RemoteException e) {
-            System.err.println("Remote Exception no RMIConnection!");
+            //System.err.println("Remote Exception no RMIConnection!");
             return false;
         } catch (NotBoundException n) {
-            System.err.println("NotBoundException no RMIConnection!");
+            //System.err.println("NotBoundException no RMIConnection!");
             return false;
         }
 

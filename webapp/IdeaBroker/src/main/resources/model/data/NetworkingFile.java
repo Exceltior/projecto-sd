@@ -26,12 +26,12 @@ public class NetworkingFile implements Serializable {
             data = new byte[length];
             f.readFully(data);
         } catch (IOException e) {
-            System.err.println("IO Exception while reading file!");
+            //System.err.println("IO Exception while reading file!");
         } finally {
             try {
                 f.close();
             } catch (IOException e) {
-                System.err.println("IO Exception while closing file!");
+                //System.err.println("IO Exception while closing file!");
             }
         }
     }
@@ -51,7 +51,7 @@ public class NetworkingFile implements Serializable {
         try {
             f.write(data);
         } catch (IOException e) {
-            System.err.println("IO Exception while writing file!");
+            //System.err.println("IO Exception while writing file!");
             return false; //Note that the finally block STILL gets executed in spite of this return.
         } finally {
             try { f.close(); } catch (IOException ignored) {}

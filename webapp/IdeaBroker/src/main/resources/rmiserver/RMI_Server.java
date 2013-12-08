@@ -546,7 +546,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     synchronized public boolean register(String user, String pass, String email) throws RemoteException {
         if (! validateData(user)){
-            System.err.println("O validate data devolveu false");
+            //System.err.println("O validate data devolveu false");
             return false;
         }
         pass = hashPassword(pass);
@@ -626,7 +626,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         try {
             file.writeTo(path);
         } catch (FileNotFoundException e) {
-            System.err.println("Should never happen!");
+            //System.err.println("Should never happen!");
             return false;
         }
 
@@ -675,7 +675,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         try {
             lastFile=f.readInt();
         } catch (IOException e) {
-            System.err.println("IO Exception while reading lastFile filefile!");
+            //System.err.println("IO Exception while reading lastFile filefile!");
         } finally {
             try { f.close(); } catch (IOException ignored) {}
         }
@@ -705,7 +705,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         try {
             return new NetworkingFile(queryResult.get(0)[0],queryResult.get(0)[1]);
         } catch (FileNotFoundException e) {
-            System.err.println("Shouldn't happen! DB corrupted?");
+            //System.err.println("Shouldn't happen! DB corrupted?");
             return null;
         }
     }
@@ -803,7 +803,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     synchronized public boolean createTopic(String name, int uid) throws  RemoteException{
         if (! validateTopic(name)){
-            System.err.println("Topico invalido");
+            //System.err.println("Topico invalido");
             return false;
         }
 
@@ -849,7 +849,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         conn = getTransactionalConnection();
 
         if (getUserMoney(uid,conn) < moneyInvested){//If the user doesn't have enough money
-            System.err.println("Error while creating the idea! the user doesn't have enought money!" +
+            //System.err.println("Error while creating the idea! the user doesn't have enought money!" +
                     " " + getUserMoney(uid,conn) + " " + moneyInvested);
             return -1;
         }
@@ -1585,7 +1585,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<String[]> result = receiveData(query, c);
 
         if ( result.isEmpty() ) {
-            System.err.println("DB consistency has gone crazy!");
+            //System.err.println("DB consistency has gone crazy!");
             return 0;
         }
 
@@ -1707,7 +1707,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try {
                 callbacks.get(id).notifyNewMarketValue(iid, value);
             } catch (Exception e) {
-                System.err.println("OPa client probably dead");
+                //System.err.println("OPa client probably dead");
                 toRemove.add(id);
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 //System.out.println("Continuing");
@@ -2026,7 +2026,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try {
                 conn = connectionPool.checkOutConnection();
             } catch (SQLException e) {
-                System.err.println("Error checking out connection for receiveData");
+                //System.err.println("Error checking out connection for receiveData");
                 cont = true;
             }
         } while ( cont );
@@ -2057,7 +2057,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try {
                 statement = conn.createStatement();
             } catch (SQLException e) {
-                System.err.println("Error creating SQL statement '" + query + "'!");
+                //System.err.println("Error creating SQL statement '" + query + "'!");
                 cont = true;
             }
         } while ( cont );
@@ -2080,7 +2080,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 }
                 statement.close();
             } catch (SQLException e) {
-                System.err.println("Error executing SQL query '" + query + "'!");
+                //System.err.println("Error executing SQL query '" + query + "'!");
                 cont = true;
             }
         } while ( cont );
@@ -2097,14 +2097,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         try {
             connection = connectionPool.checkOutConnection();
         } catch (SQLException e) {
-            System.err.println("Error checkout out a new connection for transactions!");
+            //System.err.println("Error checkout out a new connection for transactions!");
             return null;
         }
 
         try {
             connection.setAutoCommit(false);
         } catch (SQLException e) {
-            System.err.println("Error setting autocommit!");
+            //System.err.println("Error setting autocommit!");
         }
 
         return connection;
@@ -2119,7 +2119,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             c.commit();
             c.setAutoCommit(true);
         } catch (SQLException e) {
-            System.err.println("Error setting autocommit to true!");
+            //System.err.println("Error setting autocommit to true!");
         }
         connectionPool.returnConnection(c);
     }
@@ -2134,7 +2134,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         try {
             conn = connectionPool.checkOutConnection();
         } catch (SQLException e) {
-            System.err.println("Error checking out connection for insertData");
+            //System.err.println("Error checking out connection for insertData");
         }
         insertData(query, conn);
         if ( conn != null )
@@ -2157,7 +2157,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try{
                 conn.createStatement().executeUpdate(query);
             }catch(SQLException s){
-                System.err.println("SQLException in the insertData method: "+s.getMessage());
+                //System.err.println("SQLException in the insertData method: "+s.getMessage());
 
                 cont = true;
                 try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
