@@ -13,7 +13,7 @@ import java.io.IOException;
 // It also has the message ids that the client and server must pass to one another.
 //
 public class Common {
-    static enum Message {
+    public static enum Message {
         MSG_OK,                     // Generic OK message
         MSG_ERR,                    // Generic ERROR message
         REQUEST_GETTOPICS,          // Get topics
