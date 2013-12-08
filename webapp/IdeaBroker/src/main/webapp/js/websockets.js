@@ -21,7 +21,7 @@ function connect(host) { // connect to the host websocket servlet
 }
 function onOpen(event) {
     console.log('Connected to ' + window.location.host + '.');
-    makeNotification("Hello World!", "A Mariana é linda!!!!")
+    //makeNotification("Hello World!", "A Mariana é linda!!!!")
 }
 
 function onClose(event) {
