@@ -17,18 +17,25 @@
 
         <!-- A acção de registo -->
         <action name="register" class="actions.controller.RegisterAction" method="execute">
-            <result name="success">home.jsp</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">listideas</param>
+                <param name="mode">userideas</param>
+            </result>
+            <result name="error">register.jsp</result>
         </action>
 
-        <!-- A acção de facebookLogin (de notar que é bem distinta de um acesso ao facebookLogin.jsp -->
         <action name="login" class="actions.controller.LoginAction" method="execute">
-                <result name="success">home.jsp</result>
-                <result name="error">error.jsp</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">listideas</param>
+                <param name="mode">userideas</param>
+            </result>
+                <result name="error">login.jsp</result>
         </action>
 
         <action name="listideas" class="actions.controller.ListIdeasAction" method="execute">
             <result name="success">listideas.jsp</result>
         </action>
+
         <action name="viewhalloffame" class="actions.controller.ViewHallOfFameAction" method="execute">
             <result name="success">viewhalloffame.jsp</result>
         </action>
@@ -44,8 +51,19 @@
         </action>
 
         <action name="loginfacebook" class="actions.controller.LoginFacebookAction" method="execute">
-            <result name="success">home.jsp</result>
-            <result name="error">error.jsp</result>
+            <result name="success" type="redirectAction">
+                <param name="actionName">listideas</param>
+                <param name="mode">userideas</param>
+            </result>
+            <result name="error">login.jsp</result>
+        </action>
+
+        <action name="registerfacebook" class="actions.controller.RegisterWithFacebook" method="execute">
+            <result name="success" type="redirectAction">
+                <param name="actionName">listideas</param>
+                <param name="mode">userideas</param>
+            </result>
+            <result name="error">register.jsp</result>
         </action>
 
         <action name="transactionhistory" class="actions.controller.ShowTransactionHistoryAction" method="execute">

@@ -3,7 +3,7 @@ package actions.controller;
 /**
  * Class responsible for handling the creation of a new account in our system, associated with a facebook Account
  */
-public class RegisterNewAccountWithFacebook extends ClientAction{
+public class RegisterWithFacebook extends ClientAction{
 
     /**
      * token conatins the user's Facebook Access Token.

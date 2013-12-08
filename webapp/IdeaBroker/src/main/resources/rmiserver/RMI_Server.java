@@ -594,8 +594,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String faceId = getFacebookUserIdFromToken(token);
         String email  = "null"; //FIXME JOCA
 
-        String query = "INSERT INTO Utilizador VALUES (user_seq.nextval,'" + email + "','" + user + "'," +
-                "null, " + starting_money + ",sysdate, null," + faceId +")";
+        String query = "INSERT INTO Utilizador VALUES (user_seq.nextval," + email + ",'" + user + "'," +
+                "null, " + starting_money + ",sysdate, null,0," + faceId +")";
 
         insertData(query);
 
