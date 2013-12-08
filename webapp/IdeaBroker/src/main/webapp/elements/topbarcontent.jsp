@@ -23,11 +23,11 @@
 
                     <s:if test="#session.client.facebookName == null">
                         <script>doWaitForFacebookLogin();</script>
-                        <div id="auth-status" style="text-align: center"><div id="auth-loggedout"><div
+                        <span></span><div id="auth-status" style="text-align: center"><div id="auth-loggedout"><div
                                 class="fb-login-button" autologoutlink="true"
                                 scope="email,user_checkins,publish_actions,publish_stream,read_stream">
-                            Login with Facebook</div></div>
-                            <div id="auth-loggedin" style="display: none"></div>
+                            Login com o <Facebook></Facebook></div></div>
+                            <div id="auth-loggedin" style="display: none"></div></span>
                     </s:if>
                     <s:else>
                         <s:property value="#session.client.facebookName"/>
