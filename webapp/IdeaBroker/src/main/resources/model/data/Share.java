@@ -2,6 +2,7 @@ package model.data;
 
 import java.io.Serializable;
 
+@SuppressWarnings("ALL")
 public class Share  implements Comparable<Share>, Serializable {
     private int uid;
     private int iid;
@@ -33,7 +34,7 @@ public class Share  implements Comparable<Share>, Serializable {
     }
 
     public int getAvailableShares() {
-        return getNum(); //FIXME: Change this
+        return getNum();
     }
 
     public float getPriceForNum(int n) {

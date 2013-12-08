@@ -33,8 +33,6 @@ function onMessage(message) { // print the received message
     console.log(message.data);
     not = $.parseJSON(message.data);
 
-    //FIXME idea name
-
     if ( not.type == "TAKEOVER") {
         makeNotification("Take Over da tua ideia!",
             "As tuas shares da idea "+not.iid+" foram reclamadas pelo root user ao valor de mercado de  "+not.marketValue+ " por um total de " + not.total+" DEICoins!");
@@ -51,7 +49,6 @@ function onMessage(message) { // print the received message
         money=not.money;
         currPricePerShare=not.currPricePerShare;
         totalInvolved = numShares*pricePerShareTransaction;
-        // idea name MISSING FIXME
         if ( not.type == "BOUGHT" ) {
             makeNotification("Shares Compradas", "Adquiriste "+numShares+" shares da ideia "+iid
                 +" a "+pricePerShareTransaction+" DEICoins cada, para um total de "+totalInvolved

@@ -1040,9 +1040,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             System.out.println("User already has "+currentShares.getAvailableShares());
         float userMoney = getUserMoney(uid, c);
         System.out.println("Checkpoint 1");
-        /**
-         * How many we want. Twice because we want to save one of these values as backup FIXME: why?
-         */
         int startingShares = currentShares != null ? currentShares.getNum() : 0;
         ret.numSharesFinal = startingShares; // Start with this
         System.out.println("Checkpoint 1.1.1");
@@ -1108,7 +1105,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             System.out.println("processing share: " + s);
 
             if ( s.getPrice() > floatmaxPricePerShare )
-                continue; //FIXME: Could actualy be break!
+                continue; //Could actualy be break!
 
             if ( s.getUid() == uid ) {
                 System.out.println("Skipping, its mine");
@@ -1140,8 +1137,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 totalSharesBought += toBuy;
             }
         }
-
-        //FIXME: STOPPED HERE
 
         if ( numShares > 0 ) {
             if ( !addToQueueOnFailure ) {

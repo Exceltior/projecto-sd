@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * current user session. It is responsible for all interaction with the RMI.
  */
 public class Client {
-    private final static String RMI_HOST = "localhost";//FIXME: MUDAR ISTO?? NAO SEI SE O PROF QUER VER LOCALHOST NO CODIGO
+    private final static String RMI_HOST = "localhost";
 
     private final static String AppPublic = "436480809808619";
     private final static String AppSecret = "af8edf703b7a95f5966e9037b545b7ce";
@@ -30,7 +30,7 @@ public class Client {
         this.rmi = new RMIConnection(RMI_HOST);
         this.uid = -1;
         this.coins = 0;
-        this.numNotifications = 0; /* FIXME: On facebookLogin, set this */
+        this.numNotifications = 0;
         this.adminStatus = true;
         this.facebookId = null;
         this.facebookName = null;
@@ -38,12 +38,11 @@ public class Client {
     }
 
     /**
-     * Calls RMI's facebookLogin safely. We have chosen to encapsulate it so that we can later on (FIXME) implement retry
+     * Calls RMI's facebookLogin safely. We have chosen to encapsulate it so that we can later on
      * mechanisms. We will need to indicate the calling function if the RMI fails. <-- FIXME
      * @param username User's username
      * @param password User's password
      * @return On success, returns the user's UID. On failure, -1 indicates an error logging in (no such user(pass).
-     * FIXME: Possibly include other error codes to indicate RMI failure
      */
     private int doRMILogin(String username, String password) {
         int ret = 0;
@@ -63,7 +62,6 @@ public class Client {
             devolve = rmi.getRMIInterface().isFacebookAccount(uid);
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME:HANDLE THIS!!! O maxi e gay
         }
         return devolve;
     }
@@ -159,8 +157,6 @@ public class Client {
      */
     private Idea[] doRMIGetUserWatchList(){
         Idea[] devolve = null;
-
-        //FIXME: Eliminar isto!
 
         try{
             devolve=rmi.getRMIInterface().getIdeasFromWatchList(uid);
@@ -374,7 +370,7 @@ public class Client {
         return devolve;
     }
 
-    //TODO: Javadoc
+
     private BuySharesReturn doRMIBuyShares(int iid, float maxPricePerShare, int buyNumShares,
                                            boolean addToQueueOnFailure, float targetSellPrice) {
         BuySharesReturn ret = null;
@@ -409,7 +405,6 @@ public class Client {
             facebookId = rmi.getRMIInterface().getFacebookUserIdFromToken(token);
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME: DEAL WITH THIS!
         }
     }
 
@@ -420,7 +415,6 @@ public class Client {
             ret = rmi.getRMIInterface().getFacebookUsernameFromToken(token);
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME: HANDLE THIS!!!!
         }
 
         return ret;
@@ -447,7 +441,6 @@ public class Client {
             this.rmi.getRMIInterface().updateFacebookToken(this.uid,token);
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME: HANDLE THIS!!!
         }
 
         return true;
@@ -489,7 +482,6 @@ public class Client {
             devolve = rmi.getRMIInterface().getHallOfFameIdeas();
         }catch(RemoteException e){
             e.printStackTrace();
-            //FIXME: HANDLE THIS!!!
         }
 
         return devolve;
@@ -784,10 +776,10 @@ public class Client {
      * @return  A boolean value, telling us if the current user is an administrator
      */
     public boolean getAdminStatus() {
-        //FIXME: MEGA FIX ME
-        //return adminStatus;
+
+        return adminStatus;
         //return true;
-        return false;
+        //return false;
     }
 
     /**

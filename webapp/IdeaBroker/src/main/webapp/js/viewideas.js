@@ -205,7 +205,6 @@ function getSellingPriceIdea(id, price) {
 // THAT THIS SHOWS THE SET SELLING PRICE FIELD, SO YOU MIGHT WANT TO USE setSellingPriceIdea() TO UPDATE THAT!
 //
 function setNumSharesForidea(id, num) {
-    /** FIXME: When we show, we need to get the selling price */
     var numshareslabel = $(getNumSharesIdeaStr(id));
     var percentshareslabel = $(getPercentSharesIdeaStr(id));
     var pct =  num / getMaxSharesForIdea() * 100.0;
@@ -381,7 +380,7 @@ function doBuyShares(id) {
 }
 
 function getMarketValue(id) {
-    return parseFloat($(getMarketValueStr(id)).text()); //FIXME
+    return parseFloat($(getMarketValueStr(id)).text());
 }
 
 function onTargetSellPriceChanged() {
