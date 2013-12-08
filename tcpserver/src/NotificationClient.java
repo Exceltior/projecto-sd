@@ -30,7 +30,7 @@ public class NotificationClient implements Runnable {
             this.inStream = new DataInputStream(currentSocket.getInputStream());
             this.objStream = new ObjectOutputStream(outStream);
         } catch (IOException e) {
-            System.err.println("Error constructing a new NotificationClient (did the connection die?");
+            //System.err.println("Error constructing a new NotificationClient (did the connection die?");
         }
 
         initRMIConnection();
@@ -50,12 +50,12 @@ public class NotificationClient implements Runnable {
 
         // Read the next Message/Request
         if ( ( user = Common.recvString(inStream)) == null){
-            System.err.println("Error No Message Received!!!");
+            //System.err.println("Error No Message Received!!!");
             return ;
         }
 
         if ( ( pwd = Common.recvString(inStream)) == null){
-            System.err.println("Error No Message Received!!!");
+            //System.err.println("Error No Message Received!!!");
             return ;
         }
 

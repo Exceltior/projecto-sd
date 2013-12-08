@@ -34,7 +34,7 @@ public class NotificationServer extends Thread {
                 new Thread(new NotificationClient(clientSocket, server.getConnection(), server)).start();
             }
             catch (IOException e) {
-                System.err.println("Accept notification failed!");
+                //System.err.println("Accept notification failed!");
             }
         }
     }

@@ -16,12 +16,12 @@ public class UDPTransmitter extends Thread {
             try {
                 clientSocket = new DatagramSocket();
             } catch (SocketException e) {
-                System.err.println("Error creating DatagramSocket!");
+                //System.err.println("Error creating DatagramSocket!");
             }
             try {
                 IPAddress = InetAddress.getByName(targetServer);
             } catch (UnknownHostException e) {
-                System.err.println("Can't reach host to ping!!");
+                //System.err.println("Can't reach host to ping!!");
             }
         } while (clientSocket == null || IPAddress == null);
 
@@ -35,7 +35,7 @@ public class UDPTransmitter extends Thread {
             try {
                 clientSocket.send(sendPacket);
             } catch (IOException e) {
-                System.err.println("Error sending packet!");
+                //System.err.println("Error sending packet!");
             }
 
             try {

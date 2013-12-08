@@ -17,7 +17,7 @@ public class UDPReceiver extends Thread{
                 serverSocket = new DatagramSocket(targetPort);
                 serverSocket.setSoTimeout(checkPeriod);
             } catch (SocketException e) {
-                System.err.println("Error creating DatagramSocket!");
+                //System.err.println("Error creating DatagramSocket!");
             }
         } while (serverSocket == null);
 
@@ -42,14 +42,14 @@ public class UDPReceiver extends Thread{
                     }
                     continue;
                 } catch (IOException e2) {
-                    System.err.println("Error receiving packet!");
+                    //System.err.println("Error receiving packet!");
                     continue;
                 }
 
                 //System.out.println("This time we got connection. Assuming it was a transient fault...");
 
             } catch (IOException e) {
-                System.err.println("Error receiving packet!");
+                //System.err.println("Error receiving packet!");
                 continue;
             }
 

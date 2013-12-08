@@ -33,11 +33,11 @@ public class ServerClient implements Runnable {
             this.outStream = new DataOutputStream(currentSocket.getOutputStream());
             this.inStream = new DataInputStream(currentSocket.getInputStream());
         } catch (IOException e) {
-            System.err.println("Error constructing a new ServerClient (did the connection die?");
+            //System.err.println("Error constructing a new ServerClient (did the connection die?");
         }
 
         if(!initRMIConnection()) {
-            System.err.println("Error getting the RMI connection!");
+            //System.err.println("Error getting the RMI connection!");
         }
     }
 
@@ -196,7 +196,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleBuyShares(){
         int iid, numberSharesToBuy;
-        float maxPricePerShare0, targetSellPrice;
+        float maxPricePerShare, targetSellPrice;
         boolean addToQueueOnFailure = true; //FIXMEREFACTOR
 
         if ( !isLoggedIn() ) {

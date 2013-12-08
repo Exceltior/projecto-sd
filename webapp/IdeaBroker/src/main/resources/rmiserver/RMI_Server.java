@@ -850,7 +850,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         if (getUserMoney(uid,conn) < moneyInvested){//If the user doesn't have enough money
             //System.err.println("Error while creating the idea! the user doesn't have enought money!" +
-                    " " + getUserMoney(uid,conn) + " " + moneyInvested);
+            //" " + getUserMoney(uid,conn) + " " + moneyInvested);
             return -1;
         }
 
@@ -1023,7 +1023,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         //                   +"buyNumShares="+buyNumShares+"\n"
         //                   +"addToQueueOnFailure="+addToQueueOnFailure+"\n"
         //                   +"targetSell="+targetSell
-        );
+        //);
         Connection c;
         if (conn == null)
             c = getTransactionalConnection();
@@ -1433,10 +1433,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                                                          boolean checkQueue
                                                          ) throws RemoteException{
         //System.out.println("setPricesSharesInternal iid="+iid+"\n"+
-        "uid="+uid+"\n"+
-        "price="+price+"\n"+
-        "conn="+conn+"\n"+
-        "checkQueue"+checkQueue);
+        //"uid="+uid+"\n"+
+        //"price="+price+"\n"+
+        //"conn="+conn+"\n"+
+        //"checkQueue"+checkQueue);
         if ( getSharesIdeaForUid(iid,uid) == null)
             return false; // You have no shares!
         Connection c;

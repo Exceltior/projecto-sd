@@ -45,7 +45,7 @@ public class Server {
                 try {
                     s.close();
                 } catch (IOException e) {
-                    System.err.println("Couldn't force close a socket!");
+                    //System.err.println("Couldn't force close a socket!");
                 }
             sockets.clear();
         }
@@ -55,7 +55,7 @@ public class Server {
                 try {
                     s.close();
                 } catch (IOException e) {
-                    System.err.println("Couldn't force close a notification socket!");
+                    //System.err.println("Couldn't force close a notification socket!");
                 }
             notificationSockets.clear();
         }
@@ -113,8 +113,8 @@ public class Server {
                     goPrimary();
             }
         } catch (IOException e) {
-            System.err.println("Network error while trying to reach RMI server! Assuming we've lost outer-world " +
-                    "connection...");
+            //System.err.println("Network error while trying to reach RMI server! Assuming we've lost outer-world " +
+            //        "connection...");
             goSecondary();
         }
     }
@@ -204,7 +204,7 @@ public class Server {
                 new Thread(new ServerClient(clientSocket, connection, this)).start();
             }
             catch (IOException e) {
-                System.err.println("Accept failed!");
+                //System.err.println("Accept failed!");
                 e.printStackTrace();
             }
         }
