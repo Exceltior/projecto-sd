@@ -1190,7 +1190,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         // Set the selling price
         System.out.println("Going to setPricesSharesInternal!");
-        setPricesSharesInternal(iid, uid, targetSell, c, false);
+        if ( ret.numSharesBought > 0)
+            setPricesSharesInternal(iid, uid, targetSell, c, false);
         System.out.println("After setPricesSharesInternal!");
 
         // UNLEASH THE BEAST!
