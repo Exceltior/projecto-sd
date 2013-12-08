@@ -61,6 +61,8 @@ public abstract class ClientAction extends ActionSupport implements SessionAware
     }
 
     boolean readCookie() {
+        if ( (this instanceof RegisterAction) || (this instanceof RegisterWithFacebookAction) )
+            return false;
         if ( servletRequest.getCookies() != null )
             for ( Cookie c : servletRequest.getCookies() ) {
                 if ( c.getName().equals(COOKIE_NAME) )
@@ -83,7 +85,11 @@ public abstract class ClientAction extends ActionSupport implements SessionAware
      */
     public final String execute() throws Exception {
         getClientSession();
-        if ( !(this instanceof RegisterAction) && !(this instanceof RegisterWithFacebookAction) ) {
+        if ( !(this instanceof RegisterAction)
+          && !(this instanceof RegisterWithFacebookAction)
+          && !(this instanceof LoginAction)
+          && !(this instanceof LoginFacebookAction) )
+        {
             if ( this.client.getUid() == -1 )
                 return ERROR;
         }

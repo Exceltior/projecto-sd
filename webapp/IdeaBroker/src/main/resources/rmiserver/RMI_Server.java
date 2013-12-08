@@ -608,10 +608,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         query = "Select userid from Utilizador where id_facebook LIKE '" + faceId +"'";
         queryResult = receiveData(query);
 
-        if (queryResult != null && !queryResult.isEmpty())
-            return Integer.valueOf(queryResult.get(0)[0]);
+        if (queryResult == null || queryResult.isEmpty())
+            return -1;
 
-        return -1;
+        int uid = Integer.valueOf(queryResult.get(0)[0]);
+        updateFacebookToken(uid,token);
+
+        return uid;
     }
 
     /**
@@ -1238,7 +1241,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                                                  "SOLD",
                                                  getUserMoney(s.getUid()),
                                                  s.getPrice(),
-                                                 ret.numSharesBought,
+                                                 sharesToBuyNum.get(i),
                                                  iid,
                                                  s.getAvailableShares()-sharesToBuyNum.get(i),
                                                  s.getPrice());

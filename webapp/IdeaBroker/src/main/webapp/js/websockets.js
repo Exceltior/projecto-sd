@@ -63,7 +63,7 @@ function onMessage(message) { // print the received message
         } else {
             makeNotification("Shares Vendidas", "Vendeste "+numShares+" shares da ideia "+iid
                 +" a "+pricePerShareTransaction+" DEICoins cada, para um total de "+totalInvolved
-                +" DEICoins ao user "+username);Z
+                +" DEICoins ao user "+username);
             console.log("We just sold "+numShares+" at "+pricePerShareTransaction+ " for a total of "+totalInvolved+" to "+username+" for idea "+iid);
         }
 
