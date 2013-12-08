@@ -67,7 +67,7 @@ public class NotificationClient implements Runnable {
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
             return;
 
-        System.out.println("Notification: User "+uid+" logged in.");
+        //System.out.println("Notification: User "+uid+" logged in.");
 
         /*
         try {

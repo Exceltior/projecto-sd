@@ -46,7 +46,7 @@ public class UDPReceiver extends Thread{
                     continue;
                 }
 
-                System.out.println("This time we got connection. Assuming it was a transient fault...");
+                //System.out.println("This time we got connection. Assuming it was a transient fault...");
 
             } catch (IOException e) {
                 System.err.println("Error receiving packet!");

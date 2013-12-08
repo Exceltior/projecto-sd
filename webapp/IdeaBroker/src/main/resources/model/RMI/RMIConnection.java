@@ -69,12 +69,12 @@ public class RMIConnection {
     }
 
     synchronized boolean connect() {
-        System.out.println("Trying connection to model.RMI...");
+        //System.out.println("Trying connection to model.RMI...");
         boolean val;
         int count=0;
         do {
             val = establishConnectionToRegistry(); count++;
-            System.out.println("Attempt "+count+"..."+(val ? "Success!" : "Failed!"));
+            //System.out.println("Attempt "+count+"..."+(val ? "Success!" : "Failed!"));
             try { Thread.sleep(count*1000); } catch (InterruptedException ignored) {}
         } while ( !val && count < 3);
 

@@ -26,7 +26,7 @@ public class AddToWatchlistAction extends AJAXAction {
      * @throws Exception
      */
     public void doAjaxWork(){
-        System.out.println(" AddToWatchlistActioniid: " + iid);
+        //System.out.println(" AddToWatchlistActioniid: " + iid);
         setAjaxStatus(client.doAddToWatchList(iid));
     }
 

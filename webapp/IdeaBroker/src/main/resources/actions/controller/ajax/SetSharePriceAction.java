@@ -30,14 +30,14 @@ public class SetSharePriceAction extends AJAXAction {
      */
     public void doAjaxWork(){
 
-        System.out.println("O execute do SetSharePriceAction esta a correr " + iid + " price: "+price);
+        //System.out.println("O execute do SetSharePriceAction esta a correr " + iid + " price: "+price);
 
         if (client.doSetSharePrice(this.iid,this.price)){
-            System.out.println("Vou devolver sucesso");
+            //System.out.println("Vou devolver sucesso");
             ajaxSuccess();
         }
         else {
-            System.out.println("Vou devolver erro");
+            //System.out.println("Vou devolver erro");
             ajaxFailure();
         }
     }

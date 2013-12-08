@@ -13,9 +13,9 @@ public class TakeoverAction extends AJAXAction {
      * @throws Exception
      */
     public void doAjaxWork() {
-        System.out.println(" TakeoverAction: " + iid);
+        //System.out.println(" TakeoverAction: " + iid);
         setAjaxStatus(client.doTakeover(iid));
-        System.out.println(" done...");
+        //System.out.println(" done...");
     }
 
     public boolean isSuccess() {

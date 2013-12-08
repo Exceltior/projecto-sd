@@ -24,7 +24,7 @@ public class AssociateWithFacebookAction extends AJAXAction {
      * @throws Exception
      */
     public void doAjaxWork(){
-        System.out.println("O token do utilizador no facebook 222 e " + token);
+        //System.out.println("O token do utilizador no facebook 222 e " + token);
         setAjaxStatus(client.doAssociateWithFacebook(token));
     }
     public boolean isSuccess() {

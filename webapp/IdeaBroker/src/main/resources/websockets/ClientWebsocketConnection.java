@@ -46,7 +46,7 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
     public void notify(String username, String type, float currentMoney, float pricePerShare, int numShares, int iid,
                        int currentSharesIid, float currPricePerShare) {
         JSONObject obj = new JSONObject();
-        System.out.println("in real notify");
+        //System.out.println("in real notify");
 
         try {
             obj.put("money", currentMoney);
@@ -77,7 +77,7 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
 
     public void notifyNewMarketValue(int iid, float value) {
         JSONObject obj = new JSONObject();
-        System.out.println("\n\nin notifyNewMarketValue\n\n");
+        //System.out.println("\n\nin notifyNewMarketValue\n\n");
 
         try {
             obj.put("marketValue", value);
@@ -96,7 +96,7 @@ public class ClientWebsocketConnection extends MessageInbound implements Seriali
 
     public void NotifyTakenOver(int iid, float marketPrice, float v) {
         JSONObject obj = new JSONObject();
-        System.out.println("\n\nin NotifyTakenOver\n\n");
+        //System.out.println("\n\nin NotifyTakenOver\n\n");
         try {
             obj.put("marketValue", marketPrice);
             obj.put("iid", iid);

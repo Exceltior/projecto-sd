@@ -18,7 +18,7 @@ public class RegisterWithFacebookAction extends ClientAction{
     }
 
     public String doWork(){
-        System.out.println("O token do utilizador no asdasdasd facebook e " + token);
+        //System.out.println("O token do utilizador no asdasdasd facebook e " + token);
 
         if (client.doRegisterNewAccountWithFacebook(token))
             return SUCCESS;

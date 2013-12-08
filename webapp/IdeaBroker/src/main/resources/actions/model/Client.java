@@ -238,7 +238,7 @@ public class Client {
             if (result > 0)
                 devolve = true;
             else{
-                System.out.println("Result e menor que 0!!!");
+                //System.out.println("Result e menor que 0!!!");
             }
 
         }catch (RemoteException e){
@@ -260,7 +260,7 @@ public class Client {
 
         try{
             devolve = rmi.getRMIInterface().setPricesShares(iid, uid, price);
-            System.out.println("Recebi " + devolve + " do rmi no set share price");
+            //System.out.println("Recebi " + devolve + " do rmi no set share price");
         }catch(RemoteException e){
             e.printStackTrace();
         }
@@ -296,7 +296,7 @@ public class Client {
             e.printStackTrace();
         }
 
-        System.out.println("O doRMIGetAdminStatus devolve " + devolve);
+        //System.out.println("O doRMIGetAdminStatus devolve " + devolve);
         return devolve;
     }
 
@@ -378,10 +378,10 @@ public class Client {
             ret = rmi.getRMIInterface().buyShares(uid, iid, maxPricePerShare, buyNumShares, addToQueueOnFailure,
                                                   targetSellPrice);
         } catch (RemoteException e) {
-            System.out.println("Exception in doRMIBUyShares");
+            //System.out.println("Exception in doRMIBUyShares");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        System.out.println("Returning from doRMIBUyShares");
+        //System.out.println("Returning from doRMIBUyShares");
         return ret;
     }
 
@@ -394,7 +394,7 @@ public class Client {
         try {
             u = rmi.getRMIInterface().getUsername(uid);
         } catch (RemoteException e) {
-            System.out.println("Exception in doRMIGetUsername");
+            //System.out.println("Exception in doRMIGetUsername");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         return u;
@@ -430,7 +430,7 @@ public class Client {
         try{
             ret = rmi.getRMIInterface().facebookLogin(token);
         }catch(RemoteException e){
-            System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
+            //System.out.println("RemoteExcetpion in the doRMIFacebookLogin");
             e.printStackTrace();
         }
         return ret;

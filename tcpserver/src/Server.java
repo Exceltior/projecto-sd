@@ -70,13 +70,13 @@ public class Server {
     }
 
     void goSecondary() {
-        System.out.println("Becoming SECONDARY server...");
+        //System.out.println("Becoming SECONDARY server...");
         primary = false;
 
     }
 
     void goPrimary() {
-        System.out.println("Becoming PRIMARY server...");
+        //System.out.println("Becoming PRIMARY server...");
         primary = true;
         if ( requestThread == null ) {
             startQueueThread();
@@ -92,7 +92,7 @@ public class Server {
 
     synchronized void notifyConnectionToOtherServerDead() {
         otherIsDown = true;
-        System.out.println("Lost connection to remote server...pinging RMI");
+        //System.out.println("Lost connection to remote server...pinging RMI");
 
 
         InetAddress inet;
@@ -100,7 +100,7 @@ public class Server {
             inet = InetAddress.getByName(RMIHost);
         } catch (UnknownHostException e) {
             //We can't even resolve the server? It must be us!!!
-            System.out.println("Can't resolve RMI IP. Assuming we've lost outer-world connection...");
+            //System.out.println("Can't resolve RMI IP. Assuming we've lost outer-world connection...");
             goSecondary();
             return;
         }
@@ -120,7 +120,7 @@ public class Server {
     }
 
     synchronized void notifyConnectionToOtherServerBack() {
-        System.out.println("Server is back!");
+        //System.out.println("Server is back!");
     }
 
     void execute(String[] args) throws IOException {
@@ -164,11 +164,11 @@ public class Server {
             e.printStackTrace();
         }
 
-        System.out.println("Listening for incoming connections port "+port);
-        System.out.println("Listening for UDP pings on port "+udpReceiverPort);
-        System.out.println("Sending UDP pings to "+otherHost+":"+udpTransmitterPort);
-        System.out.println("Notification server running on port "+notificationPort);
-        System.out.println("Starting as primary: "+primary);
+        //System.out.println("Listening for incoming connections port "+port);
+        //System.out.println("Listening for UDP pings on port "+udpReceiverPort);
+        //System.out.println("Sending UDP pings to "+otherHost+":"+udpTransmitterPort);
+        //System.out.println("Notification server running on port "+notificationPort);
+        //System.out.println("Starting as primary: "+primary);
 
         Socket clientSocket;
 

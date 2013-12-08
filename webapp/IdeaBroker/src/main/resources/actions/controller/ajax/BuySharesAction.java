@@ -23,17 +23,17 @@ public class BuySharesAction extends AJAXAction {
     private float    totalSpent;
 
     public void doAjaxWork(){
-        System.out.println("BuySharesAction called!");
+        //System.out.println("BuySharesAction called!");
         BuySharesReturn ret = client.doBuyShares(iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,
                                                  targetSellPrice);
-        System.out.println("BuySharesAction got ret!");
-        System.out.println(ret);
+        //System.out.println("BuySharesAction got ret!");
+        //System.out.println(ret);
         ajaxSuccess();
         result = ret.result;
         numSharesBought=ret.numSharesBought;
         numSharesFinal = ret.numSharesFinal;
         totalSpent = ret.totalSpent;
-        System.out.println("BuySharesAction leaving!");
+       //System.out.println("BuySharesAction leaving!");
     }
     public boolean isSuccess() {
         return super.isSuccess();

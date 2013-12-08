@@ -24,13 +24,13 @@ public class LoginAction extends ClientAction{
         if (username.isEmpty() || password.isEmpty())
             return ERROR;
 
-        System.out.println("Login: "+username+" "+password);
+        //System.out.println("Login: "+username+" "+password);
         if ( client.doLogin(StringEscapeUtils.escapeSql(username), StringEscapeUtils.escapeSql(password)) ){
-            System.out.println("Vou devolver sucesso no execute do LoginAction");
+            //System.out.println("Vou devolver sucesso no execute do LoginAction");
             return SUCCESS;
         }
         else{
-            System.out.println("Vou devolver erro no execute do LoginAction");
+            //System.out.println("Vou devolver erro no execute do LoginAction");
             return ERROR;
         }
     }

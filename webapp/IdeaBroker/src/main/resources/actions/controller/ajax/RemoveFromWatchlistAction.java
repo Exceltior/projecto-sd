@@ -15,7 +15,7 @@ public class RemoveFromWatchlistAction extends AJAXAction {
     private int     iid;
 
     public void doAjaxWork(){
-        System.out.println(" RemoveFromWatchlistAction: " + iid);
+        //System.out.println(" RemoveFromWatchlistAction: " + iid);
         setAjaxStatus(client.doRemoveFromWatchList(iid));
     }
     public boolean isSuccess() {

@@ -56,7 +56,7 @@ public abstract class ClientAction extends ActionSupport implements SessionAware
         } else {
             this.client = (Client) session.get("client");
         }
-        System.out.println("getClientSession(): " + client.getUid());
+        //System.out.println("getClientSession(): " + client.getUid());
         writeCookie();
     }
 

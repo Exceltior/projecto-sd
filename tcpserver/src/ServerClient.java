@@ -69,7 +69,7 @@ public class ServerClient implements Runnable {
         }
 
         if ( !Common.sendMessage(Common.Message.MSG_OK, outStream)) {
-            System.out.println("Connection to a client dropped while starting!");
+            //System.out.println("Connection to a client dropped while starting!");
             server.removeSocket(socket);
             return;
         }
@@ -79,7 +79,7 @@ public class ServerClient implements Runnable {
 
             // Read the next Message/Request
             if ( ( msg = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD){
-                System.out.println("Error No Message Received!!!");
+                //System.out.println("Error No Message Received!!!");
                 break ;
             }
 
@@ -324,7 +324,7 @@ public class ServerClient implements Runnable {
             if ( !Common.sendMessage(Common.Message.MSG_ERR,outStream) )
                 return false;
 
-        System.out.println("Client goes");
+        //System.out.println("Client goes");
         return Common.sendMessage(Common.Message.MSG_OK, outStream);
     }
 }
