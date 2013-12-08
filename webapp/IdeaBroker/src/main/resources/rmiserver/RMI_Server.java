@@ -1079,6 +1079,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         int numShares = buyNumShares;
         int totalSharesBought = 0;
 
+        if ( targetSell == -1 ) {
+            targetSell = currentShares == null ? getMarketValue(iid) : currentShares.getPrice();
+        }
+
         System.out.println("Checkpoint 1.1");
         float totalSpent = 0;
 
@@ -2073,8 +2077,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     private synchronized void setSharesIdea(int uid, int iid,int nshares, float price,
                                             Connection conn)throws RemoteException{
         String query = "select * from \"Share\" where userid="+uid+" and "+"iid="+iid;
+        System.out.println("SSI");
         ArrayList<String[]> result = ((conn == null) ? receiveData(query) : receiveData(query, conn));
-
+        System.out.println("SSII");
         if ( !result.isEmpty() ) {
             // This already exists, we should just update it
 
@@ -2086,6 +2091,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             }
         } else
             query = "INSERT INTO \"Share\" VALUES (" + iid + "," + uid + "," + nshares + "," + price + ")";
+
+        System.out.println("SSIII");
 
         if ( conn == null )
             insertData(query);

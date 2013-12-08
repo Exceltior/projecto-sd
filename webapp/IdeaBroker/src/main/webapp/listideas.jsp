@@ -75,7 +75,9 @@
                                         <%-- href="viewidea.action?iid=<s:property value="iid" />" --%>
                                     <h4
                                             class="list-group-item-heading"><s:property value="title" /></h4>
+                                            <small>Ideia <s:property value="id" /></small>
                                     <p class="list-group-item-text">
+
                                     <div style="height: 25px">
                                         <div style="float:right; white-space:nowrap;" id="ideatags<s:property
                                              value="id" />">

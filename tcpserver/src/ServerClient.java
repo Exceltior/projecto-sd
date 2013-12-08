@@ -105,12 +105,7 @@ public class ServerClient implements Runnable {
                     //System.err.println("Error in the handle registration method!!!");
                     break ;
                 }
-            } else if (msg == Common.Message.REQUEST_GET_IDEA_BY_IID){
-                if ( !handleGetIdeaByIID() ){
-                    //System.err.println("Error in the handle get idea by IID method!!!");
-                    break ;
-                }
-            }else if(msg == Common.Message.REQUEST_CREATEIDEA){
+            } else if(msg == Common.Message.REQUEST_CREATEIDEA){
                 if ( !handleCreateIdea()){
                     //System.err.println("Error in the handle create idea method!!!");
                     break ;
@@ -200,8 +195,10 @@ public class ServerClient implements Runnable {
     }
 
     private boolean handleBuyShares(){
-        int iid, price, numberSharesToBuy, minNumberShares, numSharesAlreadyHas;
+        int iid, numberSharesToBuy;
         boolean check;
+        float maxPricePerShare = 0, targetSellPrice = 0;
+        boolean addToQueueOnFailure = true; //FIXMEREFACTOR
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -217,17 +214,14 @@ public class ServerClient implements Runnable {
         if ( (numberSharesToBuy = Common.recvInt(inStream)) == -1)
             return false;
 
-        if ( (price = Common.recvInt(inStream)) == -1)
+        if ( (maxPricePerShare = Common.recvFloat(inStream)) == -1)
             return false;
 
- //       if (price == -2)//To void the "They're trying to hack us" message
- //           price = -1;
-
-        if ( (minNumberShares = Common.recvInt(inStream)) == -1)
+        if ( (targetSellPrice = Common.recvFloat(inStream)) == -1)
             return false;
 
-        float maxPricePerShare = 100, targetSellPrice = 100;
-        boolean addToQueueOnFailure = true; //FIXMEREFACTOR
+        if ( targetSellPrice == -2) targetSellPrice = -1;
+
 
         BuySharesReturn ret;
 
@@ -240,7 +234,7 @@ public class ServerClient implements Runnable {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        if (ret!=null && ret.result.contains("OK")){
+        if (ret!=null && !ret.result.contains("NOBUY")){
             if (!Common.sendMessage(Common.Message.MSG_OK,outStream))
                 return false;
         } else {
@@ -302,53 +296,6 @@ public class ServerClient implements Runnable {
 
         return true;
     }
-
-    ////
-    //  Gets an idea from its id
-    ////
-    private boolean handleGetIdeaByIID() {
-        if ( !isLoggedIn() ) {
-            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
-        }
-
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
-
-        int iid;
-
-        if ( (iid = Common.recvInt(inStream)) == -1)
-            return false;
-
-        Idea idea;
-
-        try {
-            idea = connection.getRMIInterface().getIdeaByIID(iid,uid);
-        } catch (RemoteException e) {
-            System.err.println("RMI exception while fetching an idea by its IID");
-            connection.onRMIFailed();
-            server.killSockets();
-            return false;
-        }
-
-        if ( idea == null ) {
-            // There is no idea with this ID
-            if ( !Common.sendMessage(Common.Message.ERR_NO_SUCH_IID, outStream))
-                return false;
-        } else {
-            // Got the idea, let's send it
-            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-                return false;
-
-            if ( !idea.writeToDataStream(outStream) )
-                return false;
-
-            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-                return false;
-        }
-
-        return true;
-    }
-
 
     ////
     //  Only returns false if we lost connection

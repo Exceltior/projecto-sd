@@ -326,21 +326,16 @@ class ClientConnection {
      * Buys shares of an idea
      * @param iid The idea id
      * @param numberSharesToBuy  Number of shares the user wants to buy
-     * @param price  The price that he wants to sell each share
-     * @param minNumberShares Minimum nunber of shares he doesnt want to sell (from the shares he bought)
+
      * @return boolean value, indicating if the transaction happened
      */
-    public boolean buyShares(int iid,int numberSharesToBuy,int price,int minNumberShares){
+    public boolean buyShares(int iid,int numberSharesToBuy,float maxPrice,float sellPrice){
         Common.Message reply;
 
         if (iid == -1)//Should never happen
             return false;
 
-        if (price == -1)
-            price = -2;
-
-        if (minNumberShares == -1)
-            minNumberShares = -2;
+        if ( sellPrice == -1 ) sellPrice = -2;
 
         for(;;){
             if ( !Common.sendMessage(Common.Message.REQUEST_BUYSHARES, outStream) ) {
@@ -364,11 +359,11 @@ class ClientConnection {
                 reconnect();continue;
             }
 
-            if (!Common.sendInt(price,outStream) ){
+            if (!Common.sendFloat(maxPrice,outStream) ){
                 reconnect();continue;
             }
 
-            if (!Common.sendInt(minNumberShares,outStream) ){
+            if (!Common.sendFloat(sellPrice,outStream) ){
                 reconnect();continue;
             }
 

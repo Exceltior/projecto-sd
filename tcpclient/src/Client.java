@@ -299,19 +299,12 @@ public class Client {
     }
 
     private boolean buyShares(){
-        //Lista ideias das quais o user nao detem 100% das shares
-        ArrayList<Idea> canBuyIdeas = conn.getIdeasBuy();//List of ideas the user can buy
         boolean repeat;
         String line;
-        int iid = -1, price = 1, numberSharesToBuy = 1, index = -1, minNumberShares = 0;
-
-        if (canBuyIdeas==null || canBuyIdeas.size() == 0){
-            System.out.println("There are no ideas to sell");
-            return false;
-        }
-
-        System.out.println("List of ideas the user can buy:");
-        for (Idea canBuyIdea : canBuyIdeas) System.out.println(canBuyIdea);
+        int iid = -1;
+        int numberSharesToBuy;
+        float sellPrice=0;
+        float maxPrice=0;
 
         //Pedir ao user que ideias quer comprar
         do{
@@ -322,8 +315,8 @@ public class Client {
                 iid = Integer.parseInt(line);
                 if (iid == -1)
                     return false;
-                index = hasElement(canBuyIdeas,iid);
-                if (iid < 1 || index == -1){
+
+                if (iid < 1){
                     System.out.println("Invalid option!");
                     repeat = true;
                 }
@@ -338,16 +331,9 @@ public class Client {
             repeat = false;
             System.out.println("Please insert the number of shares you want to buy from the given idea:");
             line = sc.nextLine();
-            try{
-                numberSharesToBuy = Integer.parseInt(line);
-                if (canBuyIdeas.get(index).getSharesBuy() < numberSharesToBuy){
-                    System.out.println("Invalid input!");
-                    repeat = true;
-                }
-            }catch(NumberFormatException n){
-                System.out.println("Invalid input!");
-                repeat = true;
-            }
+            numberSharesToBuy = Integer.parseInt(line);
+            if ( numberSharesToBuy < 0 )
+                repeat = true; //I ONLY DO THIS THING THIS WAY BECAUSE JOCA DID IT TOO.
         }while (repeat);
 
         do{
@@ -356,8 +342,8 @@ public class Client {
                     " want to change it:");
             line = sc.nextLine();
             try{
-                price = Integer.parseInt(line);
-                if(price < -1){
+                sellPrice = Float.parseFloat(line);
+                if(sellPrice != -1 && sellPrice < 0){
                     System.out.println("Invalid input!");
                     repeat = true;
                 }
@@ -370,12 +356,11 @@ public class Client {
         do{
 
             repeat = false;
-            System.out.println("Please insert the minimum number of shares you dont want to sell from the shares you " +
-                    " are going to buy (If you already have shares and want to keep the same number enter -1)");
+            System.out.println("Please insert the maximum price you are willing to give for the shares.");
             line = sc.nextLine();
             try{
-                minNumberShares = Integer.parseInt(line);
-                if(minNumberShares < -1 || minNumberShares > numberSharesToBuy){
+                maxPrice = Float.parseFloat(line);
+                if(maxPrice <= 0 ){
                     System.out.println("Invalid input!");
                     repeat = true;
                 }
@@ -386,7 +371,7 @@ public class Client {
         }while (repeat);
 
 
-        return conn.buyShares(iid,numberSharesToBuy,price,minNumberShares);
+        return conn.buyShares(iid,numberSharesToBuy,maxPrice,sellPrice);
     }
 
     private void mainLoop(){
