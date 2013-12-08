@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 ////
 // This class, which implements an independent thread, is responsible for handling all requests from a given client
@@ -114,17 +115,6 @@ public class ServerClient implements Runnable {
                     //System.err.println("Error in the handle create idea method!!!");
                     break ;
                 }
-            }else if (msg == Common.Message.REQUEST_GET_TOPICS_OF_IDEA){
-                if (!handleGetTopicsOfIdea()){
-                    //System.err.println("Error in the handle get topics of idea method!!!!!!");
-                    break;
-                }
-
-            }else if(msg == Common.Message.REQUEST_GETIDEASHARES){
-                if (!handleGetIdeaShares()){
-                    //System.err.println("Error in the handle get idea shares method!!!!!!!!");
-                    break;
-                }
             }else if (msg == Common.Message.REQUEST_BUYSHARES){
                 if (!handleBuyShares()){
                     //System.err.println("Error in the handle buy shares method!!!!!");
@@ -174,44 +164,8 @@ public class ServerClient implements Runnable {
         return true;
     }
 
-    ////
-    //  Get the list of topics where a given idea is
-    ////
-    private boolean handleGetTopicsOfIdea(){
-        int iid;
-        ServerTopic[] list_topics;
 
-        if ( !isLoggedIn() ) {
-            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
-        }
-
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
-
-        if ( (iid = Common.recvInt(inStream)) == -1)
-            return false;
-
-        try{
-            list_topics = connection.getRMIInterface().getIdeaTopics(iid);
-        }catch(RemoteException r){
-            System.err.println("Error while getting ideas from topic");
-            connection.onRMIFailed();
-            server.killSockets();
-            return false;
-        }
-
-        if (!Common.sendInt(list_topics.length,outStream))
-            return false;
-
-        for (ServerTopic list_topic : list_topics) {
-            if (! list_topic.writeToDataStream(outStream))
-                return false;
-        }
-
-        return Common.sendMessage(Common.Message.MSG_OK, outStream);
-    }
-
-    private String[] receiveData(){ //YA JOCA, QUE NOME DE MERDA PARA ESTA FUNÇÃO. FIXME.
+    private String[] receiveTopicsArray(){
         String[] data;
         int numIdeas;
         String temp;
@@ -300,16 +254,10 @@ public class ServerClient implements Runnable {
     //  Creates a new Idea
     ////
     private boolean handleCreateIdea(){
-        Common.Message reply;
-        String title, description, topic;
+        String title, description;
+        int result;
+        float moneyInvested ;
         String[] topicsArray;
-        //int[] ideasForArray, ideasAgainstArray, ideasNeutralArray;
-        ArrayList<Integer> ideasForArray = new ArrayList<Integer>(),
-                           ideasAgainstArray = new ArrayList<Integer>(),
-                           ideasNeutralArray = new ArrayList<Integer>();
-        int nshares, price, result, numMinShares;
-        boolean result_topics, result_shares;
-        NetworkingFile ficheiro = null;
 
         if ( !isLoggedIn() ) {
             return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
@@ -324,34 +272,17 @@ public class ServerClient implements Runnable {
         if ( (description = Common.recvString(inStream)) == null)
             return false;
 
-        if ( (nshares = Common.recvInt(inStream)) == -1)
-            return false;
-        if ( (price = Common.recvInt(inStream)) == -1)
-            return false;
-
-        if ( (numMinShares = Common.recvInt(inStream)) == -1)
+        if ( (moneyInvested = Common.recvFloat(inStream)) == -1)
             return false;
 
         //Receive Topics
-        if ( (topicsArray = receiveData()) == null )
+        if ( (topicsArray = receiveTopicsArray()) == null )
             return false;
 
-        //Receive Ideas For
-        if ( !receiveInt(ideasForArray) )
-            return false;
-
-        //Receive Ideas Against
-        if ( !receiveInt(ideasAgainstArray))
-            return false;
-
-        //Receive Ideas Neutral
-        if ( !receiveInt(ideasNeutralArray))
-            return false;
-
-        float moneyInvested = 100; //FIXMEREFACTOR
-        ArrayList<String> topics = new ArrayList<String>(); //FIXMEREFACTOR
+        ArrayList<String> topics = new ArrayList<String>(topicsArray.length); //FIXMEREFACTOR
+        Collections.addAll(topics, topicsArray);
         try {
-            result = connection.getRMIInterface().createIdea(title,description,uid,moneyInvested,topics,ficheiro);
+            result = connection.getRMIInterface().createIdea(title,description,uid,moneyInvested,topics,null);
         } catch (RemoteException e) {
             result = -1;
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -418,52 +349,6 @@ public class ServerClient implements Runnable {
         return true;
     }
 
-    private boolean handleGetIdeaShares(){
-        int iid;
-        Share ideaShares;
-
-        if ( !isLoggedIn() ) {
-            return Common.sendMessage(Common.Message.ERR_NOT_LOGGED_IN, outStream);
-        }
-
-        if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-            return false;
-
-        //Receive data
-        if ( (iid = Common.recvInt(inStream)) == -1){
-            return false;
-        }
-
-        try{
-            ideaShares = connection.getRMIInterface().getIdeaShares(iid,uid);
-        }catch(RemoteException r){
-            System.err.println("RemoteException in the handle get idea shares method!!");
-            connection.onRMIFailed();
-            server.killSockets();
-            return false;
-        }
-
-        if (ideaShares == null){
-            return Common.sendMessage(Common.Message.MSG_ERR, outStream);
-        }else{
-            //Send data confirmation
-            if ( !Common.sendMessage(Common.Message.MSG_OK, outStream))
-                return false;
-        }
-/** FIXMEREFACTOR: Como é que é esta merda?!
-        //Send Data
-        if (!Common.sendInt(ideaShares.size(),outStream))
-            return false;
-
-        for (String ideaShare : ideaShares) {
-            if (! Common.sendString(ideaShare, outStream))
-                return false;
-        }
-
-        //Send final confirmation*/
-        return Common.sendMessage(Common.Message.MSG_OK, outStream);
-
-    }
 
     ////
     //  Only returns false if we lost connection
@@ -493,6 +378,7 @@ public class ServerClient implements Runnable {
             if ( !Common.sendMessage(Common.Message.MSG_ERR,outStream) )
                 return false;
 
+        System.out.println("Client goes");
         return Common.sendMessage(Common.Message.MSG_OK, outStream);
     }
 }

@@ -185,17 +185,7 @@ class ClientConnection {
                 this.lastUsername = user;
                 this.lastPassword = pass;
                 this.loggedIn = true;
-
-                if ( (reply = Common.recvMessage(inStream)) == Common.Message.ERR_NO_MSG_RECVD) {
-                    reconnect(); continue;
-                }
-
-                if ( reply == Common.Message.MSG_USER_HAS_PENDING_REQUESTS)
-                    return 2;
-                else if ( reply == Common.Message.MSG_USER_NOT_NOTIFIED_REQUESTS)
-                    return 1;
-                else
-                    return 0;
+                return 0;
             } else
                 return 3;
         }
@@ -235,7 +225,7 @@ class ClientConnection {
      * @param data The ArrayList of objects "String" we want to send
      * @return A boolean value indicating the success or failure of the operation
      */
-    boolean sendData(ArrayList<String> data){
+    boolean sendTopicsArray(ArrayList<String> data){
         //Send number of items
 
         if(data != null && data.size()>0){
@@ -280,73 +270,13 @@ class ClientConnection {
     }
 
     /**
-     * Method used to set the relationship between two ideas
-     * @param iidparent The id of the "parent" idea, that is, the idea which will serve as a "reference"
-     * @param iidchild The id of the "child" idea, that is, the idea which will agree, disagree or be neutral with the
-     *                 "parent" idea
-     * @param type The type of relantionship we want to establish
-     * @return A boolean value indicating the success or failure of the operation
-     */
-    boolean setRelationBetweenIdeas(int iidparent,int iidchild, int type){
-        Common.Message reply;
-
-        if (type == -1)
-            type = -2;
-
-        for(;;){
-            if ( !Common.sendMessage(Common.Message.REQUEST_SETIDEARELATION, outStream) ) {
-                reconnect(); continue;
-            }
-
-            if ( (reply=Common.recvMessage(inStream)) == Common.Message.MSG_ERR ){
-                reconnect(); continue;
-            }
-
-            if ( reply == Common.Message.ERR_NO_MSG_RECVD) {
-                reconnect(); continue;
-            }
-
-            if ( reply == Common.Message.ERR_NOT_LOGGED_IN ) {
-                return false;
-            }
-
-            //Send idea1
-            if (!Common.sendInt(iidparent,outStream)){
-                reconnect();continue;
-            }
-
-            //Send idea2
-            if (!Common.sendInt(iidchild,outStream)){
-                reconnect();continue;
-            }
-
-            //Send Relationship Type
-            if(!Common.sendInt(type,outStream)){
-                reconnect();continue;
-            }
-
-            //Get final confirmation
-            reply = Common.recvMessage(inStream);
-
-            return reply == Common.Message.MSG_OK;
-        }
-    }
-
-    /**
      * Creates a new idea in the database of the application
      * @param title The title of the idea
      * @param description The description of the idea
-     * @param nshares The number of shares of the idea
-     * @param price The price of each share of the idea
      * @param topics A list of the topics' titles where we will include the idea
-     * @param minNumShares The minimum number of shares the owner of the idea wants to keep to himself (or herslef)
-     * @param ideasFor A list of the ids of the ideas that the idea to be created supports
-     * @param ideasAgainst A list of the ids of the ideas that the idea to be created doesnt support
-     * @param ideasNeutral A list of the ids of the ideas that the idea is neutral
-     * @param ficheiro  The file to associate with the idea to be created
      * @return A boolean value indicating the success or failure of the operation
      */
-    boolean createIdea(String title, String description, int nshares, int price, ArrayList<String> topics, int minNumShares, ArrayList<Integer> ideasFor, ArrayList<Integer> ideasAgainst, ArrayList<Integer> ideasNeutral,NetworkingFile ficheiro){
+    boolean createIdea(String title, String description, ArrayList<String> topics,float initialInvestment){
         Common.Message reply;
 
 
@@ -375,111 +305,19 @@ class ClientConnection {
                 reconnect(); continue;
             }
 
-            if ( !Common.sendInt(nshares, outStream) ) {
+            if ( !Common.sendFloat(initialInvestment, outStream) ) {
                 reconnect(); continue;
-            }
-
-            if ( !Common.sendInt(price, outStream) ) {
-                reconnect(); continue;
-            }
-
-            if( !Common.sendInt(minNumShares,outStream) ){
-                reconnect();continue;
             }
 
             //Send topics
-            if ( !sendData(topics)){
-                reconnect();continue;
-            }
-
-            //Send ideas for
-            if ( !sendInteger(ideasFor)){
-                reconnect();continue;
-            }
-
-            //Send ideas against
-            if ( !sendInteger(ideasAgainst)){
-                reconnect();continue;
-            }
-
-            //Send ideas neutral
-            if ( !sendInteger(ideasNeutral)){
-                reconnect();continue;
-            }
-
-            //Get Confirmations of data except topics and ideas relations
-            reply = Common.recvMessage(inStream);
-
-            if (reply == Common.Message.ERR_NO_MSG_RECVD){
-                System.err.println("Error while creating idea in the database");
-                return false;
-            }
-
-            for (String topic : topics) {
-                reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD)
-                    return false;
-
-                if (reply == Common.Message.ERR_TOPIC_NAME)
-                    System.out.println("Error while associating topic " + topic + ": Invalid topic name");
-            }
-
-            for (Integer anIdeasFor : ideasFor) {
-                reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD)
-                    return false;
-
-                if (reply == Common.Message.ERR_NO_SUCH_IID)
-                    System.out.println("Error while associating idea " + anIdeasFor + ": Invalid idea name");
-                //Else, we got MSG_OK, everything's fine, move along, nothing to see here
-            }
-
-            for (Integer anIdeasAgainst : ideasAgainst) {
-                reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD)
-                    return false;
-
-                if (reply == Common.Message.ERR_NO_SUCH_IID)
-                    System.out.println("Error while associating idea " + anIdeasAgainst + ": Invalid idea name");
-                //Else, we got MSG_OK, everything's fine, move along, nothing to see here
-            }
-
-            for (Integer anIdeasNeutral : ideasNeutral) {
-                reply = Common.recvMessage(inStream);
-                if (reply == Common.Message.ERR_NO_MSG_RECVD)
-                    return false;
-
-                if (reply == Common.Message.ERR_NO_SUCH_IID)
-                    System.out.println("Error while associating idea " + anIdeasNeutral + ": Invalid idea name");
-                //Else, we got MSG_OK, everything's fine, move along, nothing to see here
-            }
-
-            //Send file
-            if (ficheiro != null){
-                if(!Common.sendMessage(Common.Message.MSG_IDEA_HAS_FILE,outStream)){
-                    reconnect();continue;
-                }
-
-                ObjectOutputStream objectStream;
-                try {
-                    objectStream = new ObjectOutputStream(outStream);
-                    objectStream.writeObject(ficheiro);
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    return false;
-                }
-
-            }else if(!Common.sendMessage(Common.Message.MSG_IDEA_DOESNT_HAVE_FILE,outStream)){
+            if ( !sendTopicsArray(topics)){
                 reconnect();continue;
             }
 
             //Get Final Confirmation
             reply = Common.recvMessage(inStream);
 
-            if (reply == Common.Message.ERR_NO_MSG_RECVD)
-                return false;
-
-            return reply == Common.Message.MSG_OK;
+            return reply != Common.Message.ERR_NO_MSG_RECVD && reply == Common.Message.MSG_OK;
 
         }
     }

@@ -36,6 +36,39 @@ public class Client {
         return sc.nextLine();
     }
 
+    private String verifyTopicString(String temp){
+        if (!temp.trim().contains(" "))
+            return temp.trim();
+        //Here we know the string has at least one space, lets check if it is at the end of the string
+        String substring = temp.substring(0,temp.length()-1);
+        if (!substring.trim().contains(" "))//The space is in the last position of the string
+            return temp.trim();
+        //Note: I left the if unsimplified for better understanding of the code
+        return null;
+    }
+
+    /**
+     * Method to filter the topics inserted by the user. With this method we can discard invalid topic names, like:
+     * #this is #topic . In this example we only consider the topics "this" and "topic", since it's impossible to use
+     * hashtags with spaces.
+     * @param list  An array of String objects, containing a list of the topics inserted by the user
+     * @return  An ArrayList of String objects, containing the final valid topics.
+     */
+    private ArrayList<String> getTopicsFromList(String[] list){
+        ArrayList<String> devolve = new ArrayList<String>();
+        String temp;
+
+        for (String aList : list) {
+            if (!aList.trim().equals("")){
+                temp = verifyTopicString(aList);
+                if (temp != null && !devolve.contains(temp.trim()))
+                    devolve.add(aList.trim());
+            }
+        }
+
+        return devolve;
+    }
+
 
     ////
     //  Method responsible for asking the user information about the topics of an idea
@@ -60,59 +93,9 @@ public class Client {
 
         }while (repeat);
 
-        temp = response.split(";");
-        for (String aTemp : temp) {
-            if (! devolve.contains(aTemp))
-                devolve.add(aTemp);
-        }
-
-        return devolve;
+        return getTopicsFromList(response.split("#"));
     }
 
-    ////
-    //  Method responsible for asking the user information about the ideas
-    ////
-    private ArrayList<Integer> askIdeas(String sentence){
-        String ideas;
-        String[] temp;
-        ArrayList<Integer> devolve = new ArrayList<Integer>();
-        int pos = 0, temp_num;
-        boolean repeat;
-
-        do{
-            repeat = false;
-            System.out.println(sentence);
-            ideas = sc.nextLine();
-
-            if (ideas.equals("")){
-                System.out.println("Invalid input!");
-                repeat = true;
-                continue;
-            }
-
-            temp = ideas.split(";");
-
-            for (String aTemp : temp) {
-                try {
-                    temp_num = Integer.parseInt(aTemp);
-                    if(temp_num == -1)
-                        return devolve;
-
-                    else if(devolve.contains(temp_num)){
-                        System.out.println("You have inserted the same idea twice, please enter again");
-                        repeat = true;
-                    }
-                    devolve.add(temp_num);
-                    pos = pos + 1;
-                } catch (NumberFormatException n) {
-                    System.out.println("Invalid input! Please enter again");
-                    repeat = true;
-                }
-            }
-        }while (repeat);
-
-        return devolve;
-    }
     ////
     //  Method responsible for collecting the information needed to create a new idea, and send a request to the TCP Server in
     //  order to create that new topic in the database
@@ -121,7 +104,7 @@ public class Client {
         String title, description, file, filePath;
         ArrayList<String> topics;
         ArrayList<Integer> ideasFor, ideasAgainst, ideasNeutral;
-        int nshares = 1, price = 1, minNumShares = 1;
+        float initialInvestment = 0;
         NetworkingFile ficheiro = null;
         boolean repeat;
         String line;
@@ -150,11 +133,11 @@ public class Client {
 
         do{
             repeat = false;
-            System.out.println("Please enter the number of shares for the idea:");
+            System.out.println("Please enter the initial Investment:");
             line = sc.nextLine();
             try{
-                nshares = Integer.parseInt(line);
-                if (nshares <= 0){
+                initialInvestment = Float.parseFloat(line);
+                if (initialInvestment <= 0){
                     System.out.println("Invalid input!");
                     repeat = true;
                 }
@@ -164,70 +147,11 @@ public class Client {
             }
         }while(repeat);
 
-        do{
-            repeat = false;
-            System.out.println("Please enter the price of each share of the idea:");
-            line = sc.nextLine();
-            try{
-                price = Integer.parseInt(line);
-                if (price <= 0){
-                    System.out.println("Invalid input!");
-                    repeat = true;
-                }
-            }catch(NumberFormatException n){
-                System.out.println("Invalid input!");
-                repeat = true;
-            }
-        }while(repeat);
+        topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: #TOpic " +
+                                   "1 #Topic2" +
+                                   ")",true);
 
-        do{
-            repeat = false;
-            System.out.println("Please enter the minimum number of shares you don't want to sell instantaneously for the given idea:");
-            line = sc.nextLine();
-            try{
-                minNumShares = Integer.parseInt(line);
-                if (minNumShares<0 || minNumShares>nshares){
-                    System.out.println("Invalid number!");
-                    repeat = true;
-                }
-            }catch(NumberFormatException n){
-                System.out.println("Invalid number!");
-                repeat = true;
-            }
-        }while(repeat);
-
-        topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: topic1;topic2)",true);
-
-        do{
-            ideasFor = askIdeas("Is your idea in favor other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-            ideasAgainst = askIdeas("Is your idea against other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-            ideasNeutral = askIdeas("Is your idea neutral to other ideas already stored in the system? If so, please enter the ids of the ideas (USAGE: iid1;iid2)\nEnter -1 to cancel");
-            //repeat = checkIdeasRelations(ideasFor,ideasAgainst,ideasNeutral);
-            if (!repeat)
-                System.out.println("\nInvalid selection of the ideas' relations!Please repeat the selection!\n");
-        }while (!repeat);
-
-        do{
-            repeat = false;
-            System.out.println("Do you want to attach a file?(Y/N)");
-            file = sc.nextLine();
-            if (file.equals("Y") || file.equals("y")){
-                System.out.println("Please enter the path to the file you want to attach:");
-                filePath = sc.nextLine();
-                try {
-                    ficheiro = new NetworkingFile(filePath);
-                } catch (FileNotFoundException e) {
-                    System.out.println("Invalid file path!");
-                    repeat = true;
-                }
-            }
-            else if(!file.equals("N") && !file.equals("n")){
-                repeat = true;
-                System.out.println("Invalid input!");
-            }
-        }while (repeat);
-
-        return conn.createIdea(title, description,nshares,price,topics,minNumShares,ideasFor,ideasAgainst,ideasNeutral,ficheiro);
+        return conn.createIdea(title, description,topics,initialInvestment);
     }
 
     ////
@@ -263,17 +187,9 @@ public class Client {
         boolean repeat;
 
         System.out.println("\n\nMain Menu");
-        System.out.println("1 - Check a topic");//List all topics and choose one. While "inside" a topic list all ideas
-        System.out.println("2 - Create a new topic");
-        System.out.println("3 - Submit an idea");
-        System.out.println("4 - Delete an idea");
-        System.out.println("5 - Show Transaction History");
-        System.out.println("6 - View Idea");
-        System.out.println("7 - Search Topic");
-        System.out.println("8 - Manage User Ideas");
-        System.out.println("9 - Add relation between two ideas");
-        System.out.println("10 - Buy shares of an idea");
-        System.out.println("0 - Sair");
+        System.out.println("1 - Create Idea");//List all topics and choose one. While "inside" a topic list all ideas
+        System.out.println("2 - Buy Shares of Idea");
+        System.out.println("0 - Quit");
 
         do{
             repeat = false;
@@ -281,7 +197,7 @@ public class Client {
             try{
                 line = sc.nextLine();
                 choice = Integer.parseInt(line);
-                if(choice < 0 || choice > 10)
+                if(choice < 0 || choice > 2)
                     repeat = true;
             }catch(NumberFormatException n){
                 repeat = true;
@@ -357,7 +273,7 @@ public class Client {
 
             if (login_result == 3){
                 stay = true;
-                System.out.println("Login unsucessfull!\nIf you want to register just enter 2, otherwise press any key to login again");
+                System.out.println("Login unsucessful!\nIf you want to register just enter 2, otherwise press any key to login again");
                 String temp = sc.nextLine();
                 try{
                     if (Integer.parseInt(temp) == 2)
@@ -491,7 +407,7 @@ public class Client {
 
 
                 //Submit an idea
-                case 3:{
+                case 1:{
                     if (!createIdea())
                         System.out.println("Error while creating an idea!");
                     else
@@ -499,10 +415,8 @@ public class Client {
                     break;
                 }
 
-
-
                 //Buy shares of an idea
-                case 10:{
+                case 2:{
                     buyShares();
                     break;
                 }
