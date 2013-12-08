@@ -114,7 +114,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             name = new JSONObject(authResponse.getBody()).getString("name");
         } catch (JSONException e) {
             e.printStackTrace();
-            //FIXME WHAT TO DO WITH THIS?????
             return null;
         }
 
@@ -149,7 +148,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             id = new JSONObject(authResponse.getBody()).getString("id");
         } catch (JSONException e) {
             e.printStackTrace();
-            //FIXME WHAT TO DO WITH THIS?????
             return null;
         }
         return id;
@@ -230,7 +228,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             messageId = new JSONObject(authResponse.getBody()).getString("id");
         } catch (JSONException e) {
             e.printStackTrace();
-            //FIXME WHAT TO DO WITH THIS?????
+            return null;
         }
 
         return messageId;
@@ -349,7 +347,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public ServerTopic[] getTopics(String title) throws RemoteException{
 
         if (title==null)
-            return getTopics();//FIXME: MAXI SHOULD WE DO THIS???
+            return getTopics();
 
         String query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i, Ideia ii " +
                 "where t.nome LIKE '%" + title + "%' and i.tid = t.tid and ii.iid=i.iid and ii.activa = 1";
@@ -436,7 +434,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     public Idea[] getIdeasFromUser(int uid) throws RemoteException{
         Idea[] ideas;
-        //FIXME IN CASE OF ERROR WAS i.iid,i.titulo,i.descricao,i.userid
+
         String query = "Select * from Ideia i, \"Share\" s where i.activa = 1 and s.iid = i.iid" +
                 " and s.userid = " + uid;
         ArrayList<String[]> queryResult = receiveData(query);
@@ -477,7 +475,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public Idea[] getIdeasFromTopic(int uid, int tid) throws RemoteException{
-        //FIXME in case of error was e.iid, e.titulo, e.descricao, e.userid, e.activa
+
         String query = "select * from Ideia e, " +
                 "TopicoIdeia t where t.iid = e.iid and t" +
                 ".tid = "+tid+" and e.activa = 1";
@@ -758,7 +756,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public Idea[] getIdeasFromWatchList(int uid) throws RemoteException{
-        //FIXME was w.iid, i.titulo, i.descricao, w.userid
+
         String query = "Select * from Ideia i, IdeiaWatchList w " +
                 "where i.activa = 1 and w.iid = i.iid and w.userid = " + uid;
         ArrayList<String[]> queryResut = receiveData(query);
@@ -870,7 +868,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         int iid;
         Connection conn;
 
-        //FIXME FIXME MAXI MAXI VE SE ESTA MERDA ESTA BEM FEITA!!!!!!!
         if (!validateIdea(title))//Cannot create the idea
             return -1;
 
@@ -932,10 +929,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
                 if (messageId != null)
                     addIdeaFacebookId(iid,messageId,conn);
-                else{
-                    System.err.println("Error while posting on facebook wall: Cannot get message facebook id");
-                    //FIXME: DEAL WITH THIS
-                }
             }
         }
         else
@@ -1278,8 +1271,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                     + iid + " por " + ret.totalSpent + " DEICoins!";
             String clientToken = tokens.get(uid);
 
-            if (!doFacebookPostComment(url, message, clientToken))
-                System.out.println("ERROR POSTING ON FACEBOOK");//FIXME HANDLE THIS
+            doFacebookPostComment(url, message, clientToken);
         }
         if ( ret.result.isEmpty() )
             ret.result = "OK";
@@ -1387,15 +1379,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     }
 
-    //FIXME: Fix this query, we no longer have minimum number of shares a user can keep!!!!!
-    //FIXME: Add javadoc - MAXI MAXI MAXI
-    /**
-     *
-     * @param uid
-     * @return
-     * @throws RemoteException
-     * UNUSED
-     */
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
         // CAGUEI. E ANDEI.
         return null;
@@ -1447,7 +1430,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     public ServerTopic getTopic(int tid, String name) throws RemoteException{
         String query;
-//FIXME: Check topics!! by maxi
+
         if (tid != -2 && !name.equals(""))
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
                     "where t.nome LIKE '%" + name +"%' and t.tid = " + tid + " and i.tid = t.tid" +
@@ -1606,7 +1589,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return getIdeaByIID(iid,-1) != null;
         } catch (RemoteException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return false; //FIXME: SHould never happen
+            return false; //FIXME: Should never happen
         }
     }
 
@@ -2003,7 +1986,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      *              in the database.
      */
     private synchronized ArrayList<String[]> getQueue(Connection conn) {
-        String query = "Select * from Compra order by compra_id ASC"; //FIXME FIXME FIXME falta order by id
+        String query = "Select * from Compra order by compra_id ASC";
         ArrayList<String[]> queryResult = receiveData(query,conn);
 
         if (queryResult == null || queryResult.isEmpty())
@@ -2639,7 +2622,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{
