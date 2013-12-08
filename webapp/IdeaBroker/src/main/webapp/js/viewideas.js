@@ -314,7 +314,7 @@ function doBuyShares(id) {
 
             //Update the money onscreen (it's okay if we don't buy anything because totalspent=0)
             //setUserMoney(getUserMoney()-data.totalSpent); FIXME Disabled because we get the notification
-            //FIXME: WARNING, Most of buy shares is all fucked up. We probably will only get QUEUED.NOMOREMONEY OR NOBUY.NOMOREMONEY or NOBUY.NOMORESHARES
+            //FIXME: WARNING, Most of buy shares is all screwed up. We probably will only get QUEUED.NOMOREMONEY OR NOBUY.NOMOREMONEY or NOBUY.NOMORESHARES
 
             if ( data.result == 'OK' ) {
                 setNumSharesForidea(id,data.numSharesFinal);

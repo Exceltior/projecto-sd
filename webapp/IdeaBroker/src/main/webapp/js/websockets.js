@@ -11,7 +11,6 @@ function connect(host) { // connect to the host websocket servlet
     else if ('MozWebSocket' in window)
         websocket = new MozWebSocket(host);
     else {
-        //FIXME: SHIT
         return;
     }
 
@@ -26,7 +25,6 @@ function onOpen(event) {
 }
 
 function onClose(event) {
-    //FIXME: CLosed, shit
     console.log("Websocket closed!");
 }
 

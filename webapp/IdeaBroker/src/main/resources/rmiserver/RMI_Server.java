@@ -586,7 +586,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized public int registerWithFacebook(String token) throws RemoteException {
         String user   = getFacebookUsernameFromToken(token);
         String faceId = getFacebookUserIdFromToken(token);
-        String email  = "null"; //FIXME JOCA VAI BUSCAR A MERDA DO EMAIL E METE ESSA MERDA NUMA FUNÇÃO. PRIVATE.
+        String email  = "null";
 
         String query = "Select userid From Utilizador where id_facebook LIKE '" + faceId + "'";
         ArrayList<String[]> queryResult = receiveData(query);
@@ -1797,7 +1797,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return queryResult;
     }
 
-    //É TUDO SYNCHRONIZED, QUE É LINDO P'RA FODASZ.
+
     private synchronized void checkQueue(Connection conn) {
         ArrayList<String[]> queue = getQueue(conn);
 
