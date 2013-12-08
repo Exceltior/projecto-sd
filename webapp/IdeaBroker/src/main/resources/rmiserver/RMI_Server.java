@@ -3,8 +3,6 @@ package rmiserver;
 import model.RMI.RMINotificationCallbackInterface;
 import model.RMI.RMI_Interface;
 import model.data.*;
-import model.data.queues.Notification;
-import model.data.queues.TransactionQueue;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
@@ -46,9 +44,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     private int lastFile = 0;
 
     private static final long   serialVersionUID  = 1L;
-    private final        Object notificationsLock = new Object();
-    private final        Object requestsLock      = new Object();
-    private TransactionQueue transactionQueue;
 
     private HashMap<Integer, RMINotificationCallbackInterface> callbacks = new HashMap<Integer,
             RMINotificationCallbackInterface>();
@@ -257,7 +252,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         super();
         this.url = "jdbc:oracle:thin:@" + servidor + ":" + porto + ":" + sid;
         readLastFile();
-        transactionQueue = new TransactionQueue(this);
         //new Thread(transactionQueue).start();
     }
 
@@ -799,28 +793,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return new Share(queryResult.get(0));
     }
 
-/*
-    //FIXME: Are we going to need this?
-    ////
-    // Method responsible for getting all the ideas in favour, neutral or against a given idea
-    ////
-    public Idea[] getIdeaRelations(int iid, int relationshipType) throws RemoteException{
-        String query = "Select * from Ideia i, RelacaoIdeias r where r.iidfilho = i.iid and r.iidpai = " + iid +
-                " and r.tipo_relacao = " + relationshipType;
-        ArrayList<String[]> queryResult = receiveData(query);
-        Idea[] devolve;
-
-        if (queryResult.isEmpty())
-            return null;
-
-        devolve = new Idea[queryResult.size()];
-
-        for (int i=0;i<queryResult.size();i++)
-            devolve[i] = new Idea(queryResult.get(i));
-
-        return devolve;
-    }
-*/
 
     /**
      * Method responsible for creating a new topic in the database
@@ -1271,10 +1243,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 }
             }
             System.out.println("CC4");
-            /*new model.data.queues.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
-                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
-            new model.data.queues.NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
-                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));*/
         }
 
 
@@ -1374,23 +1342,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return devolve;
     }
 
-    /**
-     * Method which tells us if a given ArrayList contains any Idea with any of the given ids
-     * @param listIdeas The ArrayList
-     * @param queryResult  An array with the ids in question
-     * @return  An Integer object, with the position in the ArrayList where the matching occured, or -1 if there were
-     *          no matching
-     */
-    private int hasElement(ArrayList<Idea> listIdeas,String[] queryResult){
-        int i;
-
-        for (i=0;i<listIdeas.size();i++){
-            if ( Integer.parseInt(queryResult[0]) == listIdeas.get(i).getId() )
-                return i;
-        }
-        return -1;
-
-    }
 
     synchronized public ArrayList<Idea> getIdeasCanBuy(int uid) throws RemoteException{
         // CAGUEI. E ANDEI.
@@ -1482,25 +1433,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return queryResult.get(0)[0];
     }
 
-/*
-    /**
-     * Gets the number of shares that a user doesnt want to sell for a given idea
-     * @param iid   The id of the idea
-     * @param uid   The id of the user
-     * @return  The number of shares the given user doesnt want to sell for the given idea
-     * @throws RemoteException
-     *
-    public int getSharesNotSell(int iid,int uid) throws RemoteException{
-        String query = "Select s.numMin from \"Share\" s where s.userid = " + uid + " and s.iid = " + iid;
-        ArrayList<String[]> queryResult = receiveData(query);
-
-        if (queryResult.isEmpty())
-            return -2;
-
-        return Integer.parseInt(queryResult.get(0)[0]);
-    }
-*/
-
     synchronized private boolean setPricesSharesInternal(int iid, int uid, float price, Connection conn,
                                                          boolean checkQueue
                                                          ) throws RemoteException{
@@ -1538,29 +1470,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized public boolean setPricesShares(int iid, int uid, float price) throws RemoteException{
         return setPricesSharesInternal(iid, uid, price, null, true);
     }
-
-/*
-    /**
-     * Sets the number of shares for a given idea that the user doesnt want to sell
-     * @param iid Id of the idea in question
-     * @param uid Id of the user requesting the operation
-     * @param numberShares Number of shares that the user doesnt want to seel
-     * @return A boolean value, indicating if the operation went well, or not
-     * @throws RemoteException
-     *
-    synchronized public boolean setSharesNotSell(int iid, int uid, int numberShares)throws RemoteException{
-        if ( getSharesIdeaForUid(iid,uid) == null)
-            return false; // You have no shares!
-        String query = "Update \"Share\" set numMin = " + numberShares + " where userid = " + uid + " and iid = " + iid;
-        Connection conn = getTransactionalConnection();
-        insertData(query,conn);
-        returnTransactionalConnection(conn);
-
-        transactionQueue.checkQueue();
-
-        return true;
-    }
-*/
 
     /**
      * Send to the Server the history of transactions for a given client
@@ -1791,27 +1700,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return result.get(0)[0];
     }
 
-    //FIXME: MAXI JAVADOC
-    /**
-     *
-     * @param uid
-     * @param iid
-     * @param numShares
-     * @param targetPrice
-     * @return
-     * @throws RemoteException
-     */
-    public boolean registerGetSharesRequest(int uid, int iid, int numShares, int targetPrice) throws RemoteException {
-        System.out.println("registerGetSharesRequest called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
-                ", targetPrice="+targetPrice);
-        boolean ret = tryGetSharesIdea(uid, iid, numShares, targetPrice);
-
-        if ( !ret )
-            transactionQueue.enqueue(new Transaction(uid, iid, numShares, targetPrice));
-
-        return ret;
-    }
-
     synchronized private boolean setMarketValue(int iid, float value, Connection c) {
         String query = "UPDATE Ideia set ultimatransacao = "+value+" where iid="+iid;
 
@@ -1842,116 +1730,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<String[]> ans = receiveData(query,c);
         connectionPool.returnConnection(c);
         return Float.valueOf(ans.get(0)[0]);
-    }
-
-    /**
-     * This tries to GET numShare shares. Notice that it doesn't try to BUY. If the user already has them,
-     * it just quits and errors out.
-     * @param uid   The id of the user performing the operation
-     * @param iid   The id of the idea involved in the transaction
-     * @param numShares The number of shares the user wants to buy
-     * @param targetPrice  The desired target price of the shares of this user after buying. If the user already has
-     *                     shares, then -2 means we should keep the price already set
-     * @return 1 on success, 0 on error (can't buy because there aren't any appropriate sellers....)
-     * @throws RemoteException
-     */
-    synchronized public boolean tryGetSharesIdea(int uid, int iid, int numShares, float targetPrice)
-            throws RemoteException {
-        System.out.println("tryGetSharesIdea called with uid="+uid+", iid="+iid+", numShares="+numShares+", " +
-                ", targetPrice="+targetPrice);
-        Share currentShares = getSharesIdeaForUid(iid, uid);
-        float userMoney = getUserMoney(uid);
-        int sharesAlvo = numShares;
-
-        if ( currentShares != null) {
-            // User already has shares
-            if ( targetPrice == -2 )
-                targetPrice = currentShares.getPrice();
-
-            numShares -= currentShares.getNum();
-
-            if ( numShares <= 0) {
-                System.out.println("User tried to get X shares, but already has them!");
-                return true; //Got them!
-            }
-        }
-
-        ArrayList<Share> shares = getSharesIdea(iid);
-        ArrayList<Share> sharesToBuy = new ArrayList<Share>();
-        ArrayList<Integer> sharesToBuyNum = new ArrayList<Integer>();
-
-        sortByPrice(shares);
-
-        // We have sorted them by price per share, so the best options are first
-
-        for (int i1 = 0; i1 < shares.size() && numShares > 0; i1++) {
-            Share s = shares.get(i1);
-            System.out.println("processing share: " + s);
-            if ( s.getUid() == uid ) {
-                System.out.println("Skipping, its mine");
-                continue;
-            }
-            int availShares = s.getAvailableShares();
-            if (availShares > 0) { //Should always happen
-                System.out.println("ALready, available shares!: " + availShares);
-
-                int toBuy = Math.min(availShares, numShares);
-
-                if (s.getPriceForNum(toBuy) > userMoney) {
-                    System.out.println("Not enough money...:" + userMoney + ", " + s.getPriceForNum(toBuy));
-                    // Not enough money...
-                    float pricePerShare = s.getPrice();
-
-                    // See how many we can buy. Round down!
-                    toBuy = (int) (((double) userMoney) / pricePerShare);
-                    if (toBuy == 0)
-                        break;
-                    System.out.println("Will still try to buy " + toBuy);
-                }
-                System.out.println("Ordering Buying " + toBuy +" shares.");
-                sharesToBuy.add(s);
-                sharesToBuyNum.add(toBuy);
-                numShares -= toBuy;
-                userMoney -= s.getPriceForNum(toBuy);
-            }
-        }
-
-        if ( numShares > 0 ) {
-            //Can't buy shares!!!
-            System.out.println("Failed to buy shares!!");
-            return false;
-        }
-
-        //Okay, move on and let's buy them. this must be transactional
-        Connection conn = getTransactionalConnection();
-        for (int i = 0; i < sharesToBuy.size(); i++) {
-            Share s = sharesToBuy.get(i);
-            int num = sharesToBuyNum.get(i);
-            int resultingShares = s.getNum()-num;
-            System.out.println("Buying "+num+"from "+s.getUid()+"!!");
-            System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
-            setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),conn);
-            insertIntoHistory(uid, s.getUid(), num,s.getPrice(),conn,iid);
-            setUserMoney(s.getUid(), getUserMoney(uid) + s.getPriceForNum(num), conn);
-        }
-
-
-        setSharesIdea(uid,iid,sharesAlvo,targetPrice,conn);
-        setUserMoney(uid,userMoney, conn);
-
-        // UNLEASH THE BEAST!
-        returnTransactionalConnection(conn);
-
-        for (int i = 0; i < sharesToBuy.size(); i++) {
-            Share s = sharesToBuy.get(i);
-            System.out.println("To buy: "+s);
-            System.out.println("(Buying): "+sharesToBuyNum.get(i));
-            /*new model.data.queues.NotificationQueue(this, s.getUid()).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
-                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));
-            new model.data.queues.NotificationQueue(this, uid).enqueue(new Notification(uid, s.getUid(), sharesToBuyNum.get(i),
-                    s.getPrice(), getUsername(uid), getUsername(s.getUid()), iid));*/
-        }
-        return true;
     }
 
     /**
@@ -2229,81 +2007,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         checkQueue(c);
     }
 
-/*
-    //Fixme: Are we going to use this??
-    ////
-    //  Method responible for checking if there ins't already a relationship between two ideas of a different
-    //  type of the relation we want to create
-    ////
-    synchronized private boolean checkOtherRelations(int iidpai, int iidfilho, int tipo) throws RemoteException{
-        String query, query2;
-
-        if (tipo == 1){
-            query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                    " and tipo_relacao = " + 0;
-
-            query2 = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                    " and tipo_relacao = " + -1;
-        }else if (tipo == -1){
-            query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                    " and tipo_relacao = " + 0;
-
-            query2 = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                    " and tipo_relacao = " + 1;
-        }else{ //tipo == 0
-            query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                    " and tipo_relacao = " + 1;
-
-            query2 = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                    " and tipo_relacao = " + -1;
-        }
-
-        //Return if there is a relationship of other type between the two ideas
-        return receiveData(query).size() == 0 && receiveData(query2).size() == 0;
-
-    }
-*/
-
-/*
-    We should not need this, since there are no relationships between ideas in this project
-    ////
-    //  Method responsible for creating the different relationships between ideas
-    ////
-    synchronized public boolean setIdeasRelations(int iidpai,int iidfilho, int tipo) throws RemoteException{
-        String query;
-
-        //  Tipo = 1 -> For
-        //  Tipo = -1 -> Against
-        //  Tipo = 0 -> Neutral
-
-        //Check if the id of the "children" idea is valid
-        query = "Select * from Ideias i where i.iid = " + iidfilho;
-        if (receiveData(query).size() == 0)
-            return false;
-
-        //Check if there isn't already a relationship in the database between these two ideas, but of a different type
-        if (!checkOtherRelations(iidpai,iidfilho,tipo))
-            return false;
-
-        //Check if the relationship we want to add is already in the database
-        query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                " and tipo_relacao = " + tipo;
-        if (receiveData(query).size() > 0)
-            return true;
-
-
-        //Check if there isn't already the same relation in the database. If there is we just don't insert that relation
-        query = "Select * from RelacaoIdeias where iidpai = " + iidpai + " and iidfilho = " + iidfilho +
-                " and tipo_relacao = " + tipo;
-        if (receiveData(query).size() > 0)
-            return true;
-
-        query = "INSERT INTO RelacaoIdeias Values(" + iidpai + ", " + iidfilho + ", " + tipo + ")";
-
-        insertData(query);
-        return true;
-    }
-*/
 
     /**
      * This just picks any connection available from the pool and uses it. If you need transactional support you can
@@ -2500,145 +2203,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
     }
 
-    /**
-     * Write the request queue file to disk. Synchronized access to the file is guaranteed by the implementation
-     * @param queue The queue which we are supposed to write to disk
-     * @throws RemoteException
-     */
-    /*public void writeRequestQueueFile(ArrayList<Request> queue) throws RemoteException {
-        synchronized (requestsLock) {
-            ObjectOutputStream out;
-            try {
-                out = new ObjectOutputStream(new FileOutputStream(requestsQueueFilePath));
-            } catch (IOException e) {
-                System.err.println("Error opening Queue file for writing!");
-                return;
-            }
-
-            try {
-                out.writeInt(queue.size());
-                for (Request r : queue)
-                    r.writeToStream(out);
-            } catch (IOException e) {
-                System.err.println("Error writing Queue to file!!");
-            }
-
-            try { out.close(); } catch (IOException ignored) {}
-        }
-    }
-/*
-    /**
-     * Read the request queue file from disk. Synchronized access to the file is guaranteed by the implementation
-     * @return The request queue
-     * @throws RemoteException
-     *//*
-    public ArrayList<Request> readRequestsFromQueueFile() throws RemoteException {
-        synchronized (requestsLock) {
-            ObjectInputStream in;
-            try {
-                in = new ObjectInputStream(new FileInputStream(requestsQueueFilePath));
-            } catch (IOException e) {
-                System.err.println("Error opening Queue file for reading!");
-                return null;
-            }
-
-            ArrayList<Request> requests = new ArrayList<Request>();
-            int size;
-            try {
-                size = in.readInt();
-            } catch (IOException e) {
-                System.err.println("Error reading size from Queue File!");
-                return null;
-            }
-            for (int i = 0; i < size; i++)
-                requests.add(new Request(in));
-
-            return requests;
-        }
-    }*/
-
-    /**
-     * Read the notifications for this user from its notifications file. Synchronized access is guaranteed by the
-     * server. In fact, too synchronized. Had we had the time, we would have implemented this lock on a per user basis.
-     * @param uid The user UID
-     * @return
-     * @throws RemoteException
-     */
-    public ArrayList<Notification> readNotificationsFromQueueFile(int uid) throws RemoteException {
-        synchronized ( notificationsLock ) {
-            ObjectInputStream in;
-            try {
-                String path = "./"+uid+"notifications.bin";
-                in = new ObjectInputStream(new FileInputStream(path));
-            } catch (IOException e) {
-                //System.err.println("Error opening Queue file for reading!");
-                return null;
-            }
-
-            ArrayList<Notification> notifications = new ArrayList<Notification>();
-            int size;
-            try {
-                size = in.readInt();
-            } catch (IOException e) {
-                System.err.println("Error reading size from Notification Queue File!");
-                return null;
-            }
-            for (int i = 0; i < size; i++)
-                try {
-                    notifications.add((Notification)in.readObject());
-                } catch (IOException e) {
-                    System.err.println("Error reading from Notification Queue File!");
-                    return null;
-                } catch (ClassNotFoundException e) {
-                    System.err.println("Error reading from Notification Queue File! (Class not found)");
-                    return null;
-                }
-
-
-            if ( notifications.size()>0 ) {
-                System.out.println("Just found notifications!");
-                for (Notification n : notifications)
-                    System.out.println("SUch as: "+n);
-            }
-
-            return notifications;
-        }
-    }
-
-    /**
-     * Write the notifications for this user in its notifications file. Synchronized access is guaranteed by the
-     * server. In fact, too synchronized. Had we had the time, we would have implemented this lock on a per user basis.
-     * @param notifications The queue with the notifications
-     * @param uid The user ID for which we want to save this queue
-     * @return
-     * @throws RemoteException
-     */
-    public boolean writeNotificationsQueueFile(ArrayList<Notification> notifications, int uid) throws
-            RemoteException {
-        synchronized ( notificationsLock ) {
-            String path = "./"+uid+"notifications.bin";
-            ObjectOutputStream out;
-            try {
-                out = new ObjectOutputStream(new FileOutputStream(path));
-            } catch (IOException e) {
-                System.err.println("Error opening Notification Queue file for writing!");
-                return false;
-            }
-
-            try {
-                out.writeInt(notifications.size());
-                for (Notification r : notifications)
-                    r.writeToStream(out);
-            } catch (IOException e) {
-                System.err.println("Error writing Notification Queue to file!!");
-                return false;
-            }
-
-            try { out.close(); } catch (IOException ignored) { }
-
-            return true;
-        }
-    }
 
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");

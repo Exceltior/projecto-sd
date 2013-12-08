@@ -7,8 +7,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketException;
-import java.rmi.RemoteException;
 
 public class NotificationClient implements Runnable {
     private Socket           socket    = null;

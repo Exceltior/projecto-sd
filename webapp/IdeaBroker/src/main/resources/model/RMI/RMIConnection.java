@@ -16,7 +16,7 @@ public class RMIConnection {
     private final Object isDownLock = new Object();
     private final String RMIHost;
 
-    synchronized void testRMINow() {
+    public synchronized void testRMINow() {
         if (RMIInterface == null) {
             isDown = true;
             return;
@@ -31,7 +31,7 @@ public class RMIConnection {
         }
     }
 
-    synchronized boolean RMIIsDown() {
+    public synchronized boolean RMIIsDown() {
         return isDown;
     }
 
