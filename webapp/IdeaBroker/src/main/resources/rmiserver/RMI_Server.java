@@ -559,7 +559,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         String query = "INSERT INTO Utilizador VALUES (user_seq.nextval,'" + email + "','" + user + "'," +
                 "'" + pass +
-                "'," + starting_money + ",sysdate, null)";
+                "'," + starting_money + ",sysdate, null,0,null)";
 
         insertData(query);
 
@@ -589,17 +589,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return true;
     }
 
-    synchronized public boolean registerWithFacebook(String token) throws RemoteException {
+    synchronized public int registerWithFacebook(String token) throws RemoteException {
         String user   = getFacebookUsernameFromToken(token);
         String faceId = getFacebookUserIdFromToken(token);
-        String email  = "null"; //FIXME JOCA
+        String email  = "null"; //FIXME JOCA VAI BUSCAR A MERDA DO EMAIL E METE ESSA MERDA NUMA FUNÇÃO. PRIVATE.
 
         String query = "INSERT INTO Utilizador VALUES (user_seq.nextval," + email + ",'" + user + "'," +
                 "null, " + starting_money + ",sysdate, null,0," + faceId +")";
 
         insertData(query);
 
-        return true;
+        return -1; //JOCA. CORRIGE-MOS.
     }
 
     /**

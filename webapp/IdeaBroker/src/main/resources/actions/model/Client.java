@@ -467,8 +467,8 @@ public class Client {
         return result;
     }
 
-    private boolean doRMIRegisterNewAccountWithFacebook(String token){
-        boolean result = false;
+    private int doRMIRegisterNewAccountWithFacebook(String token){
+        int result = -1;
 
         try{
             result = this.rmi.getRMIInterface().registerWithFacebook(token);
@@ -671,13 +671,14 @@ public class Client {
 
 
     public boolean doRegisterNewAccountWithFacebook( String token){
-        boolean devolve =doRMIRegisterNewAccountWithFacebook(token);
-        if (devolve) {
+        this.uid = doRMIRegisterNewAccountWithFacebook(token);
+        if (uid != -1) {
             this.facebookAccount = true;
             this.facebookName = this.username = doRMIGetFacebookUsernameFromToken(token);
+            return true;
         }
 
-        return devolve;
+        return false;
     }
 
     /**

@@ -19,7 +19,7 @@ public interface RMI_Interface extends Remote {
     public String getIdeaFacebookId(int iid) throws RemoteException;
     //public int canLogin(String user, String pwd) throws  RemoteException;
     public boolean register(String user, String pass, String email) throws RemoteException;
-    public boolean registerWithFacebook(String token) throws RemoteException;
+    public int registerWithFacebook(String token) throws RemoteException;
     public boolean associateWithFacebook(int uid, String token) throws RemoteException;
     public ServerTopic[] getTopics() throws RemoteException;
     public ServerTopic[] getTopics(String title) throws RemoteException;
