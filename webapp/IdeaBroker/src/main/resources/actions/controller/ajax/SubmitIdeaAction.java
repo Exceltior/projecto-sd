@@ -1,17 +1,18 @@
-package actions.controller;
+package actions.controller.ajax;
 
 import model.data.Idea;
 import model.data.NetworkingFile;
 import org.apache.commons.lang.xwork.StringEscapeUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
  * This action is used when the user wants to create a new idea. When this action is "generated" the following attributes
  * are expected to have been defined by the user: title; body; topicsList; moneyInvested; contentType; filename.
  */
-public class SubmitIdeaAction extends AJAXAction{
+public class SubmitIdeaAction extends AJAXAction {
 
     /**
      * idea contains an Idea object, with the idea created by the user.
@@ -136,8 +137,7 @@ public class SubmitIdeaAction extends AJAXAction{
      *                      Otherwise, it returns ERROR.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database.
      */
-    public String execute() throws Exception {
-        super.execute();
+    public void doAjaxWork() {
 
         System.out.println("moneyInvested: "+moneyInvested);
         System.out.println("title: "+title);
@@ -147,7 +147,11 @@ public class SubmitIdeaAction extends AJAXAction{
 
         if (file != null){
             //System.out.println("Ideia submetida e tem " + file.getPath() + " como caminho para o ficheiro");
-            userFile = new NetworkingFile(file.getPath());
+            try {
+                userFile = new NetworkingFile(file.getPath());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         idea = new Idea();
@@ -165,7 +169,6 @@ public class SubmitIdeaAction extends AJAXAction{
             ajaxFailure();
         }
 
-        return SUCCESS;
     }
     public boolean isSuccess() {
         return super.isSuccess();

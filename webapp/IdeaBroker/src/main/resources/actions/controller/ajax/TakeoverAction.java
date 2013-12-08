@@ -1,6 +1,6 @@
-package actions.controller;
+package actions.controller.ajax;
 
-public class TakeoverAction extends AJAXAction{
+public class TakeoverAction extends AJAXAction {
 
     /**
      * The id of the idea we want to add to the user's watchlist.
@@ -12,12 +12,10 @@ public class TakeoverAction extends AJAXAction{
      * @return              If the removal was successfull returns SUCCESS. Otherwise returns ERROR.
      * @throws Exception
      */
-    public String execute() throws Exception {
-        super.execute();
+    public void doAjaxWork() {
         System.out.println(" TakeoverAction: " + iid);
         setAjaxStatus(client.doTakeover(iid));
         System.out.println(" done...");
-        return SUCCESS;
     }
 
     public boolean isSuccess() {

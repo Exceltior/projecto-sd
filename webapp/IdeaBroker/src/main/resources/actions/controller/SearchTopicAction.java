@@ -48,8 +48,7 @@ public class SearchTopicAction extends ClientAction {
      * @return              If the operation is successfull it returns SUCCESS. Otherwise, returns ERROR.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
-    public String execute() throws Exception{
-        super.execute();
+    public String doWork() {
 
         this.topics = client.doSearchTopic(title);
 

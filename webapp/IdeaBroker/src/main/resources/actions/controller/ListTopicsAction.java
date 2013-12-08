@@ -33,8 +33,7 @@ public class ListTopicsAction extends ClientAction{
      * @return              A String object, informing the success or failure of the operation.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database.
      */
-    public String execute() throws Exception {
-        super.execute();
+    public String doWork(){
         this.topics = client.doGetTopics();
         /*topics = new Topic[3];
         for (int i=0; i < topics.length; i++)

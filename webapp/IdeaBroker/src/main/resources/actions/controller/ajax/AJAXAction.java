@@ -1,5 +1,7 @@
-package actions.controller;
+package actions.controller.ajax;
 
+
+import actions.controller.ClientAction;
 
 /**
  * AJAX action. This action is mapped in struts.xml to produce JSON. The JSON parser will iterate through the action
@@ -15,13 +17,15 @@ package actions.controller;
  *
  * FIXME: This documentation has to be improved
  */
-public class AJAXAction extends ClientAction{
+public abstract class AJAXAction extends ClientAction {
     private boolean success;
 
-    public String execute() throws Exception {
-        super.execute();
+    final public String doWork() {
+        doAjaxWork();
         return SUCCESS;
     }
+
+    public abstract void doAjaxWork();
 
     public boolean isSuccess() {
         return success;

@@ -1,5 +1,7 @@
 package actions.controller;
 
+import org.apache.commons.lang.xwork.StringEscapeUtils;
+
 /**
  * This action is used when the user tries to registerWithFacebook. When execute() is called, the username, password and email are
  * expected to be filled with username, password and email of the user performing the registration.
@@ -19,10 +21,10 @@ public class RegisterAction extends ClientAction {
      * @return              If the registration was successfull, returns SUCCESS. Otherwise returns ERROR.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
-    public String execute() throws Exception {
-        super.execute();
+    public String doWork() {
 
-        if ( client.doRegister(username, password,email) )
+        if ( client.doRegister(StringEscapeUtils.escapeSql(username), StringEscapeUtils.escapeSql(password),
+                               StringEscapeUtils.escapeSql(email)) )
             return SUCCESS;
         else
             return ERROR;

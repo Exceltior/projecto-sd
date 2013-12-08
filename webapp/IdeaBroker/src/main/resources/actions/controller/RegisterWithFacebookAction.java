@@ -3,7 +3,7 @@ package actions.controller;
 /**
  * Class responsible for handling the creation of a new account in our system, associated with a facebook Account
  */
-public class RegisterWithFacebook extends ClientAction{
+public class RegisterWithFacebookAction extends ClientAction{
 
     /**
      * token conatins the user's Facebook Access Token.
@@ -17,8 +17,7 @@ public class RegisterWithFacebook extends ClientAction{
         this.token = token;
     }
 
-    public String execute() throws Exception{
-        super.execute();
+    public String doWork(){
         System.out.println("O token do utilizador no asdasdasd facebook e " + token);
 
         if (client.doRegisterNewAccountWithFacebook(token))

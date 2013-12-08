@@ -1,4 +1,5 @@
-package actions.controller;
+package actions.controller.ajax;
+
 
 /**
  * AJAX action. This action is mapped in struts.xml to produce JSON. The JSON parser will iterate through the action
@@ -10,14 +11,12 @@ package actions.controller;
  * AJAX OUT: JSON:
  *              success: Boolean indicating success or failure of the operation.
  */
-public class RemoveFromWatchlistAction extends AJAXAction{
+public class RemoveFromWatchlistAction extends AJAXAction {
     private int     iid;
 
-    public String execute() throws Exception {
-        super.execute();
+    public void doAjaxWork(){
         System.out.println(" RemoveFromWatchlistAction: " + iid);
         setAjaxStatus(client.doRemoveFromWatchList(iid));
-        return SUCCESS;
     }
     public boolean isSuccess() {
         return super.isSuccess();

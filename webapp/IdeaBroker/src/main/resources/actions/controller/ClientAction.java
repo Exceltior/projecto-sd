@@ -21,9 +21,11 @@ import java.util.Map;
  * A session variable is exposed to children classes, as well as the client object,
  * which is guaranteed by ClientAction to always be valid *IF* they comply and call ClientAction's execute method.
  */
-public class ClientAction extends ActionSupport implements SessionAware, ServletResponseAware, ServletRequestAware {
+public abstract class ClientAction extends ActionSupport implements SessionAware, ServletResponseAware,
+        ServletRequestAware {
 
-    private static final String COOKIE_NAME="IdeaBrokerEncodedUid";
+    private static final String COOKIE_NAME        = "IdeaBrokerEncodedUid";
+    private static final String INVALID_ENCODEDUID = "-1";
 
     protected Map<String, Object> session;
     protected Client              client;
@@ -46,7 +48,7 @@ public class ClientAction extends ActionSupport implements SessionAware, Servlet
     private void getClientSession() {
         if ( !session.containsKey("client") ) {
             this.client = new Client();
-            if (!readCookie()) {
+            if ( !readCookie() ) {
                 //Logged with encodeduserid
                 //client.doLogin("Hakuna", "Matata"); //FIXME: HACKED IN to make our lives easier
             }
@@ -54,15 +56,16 @@ public class ClientAction extends ActionSupport implements SessionAware, Servlet
         } else {
             this.client = (Client) session.get("client");
         }
-        System.out.println("getClientSession(): "+client.getUid());
+        System.out.println("getClientSession(): " + client.getUid());
         writeCookie();
     }
 
     boolean readCookie() {
         if ( servletRequest.getCookies() != null )
-            for(Cookie c : servletRequest.getCookies()) {
-                if (c.getName().equals(COOKIE_NAME))
-                    return client.loginWithEncodedUid(c.getValue());
+            for ( Cookie c : servletRequest.getCookies() ) {
+                if ( c.getName().equals(COOKIE_NAME) )
+                    if ( c.getValue() != INVALID_ENCODEDUID )
+                        return client.loginWithEncodedUid(c.getValue());
             }
         return false;
     }
@@ -78,10 +81,17 @@ public class ClientAction extends ActionSupport implements SessionAware, Servlet
      * @return A String object, informing the success or failure of the operation.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database.
      */
-    public String execute() throws Exception {
+    public final String execute() throws Exception {
         getClientSession();
-        return SUCCESS;
+        if ( !(this instanceof RegisterAction) && !(this instanceof RegisterWithFacebookAction) ) {
+            if ( this.client.getUid() == -1 )
+                return ERROR;
+        }
+
+        return doWork();
     }
+
+    public abstract String doWork();
 
     @Override
     public void setServletResponse(javax.servlet.http.HttpServletResponse httpServletResponse) {

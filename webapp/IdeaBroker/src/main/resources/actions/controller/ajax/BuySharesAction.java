@@ -1,4 +1,4 @@
-package actions.controller;
+package actions.controller.ajax;
 
 import model.data.BuySharesReturn;
 
@@ -22,8 +22,7 @@ public class BuySharesAction extends AJAXAction {
     private int    numSharesFinal;
     private float    totalSpent;
 
-    public String execute() throws Exception {
-        super.execute();
+    public void doAjaxWork(){
         System.out.println("BuySharesAction called!");
         BuySharesReturn ret = client.doBuyShares(iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,
                                                  targetSellPrice);
@@ -35,7 +34,6 @@ public class BuySharesAction extends AJAXAction {
         numSharesFinal = ret.numSharesFinal;
         totalSpent = ret.totalSpent;
         System.out.println("BuySharesAction leaving!");
-        return SUCCESS;
     }
     public boolean isSuccess() {
         return super.isSuccess();

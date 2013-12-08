@@ -1,4 +1,4 @@
-package actions.controller;
+package actions.controller.ajax;
 
 /**
  * Class responsible for handling the association of a Facebook Account to an existing account in our system.
@@ -23,11 +23,9 @@ public class AssociateWithFacebookAction extends AJAXAction {
      * @return              A String object, containing the result or failure of the operation.
      * @throws Exception
      */
-    public String execute() throws Exception{
-        super.execute();
+    public void doAjaxWork(){
         System.out.println("O token do utilizador no facebook 222 e " + token);
         setAjaxStatus(client.doAssociateWithFacebook(token));
-        return SUCCESS;
     }
     public boolean isSuccess() {
         return super.isSuccess();

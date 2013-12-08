@@ -8,7 +8,6 @@ import model.data.TransactionHistoryEntry;
  * history of transactions.
  */
 public class ShowTransactionHistoryAction extends ClientAction {
-    public class Transaction {}
 
     /**
      * historyList is an Array of String objects, each containing the information about a transaction in which the user is
@@ -17,8 +16,7 @@ public class ShowTransactionHistoryAction extends ClientAction {
     private TransactionHistoryEntry[] historyList;
 
 
-    public String execute() throws Exception {
-        super.execute();
+    public String doWork(){
 
         this.historyList = client.doGetHistory();
         if ( this.historyList != null )

@@ -34,20 +34,22 @@
 
         <action name="listideas" class="actions.controller.ListIdeasAction" method="execute">
             <result name="success">listideas.jsp</result>
+            <result name="error">login.jsp</result>
         </action>
 
         <action name="viewhalloffame" class="actions.controller.ViewHallOfFameAction" method="execute">
             <result name="success">viewhalloffame.jsp</result>
+            <result name="error">login.jsp</result>
         </action>
 
         <action name="listtopics" class="actions.controller.ListTopicsAction" method="execute">
             <result name="success">listtopics.jsp</result>
-            <result name="error">error.jsp</result>
+            <result name="error">login.jsp</result>
         </action>
 
         <action name="searchtopic" class="actions.controller.SearchTopicAction" method="execute">
             <result name="success">listtopics.jsp</result>
-            <result name="error">error.jsp</result>
+            <result name="error">login.jsp</result>
         </action>
 
         <action name="loginfacebook" class="actions.controller.LoginFacebookAction" method="execute">
@@ -58,7 +60,7 @@
             <result name="error">login.jsp</result>
         </action>
 
-        <action name="registerfacebook" class="actions.controller.RegisterWithFacebook" method="execute">
+        <action name="registerfacebook" class="actions.controller.RegisterWithFacebookAction" method="execute">
             <result name="success" type="redirectAction">
                 <param name="actionName">listideas</param>
                 <param name="mode">userideas</param>
@@ -68,41 +70,49 @@
 
         <action name="transactionhistory" class="actions.controller.ShowTransactionHistoryAction" method="execute">
             <result name="success">showtransactionhistory.jsp</result>
-            <result name="error">error.jsp</result>
+            <result name="error">login.jsp</result>
         </action>
 
     </package>
 
     <package name="default" namespace="/" extends="json-default">
-        <action name="addtowatchlist" class="actions.controller.AddToWatchlistAction" method="execute">
+        <action name="addtowatchlist" class="actions.controller.ajax.AddToWatchlistAction" method="execute">
             <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
-        <action name="removefromwatchlist" class="actions.controller.RemoveFromWatchlistAction" method="execute">
+        <action name="removefromwatchlist" class="actions.controller.ajax.RemoveFromWatchlistAction" method="execute">
             <result type="json"></result>
-        </action>
-
-        <action name="setshareprice" class="actions.controller.SetSharePriceAction" method="execute">
-            <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
 
-        <action name="buyshares" class="actions.controller.BuySharesAction" method="execute">
+        <action name="setshareprice" class="actions.controller.ajax.SetSharePriceAction" method="execute">
             <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
 
-        <action name="removeidea" class="actions.controller.RemoveIdeaAction" method="execute">
+        <action name="buyshares" class="actions.controller.ajax.BuySharesAction" method="execute">
             <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
 
-        <action name="takeover" class="actions.controller.TakeoverAction" method="execute">
+        <action name="removeidea" class="actions.controller.ajax.RemoveIdeaAction" method="execute">
             <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
 
-        <action name="submitidea" class="actions.controller.SubmitIdeaAction" method="execute">
+        <action name="takeover" class="actions.controller.ajax.TakeoverAction" method="execute">
             <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
 
-        <action name="facebookassociate" class="actions.controller.AssociateWithFacebookAction" method="execute">
+        <action name="submitidea" class="actions.controller.ajax.SubmitIdeaAction" method="execute">
             <result type="json"></result>
+            <result name="error">login.jsp</result>
+        </action>
+
+        <action name="facebookassociate" class="actions.controller.ajax.AssociateWithFacebookAction" method="execute">
+            <result type="json"></result>
+            <result name="error">login.jsp</result>
         </action>
     </package>
 

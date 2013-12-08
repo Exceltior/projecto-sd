@@ -2,16 +2,14 @@ package actions.controller;
 
 import model.data.Idea;
 
-public class ViewHallOfFameAction extends ClientAction{
+public class ViewHallOfFameAction extends ClientAction {
     private Idea[] ideas;
 
     public Idea[] getIdeas() {
         return ideas;
     }
 
-    public String execute() throws Exception {
-        super.execute();
-
+    public String doWork() {
         ideas = client.doGetHallOfFameIdeas();
 
         if ( ideas == null)

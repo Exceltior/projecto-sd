@@ -1,11 +1,12 @@
-package actions.controller;
+package actions.controller.ajax;
+
 
 /**
  * This action is used when the user tries to define a new selling price for his shares of a given idea.
  * When execute() is called, the iid and price are expected to have been filled, so that we know which idea is involved in
  * the operation, and at which price the user wants to sell his shares of that idea.
  */
-public class SetSharePriceAction extends AJAXAction{
+public class SetSharePriceAction extends AJAXAction {
 
     /**
      * price represents the price ar which the user wants to sell his shares of an idea.
@@ -27,8 +28,7 @@ public class SetSharePriceAction extends AJAXAction{
      * @return              If the operations is successfull, it returns SUCCESS. Otherwise, returns ERROR.
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database.
      */
-    public String execute() throws Exception{
-        super.execute();
+    public void doAjaxWork(){
 
         System.out.println("O execute do SetSharePriceAction esta a correr " + iid + " price: "+price);
 
@@ -40,7 +40,6 @@ public class SetSharePriceAction extends AJAXAction{
             System.out.println("Vou devolver erro");
             ajaxFailure();
         }
-        return SUCCESS;
     }
 
     /**

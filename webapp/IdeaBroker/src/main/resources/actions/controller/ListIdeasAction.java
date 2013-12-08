@@ -56,8 +56,7 @@ public class ListIdeasAction extends ClientAction{
      * @return A String object, informing the success or failure of the operation
      * @throws Exception    Throws an exception, in case of an error occurrs when accessing to the database
      */
-    public String execute() throws Exception {
-        super.execute();
+    public String doWork(){
 
         if ( mode.equals("topic") ) {
             this.ideas     = client.doGetTopicIdeas(tid);
@@ -71,7 +70,8 @@ public class ListIdeasAction extends ClientAction{
         } else if ( mode.equals("watchlist") ) {
             this.ideas     = client.doGetUserWatchList();
             this.title     = "Watchlist";
-        }
+        } else
+            return ERROR;
         //System.out.println("Got " + this.ideas.length + " for topic id: "+tid);
 
         return SUCCESS;

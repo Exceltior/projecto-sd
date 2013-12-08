@@ -1,5 +1,7 @@
-package actions.controller;
+package actions.controller.ajax;
 
+
+import actions.controller.ajax.AJAXAction;
 
 /**
  * AJAX action. This action is mapped in struts.xml to produce JSON. The JSON parser will iterate through the action
@@ -11,7 +13,7 @@ package actions.controller;
  * AJAX OUT: JSON:
  *              success: Boolean indicating success or failure of the operation.
  */
-public class AddToWatchlistAction extends AJAXAction{
+public class AddToWatchlistAction extends AJAXAction {
 
     /**
      * The id of the idea we want to add to the user's watchlist.
@@ -23,11 +25,9 @@ public class AddToWatchlistAction extends AJAXAction{
      * @return              If the removal was successfull returns SUCCESS. Otherwise returns ERROR.
      * @throws Exception
      */
-    public String execute() throws Exception {
-        super.execute();
+    public void doAjaxWork(){
         System.out.println(" AddToWatchlistActioniid: " + iid);
         setAjaxStatus(client.doAddToWatchList(iid));
-        return SUCCESS;
     }
 
 

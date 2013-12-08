@@ -1,6 +1,7 @@
-package actions.controller;
+package actions.controller.ajax;
 
-public class RemoveIdeaAction extends AJAXAction{
+
+public class RemoveIdeaAction extends AJAXAction {
 
     /**
      * IN
@@ -17,8 +18,7 @@ public class RemoveIdeaAction extends AJAXAction{
         this.iid = temp;
     }
 
-    public String execute() throws Exception {
-        super.execute();
+    public void doAjaxWork(){
         int retval;
         System.out.println("Remove idea "+iid);
         setAjaxStatus(client.doRemoveIdea(iid) !=-1);
@@ -28,7 +28,6 @@ public class RemoveIdeaAction extends AJAXAction{
             result = "OK";
 
         System.out.println("result "+result);
-        return SUCCESS;
     }
     public boolean isSuccess() {
         return super.isSuccess();

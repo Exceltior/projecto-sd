@@ -105,6 +105,9 @@
                                             <input class="form-control" placeholder="Password" name="password" type="password" value="">
                                         </div>
                                         <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">
+                                        <div class="form-group">
+                                            <a class="primary" href="register.jsp">Não tem conta?</a>
+                                        </div>
                                     </fieldset>
                                 </form>
                                 <hr/>
