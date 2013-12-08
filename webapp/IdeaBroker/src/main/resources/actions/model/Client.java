@@ -160,7 +160,6 @@ public class Client {
     private Idea[] doRMIGetUserWatchList(){
         Idea[] devolve = null;
 
-        uid = 1;
         //FIXME: Eliminar isto!
 
         try{
@@ -588,8 +587,14 @@ public class Client {
      * @return True if there is success logging in. False otherwise
      */
     public boolean loginWithEncodedUid(String encodeduid) {
+
+        //TODO: This is vulnerable. In a proper system, we'd check the encodeduid with RMI here
         if ( (this.uid = Integer.valueOf(encodeduid)) != -1 ) {
             this.username = doRMIGetUsername();
+            if ( this.username == null || this.username.isEmpty() ) {
+                this.uid = -1;
+                return false;
+            }
             this.adminStatus = doRMIGetAdminStatus();
             this.facebookAccount = doRMIGetFacebookUserId() != null;
 

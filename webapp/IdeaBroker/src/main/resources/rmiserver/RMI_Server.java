@@ -1704,17 +1704,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "UPDATE Ideia set ultimatransacao = "+value+" where iid="+iid;
 
         insertData(query,c);
-
-        for (int id : callbacks.keySet()) {
+        Set<Integer> keys = callbacks.keySet();
+        ArrayList<Integer> toRemove = new ArrayList<Integer>();
+        for (int id : keys) {
             System.out.println("setMarketValue id: "+id);
             try {
                 callbacks.get(id).notifyNewMarketValue(iid, value);
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 System.err.println("OPa client probably dead");
-                callbacks.remove(id);
+                toRemove.add(id);
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                System.out.println("Continuing");
             }
+            System.out.println("cccc2");
         }
+        System.out.println("For out!");
+        for (int id : toRemove)
+            callbacks.remove(id);
         System.out.println("Leaving setMarketValue!");
         return true;
     }

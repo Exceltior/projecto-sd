@@ -66,7 +66,7 @@ public abstract class ClientAction extends ActionSupport implements SessionAware
         if ( servletRequest.getCookies() != null )
             for ( Cookie c : servletRequest.getCookies() ) {
                 if ( c.getName().equals(COOKIE_NAME) )
-                    if ( c.getValue() != INVALID_ENCODEDUID )
+                    if ( !c.getValue().equals(INVALID_ENCODEDUID) )
                         return client.loginWithEncodedUid(c.getValue());
             }
         return false;
