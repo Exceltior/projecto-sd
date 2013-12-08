@@ -483,10 +483,6 @@ public class ServerClient implements Runnable {
         if ( (pwd = Common.recvString(inStream)) == null)
             return false;
 
-        ArrayList<Object> objects = new ArrayList<Object>();
-        objects.add(user);
-        objects.add(pwd);
-
         try {
             this.uid = connection.getRMIInterface().login(user,pwd);
         } catch (RemoteException e) {
@@ -494,9 +490,9 @@ public class ServerClient implements Runnable {
         }
 
         if ( uid == -1 )
-            return true;
+            if ( !Common.sendMessage(Common.Message.MSG_ERR,outStream) )
+                return false;
 
-        // Message was handled successfully
-        return true;
+        return Common.sendMessage(Common.Message.MSG_OK, outStream);
     }
 }
