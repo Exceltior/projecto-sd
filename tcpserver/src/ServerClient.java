@@ -196,8 +196,7 @@ public class ServerClient implements Runnable {
 
     private boolean handleBuyShares(){
         int iid, numberSharesToBuy;
-        boolean check;
-        float maxPricePerShare = 0, targetSellPrice = 0;
+        float maxPricePerShare0, targetSellPrice;
         boolean addToQueueOnFailure = true; //FIXMEREFACTOR
 
         if ( !isLoggedIn() ) {

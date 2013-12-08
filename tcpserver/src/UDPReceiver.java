@@ -7,12 +7,6 @@ public class UDPReceiver extends Thread{
     private Server server;
     private int checkPeriod;
 
-    public UDPReceiver(int targetPort, Server server, int checkPeriod) {
-        this.targetPort = targetPort;
-        this.server = server;
-        this.checkPeriod = checkPeriod;
-    }
-
     @Override
     public void run() {
         DatagramSocket serverSocket = null;

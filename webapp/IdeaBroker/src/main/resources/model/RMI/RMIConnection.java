@@ -81,11 +81,7 @@ public class RMIConnection {
 
         isDown = !val;
 
-        if ( isDown ) {
 
-            // Kill the sockets, because it wasn't a transient failure
-            //FIXME: What to do here? Probably get a new connection...
-        }
 
         return val;
     }

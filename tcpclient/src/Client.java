@@ -1,10 +1,8 @@
 import model.data.Idea;
 import model.data.NetworkingFile;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -74,7 +72,7 @@ public class Client {
     //  Method responsible for asking the user information about the topics of an idea
     //  atLeastOneElement - Indicates if the user actually needs to insert a topic or not
     ////
-    private ArrayList<String> askTopics(String sentence, boolean atLeastOneElement){
+    private ArrayList<String> askTopics(String sentence){
         boolean repeat;
         String response;
         String[] temp;
@@ -85,7 +83,7 @@ public class Client {
             System.out.println(sentence);
             response = sc.nextLine();
 
-            if (atLeastOneElement && response.equals("")){//Empty String, going to ask the user again
+            if ( true && response.equals("")){//Empty String, going to ask the user again
                 System.out.println("Invalid input!");
                 repeat = true;
             }else if(response.equals(""))
@@ -149,7 +147,7 @@ public class Client {
 
         topics = askTopics("Please enter the titles of the topics where you want to include your idea (USAGE: #TOpic " +
                                    "1 #Topic2" +
-                                   ")",true);
+                                   ")");
 
         return conn.createIdea(title, description,topics,initialInvestment);
     }
@@ -375,10 +373,9 @@ public class Client {
     }
 
     private void mainLoop(){
-        int choice, topic;
-        boolean stay = true;
+        int choice;
 
-        while(stay){
+        while(true){
             choice = Menu(sc);
 
             switch(choice){

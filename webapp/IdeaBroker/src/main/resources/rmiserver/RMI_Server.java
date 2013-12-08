@@ -91,7 +91,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     public String getFacebookUsernameFromToken(String token) throws RemoteException{
-        String name = null;
+        String name;
         OAuthService service = new ServiceBuilder()
                 .provider(FacebookApi.class)
                 .apiKey("436480809808619")
@@ -125,7 +125,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
     public String getFacebookUserIdFromToken(String token) throws RemoteException{
-        String id = null;
+        String id;
         OAuthService service = new ServiceBuilder()
                 .provider(FacebookApi.class)
                 .apiKey("436480809808619")
@@ -217,7 +217,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         Response authResponse = authRequest.send();
         System.out.println("BODY " + authResponse.getBody());
 
-        String messageId = null;
+        String messageId;
 
         try {
             messageId = new JSONObject(authResponse.getBody()).getString("id");
@@ -1024,14 +1024,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                             +"addToQueueOnFailure="+addToQueueOnFailure+"\n"
                             +"targetSell="+targetSell
         );
-        Connection c = null;
+        Connection c;
         if (conn == null)
             c = getTransactionalConnection();
         else
             c = conn;
 
         //Get the id of the idea on facebook
-        String ideaFacebookId = null;
+        String ideaFacebookId;
         ideaFacebookId = getIdeaFacebookId(iid);
 
         BuySharesReturn ret = new BuySharesReturn();
@@ -1653,7 +1653,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @return  An array of Idea objects, containing all the ideas of the Hall of Fame, stored in the database.
      */
     public Idea[] getHallOfFameIdeas() throws RemoteException{
-        Idea[] devolve = null;
+        Idea[] devolve;
         String query = "Select * from Ideia i, HallFame h where i.iid = h.iid";
         ArrayList<String[]> queryResult = receiveData(query);
 
@@ -1727,7 +1727,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
     public float getMarketValue(int iid) throws RemoteException {
         String query = "select ultimatransacao from Ideia where iid="+iid;
-        Connection c = null;
+        Connection c;
         try {
             c = connectionPool.checkOutConnection();
         } catch (SQLException e) {
@@ -1927,7 +1927,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     synchronized private boolean setTopicsIdea(int iid, String topicTitle, int uid,
                                                Connection conn) throws RemoteException{
-        Connection c = null;
+        Connection c;
         if ( conn == null ) c = getTransactionalConnection();
         else c = conn;
 
@@ -2165,7 +2165,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 System.err.println("SQLException in the insertData method: "+s.getMessage());
 
                 cont = true;
-                try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
             }
 
         } while ( cont );

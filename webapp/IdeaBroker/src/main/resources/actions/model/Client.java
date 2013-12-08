@@ -510,7 +510,7 @@ public class Client {
         try {
             ret = rmi.getRMIInterface().getFacebookUserId(this.uid);
         } catch (RemoteException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
         return ret;

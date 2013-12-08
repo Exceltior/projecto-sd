@@ -6,12 +6,6 @@ public class UDPTransmitter extends Thread {
     private int targetPort;
     private int period;
 
-    public UDPTransmitter(String targetServer, int targetPort, int period) {
-        this.targetServer = targetServer;
-        this.targetPort = targetPort;
-        this.period = period;
-    }
-
 
     @Override
     public void run() {

@@ -320,10 +320,7 @@ public class Idea implements Serializable {
      */
     public void setTopics(Topic[] topics) {
         this.topics = new Topic[topics.length];
-        for ( int i = 0; i < topics.length; i++ ) {
-            this.topics[i] = topics[i];
-
-        }
+        System.arraycopy(topics, 0, this.topics, 0, topics.length);
 
     }
 }
