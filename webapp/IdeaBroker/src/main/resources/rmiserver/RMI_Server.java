@@ -908,7 +908,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             } else {
                 System.out.println("S1");
-                String message = "O user " + uid + " criou a ideia '"+title+"' com o conteúdo '"+description+"' com " +
+                String message = "O user " + getUsername(uid) + " criou a ideia '"+title+"' com o conteúdo '"+description+"' com " +
                         "um " +
                         "investimento inicial de "+moneyInvested+" DEICoins!";
                 Token finalToken = new Token(clientToken,AppSecret);
