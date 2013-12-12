@@ -1,5 +1,5 @@
 /*Criacao dos Utilizadores*/
-INSERT INTO Utilizador VALUES (user_seq.nextval,'hakuna@matata.com','Hakuna','91968f0580a96a8467addb44038a7154', 1000000, to_date('2013.10.12', 'yyyy.mm.dd'), null,1,'100003701544271');
+INSERT INTO Utilizador VALUES (user_seq.nextval,'hakuna@matata.com','Hakuna','91968f0580a96a8467addb44038a7154', 1000000, to_date('2013.10.12', 'yyyy.mm.dd'), null,0,'100003701544271');
 INSERT INTO Utilizador VALUES (user_seq.nextval,'joca@joca.com', 'Joca', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,0,'100000015266864');
 INSERT INTO Utilizador VALUES (user_seq.nextval,'root@ideabroker.com', 'root', '63a9f0ea7bb98050796b649e85481845', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,1,null);
 INSERT INTO Utilizador VALUES (user_seq.nextval,'joca3@joca.com', 'Joca3', 'aa1bf4646de67fd9086cf6c79007026c', 1000000, to_date('2013.10.14', 'yyyy.mm.dd'), null,0,null);
@@ -58,7 +58,6 @@ INSERT INTO "Share" VALUES (8,5,50000,2);
 INSERT INTO "Share" VALUES (9,1,10000,2);
 INSERT INTO "Share" VALUES (9,4,10000,2);
 INSERT INTO "Share" VALUES (9,5,80000,2);
-INSERT INTO "Share" VALUES (10,2,50000,1);
 INSERT INTO "Share" VALUES (10,2,50000,1);
 
 /*Inserir ideias na watchlist*/

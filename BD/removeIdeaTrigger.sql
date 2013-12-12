@@ -1,6 +1,6 @@
 Drop Trigger removeIdeia;
 
-CREATE TRIGGER removeIdeia Before UPDATE OF activa ON Ideia FOR EACH ROW WHEN ( new.activa = 0)
+CREATE OR REPLACE TRIGGER removeIdeia Before UPDATE OF activa ON Ideia FOR EACH ROW WHEN ( new.activa = 0)
 DECLARE
 BEGIN  
   DELETE FROM "Share" where iid = :NEW.iid;

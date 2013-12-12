@@ -880,14 +880,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         try{
             //Run the procedure for creating the idea
-            String procedureCall = "{call Create_Idea(?,?,?,?)}";
+            String procedureCall = "{call Create_Idea(?,?,?,?,?)}";
             CallableStatement pstmt = conn.prepareCall(procedureCall);
             pstmt.setString(1,title);
             pstmt.setString(2,description);
-            pstmt.setInt(3,uid);
-            pstmt.setFloat(4,initialSell);
+            pstmt.setInt(3, uid);
+            pstmt.setFloat(4, initialSell);
+            pstmt.registerOutParameter(5, Types.NUMERIC);
             pstmt.execute();
-            //pstmt.close();
+            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
+            int verify = pstmt.getInt(5);
+            if (verify == -1)
+                return -1;
 
             //Run the function
             query = "Select getCurrentIid() from dual";
@@ -916,39 +920,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             return -1;
         }
 
-        //FIXME: INICIO COMENTARIOS
-        /*
-
-        query = "INSERT INTO Ideia VALUES (idea_seq.nextval,'" + title + "','" + description + "'," +
-                "" + uid + "," +
-                "" + "1,null,null,"+ initialSell +",null)";
-
-        insertData(query,conn);//Insert the idea
-
-        query = "Select i.iid from Ideia i where i.titulo = '" + title + "' and i.descricao = '" + description +
-                "' and i.userid = " + uid + " and i.activa = 1";
-
-        queryResult = receiveData(query,conn);
-
-        if (queryResult.size()>0){
-
-            /*
-            iid =  Integer.parseInt(queryResult.get(0)[0]);
-
-            //Insert the shares
-            setSharesIdea(uid,iid,starting_shares,initialSell,conn);
-
-            //Deduce the money from the user's account
-            setUserMoney(uid,starting_money-moneyInvested,conn);
-
-            //Tratar dos topicos
-            for (String topico : topics)
-                setTopicsIdea(iid,topico,uid,conn);
-
-
-            */
-
-        //FIXME: FIM COMENTARIOS
         if (queryResult.size()>0){
 
             //System.out.println("Antes de adicionar o ficheiro");
@@ -1533,7 +1504,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     synchronized public boolean setPricesShares(int iid, int uid, float price) throws RemoteException{
-        return setPricesSharesInternal(iid, uid, price, null, true);
+
+        //return setPricesSharesInternal(iid, uid, price, null, true);
+        Connection conn;
+
+        conn = getTransactionalConnection();
+
+        try{
+            //Run the procedure for creating the idea
+            String procedureCall = "{call setSharePriceProcedure(?,?,?,?)}";
+            CallableStatement pstmt = conn.prepareCall(procedureCall);
+            pstmt.setInt(1,iid);
+            pstmt.setInt(2,uid);
+            pstmt.setFloat(3, price);
+            pstmt.registerOutParameter(4, Types.NUMERIC);
+            pstmt.execute();
+            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
+            int verify = pstmt.getInt(4);
+            if (verify == -1)
+                return false;
+        }catch(SQLException s){
+            s.printStackTrace();
+            //FIXME: HANDLE THIS!
+        }
+
+        return true;
     }
 
     /**
