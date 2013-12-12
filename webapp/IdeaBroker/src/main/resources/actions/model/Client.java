@@ -306,13 +306,15 @@ public class Client {
      * @return      A boolean value, indicating the success or failure of the operation.
      */
     private boolean doRMIAddToWatchList(int iid){
+        boolean devolve;
         try{
-            rmi.getRMIInterface().addIdeaToWatchlist(iid, uid);
+            devolve = rmi.getRMIInterface().addIdeaToWatchlist(iid, uid);
         }catch(RemoteException e){
             e.printStackTrace();
+            return false;
         }
 
-        return true;
+        return devolve;
     }
 
     /**
@@ -321,13 +323,15 @@ public class Client {
      * @return      A boolean value, indicating the success or failure of the operation.
      */
     private boolean doRMIRemoveFromWatchList(int iid){
+        boolean devolve;
         try{
-            rmi.getRMIInterface().removeIdeaFromWatchlist(iid, uid);
+            devolve = rmi.getRMIInterface().removeIdeaFromWatchlist(iid, uid);
         }catch(RemoteException e){
             e.printStackTrace();
+            return false;
         }
 
-        return true;
+        return devolve;
     }
 
     /**
@@ -350,7 +354,7 @@ public class Client {
      * Safely deletes an idea as requested by the user.
      * @param iid   The id of the idea.
      * @return We have 4 possible return values:
-     * -1 -> Idea has no children
+     * -1 -> Error deleting the idea
      * -2 -> User is not the owner of the idea
      * 1 > Everything went well
      */
@@ -488,13 +492,15 @@ public class Client {
     }
 
     private boolean doRMITakeover(int iid) {
+        boolean devolve;
         try {
-            rmi.getRMIInterface().takeOver(iid);
+            devolve = rmi.getRMIInterface().takeOver(iid);
         } catch (RemoteException e) {
             //System.err.println("Takeover error");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return false;
         }
-        return true;
+        return devolve;
     }
 
     public String doRMIGetFacebookUserId() {

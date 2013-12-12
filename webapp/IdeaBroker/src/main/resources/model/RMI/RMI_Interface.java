@@ -38,7 +38,7 @@ public interface RMI_Interface extends Remote {
     public int createIdea(String title, String description, int uid,float moneyInvested,ArrayList<String> topics,NetworkingFile file) throws RemoteException;
     public TransactionHistoryEntry[] getHistory(int iid) throws RemoteException;
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException;
-    public void updateUserTime(int uid) throws RemoteException;
+    public boolean updateUserTime(int uid) throws RemoteException;
     public boolean addFile(int iid, NetworkingFile file) throws RemoteException;
     public NetworkingFile getFile(int iid) throws RemoteException;
     boolean sayTrue() throws RemoteException;
@@ -48,13 +48,13 @@ public interface RMI_Interface extends Remote {
     public String getTopicTitle(int tid) throws RemoteException;
     public float getUserMoney(int uid) throws RemoteException;
     public boolean getAdminStatus(int uid) throws RemoteException;
-    public void addIdeaToWatchlist(int iid, int uid) throws RemoteException;
+    public boolean addIdeaToWatchlist(int iid, int uid) throws RemoteException;
     public Idea[] getHallOfFameIdeas() throws RemoteException;
     public String getFacebookUsernameFromToken(String token) throws RemoteException;
-    public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
+    public boolean removeIdeaFromWatchlist(int iid, int uid) throws RemoteException;
     public boolean isFacebookAccount(int uid) throws RemoteException;
     public void addCallbackToUid(int uid, RMINotificationCallbackInterface c) throws RemoteException;
     public float getMarketValue(int iid) throws RemoteException;
-    public void takeOver(int iid) throws RemoteException;
+    public boolean takeOver(int iid) throws RemoteException;
     public String getFacebookUserId(int uid) throws RemoteException;
 }

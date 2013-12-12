@@ -574,9 +574,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 "'" + pass +
                 "'," + starting_money + ",sysdate, null,0,null)";
 
-        insertData(query);
-
-        return true;
+        return insertData(query);
     }
 
     /**
@@ -595,7 +593,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String facebookId = getFacebookUserIdFromToken(token);
 
         query = "Update Utilizador set id_facebook = " + facebookId + " where userid = " + uid;
-        insertData(query);
+        if (!insertData(query))
+            return false;
 
         updateFacebookToken(uid,token);
 
@@ -616,7 +615,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         query = "INSERT INTO Utilizador VALUES (user_seq.nextval," + email + ",'" + user + "'," +
                 "null, " + starting_money + ",sysdate, null,0," + faceId +")";
 
-        insertData(query);
+        if(!insertData(query))
+            return -1;
 
         query = "Select userid from Utilizador where id_facebook LIKE '" + faceId +"'";
         queryResult = receiveData(query);
@@ -652,7 +652,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "Update Ideia set path = '" + path + "', originalfile = '" + file.getName() +
                 "' where iid = " + iid;
 
-        insertData(query);
+        if (!insertData(query))
+            return false;
 
         updateLastFile();
         return true;
@@ -828,8 +829,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         String query = "INSERT INTO Topico VALUES (topic_seq.nextval,'" + name + "'," + uid + ")";
 
-        insertData(query);
-        return true;
+        return insertData(query);
     }
 
     /**
@@ -1013,6 +1013,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param uid  User that wants to remove the idea
      * @return We have 2 possible return values:
      * -2 -> User is not the owner of the idea
+     * -1 -> Error while deleting the idea
      * 1 > Everything went well
      * @throws RemoteException
      */
@@ -1035,7 +1036,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
 
         query = "update Ideia set activa = 0 where iid="+idea.getId();
-        insertData(query);
+        if(!insertData(query))
+            return -1;//Error deleting the idea
 
         String clientToken = tokens.get(uid);
         query = "Select facebook_id from Ideia where iid = " + idea.getId()+ " and facebook_id IS NOT NULL";
@@ -1200,20 +1202,26 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             //  System.out.println("Buying "+num+"from "+s.getUid()+"!!");
             // System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
             // System.out.println("H 1!");
-            setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),c);
+            if(!setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),c))
+                return null;
             //System.out.println("H 2!");
-            insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid);
+            if(!insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid))
+                return null;
             //System.out.println("H 3!");
-            setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getPriceForNum(num), c);
+            if(!setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getPriceForNum(num), c))
+                return null;
+
             //System.out.println("H 4!");
         }
 
         //System.out.println("Before setSharesIdea");
-        setSharesIdea(uid,iid,startingShares+totalSharesBought,targetSell,c);
+        if(!setSharesIdea(uid,iid,startingShares+totalSharesBought,targetSell,c))
+            return null;
 
 
         //System.out.println("Before setUserMoney");
-        setUserMoney(uid,userMoney, c);
+        if(!setUserMoney(uid,userMoney, c))
+            return null;
 
         //Set it to the last transaction price that happened
         if (s != null)
@@ -1316,12 +1324,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             // Need to queue! But how many? we can calculate them
             //System.out.println("Need to add to queue!");
             Connection conn = getTransactionalConnection();
-            checkQueue(conn);
+            if (!checkQueue(conn))
+                return null;
             insertIntoQueue(uid,iid,buyNumShares-ret.numSharesBought,maxPricePerShare,targetSellPrice,conn);
             returnTransactionalConnection(conn);
         } else if ( ret.result.equals("OK") ) {
             Connection conn = getTransactionalConnection();
-            checkQueue(conn);
+            if(!checkQueue(conn))
+                return null;
             returnTransactionalConnection(conn);
         }
         return ret;
@@ -1484,10 +1494,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         else c = getTransactionalConnection();
 
         String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
-        insertData(query,c);
+        if (!insertData(query,c))
+            return false;
         //System.out.println("OKAY, updated!");
         if ( checkQueue )
-            checkQueue(c);
+            if (!checkQueue(c))
+                return false;
         //System.out.println("OKAY, updated right after!");
         if ( conn == null )
             returnTransactionalConnection(c);
@@ -1527,6 +1539,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             s.printStackTrace();
             //FIXME: HANDLE THIS!
         }
+
+        returnTransactionalConnection(conn);
 
         return true;
     }
@@ -1662,10 +1676,33 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param uid   The user's id.
      * @throws RemoteException
      */
-    public void addIdeaToWatchlist(int iid, int uid) throws RemoteException{
-        String query = "Insert INTO IdeiaWatchList Values(" + uid + ", " + iid +")";
+    public boolean addIdeaToWatchlist(int iid, int uid) throws RemoteException{
+        //String query = "Insert INTO IdeiaWatchList Values(" + uid + ", " + iid +")";
 
-        insertData(query);
+        //insertData(query);
+        Connection conn = getTransactionalConnection();
+
+        try{
+            //Run the procedure for creating the idea
+            String procedureCall = "{call addToWatchList(?,?,?)}";
+            CallableStatement pstmt = conn.prepareCall(procedureCall);
+            pstmt.setInt(1,iid);
+            pstmt.setInt(2,uid);
+            pstmt.registerOutParameter(3, Types.NUMERIC);
+            pstmt.execute();
+
+            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
+            int verify = pstmt.getInt(4);
+            if (verify == -1)
+                return false;
+        }catch(SQLException s){
+            s.printStackTrace();
+            //FIXME: HANDLE THIS!!!
+        }
+
+        returnTransactionalConnection(conn);
+
+        return true;
     }
 
     /**
@@ -1674,10 +1711,33 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param uid   The user's id.
      * @throws RemoteException
      */
-    public void removeIdeaFromWatchlist(int iid, int uid) throws RemoteException{
-        String query = "delete from IdeiaWatchList where userid = "+uid+" and iid="+iid;
+    public boolean removeIdeaFromWatchlist(int iid, int uid) throws RemoteException{
+        //String query = "delete from IdeiaWatchList where userid = "+uid+" and iid="+iid;
 
-        insertData(query);
+        //insertData(query);
+        Connection conn = getTransactionalConnection();
+
+        try{
+            //Run the procedure for creating the idea
+            String procedureCall = "{call removeFromWatchList(?,?,?)}";
+            CallableStatement pstmt = conn.prepareCall(procedureCall);
+            pstmt.setInt(1,iid);
+            pstmt.setInt(2,uid);
+            pstmt.registerOutParameter(3, Types.NUMERIC);
+            pstmt.execute();
+
+            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
+            int verify = pstmt.getInt(4);
+            if (verify == -1)
+                return false;
+        }catch(SQLException s){
+            s.printStackTrace();
+            //FIXME: HANDLE THIS!!!
+        }
+
+        returnTransactionalConnection(conn);
+
+        return true;
     }
 
     @Override
@@ -1735,13 +1795,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param conn The connection to use, for instance, for transactional operations. null if don't care which
      *             connection to use
      */
-    private void setUserMoney(int uid, float money, Connection conn) {
+    private boolean setUserMoney(int uid, float money, Connection conn) {
         String query = "update Utilizador set dinheiro="+money+" where userid="+uid;
 
         if ( conn == null )
-            insertData(query);
+            return insertData(query);
         else
-            insertData(query, conn);
+            return insertData(query, conn);
     }
 
     /**
@@ -1763,7 +1823,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     synchronized private boolean setMarketValue(int iid, float value, Connection c) {
         String query = "UPDATE Ideia set ultimatransacao = "+value+" where iid="+iid;
 
-        insertData(query,c);
+        if(!insertData(query,c))
+            return false;
         Set<Integer> keys = callbacks.keySet();
         ArrayList<Integer> toRemove = new ArrayList<Integer>();
         for (int id : keys) {
@@ -1813,7 +1874,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "INSERT INTO Compra VALUES (fila_seq.nextval," + userid + "," + iid + "," + num + "," +
                 maxpricepershare + "," + targetSellPrice + ")";
 
-        insertData(query,conn);
+        if(!insertData(query,conn))
+                return 1;
 
         query = "Select fila_seq.currval from DUAL";
         ArrayList<String[]>queryResult = receiveData(query,conn);
@@ -1824,10 +1886,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return Integer.valueOf(queryResult.get(0)[0]);
     }
 
-    synchronized private void updateQueueEntry(int id, float num, Connection conn){
+    synchronized private boolean updateQueueEntry(int id, float num, Connection conn){
         String query = "UPDATE Compra SET num="+num+" where compra_id="+id;
 
-        insertData(query,conn);
+        return insertData(query,conn);
     }
 
     /**
@@ -1835,10 +1897,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param id    The id of the user requesting the transaction
      * @param conn  Connection to the database
      */
-    synchronized private void removeFromQueue(int id,Connection conn){
+    synchronized private boolean removeFromQueue(int id,Connection conn){
         String query = "Delete from Compra where compra_id = " + id;
 
-        insertData(query,conn);
+        return insertData(query,conn);
     }
 
     /**
@@ -1857,11 +1919,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
 
 
-    private synchronized void checkQueue(Connection conn) {
+    private synchronized boolean checkQueue(Connection conn) {
         ArrayList<String[]> queue = getQueue(conn);
 
         if ( queue == null )
-            return;
+            return false;
 
         for ( int i = 0; i < queue.size(); i++ ) {
             //System.out.println("Iteration "+i);
@@ -1878,22 +1940,24 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try {
                 ret = tryBuyShares(uid, iid, maxpriceshare, num, true, sellingPrice,conn,true);
             } catch (RemoteException ignored) {
-                return;
+                return false;
             }
 
             //System.out.println("cc2 "+i);
             if ( ret.result.equals("OK") ) {
                 //System.out.println("We did it! " + ret);
                 // Remove it from the queue, we've processed it
-                removeFromQueue(id, conn);
+                if(!removeFromQueue(id, conn))
+                    return false;
                 queue.remove(i);
 
                 //Start again, as some of the other queued transactions may potentially take place now
                 i = 0;
             } else if (ret.result.contains("QUEUE")) {
-                updateQueueEntry(id, num-ret.numSharesBought,conn);
+                return updateQueueEntry(id, num-ret.numSharesBought,conn);
             }
         }
+        return true;
     }
 
     /**
@@ -1904,9 +1968,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param price The price of each share for the given idea
      * @throws RemoteException
      */
-    synchronized public void setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
+    synchronized public boolean setSharesIdea(int uid, int iid, int nshares, float price)throws RemoteException{
         /* null here means no transactional connection */
-        setSharesIdea(uid, iid, nshares,price,null);
+        return setSharesIdea(uid, iid, nshares,price,null);
     }
 
     /**
@@ -1918,7 +1982,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param conn Connection to the RMI Server
      * @throws RemoteException
      */
-    private synchronized void setSharesIdea(int uid, int iid,int nshares, float price,
+    private synchronized boolean setSharesIdea(int uid, int iid,int nshares, float price,
                                             Connection conn)throws RemoteException{
         String query = "select * from \"Share\" where userid="+uid+" and "+"iid="+iid;
         //System.out.println("SSI");
@@ -1939,9 +2003,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         //System.out.println("SSIII");
 
         if ( conn == null )
-            insertData(query);
+            return insertData(query);
         else
-            insertData(query,conn);
+            return insertData(query,conn);
 
     }
 
@@ -1954,7 +2018,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param conn  Connection to the RMI Server
      * @param iid Id of the idea whose shares were involved in the transaction
      */
-    synchronized private void insertIntoHistory(int uidBuyer, int uidSeller, int nshares, float price, Connection conn,
+    synchronized private boolean insertIntoHistory(int uidBuyer, int uidSeller, int nshares, float price, Connection conn,
                                                 int iid) {
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
         Date transactionDate = new Date();
@@ -1963,9 +2027,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         query = query + ", to_date('" +  sDate + "','yyyy:mm:dd:hh24:mi:ss'))";
         if ( conn == null )
-            insertData(query);
+            return insertData(query);
         else
-            insertData(query,conn);
+            return insertData(query,conn);
     }
 
     /**
@@ -1973,7 +2037,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param uid The id of the user
      * @throws RemoteException
      */
-    public void updateUserTime(int uid) throws RemoteException{
+    public boolean updateUserTime(int uid) throws RemoteException{
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss");
         Date transactionDate = new Date();
         String sDate= format1.format(transactionDate), queryData;
@@ -1981,7 +2045,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         queryData = "Update Utilizador set dataUltimoLogin = to_date('" + sDate +
                 "','yyyy:mm:dd:hh24:mi:ss') where userid = " + uid;
-        insertData(queryData);
+        return insertData(queryData);
     }
 
     synchronized private boolean setTopicsIdea(int iid, String topicTitle, int uid,
@@ -2013,7 +2077,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         query = "INSERT INTO TopicoIdeia VALUES (" + topic_id + "," + iid + ")";
         //System.out.println("Antes do insert");
-        insertData(query,c);
+        if(!insertData(query,c))
+            return false;
         // System.out.println("Antes do true");
 
         if ( conn == null )
@@ -2034,29 +2099,30 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         return setTopicsIdea ( iid, topicTitle, uid, null);
     }
 
-    synchronized private void addToHallOfFame(int iid, Connection c) {
+    synchronized private boolean addToHallOfFame(int iid, Connection c) {
         String query = "INSERT INTO HallFame VALUES (fame_seq.nextval," + iid + ")";
-        insertData(query, c);
-        query = "update Ideia set activa=0 where iid = "+iid;
-        insertData(query, c);
+        return insertData(query, c);
     }
 
-    synchronized public void takeOver(int iid) throws RemoteException {
+    synchronized public boolean takeOver(int iid) throws RemoteException {
         Connection c = getTransactionalConnection();
-        takeOver(iid, c);
+        boolean devolve = takeOver(iid, c);
         returnTransactionalConnection(c);
+        return devolve;
     }
 
-    synchronized private void takeOver(int iid, Connection c) throws RemoteException {
+    synchronized private boolean takeOver(int iid, Connection c) throws RemoteException {
         ArrayList<Share> currentShares = getSharesIdea(iid, c);
         float marketPrice = getMarketValue(iid);
 
         for ( Share s : currentShares ) {
             //System.out.println("Taking over "+s.getAvailableShares()+"from "+s.getUid()+"!!");
             //System.out.println("T 1!");
-            setSharesIdea(s.getUid(),s.getIid(),0,s.getPrice(),c);
+            if(!setSharesIdea(s.getUid(),s.getIid(),0,s.getPrice(),c))
+                return false;
             //System.out.println("T 3!");
-            setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getAvailableShares()*marketPrice, c);
+            if (!setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getAvailableShares()*marketPrice, c))
+                return false;
             //System.out.println("T 4!");
 
             try {
@@ -2070,7 +2136,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         addToHallOfFame(iid, c);
         //Need to check the queue, as we may have given enough money to a user...
-        checkQueue(c);
+        return checkQueue(c);
     }
 
 
@@ -2193,16 +2259,20 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * version which can operate on a given connection (for things such as transactions...)
      * @param query The query being executed in the database.
      */
-    private void insertData(String query) {
+    private boolean insertData(String query) {
         Connection conn = null;
+        boolean devolve;
+
         try {
             conn = connectionPool.checkOutConnection();
         } catch (SQLException e) {
             //System.err.println("Error checking out connection for insertData");
+            return false;
         }
-        insertData(query, conn);
+        devolve = insertData(query, conn);
         if ( conn != null )
             connectionPool.returnConnection(conn);
+        return devolve;
     }
 
     /**
@@ -2211,11 +2281,13 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @param query The query we want to execute in the database
      * @param conn  The connection to the database
      */
-    private void insertData(String query, Connection conn) {
-        if ( conn == null ) {insertData(query);return;}
+    private boolean insertData(String query, Connection conn) {
+        if ( conn == null )
+            return insertData(query);
         //System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
         boolean cont;
 
+        /*
         do {
             cont = false;
             try{
@@ -2228,8 +2300,17 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             }
 
         } while ( cont );
+        */
+        try{
+            conn.createStatement().executeUpdate(query);
+        }catch(SQLException s){
+            System.err.println("SQLException in the insertData method: "+s.getMessage());
+            return false;
+            //FIXME: HANDLE THIS!!!
+        }
 
         //System.out.println("-------------------------------DONE");
+        return true;
     }
 
     private void execute(){
