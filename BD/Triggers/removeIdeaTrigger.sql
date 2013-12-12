@@ -7,4 +7,7 @@ BEGIN
   DELETE FROM TopicoIdeia where iid = :NEW.iid;
   :NEW.originalfile := null;
   :NEW.path := null;
+EXCEPTION
+  WHEN OTHERS THEN
+    rollback;
 END;

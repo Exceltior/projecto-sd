@@ -8,5 +8,8 @@ BEGIN
     INSERT INTO Topico VALUES (topic_seq.nextval,titulo,user_id);
   END IF;
   Insert into TopicoIdeia VALUES ( (Select tid From Topico where nome like titulo) ,iid);
+EXCEPTION
+  WHEN OTHERS THEN
+    rollback;
 END Idea_Topic;
 
