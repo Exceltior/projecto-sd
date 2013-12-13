@@ -879,41 +879,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         //System.out.println("O preço de venda inicial e " + initialSell);
 
         try{
-            //Run the procedure for creating the idea
-            String procedureCall = "{call Create_Idea(?,?,?,?,?)}";
-            CallableStatement pstmt = conn.prepareCall(procedureCall);
-            pstmt.setString(1,title);
-            pstmt.setString(2,description);
-            pstmt.setInt(3, uid);
-            pstmt.setFloat(4, initialSell);
-            pstmt.registerOutParameter(5, Types.NUMERIC);
-            pstmt.execute();
-            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
-            int verify = pstmt.getInt(5);
-            if (verify == -1)
+            //Create the idea in the database
+            query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +") From dual";
+            queryResult = receiveData(query);
+            if (queryResult == null || queryResult.isEmpty())
                 return -1;
 
-            //Run the function
-            query = "Select getCurrentIid() from dual";
-            queryResult = receiveData(query,conn);
+            iid = Integer.valueOf(queryResult.get(0)[0]);
 
-            iid =  Integer.parseInt(queryResult.get(0)[0]);
+            if (iid == -1)
+                return -1;
 
-            //Run the procedure for associating the idea to the topics
+            //Associate the idea with each topic
             for (String topico : topics){
-                procedureCall = "{call Idea_Topic(?,?,?)}";
-                pstmt = conn.prepareCall(procedureCall);
-                pstmt.setInt(1,iid);
-                pstmt.setString(2,topico);
-                pstmt.setInt(3,uid);
-                pstmt.execute();
-            }
+                query = "Select associateIdeaWithTopic (" + iid + ",'" + topico + "'," + uid + ") From dual";
+                queryResult = receiveData(query);
 
-            pstmt.close();
-        }catch(SQLException s){
-            s.printStackTrace();
-            //FIXME: What to do with this???
-            return -1;
+                if (queryResult == null || queryResult.isEmpty() || Integer.valueOf(queryResult.get(0)[0]) == -1)
+                    return -1;
+            }
         }catch(NumberFormatException n){
             n.printStackTrace();
             //FIXME: What to do with this???
