@@ -884,7 +884,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         try{
             System.err.println("C6");
             //Create the idea in the database
-                query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +") From dual";
+            query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +"," + moneyInvested + ") From dual";
             queryResult = receiveData(query, conn);
             if (queryResult == null || queryResult.isEmpty()){
                 System.err.println("C7");
