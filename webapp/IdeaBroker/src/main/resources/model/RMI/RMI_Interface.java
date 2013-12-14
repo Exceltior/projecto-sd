@@ -2,6 +2,7 @@ package model.RMI;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 import model.data.*;
@@ -39,7 +40,7 @@ public interface RMI_Interface extends Remote {
     public TransactionHistoryEntry[] getHistory(int iid) throws RemoteException;
     public Share getSharesIdeaForUid(int iid, int uid) throws RemoteException;
     public boolean updateUserTime(int uid) throws RemoteException;
-    public boolean addFile(int iid, NetworkingFile file) throws RemoteException;
+    public boolean addFile(int iid, NetworkingFile file,Connection conn) throws RemoteException;
     public NetworkingFile getFile(int iid) throws RemoteException;
     boolean sayTrue() throws RemoteException;
     public boolean setPricesShares(int iid, int uid, float price) throws RemoteException;

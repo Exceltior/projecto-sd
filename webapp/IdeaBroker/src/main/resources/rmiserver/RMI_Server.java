@@ -607,7 +607,8 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String email  = "null";
 
         String query = "Select userid From Utilizador where id_facebook LIKE '" + faceId + "'";
-        ArrayList<String[]> queryResult = receiveData(query);
+        Connection conn = getTransactionalConnection();
+        ArrayList<String[]> queryResult = receiveData(query,conn);
 
         if (queryResult == null || !queryResult.isEmpty())//There is already an account with the given facebook Id
             return -1;
@@ -615,17 +616,23 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         query = "INSERT INTO Utilizador VALUES (user_seq.nextval," + email + ",'" + user + "'," +
                 "null, " + starting_money + ",sysdate, null,0," + faceId +")";
 
-        if(!insertData(query))
+        if(!insertData(query,conn)){
+            returnTransactionalConnection(conn);
             return -1;
+        }
 
         query = "Select userid from Utilizador where id_facebook LIKE '" + faceId +"'";
         queryResult = receiveData(query);
 
-        if (queryResult == null || queryResult.isEmpty())
+        if (queryResult == null || queryResult.isEmpty()){
+            returnTransactionalConnection(conn);
             return -1;
+        }
 
         int uid = Integer.valueOf(queryResult.get(0)[0]);
         updateFacebookToken(uid,token);
+
+        returnTransactionalConnection(conn);
 
         return uid;
     }
@@ -636,10 +643,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * that lastFile's value should be kept in DB, or in a file, not be the result of counting files!
      * @param iid The idea to associate it with
      * @param file The file, which has already been sent by the client
+     * @param conn The connection to the database
      * @return true on success, false on error (may file because we can't create the file)
      * @throws RemoteException
      */
-    synchronized public boolean addFile(int iid, NetworkingFile file) throws RemoteException {
+    synchronized public boolean addFile(int iid, NetworkingFile file,Connection conn) throws RemoteException {
         String path="./"+lastFile+".bin";
 
         try {
@@ -652,7 +660,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         String query = "Update Ideia set path = '" + path + "', originalfile = '" + file.getName() +
                 "' where iid = " + iid;
 
-        if (!insertData(query))
+        if (!insertData(query,conn))
             return false;
 
         updateLastFile();
@@ -922,7 +930,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             //System.out.println("Antes de adicionar o ficheiro");
             //Tratar do ficheiro
             if (file != null)
-                addFile(iid,file); //FIXME: should be able to also receive the connection
+                addFile(iid,file,conn); //FIXME: should be able to also receive the connection
             //System.out.println("Já adicionei o ficheiro");
             System.err.println("C12");
             //FACEBOOK
@@ -1016,17 +1024,21 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public int removeIdea(Idea idea, int uid) throws  RemoteException {
-
+        Connection conn = getTransactionalConnection();
         //Check if user is owner of the idea
         String query = "Select s.userid from \"Share\" s where s.iid = " + idea.getId();
-        ArrayList<String[]> queryResult = receiveData(query);
+        ArrayList<String[]> queryResult = receiveData(query,conn);
 
-        if (queryResult.size() != 1)
+        if (queryResult.size() != 1){
+            returnTransactionalConnection(conn);
             return -2;//User is not owner of the idea
+        }
 
             //Only has one owner
-        else if (Integer.parseInt(queryResult.get(0)[0]) != uid )
+        else if (Integer.parseInt(queryResult.get(0)[0]) != uid ){
+            returnTransactionalConnection(conn);
             return -2;//User is not owner of the idea
+        }
 
         //Here we know that the user is the owner of the idea
         if ( ideaHasFiles(idea.getId()) ) {
@@ -1034,12 +1046,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
 
         query = "update Ideia set activa = 0 where iid="+idea.getId();
-        if(!insertData(query))
+        if(!insertData(query,conn)){
+            returnTransactionalConnection(conn);
             return -1;//Error deleting the idea
+        }
 
         String clientToken = tokens.get(uid);
         query = "Select facebook_id from Ideia where iid = " + idea.getId()+ " and facebook_id IS NOT NULL";
-        queryResult = receiveData(query);
+        queryResult = receiveData(query,conn);
         if (queryResult != null && !queryResult.isEmpty()){
             //Delete post on facebook
             String ideaFacebookId = queryResult.get(0)[0];
@@ -1049,6 +1063,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             doFacebookRemovePost(requestUrl,finalToken);
         }
 
+        returnTransactionalConnection(conn);
         return 1;//Everything ok
 
     }
@@ -1364,21 +1379,25 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      * @throws RemoteException
      */
     public ServerTopic[] getIdeaTopics(int iid) throws RemoteException{
+        Connection conn = getTransactionalConnection();
         String query = "Select * from TopicoIdeia t where t.iid = " + iid;
-        ArrayList<String[]> queryResult = receiveData(query), topic;
+        ArrayList<String[]> queryResult = receiveData(query,conn), topic;
         ServerTopic[] listTopics;
 
-        if (queryResult == null)
+        if (queryResult == null){
+            returnTransactionalConnection(conn);
             return null;
+        }
 
         listTopics = new ServerTopic[queryResult.size()];
         for (int i=0;i<queryResult.size();i++){
             query = "Select t.tid, t.nome, t.userid, count(i.tid) from Topico t, TopicoIdeia i " +
                     "where i.tid = t.tid and t.tid = " + queryResult.get(i)[0] + " group by t.tid, t.nome, t.userid";
-            topic = receiveData(query);
+            topic = receiveData(query,conn);
             listTopics[i] = new ServerTopic(topic.get(0));
         }
 
+        returnTransactionalConnection(conn);
         return listTopics;
     }
 
@@ -2389,7 +2408,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.120";
+        String db = "192.168.56.101";
         if ( args.length == 1)
             db = args[0];
         try{
