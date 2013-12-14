@@ -1739,7 +1739,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             pstmt.execute();
 
             //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
-            int verify = pstmt.getInt(4);
+            int verify = pstmt.getInt(3);
             if (verify == -1){
                 returnTransactionalConnection(conn);
                 return false;
@@ -1776,7 +1776,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             pstmt.execute();
 
             //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
-            int verify = pstmt.getInt(4);
+            int verify = pstmt.getInt(3);
             if (verify == -1){
                 returnTransactionalConnection(conn);
                 return false;
