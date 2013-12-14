@@ -9,6 +9,7 @@ BEGIN
   INSERT INTO "Share" VALUES (idea_seq.currval,user_id,100000,preco);
   UPDATE Utilizador set dinheiro = dinheiro - (Select dinheiro From Utilizador where userid = user_id) where userid = user_id;  
   SELECT idea_seq.currval INTO temp FROM dual;
+  COMMIT;
   return temp;
 EXCEPTION
   WHEN OTHERS THEN
