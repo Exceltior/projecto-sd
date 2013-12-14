@@ -308,6 +308,7 @@ function doBuyShares(id) {
     var message, header, type;
 
     postJSON('buyshares.action', formData,function(data) {
+        console.log("Buy shares action! "+data);
         if ( data.success ) {
             gClosedialog.close();
 
