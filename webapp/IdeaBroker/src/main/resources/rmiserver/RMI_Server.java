@@ -861,45 +861,50 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         float initialSell;
         int iid;
         Connection conn;
-
+        System.err.println("C1");
         if (!validateIdea(title))//Cannot create the idea
             return -1;
-
+        System.err.println("C2");
         conn = getTransactionalConnection();
-
+        System.err.println("C3");
         if (getUserMoney(uid,conn) < moneyInvested){//If the user doesn't have enough money
             //System.err.println("Error while creating the idea! the user doesn't have enought money!" +
             //" " + getUserMoney(uid,conn) + " " + moneyInvested);
+            System.err.println("C4");
             returnTransactionalConnection(conn);
             return -1;
         }
 
+        System.err.println("C5");
         initialSell = starting_shares;
         initialSell = moneyInvested/initialSell;
 
         //System.out.println("O preço de venda inicial e " + initialSell);
 
         try{
+            System.err.println("C6");
             //Create the idea in the database
                 query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +") From dual";
-            queryResult = receiveData(query);
+            queryResult = receiveData(query, conn);
             if (queryResult == null || queryResult.isEmpty()){
+                System.err.println("C7");
                 returnTransactionalConnection(conn);
                 return -1;
             }
-
+            System.err.println("C8");
             iid = Integer.valueOf(queryResult.get(0)[0]);
 
             if (iid == -1){
                 returnTransactionalConnection(conn);
                 return -1;
             }
-
+            System.err.println("C9");
             //Associate the idea with each topic
             for (String topico : topics){
                 query = "Select associateIdeaToTopic (" + iid + ",'" + topico + "'," + uid + ") From dual";
-                queryResult = receiveData(query);
-
+                System.err.println("C11");
+                queryResult = receiveData(query, conn);
+                System.err.println("C111");
                 if (queryResult == null || queryResult.isEmpty() || Integer.valueOf(queryResult.get(0)[0]) == -1){
                     returnTransactionalConnection(conn);
                     return -1;
@@ -911,21 +916,22 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             returnTransactionalConnection(conn);
             return -1;
         }
-
+        System.err.println("C10");
         if (queryResult.size()>0){
-
+            System.err.println("C11");
             //System.out.println("Antes de adicionar o ficheiro");
             //Tratar do ficheiro
             if (file != null)
-                addFile(iid,file);
+                addFile(iid,file); //FIXME: should be able to also receive the connection
             //System.out.println("Já adicionei o ficheiro");
-
+            System.err.println("C12");
             //FACEBOOK
             String clientToken = tokens.get(uid);
             if ( clientToken == null ) {
                 System.out.println("Invalid or no token in hashmap");
-
+                System.err.println("C13");
             } else {
+                System.err.println("C14");
                 //System.out.println("S1");
                 String message = "O user " + getUsername(uid) + " criou a ideia '"+title+"' com o conteúdo '"+description+"' com " +
                         "um " +
@@ -933,14 +939,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 Token finalToken = new Token(clientToken,AppSecret);
 
                 String messageId = doFacebookWallPost("https://graph.facebook.com/me/feed",message,finalToken);
-
+                System.err.println("C15");
                 if (messageId != null)
                     addIdeaFacebookId(iid,messageId,conn);
             }
         }
         else
             iid = -1;
-
+        System.err.println("C16");
         returnTransactionalConnection(conn);
         //System.out.println("Vou retornar " + iid +" no createIdea");
         return iid;
@@ -2208,7 +2214,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<String[]> result = new ArrayList<String[]>();
         Statement statement = null;
 
-        //System.out.println("\n-------------------------------\nRunning query: "+query);
+        System.out.println("\n-------------------------------\nRunning query: "+query);
 
         boolean cont;
         do {
@@ -2216,7 +2222,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             try {
                 statement = conn.createStatement();
             } catch (SQLException e) {
-                //System.err.println("Error creating SQL statement '" + query + "'!");
+                System.err.println("Error creating SQL statement '" + query + "'!");
                 cont = true;
             }
         } while ( cont );
@@ -2239,11 +2245,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                 }
                 statement.close();
             } catch (SQLException e) {
-                //System.err.println("Error executing SQL query '" + query + "'!");
+                System.err.println("Error executing SQL query '" + query + "'! " +  e.getMessage());
                 cont = true;
             }
         } while ( cont );
-        //System.out.println("-------------------------------DONE");
+        System.out.println("-------------------------------DONE");
         return result;
     }
 
@@ -2313,7 +2319,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     private boolean insertData(String query, Connection conn) {
         if ( conn == null )
             return insertData(query);
-        //System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
+        System.out.println("\n-------------------------------\nRunning inseeeeeert query: "+query);
         boolean cont;
 
         /*
@@ -2338,7 +2344,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             //FIXME: HANDLE THIS!!!
         }
 
-        //System.out.println("-------------------------------DONE");
+        System.out.println("-------------------------------DONE");
         return true;
     }
 
@@ -2383,7 +2389,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     public static void main(String[] args) {
         System.getProperties().put("java.security.policy", "policy.all");
         System.setSecurityManager(new RMISecurityManager());
-        String db = "192.168.56.101";
+        String db = "192.168.56.120";
         if ( args.length == 1)
             db = args[0];
         try{
