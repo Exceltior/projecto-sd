@@ -139,14 +139,14 @@ public class SubmitIdeaAction extends AJAXAction {
      */
     public void doAjaxWork() {
 
-        //System.out.println("moneyInvested: "+moneyInvested);
-        //System.out.println("title: "+title);
-        //System.out.println("topicsList: "+topicsList);
+        System.out.println("moneyInvested: "+moneyInvested);
+       System.out.println("title: "+title);
+      System.out.println("topicsList: "+topicsList);
 
         NetworkingFile userFile = null;
 
         if (file != null){
-            //System.out.println("Ideia submetida e tem " + file.getPath() + " como caminho para o ficheiro");
+            System.out.println("Ideia submetida e tem " + file.getPath() + " como caminho para o ficheiro");
             try {
                 userFile = new NetworkingFile(file.getPath());
             } catch (FileNotFoundException e) {
@@ -161,11 +161,11 @@ public class SubmitIdeaAction extends AJAXAction {
         topics = getTopicsFromList(topicsList.split("#"));
 
         if (client.doSubmitIdea(idea,topics,moneyInvested,userFile)){
-            //System.out.println("Correu bem a submissao da ideia!!!!!!!!");
+            System.out.println("Correu bem a submissao da ideia!!!!!!!!");
             ajaxSuccess();
         }
         else{
-            //System.out.println("Correu mal a submissao da ideia!!!!!!!");
+            System.out.println("Correu mal a submissao da ideia!!!!!!!");
             ajaxFailure();
         }
 
