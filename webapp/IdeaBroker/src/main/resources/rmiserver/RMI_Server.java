@@ -870,6 +870,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if (getUserMoney(uid,conn) < moneyInvested){//If the user doesn't have enough money
             //System.err.println("Error while creating the idea! the user doesn't have enought money!" +
             //" " + getUserMoney(uid,conn) + " " + moneyInvested);
+            returnTransactionalConnection(conn);
             return -1;
         }
 
@@ -882,25 +883,32 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             //Create the idea in the database
             query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +") From dual";
             queryResult = receiveData(query);
-            if (queryResult == null || queryResult.isEmpty())
+            if (queryResult == null || queryResult.isEmpty()){
+                returnTransactionalConnection(conn);
                 return -1;
+            }
 
             iid = Integer.valueOf(queryResult.get(0)[0]);
 
-            if (iid == -1)
+            if (iid == -1){
+                returnTransactionalConnection(conn);
                 return -1;
+            }
 
             //Associate the idea with each topic
             for (String topico : topics){
                 query = "Select associateIdeaWithTopic (" + iid + ",'" + topico + "'," + uid + ") From dual";
                 queryResult = receiveData(query);
 
-                if (queryResult == null || queryResult.isEmpty() || Integer.valueOf(queryResult.get(0)[0]) == -1)
+                if (queryResult == null || queryResult.isEmpty() || Integer.valueOf(queryResult.get(0)[0]) == -1){
+                    returnTransactionalConnection(conn);
                     return -1;
+                }
             }
         }catch(NumberFormatException n){
             n.printStackTrace();
             //FIXME: What to do with this???
+            returnTransactionalConnection(conn);
             return -1;
         }
 
@@ -1166,7 +1174,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         if ( numShares > 0 ) {
             if ( !addToQueueOnFailure ) {
-                ret.result = "NOBUY.NOMOREMONEY"; return ret;
+                ret.result = "NOBUY.NOMOREMONEY";
+                if ( conn == null )
+                    returnTransactionalConnection(c);
+                return ret;
             }
 
             //Can't buy shares!!!
@@ -1186,26 +1197,41 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             //  System.out.println("Buying "+num+"from "+s.getUid()+"!!");
             // System.out.println("^That menas that s.getPriceForNum(num) = "+s.getPriceForNum(num));
             // System.out.println("H 1!");
-            if(!setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),c))
+            if(!setSharesIdea(s.getUid(),s.getIid(),resultingShares,s.getPrice(),c)){
+                if ( conn == null )
+                    returnTransactionalConnection(c);
                 return null;
+            }
             //System.out.println("H 2!");
-            if(!insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid))
+            if(!insertIntoHistory(uid, s.getUid(), num,s.getPrice(),c,iid)){
+                if ( conn == null )
+                    returnTransactionalConnection(c);
                 return null;
+            }
             //System.out.println("H 3!");
-            if(!setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getPriceForNum(num), c))
+            if(!setUserMoney(s.getUid(), getUserMoney(s.getUid()) + s.getPriceForNum(num), c)){
+                if ( conn == null )
+                    returnTransactionalConnection(c);
                 return null;
+            }
 
             //System.out.println("H 4!");
         }
 
         //System.out.println("Before setSharesIdea");
-        if(!setSharesIdea(uid,iid,startingShares+totalSharesBought,targetSell,c))
+        if(!setSharesIdea(uid,iid,startingShares+totalSharesBought,targetSell,c)){
+            if ( conn == null )
+                returnTransactionalConnection(c);
             return null;
+        }
 
 
         //System.out.println("Before setUserMoney");
-        if(!setUserMoney(uid,userMoney, c))
+        if(!setUserMoney(uid,userMoney, c)){
+            if ( conn == null )
+                returnTransactionalConnection(c);
             return null;
+        }
 
         //Set it to the last transaction price that happened
         if (s != null)
@@ -1308,14 +1334,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             // Need to queue! But how many? we can calculate them
             //System.out.println("Need to add to queue!");
             Connection conn = getTransactionalConnection();
-            if (!checkQueue(conn))
+            if (!checkQueue(conn)){
+                returnTransactionalConnection(conn);
                 return null;
+            }
             insertIntoQueue(uid,iid,buyNumShares-ret.numSharesBought,maxPricePerShare,targetSellPrice,conn);
             returnTransactionalConnection(conn);
         } else if ( ret.result.equals("OK") ) {
             Connection conn = getTransactionalConnection();
-            if(!checkQueue(conn))
+            if(!checkQueue(conn)){
+                returnTransactionalConnection(conn);
                 return null;
+            }
             returnTransactionalConnection(conn);
         }
         return ret;
@@ -1478,12 +1508,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         else c = getTransactionalConnection();
 
         String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
-        if (!insertData(query,c))
+        if (!insertData(query,c)){
+            if (conn == null)
+                returnTransactionalConnection(c);
             return false;
+        }
         //System.out.println("OKAY, updated!");
         if ( checkQueue )
-            if (!checkQueue(c))
+            if (!checkQueue(c)){
+                if (conn == null)
+                    returnTransactionalConnection(c);
                 return false;
+            }
         //System.out.println("OKAY, updated right after!");
         if ( conn == null )
             returnTransactionalConnection(c);
@@ -1517,8 +1553,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             pstmt.execute();
             //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
             int verify = pstmt.getInt(4);
-            if (verify == -1)
+            if (verify == -1){
+                returnTransactionalConnection(conn);
                 return false;
+            }
         }catch(SQLException s){
             s.printStackTrace();
             //FIXME: HANDLE THIS!
@@ -1677,8 +1715,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
             int verify = pstmt.getInt(4);
-            if (verify == -1)
+            if (verify == -1){
+                returnTransactionalConnection(conn);
                 return false;
+            }
         }catch(SQLException s){
             s.printStackTrace();
             //FIXME: HANDLE THIS!!!
@@ -1712,8 +1752,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
             int verify = pstmt.getInt(4);
-            if (verify == -1)
+            if (verify == -1){
+                returnTransactionalConnection(conn);
                 return false;
+            }
         }catch(SQLException s){
             s.printStackTrace();
             //FIXME: HANDLE THIS!!!
@@ -2061,8 +2103,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         query = "INSERT INTO TopicoIdeia VALUES (" + topic_id + "," + iid + ")";
         //System.out.println("Antes do insert");
-        if(!insertData(query,c))
+        if(!insertData(query,c)){
+            if (conn == null)
+                returnTransactionalConnection(c);
             return false;
+        }
         // System.out.println("Antes do true");
 
         if ( conn == null )
