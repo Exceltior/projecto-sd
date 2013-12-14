@@ -1,2 +1,2 @@
-Create user Bases_Dados identified by bd2013;
-Grant connect,resource,dba to Alan;
+Create user sd identified by sd;
+Grant connect,resource,dba to sd;
