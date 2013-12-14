@@ -1316,7 +1316,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         }
         if ( ret.result.isEmpty() )
             ret.result = "OK";
-        // System.out.println("I'm leaving! " + ret);
+         System.out.println("I'm leaving! " + ret);
         return ret;
 
     }
@@ -1335,14 +1335,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
                                      boolean addToQueueOnFailure, float targetSellPrice) throws RemoteException {
         BuySharesReturn ret = tryBuyShares(uid,iid,maxPricePerShare,buyNumShares,addToQueueOnFailure,targetSellPrice,
                 null, false);
-        //System.out.println("Got out of tryBuyShares");
+        System.out.println("Got out of tryBuyShares. Ret:"+ret);
         if ( ret.result.contains("QUEUED.") ) {
             // Need to queue! But how many? we can calculate them
             //System.out.println("Need to add to queue!");
             Connection conn = getTransactionalConnection();
             if (!checkQueue(conn)){
                 returnTransactionalConnection(conn);
-                return null;
+                return ret;
             }
             insertIntoQueue(uid,iid,buyNumShares-ret.numSharesBought,maxPricePerShare,targetSellPrice,conn);
             returnTransactionalConnection(conn);
@@ -1350,7 +1350,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             Connection conn = getTransactionalConnection();
             if(!checkQueue(conn)){
                 returnTransactionalConnection(conn);
-                return null;
+                return ret;
             }
             returnTransactionalConnection(conn);
         }
