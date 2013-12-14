@@ -43,7 +43,8 @@ function searchIdea() {
 }
 
 function onIdeaformChange() {
-    var investmentbox = $('#ideainvestment');
+
+    var investmentbox = $('#moneyInvested');
     var modalsubmitbutton = $('#modalsubmitbutton');
     console.log("val: "+investmentbox.val());
     if ( investmentbox.val().length == 0 || !isValidPositiveNum(investmentbox.val()) ) {
@@ -112,10 +113,41 @@ function onSubmitIdeaFailure() {
 }
 
 function doSubmitIdea() {
+    $("form#createideadata").submit(function(){
+
+        var formData = new FormData($(this)[0]);
+        console.log(formData);
+        $.ajax({
+            url: 'submitidea.action',
+            type: 'POST',
+            data: formData,
+            beforeSend: function (xhr){
+                xhr.setRequestHeader("Accept","text/json");
+            },
+            async: false,
+            success: function (data) {
+                console.log(data);
+                if ( data.success ) {
+                    onSubmitIdeaSuccess();
+                } else {
+                    onSubmitIdeaFailure();
+                }
+
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+
+        return false;
+    });
+
+    $('#submitIt').click();
+    return;/*
     title = $('#ideatitle').val();
     body = $('#ideabody').val();
     topics = $('#ideatopics').val();
-    moneyinvested = $('#ideainvestment').val();
+    moneyinvested = $('#moneyInvested').val();
     console.log('t: '+title);
     console.log('bo: '+body);
     console.log('to: '+topics);
@@ -127,14 +159,24 @@ function doSubmitIdea() {
                 onSubmitIdeaFailure();
             }
         }
-    );
+    );*/
+}
+
+function btnchange() {
+    console.log("woohoo!");
+        var input = $('#file'),
+            label = input.val().replace(/C:\\fakepath\\/i, '');;
+    console.log(input);
+    console.log(label);
+    $('#ficheirodeisugaalmas').val(label);
 }
 function createIdea() {
 
     var html =
-        '<div class="input-group" style="padding-bottom:10px;">' +
+        '<form id="createideadata" method="post" enctype="multipart/form-data" action="submitidea.action">' +
+            '<div class="input-group" style="padding-bottom:10px;">' +
             '<span class="input-group-addon" >Título: </span>' +
-            '<input onkeyup="onIdeaformChange()" type="text" class="form-control" placeholder="Exemplo: DEI Suga Almas" id="ideatitle"/>' +
+            '<input onkeyup="onIdeaformChange()" type="text" class="form-control" placeholder="Exemplo: DEI Suga Almas" name="title" id="title"/>' +
             '</div>' +
             '<div class="input-group"   style="padding-bottom:10px;">' +
             '<span class="input-group-addon">Conteúdo: </span>' +
@@ -142,18 +184,28 @@ function createIdea() {
             'rows="3"' +
             'type="textarea"' +
             'class="form-control"' +
-            'placeholder="Exemplo: 90% do meu tempo útil é passado no DEI" id="ideabody"/>' +
+            'placeholder="Exemplo: 90% do meu tempo útil é passado no DEI" id="body" name="body"/>' +
             '</div>' +
             '<div class="input-group"  style="padding-bottom:10px;">' +
             '<span class="input-group-addon">Tópicos: </span>' +
-            '<input onkeyup="onIdeaformChange()" type="text" class="form-control" placeholder="Exemplo #Topico1 #Topico2 #TopicoTrês" id="ideatopics"/>' +
-            '</div>'+
+            '<input onkeyup="onIdeaformChange()" type="text" class="form-control" placeholder="Exemplo #Topico1 #Topico2 #TopicoTrês" name="topicsList" id="topicsList"/>' +
+            '</div>' +
             '<div class="input-group">' +
             '<span class="input-group-addon">Investimento Inicial: </span>' +
-            '<input type="text" class="form-control" placeholder="Exemplo: 19930507.1605" id="ideainvestment"' +
+            '<input type="text" class="form-control" placeholder="Exemplo: 19930507.1605" name="moneyInvested" id="moneyInvested" ' +
             '' +
             'onkeyup="onIdeaformChange()"/>' +
-            '</div>';
+            '</div>' +
+            '<br /><div class="input-group">' +
+            '<span class="input-group-btn">' +
+            '<span class="btn btn-primary btn-file" onchange="btnchange()">Adicionar ficheiro...' +
+            '<input id="file" name="file" type="file" multiple="" >' +
+            '</span>' +
+            '</span>' +
+            '<input type="text" id="ficheirodeisugaalmas" class="form-control" readonly="">' +
+            '</div>' +
+            '<button type="submit" id="submitIt" class="btn btn-success btn-sm" style="display: none;">' +
+            '</form>';
 
     var message = function(dialogRef){
         var $message =
