@@ -881,7 +881,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
         try{
             //Create the idea in the database
-            query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +") From dual";
+                query = "Select createIdea('" + title + "','" + description + "'," + uid + "," + initialSell +") From dual";
             queryResult = receiveData(query);
             if (queryResult == null || queryResult.isEmpty()){
                 returnTransactionalConnection(conn);
@@ -897,7 +897,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
             //Associate the idea with each topic
             for (String topico : topics){
-                query = "Select associateIdeaWithTopic (" + iid + ",'" + topico + "'," + uid + ") From dual";
+                query = "Select associateIdeaToTopic (" + iid + ",'" + topico + "'," + uid + ") From dual";
                 queryResult = receiveData(query);
 
                 if (queryResult == null || queryResult.isEmpty() || Integer.valueOf(queryResult.get(0)[0]) == -1){

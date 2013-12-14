@@ -233,7 +233,7 @@ public class Client {
         int result;
 
         try{
-            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), getUid(), moneyInvested, topicos, file);
+            result = rmi.getRMIInterface().createIdea(ideia.getTitle(), ideia.getBody(), uid, moneyInvested, topicos, file);
 
             if (result > 0)
                 devolve = true;
