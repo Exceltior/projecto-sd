@@ -1,5 +1,3 @@
-DROP PROCEDURE addToWatchList;
-
 CREATE OR REPLACE PROCEDURE addToWatchList (idea_id IN NUMBER, user_id IN NUMBER, temp OUT NUMBER) IS
 BEGIN
   temp := -1;

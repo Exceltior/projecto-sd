@@ -1,5 +1,3 @@
-DROP TRIGGER removeIdeia;
-
 CREATE OR REPLACE TRIGGER removeIdeia BEFORE UPDATE OF activa ON Ideia FOR EACH ROW WHEN ( new.activa = 0)
 DECLARE
 BEGIN  

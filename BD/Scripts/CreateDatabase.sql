@@ -1,0 +1,10 @@
+@@ CreateTables
+@@ InsertData
+@@ addToHallofFameTrigger
+@@ removeIdeaTrigger
+@@ setSharesTrigger
+@@ removeFromWatchListProcedure
+@@ addToWatchListProcedure
+@@ setSharesProcedure
+@@ associateIdeaToTopicFunction
+@@ createIdeaFunction

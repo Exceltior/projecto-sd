@@ -1,5 +1,3 @@
-DROP FUNCTION createIdea;
-
 CREATE OR REPLACE FUNCTION createIdea (titulo IN Varchar2, descricao IN Varchar2, user_id IN NUMBER, preco IN Number, invested IN NUMBER) RETURN NUMBER IS  
 PRAGMA AUTONOMOUS_TRANSACTION;
 temp NUMBER := -1;
