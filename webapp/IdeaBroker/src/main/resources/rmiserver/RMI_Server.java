@@ -1355,18 +1355,12 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
             // Need to queue! But how many? we can calculate them
             //System.out.println("Need to add to queue!");
             Connection conn = getTransactionalConnection();
-            if (!checkQueue(conn)){
-                returnTransactionalConnection(conn);
-                return ret;
-            }
+            checkQueue(conn);
             insertIntoQueue(uid,iid,buyNumShares-ret.numSharesBought,maxPricePerShare,targetSellPrice,conn);
             returnTransactionalConnection(conn);
         } else if ( ret.result.equals("OK") ) {
             Connection conn = getTransactionalConnection();
-            if(!checkQueue(conn)){
-                returnTransactionalConnection(conn);
-                return ret;
-            }
+            checkQueue(conn);
             returnTransactionalConnection(conn);
         }
         return ret;
@@ -1532,19 +1526,28 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         if ( conn != null) c = conn;
         else c = getTransactionalConnection();
 
-        String query = "Update \"Share\" set valor = " + price + " where userid = " + uid + " and iid = " + iid;
-        if (!insertData(query,c)){
-            if (conn == null)
-                returnTransactionalConnection(c);
-            return false;
+        try{
+            //Run the procedure for creating the idea
+            String procedureCall = "{call setSharePriceProcedure(?,?,?,?)}";
+            CallableStatement pstmt = c.prepareCall(procedureCall);
+            pstmt.setInt(1,iid);
+            pstmt.setInt(2,uid);
+            pstmt.setFloat(3, price);
+            pstmt.registerOutParameter(4, Types.NUMERIC);
+            pstmt.execute();
+            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
+            int verify = pstmt.getInt(4);
+            if (verify == -1){
+                returnTransactionalConnection(conn);
+                return false;
+            }
+        }catch(SQLException s){
+            s.printStackTrace();
+            //FIXME: HANDLE THIS!
         }
         //System.out.println("OKAY, updated!");
         if ( checkQueue )
-            if (!checkQueue(c)){
-                if (conn == null)
-                    returnTransactionalConnection(c);
-                return false;
-            }
+            checkQueue(c);
         //System.out.println("OKAY, updated right after!");
         if ( conn == null )
             returnTransactionalConnection(c);
@@ -1562,34 +1565,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
      */
     synchronized public boolean setPricesShares(int iid, int uid, float price) throws RemoteException{
 
-        //return setPricesSharesInternal(iid, uid, price, null, true);
-        Connection conn;
-
-        conn = getTransactionalConnection();
-
-        try{
-            //Run the procedure for creating the idea
-            String procedureCall = "{call setSharePriceProcedure(?,?,?,?)}";
-            CallableStatement pstmt = conn.prepareCall(procedureCall);
-            pstmt.setInt(1,iid);
-            pstmt.setInt(2,uid);
-            pstmt.setFloat(3, price);
-            pstmt.registerOutParameter(4, Types.NUMERIC);
-            pstmt.execute();
-            //The procedure "returns" an Integer value, which will indicate the success or failure of the operation
-            int verify = pstmt.getInt(4);
-            if (verify == -1){
-                returnTransactionalConnection(conn);
-                return false;
-            }
-        }catch(SQLException s){
-            s.printStackTrace();
-            //FIXME: HANDLE THIS!
-        }
-
-        returnTransactionalConnection(conn);
-
-        return true;
+        return setPricesSharesInternal(iid, uid, price, null, true);
     }
 
     /**
@@ -1974,7 +1950,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         ArrayList<String[]> queue = getQueue(conn);
 
         if ( queue == null )
-            return false;
+            return true; //ESTAVA VAZIA.
 
         for ( int i = 0; i < queue.size(); i++ ) {
             //System.out.println("Iteration "+i);
