@@ -9,5 +9,5 @@ BEGIN
   :NEW.path := null;
 EXCEPTION
   WHEN OTHERS THEN
-    rollback;
+    ROLLBACK;
 END;

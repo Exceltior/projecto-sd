@@ -6,5 +6,5 @@ BEGIN
   UPDATE Ideia set activa = 0 where iid = :NEW.iid;
 EXCEPTION
   WHEN OTHERS THEN
-    rollback;
+    ROLLBACK;
 END;
