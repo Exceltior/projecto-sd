@@ -1,4 +1,4 @@
-package rmiserver;
+package rmiserver; //NUNCA MAIS TOCO NESTA MERDA!
 
 import model.RMI.RMINotificationCallbackInterface;
 import model.RMI.RMI_Interface;
